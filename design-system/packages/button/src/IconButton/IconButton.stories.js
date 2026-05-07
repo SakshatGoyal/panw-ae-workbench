@@ -39,7 +39,7 @@ const sharedArgTypes = {
   size: {
     options: ['sm', 'md', 'lg'],
     control: { type: 'select' },
-    description: 'sm=32px, md=40px, lg=48px (padding-based)',
+    description: 'sm=32/36, md=40/44, lg=48/52 (locked width = height per size × iconSize)',
     table: { defaultValue: { summary: '"sm"' } },
   },
   iconSize: {

@@ -8,17 +8,34 @@
 // Stage's call: single corner (radius.tight = 4px). Brand-vs-neutral split is
 // preserved because at icon size the glyph carries color intent — explicit
 // ghost vs ghost-accent matters in a way it doesn't for text buttons.
+//
+// Square is a contract, not a calculation. Earlier the size came from
+// padding plus the intrinsic icon dimensions — correct on paper, fragile in
+// practice: any flex parent with default stretch alignment, any grid column
+// sized off a larger sibling, any toolbar with a fixed row height would
+// rectangle the chip without warning. The current implementation locks
+// width and height explicitly per size × icon-size combo, refuses to
+// flex-grow or stretch, and falls back to aspect-ratio if a consumer's
+// override removes one dimension. Six locked combos:
+//
+//   sm + 16 → 32×32     md + 16 → 40×40     lg + 16 → 48×48
+//   sm + 20 → 36×36     md + 20 → 44×44     lg + 20 → 52×52
 // =============================================================================
 
 // ─── Base ────────────────────────────────────────────────────────────────────
 
 .panw--btn-icon {
   @include button-reset;
-  padding: 0.5rem;
+  padding: 0;                  // size comes from width/height, not padding
   border: none;
-  border-radius: 4px; // radius.tight — Stage's single icon-button corner.
+  border-radius: 4px;          // radius.tight — Stage's single icon-button corner
   line-height: 0;
   color: var(--panw-icon-button-ghost-color);
+
+  // Refuse to be reshaped by parent layout.
+  flex: 0 0 auto;              // never grow or shrink in a flex parent
+  place-self: center;          // never stretch in a grid cell
+  aspect-ratio: 1 / 1;         // backstop if a consumer overrides w or h
 }
 
 // ─── Icon wrapper ─────────────────────────────────────────────────────────────
@@ -48,14 +65,17 @@
   svg { width: 1.25rem; height: 1.25rem; }
 }
 
-// ─── Sizes (padding-based) ────────────────────────────────────────────────────
-// sm: 8px padding  → 32px (16px icon) / 36px (20px icon)
-// md: 12px padding → 40px (16px icon) / 44px (20px icon)
-// lg: 16px padding → 48px (16px icon) / 52px (20px icon)
+// ─── Sizes (locked width × height per size × icon-size) ─────────────────────
+// The matrix is explicit so consumers reading either axis alone still get
+// the same square. The OUTER button carries both classes; the inner span
+// keeps __icon--16 / __icon--20 for the glyph itself.
 
-.panw--btn-icon--sm { padding: 0.5rem; }
-.panw--btn-icon--md { padding: 0.75rem; }
-.panw--btn-icon--lg { padding: 1rem; }
+.panw--btn-icon--sm.panw--btn-icon--icon-16 { width: 2rem;    height: 2rem; }    //  32 × 32
+.panw--btn-icon--sm.panw--btn-icon--icon-20 { width: 2.25rem; height: 2.25rem; } //  36 × 36
+.panw--btn-icon--md.panw--btn-icon--icon-16 { width: 2.5rem;  height: 2.5rem; }  //  40 × 40
+.panw--btn-icon--md.panw--btn-icon--icon-20 { width: 2.75rem; height: 2.75rem; } //  44 × 44
+.panw--btn-icon--lg.panw--btn-icon--icon-16 { width: 3rem;    height: 3rem; }    //  48 × 48
+.panw--btn-icon--lg.panw--btn-icon--icon-20 { width: 3.25rem; height: 3.25rem; } //  52 × 52
 
 // ─── Kinds ────────────────────────────────────────────────────────────────────
 

@@ -24,7 +24,12 @@ export const IconButtonKinds = [
 export type IconButtonKind = (typeof IconButtonKinds)[number];
 
 /**
- * sm=32px, md=40px, lg=48px (padding-based; icon dimensions controlled by iconSize).
+ * Locked square dimensions per size × iconSize:
+ *   sm + 16 → 32×32   md + 16 → 40×40   lg + 16 → 48×48
+ *   sm + 20 → 36×36   md + 20 → 44×44   lg + 20 → 52×52
+ *
+ * The button refuses to flex-grow or grid-stretch — the chip is square
+ * by contract, not by intrinsic content sizing.
  *
  * In-field affordance pattern: pair the IconButton size with the field's
  * own size so the button fills the field row height — number-input is the
@@ -82,10 +87,16 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
 
     const supportsSelected = kind === 'ghost' || kind === 'ghost-accent';
 
+    // Both size AND iconSize land on the outer button. The CSS combines
+    // them to lock explicit width/height — square is a contract, not a
+    // calculation, so a parent flex/grid layout can't stretch the button
+    // into a rectangle. The inner span keeps its own --icon-NN class for
+    // glyph dimensions.
     const buttonClasses = classNames(className, {
       [`${prefix}--btn-icon`]: true,
       [`${prefix}--btn-icon--${kind}`]: kind,
       [`${prefix}--btn-icon--${size}`]: size,
+      [`${prefix}--btn-icon--icon-${iconSize}`]: iconSize,
       [`${prefix}--btn-icon--selected`]: isSelected && supportsSelected,
       [`${prefix}--btn-icon--disabled`]: disabled,
     });

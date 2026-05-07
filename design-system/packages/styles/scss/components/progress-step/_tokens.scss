@@ -35,5 +35,11 @@
   --panw-ps-title:           var(--ds-text-primary);
   --panw-ps-description:     var(--ds-text-tertiary-rest);
 
-  --panw-ps-hover-bg:        var(--ds-highlight-hover);
+  // Hover signal lives in the connector line, not the surface — the progress
+  // step's identity is its colored top-border, so the hover affordance lives
+  // there too. Status lines (success/warning/caution/error) keep their family
+  // on hover (they're already loud enough to read interactive when clickable);
+  // the neutral 'inactive' line shifts to brand on hover to communicate
+  // affordance against the otherwise-quiet grey.
+  --panw-ps-border-inactive-hover: var(--ds-lines-brand-rest);
 }

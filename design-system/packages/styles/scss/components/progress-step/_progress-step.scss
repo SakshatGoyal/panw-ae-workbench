@@ -129,7 +129,9 @@
 .panw--ps-step--active   { border-top-color: var(--panw-ps-border-active); }
 .panw--ps-step--inactive { border-top-color: var(--panw-ps-border-inactive); }
 
-.panw--ps-step--hover,
-.panw--ps-step:hover {
-  background-color: var(--panw-ps-hover-bg);
+// Hover lives in the line, not the surface. Only the neutral 'inactive'
+// step shifts its line family on hover; status-typed lines stay put.
+.panw--ps-step--inactive:hover[role='button'],
+.panw--ps-step--inactive.panw--ps-step--hover {
+  border-top-color: var(--panw-ps-border-inactive-hover);
 }

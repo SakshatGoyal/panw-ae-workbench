@@ -57,6 +57,19 @@
   --panw-button-ghost-text:         var(--ds-text-primary);
   --panw-button-ghost-text-disabled: var(--ds-text-secondary-disabled);
 
+  // ── Ghost-brand (transparent, brand text) ─────────────────────────────────
+  // The borderless counterpart to tertiary. Tertiary commits with a chip
+  // (border + brand text); ghost-brand commits with the text alone. Hover
+  // lifts to highlight.* (alpha-brand engaged ground) — same family as
+  // tertiary, signaling "soft brand action" without the chip affordance.
+  --panw-button-ghost-brand-bg:           var(--ds-ghost-rest);
+  --panw-button-ghost-brand-bg-hover:     var(--ds-highlight-hover);
+  --panw-button-ghost-brand-bg-active:    var(--ds-highlight-pressed);
+  --panw-button-ghost-brand-text:         var(--ds-text-brand-rest);
+  --panw-button-ghost-brand-text-hover:   var(--ds-text-brand-hover);
+  --panw-button-ghost-brand-text-pressed: var(--ds-text-brand-pressed);
+  --panw-button-ghost-brand-text-disabled: var(--ds-text-brand-disabled);
+
   // ── Danger ────────────────────────────────────────────────────────────────
   --panw-button-danger-bg:           var(--ds-surface-danger-rest);
   --panw-button-danger-bg-hover:     var(--ds-surface-danger-hover);

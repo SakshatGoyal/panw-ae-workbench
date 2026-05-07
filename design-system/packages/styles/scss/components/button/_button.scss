@@ -144,6 +144,29 @@
   }
 }
 
+// Ghost-brand — transparent, brand text. Borderless counterpart to tertiary;
+// hover lifts to highlight.* (alpha-brand engaged ground). Disabled is
+// content-led: surface stays transparent, text drops to text.brand.disabled.
+.panw--btn--ghost-brand {
+  background-color: var(--panw-button-ghost-brand-bg);
+  color: var(--panw-button-ghost-brand-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-ghost-brand-bg-hover);
+    color: var(--panw-button-ghost-brand-text-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-ghost-brand-bg-active);
+    color: var(--panw-button-ghost-brand-text-pressed);
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: var(--panw-button-ghost-brand-text-disabled);
+  }
+}
+
 // Danger — red filled, inverse text. Surface.danger.disabled (red30) is the
 // carve-out where the surface itself dims rather than content.
 .panw--btn--danger {

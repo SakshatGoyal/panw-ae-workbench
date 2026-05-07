@@ -35,12 +35,13 @@
 
 /// Typography for standard (text) buttons.
 ///
-/// Stage's call: 600 weight, no decorative letter-spacing. Inter at 14px /
-/// 600 / 18px is legible at all three button heights, and dropping the 0.25px
-/// tracking removes a literal that wasn't carrying its weight.
+/// Stage's call: regular weight (400). 600 read as too-loud at button scale —
+/// finance/sales surfaces favor density and quiet labels. The button geometry
+/// (radius, border, fill) does the affordance work; the label sits at body
+/// weight. No decorative letter-spacing.
 @mixin button-typography {
   font-family: var(--ds-type-font-family-sans, 'Inter', sans-serif);
-  font-weight: 600;
+  font-weight: 400;
   font-size: 0.875rem;
   line-height: 1.286;
 }

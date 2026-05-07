@@ -21,7 +21,7 @@ const iconMap = {
 
 const sharedArgTypes = {
   kind: {
-    options: ['primary', 'secondary', 'tertiary', 'ghost', 'danger'],
+    options: ['primary', 'secondary', 'tertiary', 'ghost', 'ghost-brand', 'danger'],
     control: { type: 'select' },
     description:
       'Visual style variant. Five canonical kinds; brand-vs-neutral intent ' +
@@ -131,6 +131,11 @@ export const Ghost = () => (
   <Button kind="ghost" onClick={action('onClick')}>Ghost</Button>
 );
 
+export const GhostBrand = () => (
+  <Button kind="ghost-brand" onClick={action('onClick')}>Ghost brand</Button>
+);
+GhostBrand.storyName = 'Ghost Brand';
+
 export const Danger = () => (
   <Button kind="danger" onClick={action('onClick')}>Danger</Button>
 );
@@ -178,6 +183,7 @@ export const Disabled = () => (
     <Button disabled kind="secondary">Secondary Disabled</Button>
     <Button disabled kind="tertiary">Tertiary Disabled</Button>
     <Button disabled kind="ghost">Ghost Disabled</Button>
+    <Button disabled kind="ghost-brand">Ghost Brand Disabled</Button>
     <Button disabled kind="danger">Danger Disabled</Button>
   </div>
 );
@@ -188,7 +194,7 @@ export const Skeleton = () => <ButtonSkeleton />;
 
 // ─── All Variants matrix ──────────────────────────────────────────────────────
 
-const KINDS = ['primary', 'secondary', 'tertiary', 'ghost', 'danger'];
+const KINDS = ['primary', 'secondary', 'tertiary', 'ghost', 'ghost-brand', 'danger'];
 const SIZES = ['small', 'default', 'large'];
 
 export const AllVariants = () => (

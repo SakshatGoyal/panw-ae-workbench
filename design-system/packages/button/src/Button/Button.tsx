@@ -23,6 +23,7 @@ export const ButtonKinds = [
   'secondary',
   'tertiary',
   'ghost',
+  'ghost-brand',
   'danger',
 ] as const;
 

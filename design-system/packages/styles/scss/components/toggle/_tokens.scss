@@ -6,7 +6,12 @@
 // Disabled tokens are explicit per family (no opacity sledgehammer).
 :root {
   --panw-toggle-track-on:           var(--ds-brand-rest);
+  --panw-toggle-track-on-hover:     var(--ds-brand-hover);
   --panw-toggle-track-off:          var(--ds-surface-accent-rest);
+  // Off-state hover is essential — without it the toggle reads as inert.
+  // The bg darkening on hover is what tells the user "this is interactive,
+  // not disabled."
+  --panw-toggle-track-off-hover:    var(--ds-surface-accent-hover);
   --panw-toggle-track-on-disabled:  var(--ds-brand-disabled);
   --panw-toggle-track-off-disabled: var(--ds-lines-neutral-disabled);
   --panw-toggle-knob:               #ffffff;

@@ -55,6 +55,16 @@
 .panw--toggle-track--off { background-color: var(--panw-toggle-track-off); }
 .panw--toggle-track--small { width: 32px; height: 16px; }
 
+// Hover states — both on and off tracks darken on hover to signal interactivity.
+// The off-state hover is especially important: without it the gray track reads
+// as disabled rather than as "click me to flip on."
+.panw--toggle-root:not(.panw--toggle-root--disabled):hover .panw--toggle-track {
+  background-color: var(--panw-toggle-track-on-hover);
+}
+.panw--toggle-root:not(.panw--toggle-root--disabled):hover .panw--toggle-track--off {
+  background-color: var(--panw-toggle-track-off-hover);
+}
+
 .panw--toggle-knob {
   width: 18px;
   height: 18px;

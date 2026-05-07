@@ -51,7 +51,9 @@
   }
 
   .panw--tag__label {
-    @include tag-typography(12px, 16px);
+    // Tags never wrap — line-height tracks the glyph (100%) so the chip
+    // height comes from padding alone, with no extra leading.
+    @include tag-typography(12px, 12px);
   }
 }
 
@@ -72,7 +74,7 @@
   }
 
   .panw--tag__label {
-    @include tag-typography(14px, 18px);
+    @include tag-typography(14px, 14px);
   }
 }
 

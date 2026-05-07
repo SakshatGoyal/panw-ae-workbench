@@ -13,6 +13,14 @@ export type FlyoutPlacement = (typeof FlyoutPlacements)[number];
  */
 export const FLYOUT_MAX_DEPTH = 3;
 
+/**
+ * Fixed flyout width. The width does not track the anchor — labels truncate
+ * with ellipsis at 320px and reveal full text via a delayed hover tooltip
+ * on the item. This keeps flyouts from being narrow off small triggers
+ * (kebabs, icon buttons) or absurdly wide off long ones.
+ */
+export const FLYOUT_WIDTH = 320;
+
 export interface FlyoutContextValue {
   mode: FlyoutMode;
   /** Set of selected values. Both modes use a Set internally; single mode

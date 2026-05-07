@@ -290,3 +290,33 @@ export const FullyLoaded = () => {
   );
 };
 FullyLoaded.storyName = 'Fully Loaded';
+
+// ─── Long Labels — exercises the truncation tooltip ──────────────────────────
+
+export const LongLabels = () => {
+  const anchorRef = useRef(null);
+  const [open, setOpen] = useState(false);
+  const [selected, setSelected] = useState([]);
+
+  return (
+    <>
+      <Trigger anchorRef={anchorRef} onClick={() => setOpen((v) => !v)} label="Long labels" />
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={anchorRef}
+        mode="single"
+        selected={selected}
+        onSelectionChange={setSelected}>
+        <FlyoutList>
+          <FlyoutItem value="a">Short</FlyoutItem>
+          <FlyoutItem value="b">A reasonably long option label that fits</FlyoutItem>
+          <FlyoutItem value="c">An exceptionally long option label that will definitely truncate at the 320px flyout width</FlyoutItem>
+          <FlyoutItem value="d">Q3 FY24 enterprise expansion deal — Acme Corp customer success forecast</FlyoutItem>
+          <FlyoutItem value="e">Another genuinely lengthy option to test the hover-after-1s tooltip behavior properly</FlyoutItem>
+        </FlyoutList>
+      </Flyout>
+    </>
+  );
+};
+LongLabels.storyName = 'Long Labels (truncation tooltip)';

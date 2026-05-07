@@ -12,6 +12,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import {
+  FLYOUT_WIDTH,
   FlyoutModes,
   FlyoutPlacements,
   FLYOUT_MAX_DEPTH,
@@ -80,9 +81,10 @@ function usePosition(
     const viewportWidth = window.innerWidth;
     const offset = 4; // Stage's trigger-to-flyout gap
 
-    // Measure flyout's natural height (clamped later by maxHeight).
+    // Fixed 320px width per Stage flyout convention — width does not track
+    // the anchor. Long item labels truncate and reveal on hover (Item.tsx).
     const flyoutHeight = flyout.scrollHeight;
-    const flyoutWidth = Math.max(anchorRect.width, flyout.scrollWidth);
+    const flyoutWidth = FLYOUT_WIDTH;
 
     const spaceBelow = viewportHeight - anchorRect.bottom - offset - 8;
     const spaceAbove = anchorRect.top - offset - 8;

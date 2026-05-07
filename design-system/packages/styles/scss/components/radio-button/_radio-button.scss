@@ -37,8 +37,8 @@
 .panw--rb-ring { fill: var(--panw-radio-ring); }
 .panw--rb-dot  { fill: var(--panw-radio-dot); }
 
-.panw--radio-button--disabled .panw--rb-ring { fill: var(--panw-radio-disabled); }
-.panw--radio-button--disabled .panw--rb-dot  { fill: var(--panw-radio-disabled); }
+.panw--radio-button--disabled .panw--rb-ring { fill: var(--panw-radio-ring-disabled); }
+.panw--radio-button--disabled .panw--rb-dot  { fill: var(--panw-radio-dot-disabled); }
 
 .panw--radio-button__label {
   font-family: var(--ds-type-font-family-sans);

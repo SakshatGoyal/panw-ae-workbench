@@ -3,15 +3,20 @@
 // =============================================================================
 // IconButton — icon-only button
 // CSS class prefix: .panw--btn-icon
-// Axes: Kind(3) × Size(3) × Shape(3) × IconSize(2) × State(3)
+// Axes: Kind(5) × Size(3) × IconSize(2) × State(rest/hover/pressed/disabled)
+//
+// Stage's call: single corner (radius.tight = 4px). Brand-vs-neutral split is
+// preserved because at icon size the glyph carries color intent — explicit
+// ghost vs ghost-accent matters in a way it doesn't for text buttons.
 // =============================================================================
 
 // ─── Base ────────────────────────────────────────────────────────────────────
 
 .panw--btn-icon {
   @include button-reset;
-  padding: 0.5rem; /* 8px default (sm) */
+  padding: 0.5rem;
   border: none;
+  border-radius: 4px; // radius.tight — Stage's single icon-button corner.
   line-height: 0;
   color: var(--panw-icon-button-ghost-color);
 }
@@ -30,83 +35,83 @@
 }
 
 .panw--btn-icon__icon--16 {
-  width: 1rem; /* 16px */
+  width: 1rem;
   height: 1rem;
 
-  svg {
-    width: 1rem;
-    height: 1rem;
-  }
+  svg { width: 1rem; height: 1rem; }
 }
 
 .panw--btn-icon__icon--20 {
-  width: 1.25rem; /* 20px */
+  width: 1.25rem;
   height: 1.25rem;
 
-  svg {
-    width: 1.25rem;
-    height: 1.25rem;
-  }
+  svg { width: 1.25rem; height: 1.25rem; }
 }
 
 // ─── Sizes (padding-based) ────────────────────────────────────────────────────
-// sm: 8px padding → total 32px (16px icon) / 36px (20px icon)
-// md: 12px padding → total 40px (16px icon) / 44px (20px icon)
-// lg: 16px padding → total 48px (16px icon) / 52px (20px icon)
+// sm: 8px padding  → 32px (16px icon) / 36px (20px icon)
+// md: 12px padding → 40px (16px icon) / 44px (20px icon)
+// lg: 16px padding → 48px (16px icon) / 52px (20px icon)
 
-.panw--btn-icon--sm {
-  padding: 0.5rem; /* 8px */
-}
-
-.panw--btn-icon--md {
-  padding: 0.75rem; /* 12px */
-}
-
-.panw--btn-icon--lg {
-  padding: 1rem; /* 16px */
-}
-
-// ─── Shapes ───────────────────────────────────────────────────────────────────
-
-.panw--btn-icon--square {
-  border-radius: 0;
-}
-
-.panw--btn-icon--rounded {
-  border-radius: 0.25rem; /* 4px */
-}
-
-.panw--btn-icon--pill {
-  border-radius: 50%;
-}
+.panw--btn-icon--sm { padding: 0.5rem; }
+.panw--btn-icon--md { padding: 0.75rem; }
+.panw--btn-icon--lg { padding: 1rem; }
 
 // ─── Kinds ────────────────────────────────────────────────────────────────────
 
-// Ghost (default: transparent bg, gray icon)
+// Ghost — transparent, neutral icon. Default for ambient/inline icon actions.
 .panw--btn-icon--ghost {
-  background-color: transparent;
+  background-color: var(--panw-icon-button-ghost-bg);
   color: var(--panw-icon-button-ghost-color);
 
   &:hover:not(:disabled) {
     background-color: var(--panw-icon-button-ghost-bg-hover);
+    color: var(--panw-icon-button-ghost-color-hover);
   }
 
   &:active:not(:disabled) {
     background-color: var(--panw-icon-button-ghost-bg-active);
+    color: var(--panw-icon-button-ghost-color-pressed);
   }
 
   &:disabled {
-    background-color: var(--panw-icon-button-ghost-disabled-bg);
+    background-color: transparent;
     color: var(--panw-icon-button-ghost-disabled-color);
   }
 
-  // Selected state (ghost only)
   &.panw--btn-icon--selected {
     background-color: var(--panw-icon-button-ghost-bg-hover);
   }
 }
 
-// Primary
+// Ghost-accent — transparent, brand icon. Hover lifts to highlight.* (alpha-
+// brand), the engaged-state ground that says "this control is brand-coloured
+// for a reason."
+.panw--btn-icon--ghost-accent {
+  background-color: var(--panw-icon-button-ghost-accent-bg);
+  color: var(--panw-icon-button-ghost-accent-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-icon-button-ghost-accent-bg-hover);
+    color: var(--panw-icon-button-ghost-accent-color-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-icon-button-ghost-accent-bg-active);
+    color: var(--panw-icon-button-ghost-accent-color-pressed);
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: var(--panw-icon-button-ghost-accent-disabled-color);
+  }
+
+  &.panw--btn-icon--selected {
+    background-color: var(--panw-icon-button-ghost-accent-bg-hover);
+  }
+}
+
+// Primary — brand filled, inverse glyph.
 .panw--btn-icon--primary {
   background-color: var(--panw-icon-button-primary-bg);
   color: var(--panw-icon-button-primary-color);
@@ -120,12 +125,12 @@
   }
 
   &:disabled {
-    background-color: var(--panw-button-disabled-bg);
+    background-color: var(--panw-icon-button-primary-bg-disabled);
     color: var(--panw-icon-button-primary-color);
   }
 }
 
-// Secondary
+// Secondary — neutral surface, secondary glyph.
 .panw--btn-icon--secondary {
   background-color: var(--panw-icon-button-secondary-bg);
   color: var(--panw-icon-button-secondary-color);
@@ -139,7 +144,26 @@
   }
 
   &:disabled {
-    background-color: var(--panw-button-disabled-bg);
-    color: var(--panw-button-disabled-bg); /* icon disappears into bg when disabled */
+    background-color: var(--panw-icon-button-secondary-bg);
+    color: var(--ds-icons-secondary-disabled);
+  }
+}
+
+// Danger — red filled, inverse glyph. Mirrors text Button danger.
+.panw--btn-icon--danger {
+  background-color: var(--panw-button-danger-bg);
+  color: var(--panw-button-danger-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-danger-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-danger-bg-active);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-danger-bg-disabled);
+    color: var(--panw-button-danger-text-disabled);
   }
 }

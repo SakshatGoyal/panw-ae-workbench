@@ -131,7 +131,6 @@ export const Search = React.forwardRef<HTMLInputElement, SearchProps>(
             kind="ghost"
             size="sm"
             iconSize={16}
-            shape={shape === 'pill' ? 'pill' : 'rounded'}
             renderIcon={X}
             aria-label="Clear search"
             onClick={(e) => {

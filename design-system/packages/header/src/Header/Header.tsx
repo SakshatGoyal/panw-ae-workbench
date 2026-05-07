@@ -100,7 +100,6 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
               kind="ghost"
               size="sm"
               iconSize={16}
-              shape="square"
               renderIcon={Filter}
               aria-label="Filter column"
               onClick={(e) => {

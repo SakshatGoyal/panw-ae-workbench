@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { IconButton, IconButtonKinds, IconButtonSizes, IconButtonShapes } from '../IconButton';
+import { IconButton, IconButtonKinds, IconButtonSizes } from '../IconButton';
 import { Plus, Search } from 'lucide-react';
 
 const DefaultIcon = (props) => <Plus size={16} data-testid="icon" {...props} />;
@@ -53,16 +53,6 @@ describe('IconButton', () => {
         <IconButton size={size} renderIcon={DefaultIcon} aria-label="Add" />
       );
       expect(screen.getByRole('button')).toHaveClass(`panw--btn-icon--${size}`);
-      unmount();
-    });
-  });
-
-  it('applies the correct class for each shape', () => {
-    IconButtonShapes.forEach((shape) => {
-      const { unmount } = render(
-        <IconButton shape={shape} renderIcon={DefaultIcon} aria-label="Add" />
-      );
-      expect(screen.getByRole('button')).toHaveClass(`panw--btn-icon--${shape}`);
       unmount();
     });
   });

@@ -66,7 +66,6 @@ export const InlineNotification = React.forwardRef<HTMLDivElement, InlineNotific
               kind="ghost"
               size="sm"
               iconSize={16}
-              shape="square"
               renderIcon={X}
               aria-label="Close notification"
               onClick={onClose}

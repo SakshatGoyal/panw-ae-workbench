@@ -160,7 +160,6 @@ export const TextEntryRounded = React.forwardRef<
               kind="ghost"
               size="sm"
               iconSize={16}
-              shape="rounded"
               renderIcon={X}
               aria-label="Clear text"
               onClick={handleClear}

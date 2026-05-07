@@ -1,6 +1,9 @@
 /**
- * Storybook stories for the PANW IconButton component.
- * Plain JS with JSDoc — mirrors Carbon's Button.stories.js pattern.
+ * Storybook stories for IconButton.
+ *
+ * Stage rebuild: five kinds (ghost, ghost-accent, primary, secondary, danger),
+ * single radius.tight corner. Brand-vs-neutral split preserved at icon size
+ * because the glyph (not the kind name) carries color intent.
  */
 
 import React from 'react';
@@ -29,7 +32,7 @@ const iconMap = {
 
 const sharedArgTypes = {
   kind: {
-    options: ['ghost', 'primary', 'secondary'],
+    options: ['ghost', 'ghost-accent', 'primary', 'secondary', 'danger'],
     control: { type: 'select' },
     table: { defaultValue: { summary: '"ghost"' } },
   },
@@ -39,16 +42,10 @@ const sharedArgTypes = {
     description: 'sm=32px, md=40px, lg=48px (padding-based)',
     table: { defaultValue: { summary: '"sm"' } },
   },
-  shape: {
-    options: ['square', 'rounded', 'pill'],
-    control: { type: 'select' },
-    description: 'Corner shape. PANW extension.',
-    table: { defaultValue: { summary: '"square"' } },
-  },
   iconSize: {
     options: [16, 20],
     control: { type: 'radio' },
-    description: 'Icon pixel dimensions. PANW extension.',
+    description: 'Icon pixel dimensions.',
     table: { defaultValue: { summary: 16 } },
   },
   disabled: {
@@ -61,7 +58,7 @@ const sharedArgTypes = {
   },
   isSelected: {
     control: 'boolean',
-    description: 'Selected state — only applies to ghost kind.',
+    description: 'Selected state — applies to ghost and ghost-accent kinds.',
     table: { defaultValue: { summary: false } },
   },
   renderIcon: {
@@ -76,9 +73,7 @@ export default {
   component: IconButton,
   argTypes: sharedArgTypes,
   parameters: {
-    docs: {
-      page: mdx,
-    },
+    docs: { page: mdx },
   },
   tags: ['autodocs'],
 };
@@ -100,7 +95,6 @@ Default.args = {
   'aria-label': 'Add item',
   kind: 'ghost',
   size: 'sm',
-  shape: 'square',
   iconSize: 16,
   disabled: false,
   isSelected: false,
@@ -110,111 +104,52 @@ Default.args = {
 // ─── Named kind stories ───────────────────────────────────────────────────────
 
 export const Ghost = () => (
-  <IconButton
-    kind="ghost"
-    renderIcon={(props) => <Plus size={16} {...props} />}
-    aria-label="Add"
-    onClick={action('onClick')}
-  />
+  <IconButton kind="ghost" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add" onClick={action('onClick')} />
+);
+
+export const GhostAccent = () => (
+  <IconButton kind="ghost-accent" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add" onClick={action('onClick')} />
 );
 
 export const Primary = () => (
-  <IconButton
-    kind="primary"
-    renderIcon={(props) => <Plus size={16} {...props} />}
-    aria-label="Add"
-    onClick={action('onClick')}
-  />
+  <IconButton kind="primary" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add" onClick={action('onClick')} />
 );
 
 export const Secondary = () => (
-  <IconButton
-    kind="secondary"
-    renderIcon={(props) => <Plus size={16} {...props} />}
-    aria-label="Add"
-    onClick={action('onClick')}
-  />
+  <IconButton kind="secondary" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add" onClick={action('onClick')} />
+);
+
+export const Danger = () => (
+  <IconButton kind="danger" renderIcon={(p) => <Trash2 size={16} {...p} />} aria-label="Delete" onClick={action('onClick')} />
 );
 
 // ─── Size stories ─────────────────────────────────────────────────────────────
 
 export const Sizes = () => (
   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-    <IconButton
-      size="sm"
-      renderIcon={(props) => <Plus size={16} {...props} />}
-      aria-label="Add (small)"
-      onClick={action('onClick')}
-    />
-    <IconButton
-      size="md"
-      renderIcon={(props) => <Plus size={16} {...props} />}
-      aria-label="Add (medium)"
-      onClick={action('onClick')}
-    />
-    <IconButton
-      size="lg"
-      renderIcon={(props) => <Plus size={16} {...props} />}
-      aria-label="Add (large)"
-      onClick={action('onClick')}
-    />
+    <IconButton size="sm" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add (small)" onClick={action('onClick')} />
+    <IconButton size="md" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add (medium)" onClick={action('onClick')} />
+    <IconButton size="lg" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add (large)" onClick={action('onClick')} />
   </div>
 );
-
-// ─── Shape stories ────────────────────────────────────────────────────────────
-
-export const ShapeSquare = () => (
-  <IconButton
-    shape="square"
-    renderIcon={(props) => <Settings size={16} {...props} />}
-    aria-label="Settings"
-    onClick={action('onClick')}
-  />
-);
-ShapeSquare.storyName = 'Shape: Square';
-
-export const ShapeRounded = () => (
-  <IconButton
-    shape="rounded"
-    renderIcon={(props) => <Settings size={16} {...props} />}
-    aria-label="Settings"
-    onClick={action('onClick')}
-  />
-);
-ShapeRounded.storyName = 'Shape: Rounded';
-
-export const ShapePill = () => (
-  <IconButton
-    shape="pill"
-    renderIcon={(props) => <Settings size={16} {...props} />}
-    aria-label="Settings"
-    onClick={action('onClick')}
-  />
-);
-ShapePill.storyName = 'Shape: Pill';
 
 // ─── Different icons ──────────────────────────────────────────────────────────
 
 const DEMO_ICONS = [
-  { icon: (props) => <Plus size={16} {...props} />, label: 'Add' },
-  { icon: (props) => <Search size={16} {...props} />, label: 'Search' },
-  { icon: (props) => <Trash2 size={16} {...props} />, label: 'Delete' },
-  { icon: (props) => <Settings size={16} {...props} />, label: 'Settings' },
-  { icon: (props) => <Bell size={16} {...props} />, label: 'Notifications' },
-  { icon: (props) => <X size={16} {...props} />, label: 'Close' },
-  { icon: (props) => <ChevronRight size={16} {...props} />, label: 'Next' },
-  { icon: (props) => <Download size={16} {...props} />, label: 'Download' },
+  { icon: (p) => <Plus size={16} {...p} />, label: 'Add' },
+  { icon: (p) => <Search size={16} {...p} />, label: 'Search' },
+  { icon: (p) => <Trash2 size={16} {...p} />, label: 'Delete' },
+  { icon: (p) => <Settings size={16} {...p} />, label: 'Settings' },
+  { icon: (p) => <Bell size={16} {...p} />, label: 'Notifications' },
+  { icon: (p) => <X size={16} {...p} />, label: 'Close' },
+  { icon: (p) => <ChevronRight size={16} {...p} />, label: 'Next' },
+  { icon: (p) => <Download size={16} {...p} />, label: 'Download' },
 ];
 
 export const WithDifferentIcons = () => (
   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
     {DEMO_ICONS.map(({ icon, label }) => (
-      <IconButton
-        key={label}
-        renderIcon={icon}
-        aria-label={label}
-        onClick={action(`onClick:${label}`)}
-      />
+      <IconButton key={label} renderIcon={icon} aria-label={label} onClick={action(`onClick:${label}`)} />
     ))}
   </div>
 );
@@ -224,59 +159,32 @@ WithDifferentIcons.storyName = 'With Different Icons';
 
 export const Selected = () => (
   <div style={{ display: 'flex', gap: '8px' }}>
-    <IconButton
-      kind="ghost"
-      isSelected={false}
-      renderIcon={(props) => <Bell size={16} {...props} />}
-      aria-label="Notifications (unselected)"
-      onClick={action('onClick')}
-    />
-    <IconButton
-      kind="ghost"
-      isSelected={true}
-      renderIcon={(props) => <Bell size={16} {...props} />}
-      aria-label="Notifications (selected)"
-      onClick={action('onClick')}
-    />
+    <IconButton kind="ghost" isSelected={false} renderIcon={(p) => <Bell size={16} {...p} />} aria-label="Notifications (unselected)" onClick={action('onClick')} />
+    <IconButton kind="ghost" isSelected={true} renderIcon={(p) => <Bell size={16} {...p} />} aria-label="Notifications (selected)" onClick={action('onClick')} />
+    <IconButton kind="ghost-accent" isSelected={true} renderIcon={(p) => <Bell size={16} {...p} />} aria-label="Notifications (ghost-accent selected)" onClick={action('onClick')} />
   </div>
 );
-Selected.storyName = 'Selected State (ghost only)';
+Selected.storyName = 'Selected State (ghost / ghost-accent)';
 
 // ─── Disabled ─────────────────────────────────────────────────────────────────
 
 export const Disabled = () => (
   <div style={{ display: 'flex', gap: '8px' }}>
-    <IconButton
-      kind="ghost"
-      disabled
-      renderIcon={(props) => <Plus size={16} {...props} />}
-      aria-label="Add (disabled ghost)"
-    />
-    <IconButton
-      kind="primary"
-      disabled
-      renderIcon={(props) => <Plus size={16} {...props} />}
-      aria-label="Add (disabled primary)"
-    />
-    <IconButton
-      kind="secondary"
-      disabled
-      renderIcon={(props) => <Plus size={16} {...props} />}
-      aria-label="Add (disabled secondary)"
-    />
+    {['ghost', 'ghost-accent', 'primary', 'secondary', 'danger'].map((kind) => (
+      <IconButton key={kind} kind={kind} disabled renderIcon={(p) => <Plus size={16} {...p} />} aria-label={`${kind} disabled`} />
+    ))}
   </div>
 );
 
 // ─── All Variants matrix ──────────────────────────────────────────────────────
 
-const IB_KINDS = ['ghost', 'primary', 'secondary'];
+const IB_KINDS = ['ghost', 'ghost-accent', 'primary', 'secondary', 'danger'];
 const IB_SIZES = ['sm', 'md', 'lg'];
-const IB_SHAPES = ['square', 'rounded', 'pill'];
 
 export const AllVariants = () => (
-  <div style={{ fontFamily: 'Inter, sans-serif', padding: '24px', background: '#f9f9f9' }}>
+  <div style={{ fontFamily: 'Inter, sans-serif', padding: '24px', background: 'var(--ds-surface-alt-rest, #f5f5f5)' }}>
     <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>
-      All Kinds × Sizes (shape: square)
+      Kinds × Sizes
     </h3>
     <div
       style={{
@@ -285,38 +193,19 @@ export const AllVariants = () => (
         gap: '8px',
         justifyContent: 'start',
         marginBottom: '32px',
-      }}
-    >
+      }}>
       {IB_SIZES.map((size) =>
         IB_KINDS.map((kind) => (
           <IconButton
             key={`${kind}-${size}`}
             kind={kind}
             size={size}
-            shape="square"
-            renderIcon={(props) => <Plus size={16} {...props} />}
+            renderIcon={(p) => <Plus size={16} {...p} />}
             aria-label={`${kind} ${size}`}
             onClick={action('onClick')}
           />
         ))
       )}
-    </div>
-
-    <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>
-      All Shapes (kind: ghost, size: md)
-    </h3>
-    <div style={{ display: 'flex', gap: '8px', marginBottom: '32px' }}>
-      {IB_SHAPES.map((shape) => (
-        <IconButton
-          key={shape}
-          kind="ghost"
-          size="md"
-          shape={shape}
-          renderIcon={(props) => <Settings size={16} {...props} />}
-          aria-label={`Settings (${shape})`}
-          onClick={action('onClick')}
-        />
-      ))}
     </div>
 
     <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>
@@ -328,7 +217,7 @@ export const AllVariants = () => (
           key={kind}
           kind={kind}
           disabled
-          renderIcon={(props) => <Plus size={16} {...props} />}
+          renderIcon={(p) => <Plus size={16} {...p} />}
           aria-label={`${kind} disabled`}
         />
       ))}

@@ -2,83 +2,24 @@
 
 $panw-prefix: 'panw';
 
+// =============================================================================
 // Tooltip — glanceable label primitive (one or two lines).
+//
 // Stage rules: surface.inverse.rest ground, text.inverse.rest, radius.tight,
-// 8/12 padding (vertical / horizontal). Descriptive variants moved to @ds/popover.
+// 8/12 padding (vertical / horizontal). The pointer triangle was dropped per
+// Stage's "decoration earns its place" rule — at tooltip scale, position
+// against the anchor signals the relationship; a 5×9 caret adds noise without
+// adding meaning. Descriptive overlays moved to @ds/popover.
+// =============================================================================
+
 .#{$panw-prefix}--tooltip {
   display: inline-flex;
   width: fit-content;
   height: fit-content;
   font-family: var(--ds-type-font-family-sans);
   box-sizing: border-box;
-  transition: opacity 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: opacity 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
-
-.#{$panw-prefix}--tooltip--direction-top,
-.#{$panw-prefix}--tooltip--direction-bottom {
-  flex-direction: column;
-  align-items: center;
-}
-
-.#{$panw-prefix}--tooltip--direction-left,
-.#{$panw-prefix}--tooltip--direction-right {
-  flex-direction: row;
-  align-items: stretch;
-}
-
-.#{$panw-prefix}--tooltip__pointer-container {
-  display: flex;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.#{$panw-prefix}--tooltip--direction-top .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-bottom .#{$panw-prefix}--tooltip__pointer-container {
-  flex-direction: row;
-  width: 100%;
-}
-
-.#{$panw-prefix}--tooltip--direction-left .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-right .#{$panw-prefix}--tooltip__pointer-container {
-  flex-direction: column;
-  height: 100%;
-}
-
-// Pointer position alignment (12px inset matches the rounded corner)
-.#{$panw-prefix}--tooltip--direction-top.#{$panw-prefix}--tooltip--position-left .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-bottom.#{$panw-prefix}--tooltip--position-left .#{$panw-prefix}--tooltip__pointer-container { justify-content: flex-start; padding: 0 12px; }
-
-.#{$panw-prefix}--tooltip--direction-top.#{$panw-prefix}--tooltip--position-middle .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-bottom.#{$panw-prefix}--tooltip--position-middle .#{$panw-prefix}--tooltip__pointer-container { justify-content: center; }
-
-.#{$panw-prefix}--tooltip--direction-top.#{$panw-prefix}--tooltip--position-right .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-bottom.#{$panw-prefix}--tooltip--position-right .#{$panw-prefix}--tooltip__pointer-container { justify-content: flex-end; padding: 0 12px; }
-
-.#{$panw-prefix}--tooltip--direction-left.#{$panw-prefix}--tooltip--position-top .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-right.#{$panw-prefix}--tooltip--position-top .#{$panw-prefix}--tooltip__pointer-container { justify-content: flex-start; padding: 8px 0; }
-
-.#{$panw-prefix}--tooltip--direction-left.#{$panw-prefix}--tooltip--position-middle .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-right.#{$panw-prefix}--tooltip--position-middle .#{$panw-prefix}--tooltip__pointer-container { justify-content: center; }
-
-.#{$panw-prefix}--tooltip--direction-left.#{$panw-prefix}--tooltip--position-bottom .#{$panw-prefix}--tooltip__pointer-container,
-.#{$panw-prefix}--tooltip--direction-right.#{$panw-prefix}--tooltip--position-bottom .#{$panw-prefix}--tooltip__pointer-container { justify-content: flex-end; padding: 8px 0; }
-
-// Pointer order
-.#{$panw-prefix}--tooltip--direction-bottom .#{$panw-prefix}--tooltip__pointer-container { order: 1; }
-.#{$panw-prefix}--tooltip--direction-bottom .#{$panw-prefix}--tooltip__content-container { order: 0; }
-.#{$panw-prefix}--tooltip--direction-right .#{$panw-prefix}--tooltip__pointer-container { order: 1; }
-.#{$panw-prefix}--tooltip--direction-right .#{$panw-prefix}--tooltip__content-container { order: 0; }
-
-.#{$panw-prefix}--tooltip__arrow {
-  display: block;
-  flex-shrink: 0;
-  fill: var(--panw-tooltip-surface);
-}
-
-.#{$panw-prefix}--tooltip--direction-top .#{$panw-prefix}--tooltip__arrow,
-.#{$panw-prefix}--tooltip--direction-bottom .#{$panw-prefix}--tooltip__arrow { width: 9px; height: 5px; }
-.#{$panw-prefix}--tooltip--direction-left .#{$panw-prefix}--tooltip__arrow,
-.#{$panw-prefix}--tooltip--direction-right .#{$panw-prefix}--tooltip__arrow { width: 5px; height: 9px; }
 
 .#{$panw-prefix}--tooltip__content-container {
   background-color: var(--panw-tooltip-surface);

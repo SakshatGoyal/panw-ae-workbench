@@ -9,10 +9,15 @@ describe('Tooltip', () => {
     expect(screen.getByRole('tooltip')).toBeInTheDocument();
   });
 
-  it('applies direction and position classes', () => {
-    const { container } = render(<Tooltip pointerDirection="bottom" pointerPosition="right" />);
+  it('applies direction class', () => {
+    const { container } = render(<Tooltip pointerDirection="bottom" />);
     expect(container.querySelector('.panw--tooltip--direction-bottom')).toBeInTheDocument();
-    expect(container.querySelector('.panw--tooltip--position-right')).toBeInTheDocument();
+  });
+
+  it('does not render a pointer arrow', () => {
+    const { container } = render(<Tooltip />);
+    expect(container.querySelector('.panw--tooltip__arrow')).toBeNull();
+    expect(container.querySelector('.panw--tooltip__pointer-container')).toBeNull();
   });
 
   it('forwards ref', () => {

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Tooltip, TooltipDirections, TooltipPositions } from './index';
+import { Tooltip, TooltipDirections } from './index';
 import mdx from './Tooltip.mdx';
 
 export default {
@@ -7,7 +7,6 @@ export default {
   component: Tooltip,
   argTypes: {
     pointerDirection: { options: TooltipDirections, control: { type: 'select' } },
-    pointerPosition: { options: TooltipPositions, control: { type: 'select' } },
     content: { control: 'text' },
   },
   parameters: { docs: { page: mdx } },
@@ -17,7 +16,6 @@ export default {
 export const Default = (args) => <Tooltip {...args} />;
 Default.args = {
   pointerDirection: 'top',
-  pointerPosition: 'left',
   content: 'A helpful hint about a UI element.',
 };
 

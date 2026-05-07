@@ -202,7 +202,8 @@ $panw-prefix: 'panw';
   cursor: pointer;
   transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
-  &:hover { background-color: var(--panw-dropdown-menu-item-hover); }
+  &:hover  { background-color: var(--panw-dropdown-menu-item-hover); }
+  &:active { background-color: var(--panw-dropdown-menu-item-pressed); }
 }
 
 .#{$panw-prefix}--dropdown__menu-item--selected {

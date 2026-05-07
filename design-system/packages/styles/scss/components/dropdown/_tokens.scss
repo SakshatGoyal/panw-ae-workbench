@@ -43,7 +43,11 @@
   --panw-dropdown-chevron-disabled:  var(--ds-icons-secondary-disabled);
 
   --panw-dropdown-menu-bg:           var(--ds-surface-rest);
-  --panw-dropdown-menu-item-hover:   var(--ds-ghost-hover);
+  // Menu items are ≤48px row-tier interactions — ghost.highlight (alpha-brand)
+  // per Stage's "scope first, size second" rule. Selected continues to use
+  // highlight.rest for the engaged-state ground.
+  --panw-dropdown-menu-item-hover:   var(--ds-ghost-highlight-hover);
+  --panw-dropdown-menu-item-pressed: var(--ds-ghost-highlight-pressed);
   --panw-dropdown-menu-selected-bg:  var(--ds-highlight-rest);
   --panw-dropdown-menu-selected-fg:  var(--ds-text-brand-rest);
 }

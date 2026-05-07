@@ -34,7 +34,9 @@
   --panw-ms-chevron-disabled:  var(--ds-icons-secondary-disabled);
 
   --panw-ms-menu-bg:           var(--ds-surface-rest);
-  --panw-ms-menu-item-hover:   var(--ds-ghost-hover);
+  // Menu items are row-tier (≤48px) — ghost.highlight per Stage.
+  --panw-ms-menu-item-hover:   var(--ds-ghost-highlight-hover);
+  --panw-ms-menu-item-pressed: var(--ds-ghost-highlight-pressed);
   --panw-ms-menu-selected-bg:  var(--ds-highlight-rest);
   --panw-ms-menu-selected-fg:  var(--ds-text-brand-rest);
 }

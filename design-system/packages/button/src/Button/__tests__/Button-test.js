@@ -6,7 +6,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import Button, { ButtonKinds, ButtonSizes, ButtonShapes } from '../Button';
+import Button, { ButtonKinds, ButtonSizes } from '../Button';
 import { Plus } from 'lucide-react';
 
 describe('Button', () => {
@@ -52,14 +52,6 @@ describe('Button', () => {
     ButtonSizes.forEach((size) => {
       const { unmount } = render(<Button size={size}>Label</Button>);
       expect(screen.getByRole('button')).toHaveClass(`panw--btn--${size}`);
-      unmount();
-    });
-  });
-
-  it('applies the correct class for each shape', () => {
-    ButtonShapes.forEach((shape) => {
-      const { unmount } = render(<Button shape={shape}>Label</Button>);
-      expect(screen.getByRole('button')).toHaveClass(`panw--btn--${shape}`);
       unmount();
     });
   });

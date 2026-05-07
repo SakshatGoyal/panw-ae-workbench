@@ -1,6 +1,9 @@
 /**
- * Storybook stories for the PANW Button component.
- * Plain JS with JSDoc — mirrors Carbon's Button.stories.js pattern.
+ * Storybook stories for the Button component.
+ *
+ * Stage rebuild: five canonical kinds (primary, secondary, tertiary, ghost,
+ * danger), one corner (radius.tight = 4px). Brand-vs-neutral intent encoded
+ * in kind name. The shape axis is gone.
  */
 
 import React from 'react';
@@ -9,7 +12,6 @@ import { Plus, ChevronRight, Trash2 } from 'lucide-react';
 import Button, { ButtonSkeleton } from './index';
 import mdx from './Button.mdx';
 
-// Helper: map story control string → icon component
 const iconMap = {
   None: undefined,
   Plus: (props) => <Plus size={16} {...props} />,
@@ -19,18 +21,11 @@ const iconMap = {
 
 const sharedArgTypes = {
   kind: {
-    options: [
-      'primary',
-      'danger',
-      'secondary-accent',
-      'secondary-gray',
-      'ghost-accent',
-      'ghost-gray',
-    ],
+    options: ['primary', 'secondary', 'tertiary', 'ghost', 'danger'],
     control: { type: 'select' },
     description:
-      'Visual style variant. `primary` and `danger` map to Carbon kinds. ' +
-      '`secondary-accent`, `secondary-gray`, `ghost-accent`, `ghost-gray` are PANW extensions.',
+      'Visual style variant. Five canonical kinds; brand-vs-neutral intent ' +
+      'is encoded in the kind name.',
     table: { defaultValue: { summary: '"primary"' } },
   },
   size: {
@@ -38,12 +33,6 @@ const sharedArgTypes = {
     control: { type: 'select' },
     description: 'Button height: small=32px, default=40px, large=48px',
     table: { defaultValue: { summary: '"default"' } },
-  },
-  shape: {
-    options: ['pill', 'standard', 'rounded'],
-    control: { type: 'select' },
-    description: 'Corner shape. PANW extension — Carbon does not have this axis.',
-    table: { defaultValue: { summary: '"pill"' } },
   },
   disabled: {
     control: 'boolean',
@@ -82,9 +71,7 @@ export default {
   subcomponents: { ButtonSkeleton },
   argTypes: sharedArgTypes,
   parameters: {
-    docs: {
-      page: mdx,
-    },
+    docs: { page: mdx },
   },
   tags: ['autodocs'],
 };
@@ -97,8 +84,7 @@ export const Default = (args) => {
     <Button
       {...rest}
       renderIcon={iconMap[renderIcon]}
-      onClick={action('onClick')}
-    >
+      onClick={action('onClick')}>
       Button
     </Button>
   );
@@ -107,7 +93,6 @@ export const Default = (args) => {
 Default.args = {
   kind: 'primary',
   size: 'default',
-  shape: 'pill',
   disabled: false,
   renderIcon: 'None',
   iconPosition: 'left',
@@ -118,7 +103,6 @@ Default.parameters = {
     include: [
       'kind',
       'size',
-      'shape',
       'disabled',
       'renderIcon',
       'iconPosition',
@@ -132,81 +116,34 @@ Default.parameters = {
 // ─── Named variant stories ────────────────────────────────────────────────────
 
 export const Primary = () => (
-  <Button kind="primary" onClick={action('onClick')}>
-    Primary
-  </Button>
+  <Button kind="primary" onClick={action('onClick')}>Primary</Button>
+);
+
+export const Secondary = () => (
+  <Button kind="secondary" onClick={action('onClick')}>Secondary</Button>
+);
+
+export const Tertiary = () => (
+  <Button kind="tertiary" onClick={action('onClick')}>Tertiary</Button>
+);
+
+export const Ghost = () => (
+  <Button kind="ghost" onClick={action('onClick')}>Ghost</Button>
 );
 
 export const Danger = () => (
-  <Button kind="danger" onClick={action('onClick')}>
-    Danger
-  </Button>
+  <Button kind="danger" onClick={action('onClick')}>Danger</Button>
 );
-
-export const SecondaryAccent = () => (
-  <Button kind="secondary-accent" onClick={action('onClick')}>
-    Secondary Accent
-  </Button>
-);
-SecondaryAccent.storyName = 'Secondary Accent (PANW)';
-
-export const SecondaryGray = () => (
-  <Button kind="secondary-gray" onClick={action('onClick')}>
-    Secondary Gray
-  </Button>
-);
-SecondaryGray.storyName = 'Secondary Gray (PANW)';
-
-export const GhostAccent = () => (
-  <Button kind="ghost-accent" onClick={action('onClick')}>
-    Ghost Accent
-  </Button>
-);
-GhostAccent.storyName = 'Ghost Accent (PANW)';
-
-export const GhostGray = () => (
-  <Button kind="ghost-gray" onClick={action('onClick')}>
-    Ghost Gray
-  </Button>
-);
-GhostGray.storyName = 'Ghost Gray (PANW)';
 
 // ─── Size stories ─────────────────────────────────────────────────────────────
 
 export const Small = () => (
-  <Button size="small" onClick={action('onClick')}>
-    Small Button
-  </Button>
+  <Button size="small" onClick={action('onClick')}>Small Button</Button>
 );
 
 export const Large = () => (
-  <Button size="large" onClick={action('onClick')}>
-    Large Button
-  </Button>
+  <Button size="large" onClick={action('onClick')}>Large Button</Button>
 );
-
-// ─── Shape stories ────────────────────────────────────────────────────────────
-
-export const ShapePill = () => (
-  <Button shape="pill" onClick={action('onClick')}>
-    Pill Shape
-  </Button>
-);
-ShapePill.storyName = 'Shape: Pill';
-
-export const ShapeStandard = () => (
-  <Button shape="standard" onClick={action('onClick')}>
-    Standard Shape
-  </Button>
-);
-ShapeStandard.storyName = 'Shape: Standard';
-
-export const ShapeRounded = () => (
-  <Button shape="rounded" onClick={action('onClick')}>
-    Rounded Shape
-  </Button>
-);
-ShapeRounded.storyName = 'Shape: Rounded';
 
 // ─── Icon stories ─────────────────────────────────────────────────────────────
 
@@ -215,8 +152,7 @@ export const WithLeftIcon = () => (
     renderIcon={(props) => <Plus size={16} {...props} />}
     iconPosition="left"
     iconDescription="Add"
-    onClick={action('onClick')}
-  >
+    onClick={action('onClick')}>
     Add Item
   </Button>
 );
@@ -224,12 +160,11 @@ WithLeftIcon.storyName = 'With Left Icon';
 
 export const WithRightIcon = () => (
   <Button
-    kind="ghost-accent"
+    kind="tertiary"
     renderIcon={(props) => <ChevronRight size={16} {...props} />}
     iconPosition="right"
     iconDescription="Navigate"
-    onClick={action('onClick')}
-  >
+    onClick={action('onClick')}>
     Continue
   </Button>
 );
@@ -240,9 +175,10 @@ WithRightIcon.storyName = 'With Right Icon';
 export const Disabled = () => (
   <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap' }}>
     <Button disabled kind="primary">Primary Disabled</Button>
+    <Button disabled kind="secondary">Secondary Disabled</Button>
+    <Button disabled kind="tertiary">Tertiary Disabled</Button>
+    <Button disabled kind="ghost">Ghost Disabled</Button>
     <Button disabled kind="danger">Danger Disabled</Button>
-    <Button disabled kind="secondary-accent">Secondary Accent Disabled</Button>
-    <Button disabled kind="ghost-accent">Ghost Accent Disabled</Button>
   </div>
 );
 
@@ -252,22 +188,13 @@ export const Skeleton = () => <ButtonSkeleton />;
 
 // ─── All Variants matrix ──────────────────────────────────────────────────────
 
-const KINDS = [
-  'primary',
-  'danger',
-  'secondary-accent',
-  'secondary-gray',
-  'ghost-accent',
-  'ghost-gray',
-];
-
+const KINDS = ['primary', 'secondary', 'tertiary', 'ghost', 'danger'];
 const SIZES = ['small', 'default', 'large'];
-const SHAPES = ['pill', 'standard', 'rounded'];
 
 export const AllVariants = () => (
-  <div style={{ fontFamily: 'Inter, sans-serif', padding: '24px', background: '#f9f9f9' }}>
+  <div style={{ fontFamily: 'Inter, sans-serif', padding: '24px', background: 'var(--ds-surface-alt-rest, #f5f5f5)' }}>
     <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>
-      All Kinds × Sizes (shape: pill)
+      Kinds × Sizes
     </h3>
     <div
       style={{
@@ -275,26 +202,15 @@ export const AllVariants = () => (
         gridTemplateColumns: `repeat(${KINDS.length}, auto)`,
         gap: '8px',
         marginBottom: '32px',
-      }}
-    >
+        justifyContent: 'start',
+      }}>
       {SIZES.map((size) =>
         KINDS.map((kind) => (
-          <Button key={`${kind}-${size}`} kind={kind} size={size} shape="pill">
+          <Button key={`${kind}-${size}`} kind={kind} size={size}>
             {kind}
           </Button>
         ))
       )}
-    </div>
-
-    <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>
-      All Shapes (kind: primary, size: default)
-    </h3>
-    <div style={{ display: 'flex', gap: '8px', marginBottom: '32px' }}>
-      {SHAPES.map((shape) => (
-        <Button key={shape} shape={shape} kind="primary">
-          {shape}
-        </Button>
-      ))}
     </div>
 
     <h3 style={{ marginBottom: '16px', fontSize: '14px', fontWeight: 600 }}>
@@ -304,15 +220,13 @@ export const AllVariants = () => (
       <Button
         renderIcon={(props) => <Plus size={16} {...props} />}
         iconPosition="left"
-        kind="primary"
-      >
+        kind="primary">
         Add Left
       </Button>
       <Button
         renderIcon={(props) => <ChevronRight size={16} {...props} />}
         iconPosition="right"
-        kind="ghost-accent"
-      >
+        kind="tertiary">
         Continue Right
       </Button>
     </div>

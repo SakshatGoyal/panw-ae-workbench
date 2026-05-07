@@ -3,15 +3,27 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { usePrefix } from '../internal/usePrefix';
 
-// ─── Kind / Size / Shape enumerations ────────────────────────────────────────
+// ─── Kind / Size enumerations ────────────────────────────────────────────────
 
+/**
+ * Stage's five canonical kinds. Brand-vs-neutral intent is encoded in the kind
+ * name (Stage rule: "kind name carries brand intent" for text buttons), so the
+ * old PANW -accent / -gray suffixes are gone.
+ *
+ * Mapping from PANW:
+ *   primary           → primary           (brand filled, no change)
+ *   danger            → danger            (red filled, no change)
+ *   secondary-gray    → secondary         (white bg, neutral text, gray border)
+ *   secondary-accent  → tertiary          (white bg, brand text, gray border)
+ *   ghost-accent      → tertiary          (folded — both are "soft brand")
+ *   ghost-gray        → ghost             (transparent, neutral text)
+ */
 export const ButtonKinds = [
   'primary',
+  'secondary',
+  'tertiary',
+  'ghost',
   'danger',
-  'secondary-accent',
-  'secondary-gray',
-  'ghost-accent',
-  'ghost-gray',
 ] as const;
 
 export type ButtonKind = (typeof ButtonKinds)[number];
@@ -21,11 +33,6 @@ export const ButtonSizes = ['small', 'default', 'large'] as const;
 
 export type ButtonSize = (typeof ButtonSizes)[number];
 
-/** PANW corner shapes. Carbon does not have this axis; it is a PANW extension. */
-export const ButtonShapes = ['pill', 'standard', 'rounded'] as const;
-
-export type ButtonShape = (typeof ButtonShapes)[number];
-
 // ─── Props interface ──────────────────────────────────────────────────────────
 
 export interface ButtonBaseProps
@@ -34,11 +41,6 @@ export interface ButtonBaseProps
   kind?: ButtonKind;
   /** Button size */
   size?: ButtonSize;
-  /**
-   * Corner shape.
-   * PANW extension — Carbon does not have a shape axis on Button.
-   */
-  shape?: ButtonShape;
   /** Disabled state */
   disabled?: boolean;
   /**
@@ -96,7 +98,6 @@ const Button: ButtonComponent = React.forwardRef(function Button<
     kind = 'primary',
     rel,
     renderIcon: IconElement,
-    shape = 'pill',
     size = 'default',
     target,
     type = 'button',
@@ -110,7 +111,6 @@ const Button: ButtonComponent = React.forwardRef(function Button<
     [`${prefix}--btn`]: true,
     [`${prefix}--btn--${kind}`]: kind,
     [`${prefix}--btn--${size}`]: size,
-    [`${prefix}--btn--${shape}`]: shape,
     [`${prefix}--btn--disabled`]: disabled,
   });
 
@@ -160,7 +160,6 @@ Button.propTypes = {
   kind: PropTypes.oneOf(ButtonKinds),
   rel: PropTypes.string,
   renderIcon: PropTypes.oneOfType([PropTypes.func, PropTypes.object]),
-  shape: PropTypes.oneOf(ButtonShapes),
   size: PropTypes.oneOf(ButtonSizes),
   target: PropTypes.string,
   type: PropTypes.oneOf(['button', 'reset', 'submit']),

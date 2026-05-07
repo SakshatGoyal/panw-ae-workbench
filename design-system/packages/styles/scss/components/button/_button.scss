@@ -3,7 +3,10 @@
 // =============================================================================
 // Button — standard (text) button
 // CSS class prefix: .panw--btn
-// Axes: Kind(6) × Size(3) × Shape(3) × State(3)
+// Axes: Kind(5) × Size(3) × State(rest/hover/pressed/disabled)
+//
+// Stage's call: one corner (radius.tight = 4px), one weight (600), no
+// decorative letter-spacing. Brand-vs-neutral intent encoded in kind name.
 // =============================================================================
 
 // ─── Base ────────────────────────────────────────────────────────────────────
@@ -11,7 +14,8 @@
 .panw--btn {
   @include button-reset;
   @include button-typography;
-  gap: 4px; /* itemSpacing: 4 */
+  border-radius: 4px; // radius.tight — Stage's single button corner.
+  gap: 4px;
 }
 
 // ─── Icon slot ───────────────────────────────────────────────────────────────
@@ -20,7 +24,7 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 1rem; /* 16px */
+  width: 1rem;
   height: 1rem;
   flex-shrink: 0;
 
@@ -34,42 +38,23 @@
 // ─── Sizes ───────────────────────────────────────────────────────────────────
 
 .panw--btn--default {
-  height: 2.5rem; /* 40px */
-  padding: 0.75rem 1rem; /* 12px 16px */
+  height: 2.5rem;
+  padding: 0.75rem 1rem;
 }
 
 .panw--btn--small {
-  height: 2rem; /* 32px */
-  padding: 0.5rem 0.75rem; /* 8px 12px */
-
-  &.panw--btn--standard,
-  &.panw--btn--rounded {
-    padding: 0.5rem 1rem; /* 8px 16px */
-  }
+  height: 2rem;
+  padding: 0.5rem 0.75rem;
 }
 
 .panw--btn--large {
-  height: 3rem; /* 48px */
-  padding: 1rem; /* 16px all sides */
-}
-
-// ─── Shapes ──────────────────────────────────────────────────────────────────
-
-.panw--btn--pill {
-  border-radius: 3.125rem; /* 50px */
-}
-
-.panw--btn--standard {
-  border-radius: 0;
-}
-
-.panw--btn--rounded {
-  border-radius: 0.25rem; /* 4px */
+  height: 3rem;
+  padding: 1rem;
 }
 
 // ─── Kinds ───────────────────────────────────────────────────────────────────
 
-// Primary
+// Primary — brand filled, inverse text.
 .panw--btn--primary {
   background-color: var(--panw-button-primary-bg);
   color: var(--panw-button-primary-text);
@@ -83,12 +68,84 @@
   }
 
   &:disabled {
-    background-color: var(--panw-button-disabled-bg);
-    color: var(--panw-button-disabled-text);
+    background-color: var(--panw-button-primary-bg-disabled);
+    color: var(--panw-button-primary-text-disabled);
   }
 }
 
-// Danger
+// Secondary — neutral bordered, primary text.
+.panw--btn--secondary {
+  background-color: var(--panw-button-secondary-bg);
+  border-color: var(--panw-button-secondary-border);
+  color: var(--panw-button-secondary-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-secondary-bg-hover);
+    border-color: var(--panw-button-secondary-border-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-secondary-bg-active);
+    border-color: var(--panw-button-secondary-border-pressed);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-secondary-bg);
+    border-color: var(--panw-button-secondary-border-disabled);
+    color: var(--panw-button-secondary-text-disabled);
+  }
+}
+
+// Tertiary — bordered with brand text. Hover lifts to highlight.* (alpha-brand
+// engaged ground) so the bordered chip reads as "soft brand commit" without
+// crossing into primary territory.
+.panw--btn--tertiary {
+  background-color: var(--panw-button-tertiary-bg);
+  border-color: var(--panw-button-tertiary-border);
+  color: var(--panw-button-tertiary-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-tertiary-bg-hover);
+    border-color: var(--panw-button-tertiary-border-hover);
+    color: var(--panw-button-tertiary-text-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-tertiary-bg-active);
+    border-color: var(--panw-button-tertiary-border-pressed);
+    color: var(--panw-button-tertiary-text-pressed);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-tertiary-bg);
+    border-color: var(--panw-button-tertiary-border-disabled);
+    color: var(--panw-button-tertiary-text-disabled);
+  }
+}
+
+// Ghost — transparent, primary text. Disabled is content-led: the surface
+// stays transparent, only the text color dims. Stage's "decoration earns its
+// place" rule — no fake disabled fill on a button that has no rest fill.
+.panw--btn--ghost {
+  background-color: var(--panw-button-ghost-bg);
+  color: var(--panw-button-ghost-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-ghost-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-ghost-bg-active);
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: var(--panw-button-ghost-text-disabled);
+  }
+}
+
+// Danger — red filled, inverse text. Surface.danger.disabled (red30) is the
+// carve-out where the surface itself dims rather than content.
 .panw--btn--danger {
   background-color: var(--panw-button-danger-bg);
   color: var(--panw-button-danger-text);
@@ -102,99 +159,15 @@
   }
 
   &:disabled {
-    background-color: var(--panw-button-disabled-bg);
-    color: var(--panw-button-disabled-text);
-  }
-}
-
-// Secondary-Accent (PANW extension: white bg + blue text + gray border)
-.panw--btn--secondary-accent {
-  background-color: var(--panw-button-secondary-accent-bg);
-  border-color: var(--panw-button-secondary-accent-border);
-  color: var(--panw-button-secondary-accent-text);
-
-  &:hover:not(:disabled) {
-    background-color: var(--panw-button-secondary-accent-bg-hover);
-    border-color: var(--panw-button-secondary-accent-border-hover);
-  }
-
-  &:active:not(:disabled) {
-    background-color: var(--panw-button-secondary-accent-bg-active);
-    border-color: var(--panw-button-secondary-accent-border-hover);
-  }
-
-  &:disabled {
-    background-color: var(--panw-button-disabled-bg);
-    border-color: transparent;
-    color: var(--panw-button-disabled-text);
-  }
-}
-
-// Secondary-Gray (PANW extension: white bg + dark text + gray border)
-.panw--btn--secondary-gray {
-  background-color: var(--panw-button-secondary-gray-bg);
-  border-color: var(--panw-button-secondary-gray-border);
-  color: var(--panw-button-secondary-gray-text);
-
-  &:hover:not(:disabled) {
-    background-color: var(--panw-button-secondary-gray-bg-hover);
-    border-color: var(--panw-button-secondary-gray-border);
-  }
-
-  &:active:not(:disabled) {
-    background-color: var(--panw-button-secondary-gray-bg-active);
-    border-color: var(--panw-button-secondary-gray-border);
-  }
-
-  &:disabled {
-    background-color: var(--panw-button-disabled-bg);
-    border-color: transparent;
-    color: var(--panw-button-disabled-text);
-  }
-}
-
-// Ghost-Accent (PANW extension: transparent bg + blue text)
-.panw--btn--ghost-accent {
-  background-color: var(--panw-button-ghost-accent-bg);
-  color: var(--panw-button-ghost-accent-text);
-
-  &:hover:not(:disabled) {
-    background-color: var(--panw-button-ghost-accent-bg-hover);
-  }
-
-  &:active:not(:disabled) {
-    background-color: var(--panw-button-ghost-accent-bg-active);
-  }
-
-  &:disabled {
-    background-color: transparent;
-    color: var(--panw-button-disabled-text);
-  }
-}
-
-// Ghost-Gray (PANW extension: transparent bg + dark text)
-.panw--btn--ghost-gray {
-  background-color: var(--panw-button-ghost-gray-bg);
-  color: var(--panw-button-ghost-gray-text);
-
-  &:hover:not(:disabled) {
-    background-color: var(--panw-button-ghost-gray-bg-hover);
-  }
-
-  &:active:not(:disabled) {
-    background-color: var(--panw-button-ghost-gray-bg-active);
-  }
-
-  &:disabled {
-    background-color: transparent;
-    color: var(--panw-button-disabled-text);
+    background-color: var(--panw-button-danger-bg-disabled);
+    color: var(--panw-button-danger-text-disabled);
   }
 }
 
 // ─── Skeleton ─────────────────────────────────────────────────────────────────
 
 .panw--btn.panw--skeleton {
-  background-color: #e5e5e5;
+  background-color: var(--ds-surface-accent-rest);
   border-color: transparent;
   color: transparent;
   pointer-events: none;

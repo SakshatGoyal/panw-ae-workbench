@@ -34,9 +34,11 @@
   --panw-ms-chevron-disabled:  var(--ds-icons-secondary-disabled);
 
   --panw-ms-menu-bg:           var(--ds-surface-rest);
-  // Menu items are row-tier (≤48px) — ghost.highlight per Stage.
-  --panw-ms-menu-item-hover:   var(--ds-ghost-highlight-hover);
-  --panw-ms-menu-item-pressed: var(--ds-ghost-highlight-pressed);
+  // Menu items default to `ghost` (neutral) hover. ghost.highlight is opt-in
+  // for brand-coded engagement; menu rows are ordinary list items. Selected
+  // continues to use highlight.rest, keeping a clean hover-vs-selected split.
+  --panw-ms-menu-item-hover:   var(--ds-ghost-hover);
+  --panw-ms-menu-item-pressed: var(--ds-ghost-pressed);
   --panw-ms-menu-selected-bg:  var(--ds-highlight-rest);
   --panw-ms-menu-selected-fg:  var(--ds-text-brand-rest);
 }

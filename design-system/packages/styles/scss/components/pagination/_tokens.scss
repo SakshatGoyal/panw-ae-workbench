@@ -1,6 +1,11 @@
-// Pagination — tokens copied from PANW source
+// Pagination — Stage tokens.
+//
+// Pagination strip is composition over other primitives. Three text tiers:
+// page label/value at primary/secondary, ellipsis at tertiary (metadata).
+// The audit's "ellipsis was using neutral80" — corrected to tertiary
+// (neutral60) where it belongs.
 :root {
-  --panw-pagination-text:           #0e1317;
-  --panw-pagination-text-secondary: #404a52;
-  --panw-pagination-ellipsis:       #404a52;
+  --panw-pagination-text:           var(--ds-text-primary);
+  --panw-pagination-text-secondary: var(--ds-text-secondary-rest);
+  --panw-pagination-ellipsis:       var(--ds-text-tertiary-rest);
 }

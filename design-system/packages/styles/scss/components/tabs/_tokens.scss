@@ -14,11 +14,12 @@
 :root {
   --panw-tabs-bg-selected:        var(--ds-surface-rest);
   --panw-tabs-bg-unselected:      var(--ds-surface-accent-rest);
-  // Hover/pressed on unselected items route to ghost.highlight (the row
-  // tier ≤48px) — not highlight.* (engaged-state fill). Tab hover is a
-  // preview, not a commit.
-  --panw-tabs-bg-hover:           var(--ds-ghost-highlight-hover);
-  --panw-tabs-bg-pressed:         var(--ds-ghost-highlight-pressed);
+  // Hover/pressed on unselected items sit on `ghost` (neutral). Tabs are
+  // navigation surfaces, not brand-engaged — the selected affordance
+  // already does the brand work (white pop + brand underline). A neutral
+  // hover keeps the preview-vs-selected hierarchy clean.
+  --panw-tabs-bg-hover:           var(--ds-ghost-hover);
+  --panw-tabs-bg-pressed:         var(--ds-ghost-pressed);
   --panw-tabs-border-accent:      var(--ds-lines-brand-rest);
   --panw-tabs-border-subtle:      var(--ds-lines-neutral-rest);
   --panw-tabs-border-medium:      var(--ds-lines-neutral-hover);

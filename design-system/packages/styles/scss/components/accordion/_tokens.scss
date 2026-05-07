@@ -1,16 +1,31 @@
-// =============================================================================
-// Accordion — CSS custom property tokens
-// FUTURE TOKEN SWAP: hex literals copied from PANW source (Accordion.css).
-// =============================================================================
-
+// Accordion — Stage tokens.
+//
+// Two themes: gray00 (surface.rest) and gray10 (surface.alt.rest). Hover and
+// pressed move both themes onto highlight.* — alpha-brand grounds. State
+// propagation rule fires: title, description, and expansion icon route to
+// the brand family when the row is on a highlight ground (the audit's
+// "state propagation broken" finding).
 :root {
-  --panw-accordion-bg-gray00:           #ffffff;
-  --panw-accordion-bg-gray10:           #f9f9f9;
-  --panw-accordion-bg-hover-gray00:     #eff8ff;
-  --panw-accordion-bg-hover-gray10:     #e8f0f8;
-  --panw-accordion-bg-pressing-gray00:  #e0f0ff;
-  --panw-accordion-bg-pressing-gray10:  #dde8f0;
-  --panw-accordion-icon-color:          #404a52;
-  --panw-accordion-title-color:         #0e1317;
-  --panw-accordion-description-color:   #656f76;
+  --panw-accordion-bg-gray00:           var(--ds-surface-rest);
+  --panw-accordion-bg-gray10:           var(--ds-surface-alt-rest);
+  --panw-accordion-bg-hover-gray00:     var(--ds-highlight-hover);
+  --panw-accordion-bg-hover-gray10:     var(--ds-highlight-hover);
+  --panw-accordion-bg-pressing-gray00:  var(--ds-highlight-pressed);
+  --panw-accordion-bg-pressing-gray10:  var(--ds-highlight-pressed);
+
+  // Rest-state foreground.
+  --panw-accordion-icon-color:          var(--ds-icons-tertiary-rest);
+  --panw-accordion-title-color:         var(--ds-text-primary);
+  --panw-accordion-description-color:   var(--ds-text-tertiary-rest);
+
+  // Brand-family routing for alpha-brand grounds (hover/pressed).
+  --panw-accordion-icon-color-hover:    var(--ds-icons-brand-hover);
+  --panw-accordion-icon-color-pressed:  var(--ds-icons-brand-pressed);
+  --panw-accordion-title-color-hover:   var(--ds-text-brand-hover);
+  --panw-accordion-title-color-pressed: var(--ds-text-brand-pressed);
+
+  // Disabled — content-led, no opacity sledgehammer.
+  --panw-accordion-icon-disabled:       var(--ds-icons-disabled);
+  --panw-accordion-title-disabled:      var(--ds-text-secondary-disabled);
+  --panw-accordion-description-disabled: var(--ds-text-tertiary-disabled);
 }

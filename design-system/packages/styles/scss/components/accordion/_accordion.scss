@@ -19,10 +19,26 @@ $panw-prefix: 'panw';
   cursor: pointer;
   user-select: none;
   background-color: var(--panw-accordion-bg-gray00);
-  transition: background-color 120ms ease-out;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
   &:hover { background-color: var(--panw-accordion-bg-hover-gray00); }
   &:active { background-color: var(--panw-accordion-bg-pressing-gray00); }
+}
+
+// State propagation: alpha-brand ground → matching family for title/icon.
+.#{$panw-prefix}--accordion__item:hover {
+  .#{$panw-prefix}--accordion__title,
+  .#{$panw-prefix}--accordion__icon-container,
+  .#{$panw-prefix}--accordion__expansion-icon {
+    color: var(--panw-accordion-title-color-hover);
+  }
+}
+.#{$panw-prefix}--accordion__item:active {
+  .#{$panw-prefix}--accordion__title,
+  .#{$panw-prefix}--accordion__icon-container,
+  .#{$panw-prefix}--accordion__expansion-icon {
+    color: var(--panw-accordion-title-color-pressed);
+  }
 }
 
 .#{$panw-prefix}--accordion--theme-gray10 .#{$panw-prefix}--accordion__item {
@@ -33,8 +49,20 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--accordion--disabled .#{$panw-prefix}--accordion__item {
   cursor: not-allowed;
-  opacity: 0.5;
   &:hover, &:active { background-color: var(--panw-accordion-bg-gray00); }
+
+  .#{$panw-prefix}--accordion__title { color: var(--panw-accordion-title-disabled); }
+  .#{$panw-prefix}--accordion__description { color: var(--panw-accordion-description-disabled); }
+  .#{$panw-prefix}--accordion__icon-container,
+  .#{$panw-prefix}--accordion__expansion-icon { color: var(--panw-accordion-icon-disabled); }
+
+  &:hover, &:active {
+    .#{$panw-prefix}--accordion__title,
+    .#{$panw-prefix}--accordion__icon-container,
+    .#{$panw-prefix}--accordion__expansion-icon {
+      color: inherit;
+    }
+  }
 }
 
 .#{$panw-prefix}--accordion--disabled.#{$panw-prefix}--accordion--theme-gray10 .#{$panw-prefix}--accordion__item {
@@ -43,12 +71,18 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--accordion--force-hover .#{$panw-prefix}--accordion__item {
   background-color: var(--panw-accordion-bg-hover-gray00);
+  .#{$panw-prefix}--accordion__title,
+  .#{$panw-prefix}--accordion__icon-container,
+  .#{$panw-prefix}--accordion__expansion-icon { color: var(--panw-accordion-title-color-hover); }
 }
 .#{$panw-prefix}--accordion--force-hover.#{$panw-prefix}--accordion--theme-gray10 .#{$panw-prefix}--accordion__item {
   background-color: var(--panw-accordion-bg-hover-gray10);
 }
 .#{$panw-prefix}--accordion--force-pressing .#{$panw-prefix}--accordion__item {
   background-color: var(--panw-accordion-bg-pressing-gray00);
+  .#{$panw-prefix}--accordion__title,
+  .#{$panw-prefix}--accordion__icon-container,
+  .#{$panw-prefix}--accordion__expansion-icon { color: var(--panw-accordion-title-color-pressed); }
 }
 .#{$panw-prefix}--accordion--force-pressing.#{$panw-prefix}--accordion--theme-gray10 .#{$panw-prefix}--accordion__item {
   background-color: var(--panw-accordion-bg-pressing-gray10);
@@ -76,7 +110,7 @@ $panw-prefix: 'panw';
   width: 16px;
   height: 16px;
   color: var(--panw-accordion-icon-color);
-  transition: transform 120ms ease-out;
+  transition: transform 110ms cubic-bezier(0.2, 0, 0.38, 0.9), color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
   svg { width: 16px; height: 16px; }
 }
@@ -156,7 +190,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--accordion__content-area {
   overflow: hidden;
-  transition: max-height 120ms ease-out, opacity 120ms ease-out;
+  transition: max-height 240ms cubic-bezier(0, 0, 0.38, 0.9), opacity 150ms cubic-bezier(0, 0, 0.38, 0.9);
   max-height: 0;
   opacity: 0;
 }

@@ -53,6 +53,15 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--search__clear {
   display: none;
   flex-shrink: 0;
+  // Constrain the inner IconButton so it can't stretch the field — the
+  // sm IconButton's 32px touch target was driving the search box to
+  // expand vertically the moment it appeared on focus. Sizing the
+  // button to match the search icon column keeps geometry stable.
+  .#{$panw-prefix}--btn-icon {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+  }
 }
 
 .#{$panw-prefix}--search--active .#{$panw-prefix}--search__clear,
@@ -97,23 +106,18 @@ $panw-prefix: 'panw';
   border-color: transparent;
 }
 
+// Active state — Stage field contract: the line is always 1px; focus
+// shifts the border color, not the border weight. Carbon's padding
+// compensation pattern would land 1px adjustments on what's currently
+// 8/12/16 vertical padding — off-grid against Stage's 4/8/12/16/24
+// scale — so the geometry stays stable and the colour does the work.
 .#{$panw-prefix}--search--active,
 .#{$panw-prefix}--search--force-active {
-  border-width: 2px;
   border-color: var(--panw-search-border-focus);
   background-color: var(--panw-search-bg-grey10);
-  padding-left: 16px;
-  padding-right: 8px;
 
   .#{$panw-prefix}--search__input::placeholder { color: var(--panw-search-text); }
 }
-
-.#{$panw-prefix}--search--sm.#{$panw-prefix}--search--active,
-.#{$panw-prefix}--search--sm.#{$panw-prefix}--search--force-active { padding-top: 6px; padding-bottom: 6px; }
-.#{$panw-prefix}--search--md.#{$panw-prefix}--search--active,
-.#{$panw-prefix}--search--md.#{$panw-prefix}--search--force-active { padding-top: 10px; padding-bottom: 10px; }
-.#{$panw-prefix}--search--lg.#{$panw-prefix}--search--active,
-.#{$panw-prefix}--search--lg.#{$panw-prefix}--search--force-active { padding-top: 14px; padding-bottom: 14px; }
 
 .#{$panw-prefix}--search--disabled,
 .#{$panw-prefix}--search--force-disabled {

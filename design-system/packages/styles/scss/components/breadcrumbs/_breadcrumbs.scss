@@ -1,11 +1,18 @@
 // =============================================================================
 // Breadcrumbs — chevron-separated nav trail
 // =============================================================================
+//
+// Stage routing:
+//   trail link        → text.link-neutral (no underline at rest, underline on hover)
+//   current page      → text.primary
+//   separator chevron → icons.tertiary
+//
+// Spacing: 8px between items and chevrons (Stage 4px grid). The component
+// does not own outer padding — that lives with whatever container wraps it.
 
 .panw--breadcrumbs {
   display: flex;
   align-items: center;
-  padding-left: 8px;
   font-family: var(--ds-type-font-family-sans);
   font-size: 14px;
   font-weight: 400;
@@ -16,7 +23,7 @@
 .panw--breadcrumbs__list {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   list-style: none;
   margin: 0;
   padding: 0;
@@ -25,7 +32,7 @@
 .panw--breadcrumbs__item {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
 }
 
 .panw--breadcrumbs__separator {
@@ -34,7 +41,7 @@
   justify-content: center;
   width: 16px;
   height: 16px;
-  color: var(--panw-breadcrumb-text);
+  color: var(--panw-breadcrumb-separator);
   flex-shrink: 0;
 
   svg { width: 16px; height: 16px; }
@@ -50,7 +57,7 @@
   font: inherit;
   letter-spacing: inherit;
   line-height: inherit;
-  transition: color 100ms ease-out;
+  transition: color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
   &:hover {
     color: var(--panw-breadcrumb-link-hover);
@@ -84,8 +91,8 @@
   font: inherit;
   letter-spacing: inherit;
   line-height: inherit;
-  transition: color 100ms ease-out;
+  transition: color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
-  &:hover  { color: var(--panw-breadcrumb-link-hover); }
-  &:active { color: var(--panw-breadcrumb-link-pressed); }
+  &:hover  { color: var(--panw-breadcrumb-link-hover); text-decoration: underline; text-decoration-skip-ink: none; }
+  &:active { color: var(--panw-breadcrumb-link-pressed); text-decoration: underline; text-decoration-skip-ink: none; }
 }

@@ -1,9 +1,19 @@
-// Toggle — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
+// Toggle — Stage tokens.
+//
+// On-track is solid brand (one of the few places where solid brand is the
+// right answer — this is the active-state physical control).
+// Off-track is surface.accent (neutral20) — the slot the knob slides in.
+// Disabled tokens are explicit per family (no opacity sledgehammer).
 :root {
-  --panw-toggle-track-on:   #006fcc; // VariableID:7203:1770
-  --panw-toggle-track-off:  #c5ccd1; // VariableID:7203:1783
-  --panw-toggle-knob:       #ffffff; // VariableID:5344:6316 (was --static-surfaces-primary)
-  --panw-toggle-label:      #404a52; // VariableID:7203:1791
-  --panw-toggle-info:       #404a52; // VariableID:7208:6383
-  --panw-toggle-focus:      #006fcc;
+  --panw-toggle-track-on:           var(--ds-brand-rest);
+  --panw-toggle-track-off:          var(--ds-surface-accent-rest);
+  --panw-toggle-track-on-disabled:  var(--ds-brand-disabled);
+  --panw-toggle-track-off-disabled: var(--ds-lines-neutral-disabled);
+  --panw-toggle-knob:               #ffffff;
+  --panw-toggle-knob-disabled:      var(--ds-surface-rest);
+  --panw-toggle-label:              var(--ds-text-secondary-rest);
+  --panw-toggle-label-disabled:     var(--ds-text-secondary-disabled);
+  --panw-toggle-info:               var(--ds-icons-tertiary-rest);
+  --panw-toggle-info-disabled:      var(--ds-icons-disabled);
+  --panw-toggle-focus:              var(--ds-lines-brand-rest);
 }

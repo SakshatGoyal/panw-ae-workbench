@@ -49,7 +49,7 @@
   flex-shrink: 0;
   box-sizing: border-box;
   background-color: var(--panw-toggle-track-on);
-  transition: background-color 0.2s ease;
+  transition: background-color 70ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 .panw--toggle-track--off { background-color: var(--panw-toggle-track-off); }
@@ -61,7 +61,7 @@
   border-radius: 18px;
   background-color: var(--panw-toggle-knob);
   flex-shrink: 0;
-  transition: transform 0.2s ease;
+  transition: transform 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 .panw--toggle-track:not(.panw--toggle-track--off) .panw--toggle-knob {
@@ -96,7 +96,27 @@
 
 .panw--toggle-root--disabled {
   cursor: not-allowed;
-  opacity: 0.5;
+}
+
+.panw--toggle-root--disabled .panw--toggle-track {
+  background-color: var(--panw-toggle-track-on-disabled);
+}
+
+.panw--toggle-root--disabled .panw--toggle-track--off {
+  background-color: var(--panw-toggle-track-off-disabled);
+}
+
+.panw--toggle-root--disabled .panw--toggle-knob {
+  background-color: var(--panw-toggle-knob-disabled);
+}
+
+.panw--toggle-root--disabled .panw--toggle-label,
+.panw--toggle-root--disabled .panw--toggle-status {
+  color: var(--panw-toggle-label-disabled);
+}
+
+.panw--toggle-root--disabled .panw--toggle-info-icon {
+  color: var(--panw-toggle-info-disabled);
 }
 
 .panw--toggle-input:focus-visible ~ .panw--toggle-track,

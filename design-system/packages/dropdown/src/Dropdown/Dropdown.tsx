@@ -15,10 +15,15 @@ export const DropdownStates = [
   'hover',
   'onclick',
   'active',
+  'error',
+  'success',
   'disabled',
   'readonly',
 ] as const;
 export type DropdownState = (typeof DropdownStates)[number];
+
+export const DropdownValidations = ['error', 'success'] as const;
+export type DropdownValidation = (typeof DropdownValidations)[number];
 
 export interface DropdownOption {
   label: string;
@@ -38,6 +43,8 @@ export interface DropdownProps {
   disabled?: boolean;
   readOnly?: boolean;
   forceState?: DropdownState;
+  /** Validation state — error or success swaps the field border family only. */
+  validation?: DropdownValidation;
   onChange?: (value: string) => void;
   className?: string;
 }
@@ -63,6 +70,7 @@ export const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
       disabled = false,
       readOnly = false,
       forceState,
+      validation,
       onChange,
       className,
     },
@@ -104,6 +112,8 @@ export const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
     else if (disabled) visualState = 'disabled';
     else if (readOnly) visualState = 'readonly';
     else if (isOpen) visualState = 'active';
+    else if (validation === 'error') visualState = 'error';
+    else if (validation === 'success') visualState = 'success';
 
     const selectedLabel = options.find((o) => o.value === internal)?.label;
 
@@ -196,6 +206,7 @@ Dropdown.propTypes = {
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,
   forceState: PropTypes.oneOf(DropdownStates),
+  validation: PropTypes.oneOf(DropdownValidations),
   onChange: PropTypes.func,
   className: PropTypes.string,
 };

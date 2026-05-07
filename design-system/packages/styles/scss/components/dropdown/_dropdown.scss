@@ -2,6 +2,13 @@
 
 $panw-prefix: 'panw';
 
+// =============================================================================
+// Dropdown — single-select trigger field with flyout listbox.
+// Conforms to the Stage field contract: always-line, focus-on-color (geometry
+// stable via inset box-shadow), validation = border-swap only, family-aware
+// disabled. radius.tight on the trigger; radius.standard on the flyout.
+// =============================================================================
+
 .#{$panw-prefix}--dropdown {
   display: flex;
   flex-direction: column;
@@ -9,23 +16,39 @@ $panw-prefix: 'panw';
   font-family: var(--ds-type-font-family-sans);
 }
 
+// ─── Title / description rows ────────────────────────────────────────────────
+
 .#{$panw-prefix}--dropdown__title-container {
   display: flex;
-  flex-direction: row;
   align-items: center;
   padding-bottom: 4px;
   gap: 8px;
-  width: 100%;
 }
 
 .#{$panw-prefix}--dropdown__title {
   flex: 1;
   font-size: 14px;
   font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.25px;
-  color: var(--panw-dropdown-text);
+  line-height: 1.286;
+  color: var(--panw-dropdown-title);
 }
+
+.#{$panw-prefix}--dropdown__description-container {
+  display: flex;
+  align-items: center;
+  padding-top: 4px;
+  gap: 8px;
+}
+
+.#{$panw-prefix}--dropdown__description {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.333;
+  color: var(--panw-dropdown-description);
+}
+
+// ─── Trigger field ───────────────────────────────────────────────────────────
 
 .#{$panw-prefix}--dropdown__wrapper {
   position: relative;
@@ -34,18 +57,25 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--dropdown__text-container {
   display: flex;
-  flex-direction: row;
   align-items: center;
-  padding: 0 16px;
   gap: 8px;
   width: 100%;
   height: 40px;
+  padding: 0 16px;
+  border: 1px solid var(--panw-dropdown-border);
   border-radius: 4px;
-  background-color: var(--panw-dropdown-bg-grey10);
-  border: none;
+  background-color: var(--panw-dropdown-bg);
   box-sizing: border-box;
   cursor: pointer;
-  transition: background-color 0.15s ease-out;
+  transition:
+    background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    box-shadow 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+
+  &:focus-visible {
+    outline: 2px solid var(--ds-lines-brand-rest);
+    outline-offset: 2px;
+  }
 }
 
 .#{$panw-prefix}--dropdown__placeholder,
@@ -53,8 +83,7 @@ $panw-prefix: 'panw';
   flex: 1;
   font-size: 14px;
   font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.25px;
+  line-height: 1.286;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -73,55 +102,77 @@ $panw-prefix: 'panw';
   svg { width: 16px; height: 16px; }
 }
 
-.#{$panw-prefix}--dropdown__description-container {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  padding-top: 4px;
-  gap: 8px;
-  width: 100%;
+// ─── Background variant — bg-grey00 routes to field.alt ──────────────────────
+
+.#{$panw-prefix}--dropdown--bg-grey00 .#{$panw-prefix}--dropdown__text-container {
+  background-color: var(--panw-dropdown-bg-alt);
 }
 
-.#{$panw-prefix}--dropdown__description {
-  flex: 1;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 16px;
-  letter-spacing: 0.25px;
-  color: var(--panw-dropdown-description);
-}
+// ─── Sizes ───────────────────────────────────────────────────────────────────
 
 .#{$panw-prefix}--dropdown--size-large .#{$panw-prefix}--dropdown__text-container { height: 48px; }
-.#{$panw-prefix}--dropdown--bg-grey00 .#{$panw-prefix}--dropdown__text-container { background-color: var(--panw-dropdown-bg-grey00); }
+
+// ─── States ──────────────────────────────────────────────────────────────────
+// Hover swaps ground only; line stays put. Active/focus shifts the line to
+// brand and lays an inset 1px box-shadow so the apparent width is 2px without
+// changing geometry. Validation (error/success) is a border-swap only — the
+// surface beneath the value never moves.
 
 .#{$panw-prefix}--dropdown--state-default .#{$panw-prefix}--dropdown__text-container:hover,
 .#{$panw-prefix}--dropdown--state-hover .#{$panw-prefix}--dropdown__text-container {
   background-color: var(--panw-dropdown-bg-hover);
 }
 
+.#{$panw-prefix}--dropdown--bg-grey00.#{$panw-prefix}--dropdown--state-default .#{$panw-prefix}--dropdown__text-container:hover,
+.#{$panw-prefix}--dropdown--bg-grey00.#{$panw-prefix}--dropdown--state-hover .#{$panw-prefix}--dropdown__text-container {
+  background-color: var(--panw-dropdown-bg-alt-hover);
+}
+
 .#{$panw-prefix}--dropdown--state-onclick .#{$panw-prefix}--dropdown__text-container {
-  background-color: var(--panw-dropdown-bg-onclick);
+  background-color: var(--panw-dropdown-bg-pressed);
 }
 
-.#{$panw-prefix}--dropdown--state-active .#{$panw-prefix}--dropdown__text-container {
-  border: 2px solid var(--panw-dropdown-border-active);
-  padding: 0 14px;
+.#{$panw-prefix}--dropdown--state-active .#{$panw-prefix}--dropdown__text-container,
+.#{$panw-prefix}--dropdown__text-container:focus-visible {
+  border-color: var(--panw-dropdown-border-focus);
+  box-shadow: inset 0 0 0 1px var(--panw-dropdown-border-focus);
+  background-color: var(--panw-dropdown-bg-active);
+  outline: none;
 }
 
-.#{$panw-prefix}--dropdown--state-disabled {
-  pointer-events: none;
-  .#{$panw-prefix}--dropdown__title,
-  .#{$panw-prefix}--dropdown__placeholder,
-  .#{$panw-prefix}--dropdown__value,
-  .#{$panw-prefix}--dropdown__chevron,
-  .#{$panw-prefix}--dropdown__description { color: var(--panw-dropdown-disabled); }
+.#{$panw-prefix}--dropdown--state-error .#{$panw-prefix}--dropdown__text-container {
+  border-color: var(--panw-dropdown-border-error);
+  box-shadow: inset 0 0 0 1px var(--panw-dropdown-border-error);
+}
+
+.#{$panw-prefix}--dropdown--state-success .#{$panw-prefix}--dropdown__text-container {
+  border-color: var(--panw-dropdown-border-success);
+  box-shadow: inset 0 0 0 1px var(--panw-dropdown-border-success);
 }
 
 .#{$panw-prefix}--dropdown--state-readonly {
   pointer-events: none;
-  .#{$panw-prefix}--dropdown__title,
-  .#{$panw-prefix}--dropdown__chevron { color: var(--panw-dropdown-readonly); }
+  .#{$panw-prefix}--dropdown__text-container { cursor: default; }
 }
+
+// Disabled — content-led. Border drops to lines.neutral.disabled, ground
+// drops to field.disabled, and text colors family-shift to *-disabled.
+.#{$panw-prefix}--dropdown--state-disabled {
+  pointer-events: none;
+  .#{$panw-prefix}--dropdown__text-container {
+    background-color: var(--panw-dropdown-bg-disabled);
+    border-color: var(--panw-dropdown-border-disabled);
+    cursor: not-allowed;
+  }
+  .#{$panw-prefix}--dropdown__title       { color: var(--panw-dropdown-title-disabled); }
+  .#{$panw-prefix}--dropdown__placeholder,
+  .#{$panw-prefix}--dropdown__value       { color: var(--panw-dropdown-text-disabled); }
+  .#{$panw-prefix}--dropdown__description { color: var(--panw-dropdown-description-disabled); }
+  .#{$panw-prefix}--dropdown__chevron     { color: var(--panw-dropdown-chevron-disabled); }
+}
+
+// ─── Flyout menu ─────────────────────────────────────────────────────────────
+// radius.standard (8px) — Stage's "holds content with defined edge" rule.
 
 .#{$panw-prefix}--dropdown__menu {
   position: absolute;
@@ -129,8 +180,10 @@ $panw-prefix: 'panw';
   left: 0;
   right: 0;
   margin-top: 4px;
+  padding: 4px 0;
   background-color: var(--panw-dropdown-menu-bg);
-  border-radius: 4px;
+  border: 1px solid var(--panw-dropdown-border);
+  border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
   z-index: 10;
   max-height: 200px;
@@ -144,13 +197,12 @@ $panw-prefix: 'panw';
   padding: 8px 16px;
   font-size: 14px;
   font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.25px;
+  line-height: 1.286;
   color: var(--panw-dropdown-text);
   cursor: pointer;
-  transition: background-color 0.1s ease;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
-  &:hover { background-color: var(--panw-dropdown-bg-hover); }
+  &:hover { background-color: var(--panw-dropdown-menu-item-hover); }
 }
 
 .#{$panw-prefix}--dropdown__menu-item--selected {

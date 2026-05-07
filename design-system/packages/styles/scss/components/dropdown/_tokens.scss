@@ -1,17 +1,49 @@
-// Dropdown — CSS tokens copied from PANW DropdownRounded.css
+// =============================================================================
+// Dropdown — Stage tokens.
+//
+// Field contract: always a 1px line at rest. Focus shifts line family to
+// lines.brand and adds a 1px inset box-shadow so the apparent width is 2px
+// without changing geometry. Validation states swap the line family only —
+// the surface beneath the value never moves under the user's typing. Disabled
+// is family-aware: text.tertiary.disabled for description, text.secondary.disabled
+// for value/title, lines.neutral.disabled for the border.
+//
+// Background routes to field.* (neutral10) — the field family — with
+// field.alt.* (neutral0) reserved for the bg-grey00 variant.
+//
+// The flyout menu sits at radius.standard (8px) per Stage's "holds content
+// with a defined edge" rule. The trigger field sits at radius.tight (4px).
+// =============================================================================
+
 :root {
-  --panw-dropdown-bg-grey10:        #ffffff;
-  --panw-dropdown-bg-grey00:        #f9f9f9;
-  --panw-dropdown-bg-hover:         #eaebeb;
-  --panw-dropdown-bg-onclick:       #dadbdb;
-  --panw-dropdown-border-active:    #006fcc;
-  --panw-dropdown-text:             #0e1317;
-  --panw-dropdown-placeholder:      #a6adb2;
-  --panw-dropdown-chevron:          #404a52;
-  --panw-dropdown-description:      #656f76;
-  --panw-dropdown-disabled:         #c5ccd1;
-  --panw-dropdown-readonly:         #656f76;
-  --panw-dropdown-menu-bg:          #ffffff;
-  --panw-dropdown-menu-selected-bg: #cfe8fc;
-  --panw-dropdown-menu-selected-fg: #006fcc;
+  --panw-dropdown-bg:                var(--ds-field-rest);
+  --panw-dropdown-bg-hover:          var(--ds-field-hover);
+  --panw-dropdown-bg-pressed:        var(--ds-field-pressed);
+  --panw-dropdown-bg-active:         var(--ds-field-selected);
+  --panw-dropdown-bg-disabled:       var(--ds-field-disabled);
+  --panw-dropdown-bg-alt:            var(--ds-field-alt-rest);
+  --panw-dropdown-bg-alt-hover:      var(--ds-field-alt-hover);
+  --panw-dropdown-bg-alt-pressed:    var(--ds-field-alt-pressed);
+
+  --panw-dropdown-border:            var(--ds-lines-neutral-rest);
+  --panw-dropdown-border-hover:      var(--ds-lines-neutral-hover);
+  --panw-dropdown-border-focus:      var(--ds-lines-brand-rest);
+  --panw-dropdown-border-error:      var(--ds-lines-danger-rest);
+  --panw-dropdown-border-success:    var(--ds-lines-status-success);
+  --panw-dropdown-border-disabled:   var(--ds-lines-neutral-disabled);
+
+  --panw-dropdown-title:             var(--ds-text-secondary-rest);
+  --panw-dropdown-title-disabled:    var(--ds-text-secondary-disabled);
+  --panw-dropdown-text:              var(--ds-text-primary);
+  --panw-dropdown-text-disabled:     var(--ds-text-secondary-disabled);
+  --panw-dropdown-placeholder:       var(--ds-text-placeholder-rest);
+  --panw-dropdown-description:       var(--ds-text-tertiary-rest);
+  --panw-dropdown-description-disabled: var(--ds-text-tertiary-disabled);
+  --panw-dropdown-chevron:           var(--ds-icons-secondary-rest);
+  --panw-dropdown-chevron-disabled:  var(--ds-icons-secondary-disabled);
+
+  --panw-dropdown-menu-bg:           var(--ds-surface-rest);
+  --panw-dropdown-menu-item-hover:   var(--ds-ghost-hover);
+  --panw-dropdown-menu-selected-bg:  var(--ds-highlight-rest);
+  --panw-dropdown-menu-selected-fg:  var(--ds-text-brand-rest);
 }

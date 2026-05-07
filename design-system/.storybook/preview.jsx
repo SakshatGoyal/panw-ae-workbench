@@ -1,11 +1,14 @@
 /**
  * Storybook global preview configuration.
  *
- * styles.css supplies the --ds-* semantic token layer (defined inside .shell,
- * .stage, and .emphasis class blocks — not :root). Without it every var(--ds-*)
- * resolves to undefined, making hover/pressed/selected states invisible.
- * The stageDecorator below applies class="stage" so those token definitions
- * become active for every story.
+ * styles.css supplies the --ds-* semantic token layer. Those tokens are defined
+ * inside .stage {} (and .shell, .emphasis), NOT in :root. The component-level
+ * --panw-* tokens live in :root and reference var(--ds-*). CSS custom properties
+ * compute at the element level: if var(--ds-highlight-hover) is evaluated on
+ * <html> (= :root) and --ds-highlight-hover isn't defined there, the resolved
+ * value is the guaranteed-invalid value — which then propagates to ALL
+ * descendants, bypassing any .stage ancestor div. The fix is to add .stage
+ * directly to <html> so that :root and .stage are on the same element.
  */
 import '../packages/styles/css/styles.css';
 import '../packages/styles/scss/components/button/index.scss';
@@ -32,13 +35,15 @@ import '../packages/styles/scss/components/tooltip/index.scss';
 import '../packages/styles/scss/components/popover/index.scss';
 import '../packages/styles/scss/components/pagination/index.scss';
 import '../packages/styles/scss/components/cells-standard/index.scss';
-import React from 'react';
 
-const stageDecorator = (Story) => React.createElement('div', { className: 'stage', style: { padding: '0' } }, React.createElement(Story));
+// Apply .stage to <html> so --ds-* tokens (defined in .stage{}) are available
+// on :root, which is where the --panw-* component tokens compute their var()
+// references. A descendant .stage div would not work because :root computes
+// var(--ds-*) before that element exists in the cascade direction.
+document.documentElement.classList.add('stage');
 
 /** @type {import('@storybook/react').Preview} */
 const preview = {
-  decorators: [stageDecorator],
   parameters: {
     actions: { argTypesRegex: '^on[A-Z].*' },
     controls: {

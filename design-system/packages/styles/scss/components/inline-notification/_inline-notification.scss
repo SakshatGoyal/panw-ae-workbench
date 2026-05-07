@@ -51,6 +51,25 @@ $panw-prefix: 'panw';
   flex-shrink: 0;
 }
 
+// Close button color follows the notification ground.
+//
+// On page-level (subtle) grounds the close button keeps its default
+// ghost-icon neutral — the surrounding text is text.primary, the X is
+// allowed to drop a tier as it's the dismissal control, not the message.
+//
+// On product-level dark fills (info, error, success — solid cobalt80,
+// red60, green60) the close button color flips to inverse so it stays
+// legible against the dark ground. The light-luminance exceptions
+// (warning yellow40, caution orange50) keep the X at primary, matching
+// the body text on those grounds.
+.#{$panw-prefix}--inline-notification--info.#{$panw-prefix}--inline-notification--product-level,
+.#{$panw-prefix}--inline-notification--error.#{$panw-prefix}--inline-notification--product-level,
+.#{$panw-prefix}--inline-notification--success.#{$panw-prefix}--inline-notification--product-level {
+  .#{$panw-prefix}--inline-notification__close .#{$panw-prefix}--btn-icon {
+    color: var(--panw-in-text-inverse);
+  }
+}
+
 // Color combinations
 .#{$panw-prefix}--inline-notification--info.#{$panw-prefix}--inline-notification--page-level {
   background-color: var(--panw-in-info-page-bg);

@@ -1,12 +1,6 @@
 // Elevation shadows are mode-agnostic and emitted at :root.
 //
-// Usage:
-//   shadow-tile-on-tile  cards stacked on tiles
-//   shadow-tiles     tiles / cards without an edge
-//   shadow-shell     FAB, raised cards, raised app bars
-//   shadow-flyout    flyouts, popovers, dropdowns
-//   shadow-persistent  bottom sheet, side navigation, raised tab bars
-//   shadow-modals    pop-up dialogs
+
 
 @use 'sass:map';
 

@@ -11,6 +11,9 @@
 
 .panw--tag {
   @include tag-base;
+  // Hover ground transition is shared across categorical and neutral
+  // variants. 110ms/entrance curve matches button and flyout-item motion.
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 // ─── Shapes ──────────────────────────────────────────────────────────────────
@@ -118,10 +121,18 @@
   &.panw--tag--low.panw--tag--#{$name} {
     background-color: var(--ds-tag-#{$name}-low-bg);
     color:            var(--ds-tag-#{$name}-low-text);
+
+    // Hover steps the pastel one rung deeper (primitive-30) — the chip
+    // becomes "more itself" rather than crossing into a different lane.
+    &:hover { background-color: var(--ds-tag-#{$name}-low-bg-hover); }
   }
   &.panw--tag--high.panw--tag--#{$name} {
     background-color: var(--ds-tag-#{$name}-high-bg);
     color:            var(--ds-tag-#{$name}-high-text);
+
+    // Hover steps the saturated one rung softer (primitive-60) — same
+    // perceptual lane, lighter on the eye.
+    &:hover { background-color: var(--ds-tag-#{$name}-high-bg-hover); }
   }
 }
 
@@ -166,7 +177,6 @@
   @include _tag-color('lavender');
   @include _tag-color('purple');
   @include _tag-color('pink');
-  @include _tag-color('magenta');
   @include _tag-color('yellow');
   @include _tag-color('bronze');
   @include _tag-color('olive');

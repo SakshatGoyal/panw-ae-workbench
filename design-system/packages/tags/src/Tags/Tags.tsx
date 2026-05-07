@@ -16,7 +16,6 @@ export const TagColors = [
   'lavender',
   'purple',
   'pink',
-  'magenta',
   'yellow',
   'bronze',
   'olive',
@@ -51,7 +50,7 @@ export interface TagsProps
   extends Omit<React.HTMLAttributes<HTMLSpanElement>, 'onClose'> {
   /** Tag label text. Mirrors PANW's `label` prop. */
   label?: string;
-  /** Color variant — 17 options matching the Figma color property. */
+  /** Color variant — 16 categorical options plus `neutral`. */
   color?: TagColor;
   /** Contrast level — `low` (pastel bg, dark text) or `high` (saturated bg, light text). */
   contrast?: TagContrast;

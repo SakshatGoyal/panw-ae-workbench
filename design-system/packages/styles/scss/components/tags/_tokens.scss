@@ -2,16 +2,18 @@
 // Tags — Stage tokens.
 //
 // Tag colors are derived references into Stage's primitive scales — see
-// stage.ts "tag" block. Each color resolves bg + text per contrast tier:
-//   low.bg   → primitive-20  (pastel)
-//   low.text → primitive-70  (deep)
-//   high.bg  → primitive-70  (saturated)
-//   high.text → "#ffffff"     (inverse white)
+// stage.ts "tag" block. Each color resolves bg + bg-hover + text per
+// contrast tier:
+//   low.bg        → primitive-20  (pastel rest)
+//   low.bg-hover  → primitive-30  (one step deeper on hover)
+//   low.text      → primitive-70  (deep)
+//   high.bg       → primitive-70  (saturated rest)
+//   high.bg-hover → primitive-60  (one step softer on hover)
+//   high.text     → "#ffffff"     (inverse white, including yellow)
 //
-// Brightness exception: high-contrast yellow uses primary text on the bright
-// ground rather than inverse white (the categorical token tag.yellow.high.text
-// resolves to neutral100, not "#ffffff"). Same treatment as Stage's
-// status.warning.strong.
+// Yellow.high.text uses inverse white like every other high-contrast tag.
+// Earlier the categorical block routed it to neutral100; that failed WCAG
+// AA against yellow70 in some surrounding contexts.
 //
 // Status-overlapping color names (red, green, orange, yellow) are kept for
 // backward compatibility. Convention: tags categorize, status communicates

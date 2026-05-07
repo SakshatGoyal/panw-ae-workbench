@@ -2,6 +2,15 @@
 
 $panw-prefix: 'panw';
 
+// =============================================================================
+// Search — leading-icon text input. Conforms to the Stage field contract.
+//
+// The earlier focus-jump bug (geometry shifting on active because border went
+// 1px -> 2px while padding stayed put) is resolved by the contract's
+// 1px-border + 1px-inset-box-shadow pattern. The off-grid padding compensation
+// concern is moot because nothing moves.
+// =============================================================================
+
 .#{$panw-prefix}--search {
   display: inline-flex;
   align-items: center;
@@ -11,16 +20,17 @@ $panw-prefix: 'panw';
   font-family: var(--ds-type-font-family-sans);
   font-size: 14px;
   font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.25px;
+  line-height: 1.286;
   cursor: text;
   overflow: hidden;
-  background-color: var(--panw-search-bg-grey10);
+  background-color: var(--panw-search-bg);
   border: 1px solid var(--panw-search-border);
   border-radius: 4px;
   padding: 12px 8px 12px 16px;
-  transition: background-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9),
-              border-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition:
+    background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    box-shadow 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 .#{$panw-prefix}--search__icon {
@@ -30,7 +40,7 @@ $panw-prefix: 'panw';
   flex-shrink: 0;
   width: 16px;
   height: 16px;
-  color: var(--panw-search-icon-grey10);
+  color: var(--panw-search-icon);
 
   svg { width: 16px; height: 16px; }
 }
@@ -42,7 +52,6 @@ $panw-prefix: 'panw';
   outline: none;
   background: transparent;
   font: inherit;
-  letter-spacing: inherit;
   color: var(--panw-search-text);
   padding: 0;
   margin: 0;
@@ -53,10 +62,7 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--search__clear {
   display: none;
   flex-shrink: 0;
-  // Constrain the inner IconButton so it can't stretch the field — the
-  // sm IconButton's 32px touch target was driving the search box to
-  // expand vertically the moment it appeared on focus. Sizing the
-  // button to match the search icon column keeps geometry stable.
+  // Constrain inner IconButton to keep field height stable when it appears.
   .#{$panw-prefix}--btn-icon {
     width: 16px;
     height: 16px;
@@ -69,65 +75,67 @@ $panw-prefix: 'panw';
   display: flex;
 }
 
-// Sizes
-.#{$panw-prefix}--search--sm { padding-top: 8px; padding-bottom: 8px; }
+// ─── Sizes (vertical padding only) ───────────────────────────────────────────
+.#{$panw-prefix}--search--sm { padding-top: 8px;  padding-bottom: 8px; }
 .#{$panw-prefix}--search--md { padding-top: 12px; padding-bottom: 12px; }
 .#{$panw-prefix}--search--lg { padding-top: 16px; padding-bottom: 16px; }
 
-// Shapes
-.#{$panw-prefix}--search--standard { border-radius: 0; }
-.#{$panw-prefix}--search--rounded  { border-radius: 4px; }
-.#{$panw-prefix}--search--pill     { border-radius: 40px; }
-
-.#{$panw-prefix}--search--sm.#{$panw-prefix}--search--pill { padding-left: 12px; }
-
-// Backgrounds
+// ─── Backgrounds ─────────────────────────────────────────────────────────────
+// grey10 routes to field.* (neutral10), grey0 routes to field.alt.* (neutral0).
+// Both carry a 1px line at rest per the field contract.
 .#{$panw-prefix}--search--grey10 {
-  background-color: var(--panw-search-bg-grey10);
-  border-color: var(--panw-search-border);
+  background-color: var(--panw-search-bg);
 }
-
 .#{$panw-prefix}--search--grey0 {
-  background-color: var(--panw-search-bg-grey0);
-  border-color: transparent;
-  .#{$panw-prefix}--search__icon { color: var(--panw-search-icon-grey0); }
+  background-color: var(--panw-search-bg-alt);
 }
 
-// States
+// ─── States ──────────────────────────────────────────────────────────────────
+// Hover swaps the ground only. Active/focus shifts border to lines.brand and
+// lays an inset 1px box-shadow for the 2px apparent width — geometry stable.
+
 .#{$panw-prefix}--search:hover:not(.#{$panw-prefix}--search--disabled):not(.#{$panw-prefix}--search--active):not(.#{$panw-prefix}--search--force-hover):not(.#{$panw-prefix}--search--force-onclick),
 .#{$panw-prefix}--search--force-hover {
   background-color: var(--panw-search-bg-hover);
-  border-color: transparent;
+}
+.#{$panw-prefix}--search--grey0:hover:not(.#{$panw-prefix}--search--disabled):not(.#{$panw-prefix}--search--active):not(.#{$panw-prefix}--search--force-hover):not(.#{$panw-prefix}--search--force-onclick),
+.#{$panw-prefix}--search--grey0.#{$panw-prefix}--search--force-hover {
+  background-color: var(--panw-search-bg-alt-hover);
 }
 
 .#{$panw-prefix}--search:active:not(.#{$panw-prefix}--search--disabled):not(.#{$panw-prefix}--search--active),
 .#{$panw-prefix}--search--force-onclick {
-  background-color: var(--panw-search-bg-onclick);
-  border-color: transparent;
+  background-color: var(--panw-search-bg-pressed);
 }
 
-// Active state — Stage field contract: the line is always 1px; focus
-// shifts the border color, not the border weight. Carbon's padding
-// compensation pattern would land 1px adjustments on what's currently
-// 8/12/16 vertical padding — off-grid against Stage's 4/8/12/16/24
-// scale — so the geometry stays stable and the colour does the work.
 .#{$panw-prefix}--search--active,
 .#{$panw-prefix}--search--force-active {
+  background-color: var(--panw-search-bg-active);
   border-color: var(--panw-search-border-focus);
-  background-color: var(--panw-search-bg-grey10);
+  box-shadow: inset 0 0 0 1px var(--panw-search-border-focus);
 
   .#{$panw-prefix}--search__input::placeholder { color: var(--panw-search-text); }
+}
+
+// Validation — border swap only.
+.#{$panw-prefix}--search--error {
+  border-color: var(--panw-search-border-error);
+  box-shadow: inset 0 0 0 1px var(--panw-search-border-error);
+}
+.#{$panw-prefix}--search--success {
+  border-color: var(--panw-search-border-success);
+  box-shadow: inset 0 0 0 1px var(--panw-search-border-success);
 }
 
 .#{$panw-prefix}--search--disabled,
 .#{$panw-prefix}--search--force-disabled {
   cursor: not-allowed;
   pointer-events: none;
-  background-color: var(--panw-search-bg-grey10);
+  background-color: var(--panw-search-bg-disabled);
   border-color: var(--panw-search-border-disabled);
 
-  .#{$panw-prefix}--search__icon,
+  .#{$panw-prefix}--search__icon { color: var(--panw-search-icon-disabled); }
   .#{$panw-prefix}--search__input,
-  .#{$panw-prefix}--search__input::placeholder { color: var(--panw-search-disabled); }
+  .#{$panw-prefix}--search__input::placeholder { color: var(--panw-search-text-disabled); }
   .#{$panw-prefix}--search__input { cursor: not-allowed; }
 }

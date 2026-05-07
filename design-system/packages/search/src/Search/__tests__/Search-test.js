@@ -39,11 +39,15 @@ describe('Search', () => {
     expect(screen.getByRole('textbox')).toBeDisabled();
   });
 
-  it('applies size, background, shape classes', () => {
-    const { container } = render(<Search size="lg" background="grey0" shape="pill" />);
+  it('applies size and background classes', () => {
+    const { container } = render(<Search size="lg" background="grey0" />);
     expect(container.querySelector('.panw--search--lg')).toBeInTheDocument();
     expect(container.querySelector('.panw--search--grey0')).toBeInTheDocument();
-    expect(container.querySelector('.panw--search--pill')).toBeInTheDocument();
+  });
+
+  it('applies validation class when set', () => {
+    const { container } = render(<Search validation="error" />);
+    expect(container.querySelector('.panw--search--error')).toBeInTheDocument();
   });
 
   it('forwards ref to the input', () => {

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
-import { Search, SearchSizes, SearchBackgrounds, SearchShapes } from './index';
+import { Search, SearchSizes, SearchBackgrounds, SearchValidations } from './index';
 import mdx from './Search.mdx';
 
 export default {
@@ -9,7 +9,7 @@ export default {
   argTypes: {
     size: { options: SearchSizes, control: { type: 'radio' } },
     background: { options: SearchBackgrounds, control: { type: 'radio' } },
-    shape: { options: SearchShapes, control: { type: 'radio' } },
+    validation: { options: [undefined, ...SearchValidations], control: { type: 'select' } },
     placeholder: { control: 'text' },
     disabled: { control: 'boolean' },
   },
@@ -34,22 +34,24 @@ export const Default = (args) => {
     />
   );
 };
-Default.args = { size: 'md', background: 'grey10', shape: 'rounded', placeholder: 'Search' };
+Default.args = { size: 'md', background: 'grey10', placeholder: 'Search' };
 
-export const Pill = () => <Search shape="pill" placeholder="Pill search" />;
-export const Standard = () => <Search shape="standard" placeholder="Standard" />;
 export const Small = () => <Search size="sm" placeholder="Small" />;
 export const Large = () => <Search size="lg" placeholder="Large" />;
 export const Disabled = () => <Search disabled placeholder="Disabled" />;
+export const Error = () => <Search validation="error" placeholder="Error state" />;
+export const Success = () => <Search validation="success" placeholder="Success state" />;
 
 export const AllVariants = () => (
-  <div style={{ padding: 24, background: '#f9f9f9', display: 'grid', gridTemplateColumns: 'repeat(3, 240px)', gap: 24 }}>
-    {SearchShapes.map((sh) =>
-      SearchSizes.map((sz) => (
-        <Search key={`${sh}-${sz}`} shape={sh} size={sz} placeholder={`${sh}/${sz}`} />
-      ))
-    )}
-    <Search background="grey0" placeholder="Grey 0 bg" />
+  <div style={{ padding: 24, background: 'var(--ds-surface-alt-rest, #f7f7f7)', display: 'grid', gridTemplateColumns: 'repeat(3, 240px)', gap: 24 }}>
+    {SearchSizes.map((sz) => (
+      <Search key={`grey10-${sz}`} size={sz} placeholder={`grey10 / ${sz}`} />
+    ))}
+    {SearchSizes.map((sz) => (
+      <Search key={`grey0-${sz}`} background="grey0" size={sz} placeholder={`grey0 / ${sz}`} />
+    ))}
+    <Search validation="error" placeholder="Error" />
+    <Search validation="success" placeholder="Success" />
     <Search disabled placeholder="Disabled" />
   </div>
 );

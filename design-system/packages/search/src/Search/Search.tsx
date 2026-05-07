@@ -11,8 +11,8 @@ export type SearchSize = (typeof SearchSizes)[number];
 export const SearchBackgrounds = ['grey10', 'grey0'] as const;
 export type SearchBackground = (typeof SearchBackgrounds)[number];
 
-export const SearchShapes = ['standard', 'rounded', 'pill'] as const;
-export type SearchShape = (typeof SearchShapes)[number];
+export const SearchValidations = ['error', 'success'] as const;
+export type SearchValidation = (typeof SearchValidations)[number];
 
 export const SearchForceStates = ['hover', 'onclick', 'active', 'disabled'] as const;
 export type SearchForceState = (typeof SearchForceStates)[number];
@@ -21,7 +21,8 @@ export interface SearchProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'size' | 'type'> {
   size?: SearchSize;
   background?: SearchBackground;
-  shape?: SearchShape;
+  /** Validation state — error or success swaps the field border family only. */
+  validation?: SearchValidation;
   forceState?: SearchForceState | null;
   value?: string;
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
@@ -35,7 +36,7 @@ export const Search = React.forwardRef<HTMLInputElement, SearchProps>(
     {
       size = 'md',
       background = 'grey10',
-      shape = 'rounded',
+      validation,
       forceState = null,
       value: controlledValue,
       onChange,
@@ -93,10 +94,11 @@ export const Search = React.forwardRef<HTMLInputElement, SearchProps>(
       `${prefix}--search`,
       `${prefix}--search--${size}`,
       `${prefix}--search--${background}`,
-      `${prefix}--search--${shape}`,
       {
         [`${prefix}--search--active`]: isActive && forceState === null,
         [`${prefix}--search--disabled`]: isDisabled && forceState !== 'disabled',
+        [`${prefix}--search--error`]: validation === 'error' && !isActive && !isDisabled,
+        [`${prefix}--search--success`]: validation === 'success' && !isActive && !isDisabled,
         [`${prefix}--search--force-hover`]: forceState === 'hover',
         [`${prefix}--search--force-onclick`]: forceState === 'onclick',
         [`${prefix}--search--force-active`]: forceState === 'active',
@@ -150,7 +152,7 @@ Search.displayName = 'Search';
 Search.propTypes = {
   size: PropTypes.oneOf(SearchSizes),
   background: PropTypes.oneOf(SearchBackgrounds),
-  shape: PropTypes.oneOf(SearchShapes),
+  validation: PropTypes.oneOf(SearchValidations),
   forceState: PropTypes.oneOf([...SearchForceStates, null]),
   value: PropTypes.string,
   onChange: PropTypes.func,

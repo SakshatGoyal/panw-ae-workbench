@@ -1,15 +1,29 @@
-// Search — tokens copied from PANW source
+// =============================================================================
+// Search — Stage tokens.
+//
+// Conforms to the field contract. radius.tight on the field. Both bg variants
+// carry a 1px line at rest.
+// =============================================================================
+
 :root {
-  --panw-search-bg-grey10:   #ffffff;
-  --panw-search-bg-grey0:    #f9f9f9;
-  --panw-search-bg-hover:    #eaebeb;
-  --panw-search-bg-onclick:  #dadbdb;
-  --panw-search-border:      #e4e8eb;
-  --panw-search-border-focus:#006fcc;
-  --panw-search-border-disabled: #c5ccd1;
-  --panw-search-text:        #0e1317;
-  --panw-search-placeholder: #a6adb2;
-  --panw-search-icon-grey10: #656f76;
-  --panw-search-icon-grey0:  #404a52;
-  --panw-search-disabled:    #c5ccd1;
+  --panw-search-bg:                var(--ds-field-rest);
+  --panw-search-bg-hover:          var(--ds-field-hover);
+  --panw-search-bg-pressed:        var(--ds-field-pressed);
+  --panw-search-bg-active:         var(--ds-field-selected);
+  --panw-search-bg-disabled:       var(--ds-field-disabled);
+  --panw-search-bg-alt:            var(--ds-field-alt-rest);
+  --panw-search-bg-alt-hover:      var(--ds-field-alt-hover);
+  --panw-search-bg-alt-pressed:    var(--ds-field-alt-pressed);
+
+  --panw-search-border:            var(--ds-lines-neutral-rest);
+  --panw-search-border-focus:      var(--ds-lines-brand-rest);
+  --panw-search-border-error:      var(--ds-lines-danger-rest);
+  --panw-search-border-success:    var(--ds-lines-status-success);
+  --panw-search-border-disabled:   var(--ds-lines-neutral-disabled);
+
+  --panw-search-text:              var(--ds-text-primary);
+  --panw-search-text-disabled:     var(--ds-text-secondary-disabled);
+  --panw-search-placeholder:       var(--ds-text-placeholder-rest);
+  --panw-search-icon:              var(--ds-icons-secondary-rest);
+  --panw-search-icon-disabled:     var(--ds-icons-secondary-disabled);
 }

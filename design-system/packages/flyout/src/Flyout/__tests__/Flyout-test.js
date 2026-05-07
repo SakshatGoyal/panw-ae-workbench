@@ -117,7 +117,7 @@ describe('Flyout', () => {
     expect(screen.queryByText('Banana')).toBeNull();
   });
 
-  it('SelectAll renders only in multiple mode', () => {
+  it('SelectAll renders only in multiple mode (icon-only, aria-labeled)', () => {
     const { rerender } = render(
       <Harness mode="single">
         <FlyoutSelectAll />
@@ -126,7 +126,7 @@ describe('Flyout', () => {
         </FlyoutList>
       </Harness>
     );
-    expect(screen.queryByText('Select all')).toBeNull();
+    expect(screen.queryByLabelText('Select all')).toBeNull();
 
     rerender(
       <Harness mode="multiple">
@@ -136,7 +136,7 @@ describe('Flyout', () => {
         </FlyoutList>
       </Harness>
     );
-    expect(screen.getByText('Select all')).toBeInTheDocument();
+    expect(screen.getByLabelText('Select all')).toBeInTheDocument();
   });
 
   it('Group toggles open state on header click', () => {

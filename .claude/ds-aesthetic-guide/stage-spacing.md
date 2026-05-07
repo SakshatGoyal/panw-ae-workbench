@@ -87,12 +87,15 @@ Applies to dropdowns, popovers, context menus, and submenus — any pattern wher
 | Property | Value |
 |---|---|
 | Trigger-to-flyout offset | 4px |
-| Flyout internal padding | 4px |
+| Flyout internal padding | minimum 4px on all four sides |
 | Item padding | 8px vertical, 12px horizontal |
 | Gap between items | 0px (contiguous) |
+| Divider clearance | 4px above and 4px below the line |
 | Nested flyout offset | 4px |
 
 The trigger is anything that opens the flyout — field, button, kebab, a parent menu item that opens a submenu. The 4px offset is constant.
+
+**Dividers are standalone elements.** A divider is a 1px horizontal line with 4px breathing room above and below — it does not live as a `border-bottom` on an interactive row. Rows have `radius.tight` corners; placing a line directly on a rounded row creates a visible "uplift" gap at each end where the radius peels away from the line. Render dividers as their own element (an `<hr>`-equivalent or a 1px-tall `<div>`) sitting between the row above and the row below.
 
 Tooltips break this pattern — they're labels, not item lists. Use 8px vertical / 12px horizontal padding only.
 

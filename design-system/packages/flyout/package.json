@@ -9,9 +9,7 @@
     ".": "./src/index.ts"
   },
   "dependencies": {
-    "@ds/checkbox": "0.1.0",
     "@ds/button": "workspace:*",
-    "@ds/text-entry": "0.1.0",
     "classnames": "^2.5.1",
     "prop-types": "^15.8.1"
   },

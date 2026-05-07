@@ -16,18 +16,21 @@ export const Filter = React.forwardRef<HTMLInputElement, FilterProps>(
     const { filter, setFilter } = useFlyoutContext();
 
     return (
-      <div className={`${prefix}--flyout__filter`}>
-        <input
-          ref={ref}
-          type="text"
-          className={`${prefix}--flyout__filter-input`}
-          value={filter}
-          onChange={(e) => setFilter(e.target.value)}
-          placeholder={placeholder}
-          autoFocus={autoFocus}
-          aria-label={placeholder}
-        />
-      </div>
+      <>
+        <div className={`${prefix}--flyout__filter`}>
+          <input
+            ref={ref}
+            type="text"
+            className={`${prefix}--flyout__filter-input`}
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            placeholder={placeholder}
+            autoFocus={autoFocus}
+            aria-label={placeholder}
+          />
+        </div>
+        <div className={`${prefix}--flyout__divider`} role="separator" aria-hidden="true" />
+      </>
     );
   }
 );

@@ -126,7 +126,12 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             ) : (
               <Button
                 key={page}
-                kind="ghost-accent"
+                // Current page wears the brand affordance; other pages
+                // sit at neutral so the user's location reads at a
+                // glance. Previously every page rendered ghost-accent,
+                // which made the strip a uniform sea of blue with no
+                // current-page emphasis.
+                kind={page === safeCurrent ? 'ghost-accent' : 'ghost-gray'}
                 size="small"
                 shape="pill"
                 aria-current={page === safeCurrent ? 'page' : undefined}

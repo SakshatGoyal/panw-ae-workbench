@@ -1,0 +1,45 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Popover } from './index';
+import * as Stories from './Popover.stories';
+
+<Meta isTemplate />
+
+# Popover
+
+[Source code](packages/popover/src/Popover/Popover.tsx)
+
+## Overview
+
+Descriptive flyout primitive — heading + body, optionally with an image
+slot and a paginated stepper. Built on Stage's card/panel role:
+
+- **surface** — `--ds-surface-rest`
+- **shadow** — `--ds-shadow-flyout`
+- **radius** — `--ds-radius-standard` (8px, the card/panel role)
+- **padding** — `12px` (`density="short"`) or `16px` (`density="structured"`)
+- **stepper** — `IconButton` from `@ds/button`
+
+This used to live as `kind="descriptive"` on `@ds/tooltip`. The split
+follows Stage's tooltip/popover distinction: tooltips are glanceable
+labels, popovers carry descriptive content. Anything previously importing
+`DescriptiveTooltip` should switch to `Popover` and pass `density` and
+content props directly.
+
+This component renders the popup itself; positioning relative to a
+trigger is the consumer's responsibility.
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+<Canvas of={Stories.Short} />
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Root has `role="dialog"`.
+- Decorative arrow uses `aria-hidden="true"`.
+- Stepper buttons are real `IconButton`s with `aria-label="Previous"`
+  and `"Next"`. They become `disabled` at the boundaries.

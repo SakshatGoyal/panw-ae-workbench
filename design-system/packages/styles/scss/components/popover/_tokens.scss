@@ -1,0 +1,16 @@
+// Popover — Stage tokens.
+//
+// The descriptive flyout that used to live as `kind="descriptive"` on
+// Tooltip. Stage's spacing/elevation/radius rules apply:
+//   surface  → surface.rest (matches card/panel role)
+//   text     → primary heading + secondary body + tertiary stepper info
+//   lines    → lines.neutral.subtle for the image placeholder ground
+//   shadow   → shadow.flyout (replaces the over-spec'd 25.6/57.6 stack)
+//   radius   → radius.standard (8px), the card/panel role
+:root {
+  --panw-popover-surface:        var(--ds-surface-rest);
+  --panw-popover-heading:        var(--ds-text-primary);
+  --panw-popover-body:           var(--ds-text-secondary-rest);
+  --panw-popover-secondary:      var(--ds-text-tertiary-rest);
+  --panw-popover-image-bg:       var(--ds-lines-neutral-tile-rest);
+}

@@ -162,7 +162,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             <div className={`${prefix}--pagination__dropdown-wrapper`}>
               <Dropdown
                 background={background}
-                size="default"
+                size="small"
                 showTitle={false}
                 showDescription={false}
                 placeholder="###"

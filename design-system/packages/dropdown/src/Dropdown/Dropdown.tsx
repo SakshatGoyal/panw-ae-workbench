@@ -7,7 +7,7 @@ import { usePrefix } from '@ds/button/src/internal/usePrefix';
 export const DropdownBackgrounds = ['grey10', 'grey00'] as const;
 export type DropdownBackground = (typeof DropdownBackgrounds)[number];
 
-export const DropdownSizes = ['default', 'large'] as const;
+export const DropdownSizes = ['small', 'default', 'large'] as const;
 export type DropdownSize = (typeof DropdownSizes)[number];
 
 export const DropdownStates = [
@@ -122,6 +122,7 @@ export const Dropdown = React.forwardRef<HTMLDivElement, DropdownProps>(
       `${prefix}--dropdown--state-${visualState}`,
       {
         [`${prefix}--dropdown--bg-grey00`]: background === 'grey00',
+        [`${prefix}--dropdown--size-small`]: size === 'small',
         [`${prefix}--dropdown--size-large`]: size === 'large',
       },
       className

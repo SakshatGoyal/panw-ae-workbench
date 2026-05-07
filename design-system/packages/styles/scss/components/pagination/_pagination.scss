@@ -38,6 +38,12 @@ $panw-prefix: 'panw';
   color: var(--panw-pagination-text-secondary);
 }
 
+// The items-per-page dropdown sits in a row of 32px chevron buttons; the
+// wrapper constrains the dropdown to a compact width and the inner trigger
+// size lives at 'small' so the row doesn't gain a 40px tile.
 .#{$panw-prefix}--pagination__dropdown-wrapper {
-  width: 96px;
+  width: 80px;
+
+  // Override Dropdown's 320px default so it fits the slot.
+  .#{$panw-prefix}--dropdown { width: 80px; }
 }

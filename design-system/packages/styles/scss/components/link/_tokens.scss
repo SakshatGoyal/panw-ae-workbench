@@ -1,16 +1,28 @@
-// =============================================================================
-// Link — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
-// =============================================================================
-
+// Link — Stage tokens.
+//
+// Two palettes map to two Stage families:
+//   blue  → text.link (the hyperlink role; underlined at rest)
+//   black → text.link-neutral (the quiet hyperlink — neutral at rest, brand
+//                              on hover/pressed; the audit's deferred
+//                              link-neutral case)
+//
+// Disabled fixes the audit's "off by a stop" — was neutral60, Stage's link
+// disabled resolves through the family token (brand30 for link, neutral50
+// for link-neutral).
 :root {
-  --panw-link-blue-default:    #006fcc; // VariableID:7203:1798
-  --panw-link-blue-hover:      #004c9d; // VariableID:7203:1799
-  --panw-link-blue-pressed:    #003474; // VariableID:7203:1800
+  // Blue (hyperlink) — text.link.
+  --panw-link-blue-default:     var(--ds-text-link-rest);
+  --panw-link-blue-hover:       var(--ds-text-link-hover);
+  --panw-link-blue-pressed:     var(--ds-text-link-pressed);
+  --panw-link-blue-disabled:    var(--ds-text-link-disabled);
 
-  --panw-link-black-default:   #404a52; // VariableID:7203:1791
-  --panw-link-black-hover:     #0e1317; // VariableID:7203:1790
-  --panw-link-black-hover-icon:#1f272e; // VariableID:7208:6384 (icon darker than text on hover)
-  --panw-link-black-pressed:   #0e1317; // VariableID:7203:1790
+  // Black (quiet hyperlink) — text.link-neutral.
+  --panw-link-black-default:    var(--ds-text-link-neutral-rest);
+  --panw-link-black-hover:      var(--ds-text-link-neutral-hover);
+  --panw-link-black-hover-icon: var(--ds-text-link-neutral-hover);
+  --panw-link-black-pressed:    var(--ds-text-link-neutral-pressed);
+  --panw-link-black-disabled:   var(--ds-text-link-neutral-disabled);
 
-  --panw-link-disabled:        #656f76; // VariableID:7203:1808
+  // Back-compat alias — both kinds reach for this when no kind is set.
+  --panw-link-disabled:         var(--ds-text-link-disabled);
 }

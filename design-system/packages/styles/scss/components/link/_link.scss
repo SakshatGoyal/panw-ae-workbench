@@ -8,16 +8,17 @@
   flex-direction: row;
   align-items: center;
   gap: 8px;
-  // packages/type yet; values copied verbatim from PANW source.
   font-family: var(--ds-type-font-family-sans);
   font-weight: 400;
   letter-spacing: 0.25px;
-  text-decoration: none;
+  text-decoration: underline;
+  text-decoration-skip-ink: none;
   cursor: pointer;
   user-select: none;
   border: none;
   background: none;
   padding: 0;
+  transition: color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
   &:focus-visible {
     outline: 2px solid currentColor;
@@ -81,7 +82,10 @@
   }
 }
 
-// ─── Black palette ───────────────────────────────────────────────────────────
+// ─── Black palette (quiet, neutral-default link-neutral) ────────────────────
+//
+// Underlined at rest like all hyperlinks. Color shifts to brand on hover and
+// pressed per text.link-neutral's family.
 
 .panw--link--black {
   color: var(--panw-link-black-default);
@@ -91,7 +95,6 @@
   &:hover,
   &.panw--link--hover {
     color: var(--panw-link-black-hover);
-    text-decoration: underline;
 
     .panw--link__icon-wrap { color: var(--panw-link-black-hover-icon); }
   }
@@ -99,7 +102,6 @@
   &:active,
   &.panw--link--pressed {
     color: var(--panw-link-black-pressed);
-    text-decoration: underline;
 
     .panw--link__icon-wrap { color: var(--panw-link-black-pressed); }
   }

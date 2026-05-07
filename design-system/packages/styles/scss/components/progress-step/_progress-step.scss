@@ -57,6 +57,7 @@
 
 .panw--ps-step__icon--success { color: var(--panw-ps-success-icon); }
 .panw--ps-step__icon--warning { color: var(--panw-ps-warning-icon); }
+.panw--ps-step__icon--caution { color: var(--panw-ps-caution-icon); }
 .panw--ps-step__icon--error   { color: var(--panw-ps-error-icon); }
 
 .panw--ps-step__number {
@@ -123,14 +124,12 @@
 
 .panw--ps-step--success  { border-top-color: var(--panw-ps-border-success); }
 .panw--ps-step--warning  { border-top-color: var(--panw-ps-border-warning); }
+.panw--ps-step--caution  { border-top-color: var(--panw-ps-border-caution); }
 .panw--ps-step--error    { border-top-color: var(--panw-ps-border-error); }
 .panw--ps-step--active   { border-top-color: var(--panw-ps-border-active); }
-.panw--ps-step--inactive {
-  border-top-color: var(--panw-ps-border-inactive);
-  border-top-style: dashed;
-}
+.panw--ps-step--inactive { border-top-color: var(--panw-ps-border-inactive); }
 
 .panw--ps-step--hover,
 .panw--ps-step:hover {
-  background-color: rgba(0, 0, 0, 0.02);
+  background-color: var(--panw-ps-hover-bg);
 }

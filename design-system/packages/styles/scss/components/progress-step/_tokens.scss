@@ -1,21 +1,39 @@
-// ProgressStep — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
+// ProgressStep — Stage tokens.
+//
+// Status icons route to icons.status.* (the static-label icon family) so
+// success/warning/caution/error all sit in their proper Stage hexes —
+// fixes the audit's "wrong family hexes" finding (the previous values
+// were close but not on-spec for any Stage family).
+//
+// Active step number = solid brand fill + text.inverse. Inactive step
+// number = surface.rest with a 1px lines.neutral.rest border (the audit's
+// "too dark" inactive border at neutral40 corrected to the rest stop).
+//
+// Top-border accent per state matches the icon family. Inactive state
+// switches from the previous dashed treatment to solid lines.neutral.rest
+// — Stage doesn't define a dashed line treatment, and dashed reads
+// engineering-spec rather than finance-product.
 :root {
-  --panw-ps-success-icon:    #29a393;
-  --panw-ps-warning-icon:    #ebbe0a;
-  --panw-ps-error-icon:      #e14e4e;
+  --panw-ps-success-icon:    var(--ds-icons-status-success);
+  --panw-ps-warning-icon:    var(--ds-icons-status-warning);
+  --panw-ps-caution-icon:    var(--ds-icons-status-caution);
+  --panw-ps-error-icon:      var(--ds-icons-status-danger);
 
-  --panw-ps-active-bg:       #006fcc;
-  --panw-ps-active-text:     #ffffff;
-  --panw-ps-inactive-bg:     #ffffff;
-  --panw-ps-inactive-text:   #0e1317;
-  --panw-ps-inactive-border: #858e94;
+  --panw-ps-active-bg:       var(--ds-brand-rest);
+  --panw-ps-active-text:     var(--ds-text-inverse-rest);
+  --panw-ps-inactive-bg:     var(--ds-surface-rest);
+  --panw-ps-inactive-text:   var(--ds-text-secondary-rest);
+  --panw-ps-inactive-border: var(--ds-lines-neutral-rest);
 
-  --panw-ps-border-success:  #33ccb8;
-  --panw-ps-border-warning:  #fad957;
-  --panw-ps-border-error:    #e14e4e;
-  --panw-ps-border-active:   #006fcc;
-  --panw-ps-border-inactive: #e4e8eb;
+  --panw-ps-border-success:  var(--ds-lines-status-success);
+  --panw-ps-border-warning:  var(--ds-lines-status-warning);
+  --panw-ps-border-caution:  var(--ds-lines-status-caution);
+  --panw-ps-border-error:    var(--ds-lines-status-danger);
+  --panw-ps-border-active:   var(--ds-lines-brand-rest);
+  --panw-ps-border-inactive: var(--ds-lines-neutral-rest);
 
-  --panw-ps-title:           #0e1317;
-  --panw-ps-description:     #656f76;
+  --panw-ps-title:           var(--ds-text-primary);
+  --panw-ps-description:     var(--ds-text-tertiary-rest);
+
+  --panw-ps-hover-bg:        var(--ds-highlight-hover);
 }

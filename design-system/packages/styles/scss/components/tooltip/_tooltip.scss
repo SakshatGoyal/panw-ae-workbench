@@ -18,7 +18,35 @@ $panw-prefix: 'panw';
   height: fit-content;
   font-family: var(--ds-type-font-family-sans);
   box-sizing: border-box;
-  transition: opacity 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  // Entrance motion — 8px directional slide + opacity fade, 70ms (fast-01)
+  // with the entrance easing curve. Direction matches where the tooltip is
+  // appearing relative to the anchor: above → moves up, left → moves left.
+  // Without the slide the tooltip "pops" mechanically; the 8px drift gives
+  // the appearance just enough physicality to feel placed rather than
+  // teleported.
+  animation: panw-tooltip-enter-up 70ms cubic-bezier(0, 0, 0.38, 0.9);
+}
+
+.#{$panw-prefix}--tooltip--direction-top    { animation-name: panw-tooltip-enter-up;    }
+.#{$panw-prefix}--tooltip--direction-bottom { animation-name: panw-tooltip-enter-down;  }
+.#{$panw-prefix}--tooltip--direction-left   { animation-name: panw-tooltip-enter-left;  }
+.#{$panw-prefix}--tooltip--direction-right  { animation-name: panw-tooltip-enter-right; }
+
+@keyframes panw-tooltip-enter-up {
+  from { opacity: 0; transform: translateY(8px);  }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes panw-tooltip-enter-down {
+  from { opacity: 0; transform: translateY(-8px); }
+  to   { opacity: 1; transform: translateY(0);    }
+}
+@keyframes panw-tooltip-enter-left {
+  from { opacity: 0; transform: translateX(8px);  }
+  to   { opacity: 1; transform: translateX(0);    }
+}
+@keyframes panw-tooltip-enter-right {
+  from { opacity: 0; transform: translateX(-8px); }
+  to   { opacity: 1; transform: translateX(0);    }
 }
 
 .#{$panw-prefix}--tooltip__content-container {

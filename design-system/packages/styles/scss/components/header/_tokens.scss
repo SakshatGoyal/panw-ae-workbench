@@ -1,11 +1,16 @@
-// Header — CSS tokens copied from PANW Header.css
+// Header — Stage tokens.
+//
+// Column header is a surface.alt-family interaction on a surface.rest ground.
+// Border lives on lines.neutral; the audit's "off by a stop" finding on
+// pressed border (was neutral80, should be neutral60) is corrected by
+// resolving to lines.neutral.pressed.
 :root {
-  --panw-header-bg:           #ffffff;
-  --panw-header-bg-hover:     #eaebeb;
-  --panw-header-bg-onclick:   #dadbdb;
-  --panw-header-border:       #e0e0e0;
-  --panw-header-border-hover: #c5ccd1;
-  --panw-header-border-bold:  #404a52;
-  --panw-header-text:         #0e1317;
-  --panw-header-icon:         #404a52;
+  --panw-header-bg:           var(--ds-surface-rest);
+  --panw-header-bg-hover:     var(--ds-surface-alt-hover);
+  --panw-header-bg-onclick:   var(--ds-surface-alt-pressed);
+  --panw-header-border:       var(--ds-lines-neutral-rest);
+  --panw-header-border-hover: var(--ds-lines-neutral-hover);
+  --panw-header-border-bold:  var(--ds-lines-neutral-pressed);
+  --panw-header-text:         var(--ds-text-secondary-rest);
+  --panw-header-icon:         var(--ds-icons-tertiary-rest);
 }

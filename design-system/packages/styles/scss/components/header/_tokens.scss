@@ -9,6 +9,8 @@
   --panw-header-bg:           var(--ds-surface-accent-rest);
   --panw-header-bg-hover:     var(--ds-surface-accent-hover);
   --panw-header-bg-onclick:   var(--ds-surface-accent-pressed);
-  --panw-header-text:         var(--ds-text-secondary-rest);
+  // Header text is primary — column headers are emphatic labels, not
+  // workhorse default text. text.primary gives them the weight they earn.
+  --panw-header-text:         var(--ds-text-primary);
   --panw-header-icon:         var(--ds-icons-tertiary-rest);
 }

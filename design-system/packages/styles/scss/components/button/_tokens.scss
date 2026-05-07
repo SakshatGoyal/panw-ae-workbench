@@ -62,6 +62,10 @@
   // (border + brand text); ghost-brand commits with the text alone. Hover
   // lifts to highlight.* (alpha-brand engaged ground) — same family as
   // tertiary, signaling "soft brand action" without the chip affordance.
+  //
+  // KEEPER under the intent-based ghost rule: ghost-brand IS brand-coded
+  // engagement, so the brand-tinted hover is deliberate. Do not swap to
+  // ghost.* — that's the default for non-brand-engaged surfaces.
   --panw-button-ghost-brand-bg:           var(--ds-ghost-rest);
   --panw-button-ghost-brand-bg-hover:     var(--ds-highlight-hover);
   --panw-button-ghost-brand-bg-active:    var(--ds-highlight-pressed);

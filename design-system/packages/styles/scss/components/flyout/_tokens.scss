@@ -10,8 +10,12 @@
   --panw-flyout-text-disabled: var(--ds-text-secondary-disabled);
   --panw-flyout-icon:         var(--ds-icons-secondary-rest);
 
-  --panw-flyout-item-hover:   var(--ds-ghost-highlight-hover);
-  --panw-flyout-item-pressed: var(--ds-ghost-highlight-pressed);
+  // Default small-element hover is neutral per Stage's intent-based ghost rule.
+  // ghost.highlight is reserved for brand-coded engagement; flyout items are
+  // ordinary list rows, so they sit on `ghost`. Selected state below stays
+  // alpha-brand (the engagement signal), keeping a clear hover-vs-selected split.
+  --panw-flyout-item-hover:   var(--ds-ghost-hover);
+  --panw-flyout-item-pressed: var(--ds-ghost-pressed);
 
   --panw-flyout-selected-bg:  var(--ds-highlight-rest);
   --panw-flyout-selected-fg:  var(--ds-text-brand-rest);

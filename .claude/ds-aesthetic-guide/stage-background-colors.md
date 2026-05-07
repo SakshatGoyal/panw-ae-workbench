@@ -44,17 +44,25 @@ ground grey     (surface.alt, surface.accent)    → field.alt  (white)
 
 ## Ghost
 
-**Selection — scope first, size second:**
+**Selection — by intent:**
 
 ```
-ghost.field      // when surrounding area is too dense for another grey field rest fill
-ghost.highlight  // ≤ 48px tall (rows, flyout items, chips, kebabs, small icon buttons)
-ghost            // > 48px tall (large interactive cards)
+ghost            // default for any transparent interactive surface, any size.
+                 // Neutral hover.
+ghost.field      // field replacement in dense areas where another grey
+                 // field rest would over-crowd the parent.
+ghost.highlight  // opt-in for brand-coded engagement (ghost-brand button,
+                 // brand-active nav, deliberately branded states).
+                 // Brand-tinted on every state.
+ghost.danger     // destructive items in lists, menus, flyouts.
+                 // Surface.danger performs the destruction; ghost.danger leads to it.
 ```
 
-**Ghost.field** replaces a field when adding another grey layer would over-crowd the parent. Transparent at rest; hover and pressed carry the input affordance.
+Default is `ghost`. Flyout items, tabs, accordion headers, chips, kebabs, small icon buttons, table rows, breadcrumb crumbs, large interactive cards — anything transparent that needs a hover state starts here. Subtlety is the point.
 
-**Ghost.danger** for destructive items in lists, menus, flyouts. Surface.danger performs the destruction; ghost.danger leads to it.
+`ghost.highlight` is opt-in. Reach for it only when the element's role is brand-coded engagement. Size is not a reason; deliberate brand intent is.
+
+If a component currently uses `ghost.highlight` and the element reads as a field replacement, swap to `ghost.field`, not `ghost`.
 
 `ghost` and `ghost.field` are visually identical today. The split exists so a future field-affordance divergence can land without a token migration — same logic as `surface.rest` / `surface.n`. Choose by the use-case rule above, not by appearance.
 

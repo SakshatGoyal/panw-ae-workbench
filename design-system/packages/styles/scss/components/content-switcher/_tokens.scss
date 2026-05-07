@@ -12,11 +12,15 @@
   --panw-cs-unselected-bg:      var(--ds-surface-rest);
   --panw-cs-unselected-text:    var(--ds-text-secondary-rest);
   --panw-cs-unselected-icon:    var(--ds-icons-tertiary-rest);
-  --panw-cs-hover-bg-gray00:    var(--ds-highlight-hover);
-  --panw-cs-hover-bg-gray10:    var(--ds-highlight-hover);
+  // Hover/pressed route to ghost.highlight (the row-tier alpha-brand,
+  // ≤48px tall) — not highlight.* which is the engaged-state fill tier.
+  // Content-switcher items preview a selection; ghost.highlight reads
+  // as preview, highlight reads as commit.
+  --panw-cs-hover-bg-gray00:    var(--ds-ghost-highlight-hover);
+  --panw-cs-hover-bg-gray10:    var(--ds-ghost-highlight-hover);
   --panw-cs-hover-text:         var(--ds-text-brand-hover);
-  --panw-cs-pressed-bg-gray00:  var(--ds-highlight-pressed);
-  --panw-cs-pressed-bg-gray10:  var(--ds-highlight-pressed);
+  --panw-cs-pressed-bg-gray00:  var(--ds-ghost-highlight-pressed);
+  --panw-cs-pressed-bg-gray10:  var(--ds-ghost-highlight-pressed);
   --panw-cs-pressed-text:       var(--ds-text-brand-pressed);
   --panw-cs-disabled-text:      var(--ds-text-secondary-disabled);
   --panw-cs-disabled-icon:      var(--ds-icons-disabled);

@@ -14,8 +14,11 @@
 :root {
   --panw-tabs-bg-selected:        var(--ds-surface-rest);
   --panw-tabs-bg-unselected:      var(--ds-surface-accent-rest);
-  --panw-tabs-bg-hover:           var(--ds-highlight-hover);
-  --panw-tabs-bg-pressed:         var(--ds-highlight-pressed);
+  // Hover/pressed on unselected items route to ghost.highlight (the row
+  // tier ≤48px) — not highlight.* (engaged-state fill). Tab hover is a
+  // preview, not a commit.
+  --panw-tabs-bg-hover:           var(--ds-ghost-highlight-hover);
+  --panw-tabs-bg-pressed:         var(--ds-ghost-highlight-pressed);
   --panw-tabs-border-accent:      var(--ds-lines-brand-rest);
   --panw-tabs-border-subtle:      var(--ds-lines-neutral-rest);
   --panw-tabs-border-medium:      var(--ds-lines-neutral-hover);

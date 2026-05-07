@@ -1,0 +1,25 @@
+// =============================================================================
+// Flyout — Stage tokens.
+// =============================================================================
+
+:root {
+  --panw-flyout-bg:           var(--ds-surface-rest);
+  --panw-flyout-border:       var(--ds-lines-neutral-rest);
+
+  --panw-flyout-text:         var(--ds-text-primary);
+  --panw-flyout-text-disabled: var(--ds-text-secondary-disabled);
+  --panw-flyout-icon:         var(--ds-icons-secondary-rest);
+
+  --panw-flyout-item-hover:   var(--ds-ghost-highlight-hover);
+  --panw-flyout-item-pressed: var(--ds-ghost-highlight-pressed);
+
+  --panw-flyout-selected-bg:  var(--ds-highlight-rest);
+  --panw-flyout-selected-fg:  var(--ds-text-brand-rest);
+
+  --panw-flyout-divider:      var(--ds-lines-neutral-rest);
+
+  --panw-flyout-filter-bg:    var(--ds-field-rest);
+  --panw-flyout-filter-text:  var(--ds-text-primary);
+  --panw-flyout-filter-placeholder: var(--ds-text-placeholder-rest);
+  --panw-flyout-filter-border: var(--ds-lines-neutral-rest);
+}

@@ -1,0 +1,206 @@
+@use 'tokens';
+
+// =============================================================================
+// Flyout — anchored panel of items, with optional filter / select-all / footer.
+// CSS class prefix: .panw--flyout
+//
+// Geometry per stage-spacing.md flyout pattern:
+//   container = radius.standard (8px), 4px internal padding all sides
+//   items     = 8v / 12h padding, gap 0 (contiguous), radius.tight (4px)
+//   shadow    = --ds-shadow-flyout
+//
+// Concentric feeling: outer 8 - padding 4 = inner 4 — items get radius.tight
+// so they read as inset chips inside the padded ground.
+// =============================================================================
+
+.panw--flyout {
+  position: absolute;
+  z-index: 100;
+  background-color: var(--panw-flyout-bg);
+  border: 1px solid var(--panw-flyout-border);
+  border-radius: 8px;
+  box-shadow: var(--ds-shadow-flyout);
+  padding: 4px;
+  font-family: var(--ds-type-font-family-sans);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  // Outer max-height set inline by positioning hook; List handles overflow.
+}
+
+// ─── Filter ──────────────────────────────────────────────────────────────────
+// Inline filter — borderless top, separated from list by a 1px divider so
+// the typing area reads as its own micro-context inside the panel.
+
+.panw--flyout__filter {
+  border-bottom: 1px solid var(--panw-flyout-divider);
+  padding: 4px;
+  margin: -4px -4px 4px;
+}
+
+.panw--flyout__filter-input {
+  width: 100%;
+  height: 32px;
+  padding: 0 12px;
+  border: none;
+  outline: none;
+  background: transparent;
+  font: inherit;
+  font-size: 14px;
+  line-height: 1.286;
+  color: var(--panw-flyout-filter-text);
+
+  &::placeholder { color: var(--panw-flyout-filter-placeholder); }
+}
+
+// ─── Select-all ──────────────────────────────────────────────────────────────
+
+.panw--flyout__select-all {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  line-height: 1.286;
+  color: var(--panw-flyout-text);
+  border-bottom: 1px solid var(--panw-flyout-divider);
+  margin-bottom: 4px;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+
+  &:hover  { background-color: var(--panw-flyout-item-hover); }
+  &:active { background-color: var(--panw-flyout-item-pressed); }
+}
+
+.panw--flyout__select-all-checkbox {
+  display: inline-flex;
+  align-items: center;
+}
+
+// ─── List ────────────────────────────────────────────────────────────────────
+
+.panw--flyout__list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Item ────────────────────────────────────────────────────────────────────
+
+.panw--flyout__item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.286;
+  color: var(--panw-flyout-text);
+  cursor: pointer;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+
+  &:hover  { background-color: var(--panw-flyout-item-hover); }
+  &:active { background-color: var(--panw-flyout-item-pressed); }
+
+  &:focus-visible {
+    outline: 2px solid var(--ds-lines-brand-rest);
+    outline-offset: -2px;
+  }
+}
+
+.panw--flyout__item--selected {
+  background-color: var(--panw-flyout-selected-bg);
+  color: var(--panw-flyout-selected-fg);
+}
+
+.panw--flyout__item--disabled {
+  color: var(--panw-flyout-text-disabled);
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.panw--flyout__item-checkbox,
+.panw--flyout__item-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panw--flyout__item-icon { color: var(--panw-flyout-icon); }
+
+.panw--flyout__item-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ─── Group (tree node) ───────────────────────────────────────────────────────
+
+.panw--flyout__group {
+  display: flex;
+  flex-direction: column;
+}
+
+.panw--flyout__group-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;  // 600 reads as label heading — tree group header.
+  line-height: 1.286;
+  color: var(--panw-flyout-text);
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+
+  &:hover  { background-color: var(--panw-flyout-item-hover); }
+  &:active { background-color: var(--panw-flyout-item-pressed); }
+
+  &:focus-visible {
+    outline: 2px solid var(--ds-lines-brand-rest);
+    outline-offset: -2px;
+  }
+}
+
+.panw--flyout__group-chevron,
+.panw--flyout__group-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--panw-flyout-icon);
+}
+
+.panw--flyout__group-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.panw--flyout__group-children {
+  display: flex;
+  flex-direction: column;
+}
+
+// ─── Footer ──────────────────────────────────────────────────────────────────
+// Top-bordered section break, right-aligned button group with 4px gap per
+// Stage's "single button group" rule.
+
+.panw--flyout__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 4px;
+  padding: 8px;
+  border-top: 1px solid var(--panw-flyout-divider);
+  margin: 4px -4px -4px;
+}

@@ -10,28 +10,22 @@ import {
   brand80,
   brand90,
   cobalt20,
-  cobalt30,
   cobalt60,
   cobalt70,
   cobalt80,
   cyan20,
-  cyan30,
   cyan60,
   cyan70,
   gold20,
-  gold30,
   gold60,
   gold70,
   green20,
-  green30,
   green60,
   green70,
   lime20,
-  lime30,
   lime60,
   lime70,
   mint20,
-  mint30,
   mint60,
   mint70,
   neutral0,
@@ -47,17 +41,14 @@ import {
   neutral90,
   neutral100,
   olive20,
-  olive30,
   olive60,
   olive70,
   orange10,
   orange20,
-  orange30,
   orange50,
   orange60,
   orange70,
   pink20,
-  pink30,
   pink60,
   pink70,
   purple20,
@@ -72,16 +63,13 @@ import {
   red70,
   red80,
   slate20,
-  slate30,
   slate60,
   slate70,
   violet20,
-  violet30,
   violet60,
   violet70,
   yellow10,
   yellow20,
-  yellow30,
   yellow40,
   yellow50,
   yellow60,
@@ -391,15 +379,16 @@ export const StageTokens = {
    *
    * Each color is a derived reference into the primitive scales:
    *   low.bg        → primitive-20  (pastel rest)
-   *   low.bg-hover  → primitive-30  (one step up — smooth transition)
    *   low.text      → primitive-70  (deep, takes pastel ground)
    *   high.bg       → primitive-70  (saturated rest)
-   *   high.bg-hover → primitive-60  (one step down — smooth transition)
+   *   high.bg-hover → primitive-60  (one step softer on hover)
    *   high.text     → "#ffffff"     (inverse white)
    *
-   * Hover steps in opposite directions on each contrast tier so the chip
-   * feels "more itself" on interaction — pastel deepens, saturated softens —
-   * rather than crossing into a different perceptual lane.
+   * Low tags do NOT carry a hover bg token — pastel grounds darkened too
+   * aggressively when shifted to primitive-30. The component instead pulls
+   * in a 1px inset border in currentColor on hover (see _tags.scss), which
+   * echoes the family without dimming the chip. High tags soften cleanly
+   * via the bg-hover token: same lane, lighter on the eye.
    *
    * If the primitive scale ever shifts, the categorical palette follows.
    *
@@ -420,22 +409,22 @@ export const StageTokens = {
    * choice that failed accessibility on certain backgrounds.
    */
   "tag": {
-    "grey":     { "low": { "bg": neutral20,  "bg-hover": neutral30, "text": neutral80 }, "high": { "bg": neutral70, "bg-hover": neutral60, "text": "#ffffff" } },
-    "accent":   { "low": { "bg": brand20,    "bg-hover": brand30,   "text": brand70   }, "high": { "bg": brand70,   "bg-hover": brand60,   "text": "#ffffff" } },
-    "red":      { "low": { "bg": red20,      "bg-hover": red30,     "text": red70     }, "high": { "bg": red70,     "bg-hover": red60,     "text": "#ffffff" } },
-    "green":    { "low": { "bg": green20,    "bg-hover": green30,   "text": green70   }, "high": { "bg": green70,   "bg-hover": green60,   "text": "#ffffff" } },
-    "orange":   { "low": { "bg": orange20,   "bg-hover": orange30,  "text": orange70  }, "high": { "bg": orange70,  "bg-hover": orange60,  "text": "#ffffff" } },
-    "slate":    { "low": { "bg": slate20,    "bg-hover": slate30,   "text": slate70   }, "high": { "bg": slate70,   "bg-hover": slate60,   "text": "#ffffff" } },
-    "lavender": { "low": { "bg": violet20,   "bg-hover": violet30,  "text": violet70  }, "high": { "bg": violet70,  "bg-hover": violet60,  "text": "#ffffff" } },
-    "purple":   { "low": { "bg": purple20,   "bg-hover": purple30,  "text": purple70  }, "high": { "bg": purple70,  "bg-hover": purple60,  "text": "#ffffff" } },
-    "pink":     { "low": { "bg": pink20,     "bg-hover": pink30,    "text": pink70    }, "high": { "bg": pink70,    "bg-hover": pink60,    "text": "#ffffff" } },
-    "yellow":   { "low": { "bg": yellow20,   "bg-hover": yellow30,  "text": yellow70  }, "high": { "bg": yellow70,  "bg-hover": yellow60,  "text": "#ffffff" } },
-    "bronze":   { "low": { "bg": gold20,     "bg-hover": gold30,    "text": gold70    }, "high": { "bg": gold70,    "bg-hover": gold60,    "text": "#ffffff" } },
-    "olive":    { "low": { "bg": olive20,    "bg-hover": olive30,   "text": olive70   }, "high": { "bg": olive70,   "bg-hover": olive60,   "text": "#ffffff" } },
-    "lime":     { "low": { "bg": lime20,     "bg-hover": lime30,    "text": lime70    }, "high": { "bg": lime70,    "bg-hover": lime60,    "text": "#ffffff" } },
-    "jade":     { "low": { "bg": mint20,     "bg-hover": mint30,    "text": mint70    }, "high": { "bg": mint70,    "bg-hover": mint60,    "text": "#ffffff" } },
-    "teal":     { "low": { "bg": cyan20,     "bg-hover": cyan30,    "text": cyan70    }, "high": { "bg": cyan70,    "bg-hover": cyan60,    "text": "#ffffff" } },
-    "cobalt":   { "low": { "bg": cobalt20,   "bg-hover": cobalt30,  "text": cobalt70  }, "high": { "bg": cobalt70,  "bg-hover": cobalt60,  "text": "#ffffff" } },
+    "grey":     { "low": { "bg": neutral20,  "text": neutral80 }, "high": { "bg": neutral70, "bg-hover": neutral60, "text": "#ffffff" } },
+    "accent":   { "low": { "bg": brand20,    "text": brand70   }, "high": { "bg": brand70,   "bg-hover": brand60,   "text": "#ffffff" } },
+    "red":      { "low": { "bg": red20,      "text": red70     }, "high": { "bg": red70,     "bg-hover": red60,     "text": "#ffffff" } },
+    "green":    { "low": { "bg": green20,    "text": green70   }, "high": { "bg": green70,   "bg-hover": green60,   "text": "#ffffff" } },
+    "orange":   { "low": { "bg": orange20,   "text": orange70  }, "high": { "bg": orange70,  "bg-hover": orange60,  "text": "#ffffff" } },
+    "slate":    { "low": { "bg": slate20,    "text": slate70   }, "high": { "bg": slate70,   "bg-hover": slate60,   "text": "#ffffff" } },
+    "lavender": { "low": { "bg": violet20,   "text": violet70  }, "high": { "bg": violet70,  "bg-hover": violet60,  "text": "#ffffff" } },
+    "purple":   { "low": { "bg": purple20,   "text": purple70  }, "high": { "bg": purple70,  "bg-hover": purple60,  "text": "#ffffff" } },
+    "pink":     { "low": { "bg": pink20,     "text": pink70    }, "high": { "bg": pink70,    "bg-hover": pink60,    "text": "#ffffff" } },
+    "yellow":   { "low": { "bg": yellow20,   "text": yellow70  }, "high": { "bg": yellow70,  "bg-hover": yellow60,  "text": "#ffffff" } },
+    "bronze":   { "low": { "bg": gold20,     "text": gold70    }, "high": { "bg": gold70,    "bg-hover": gold60,    "text": "#ffffff" } },
+    "olive":    { "low": { "bg": olive20,    "text": olive70   }, "high": { "bg": olive70,   "bg-hover": olive60,   "text": "#ffffff" } },
+    "lime":     { "low": { "bg": lime20,     "text": lime70    }, "high": { "bg": lime70,    "bg-hover": lime60,    "text": "#ffffff" } },
+    "jade":     { "low": { "bg": mint20,     "text": mint70    }, "high": { "bg": mint70,    "bg-hover": mint60,    "text": "#ffffff" } },
+    "teal":     { "low": { "bg": cyan20,     "text": cyan70    }, "high": { "bg": cyan70,    "bg-hover": cyan60,    "text": "#ffffff" } },
+    "cobalt":   { "low": { "bg": cobalt20,   "text": cobalt70  }, "high": { "bg": cobalt70,  "bg-hover": cobalt60,  "text": "#ffffff" } },
   },
 } as const;
 

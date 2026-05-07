@@ -1,16 +1,14 @@
 // Header — Stage tokens.
 //
-// Column header is a surface.alt-family interaction on a surface.rest ground.
-// Border lives on lines.neutral; the audit's "off by a stop" finding on
-// pressed border (was neutral80, should be neutral60) is corrected by
-// resolving to lines.neutral.pressed.
+// Column header is its own surface — surface.accent.* per Stage's "if it's
+// standalone, accent" rule. The earlier surface.alt-on-surface.rest pattern
+// implied a tile-on-tile relationship that doesn't exist here; the column
+// header is the element. The border-bottom that used to define the strip is
+// dropped — the accent fill itself carries the visual edge.
 :root {
-  --panw-header-bg:           var(--ds-surface-rest);
-  --panw-header-bg-hover:     var(--ds-surface-alt-hover);
-  --panw-header-bg-onclick:   var(--ds-surface-alt-pressed);
-  --panw-header-border:       var(--ds-lines-neutral-rest);
-  --panw-header-border-hover: var(--ds-lines-neutral-hover);
-  --panw-header-border-bold:  var(--ds-lines-neutral-pressed);
+  --panw-header-bg:           var(--ds-surface-accent-rest);
+  --panw-header-bg-hover:     var(--ds-surface-accent-hover);
+  --panw-header-bg-onclick:   var(--ds-surface-accent-pressed);
   --panw-header-text:         var(--ds-text-secondary-rest);
   --panw-header-icon:         var(--ds-icons-tertiary-rest);
 }

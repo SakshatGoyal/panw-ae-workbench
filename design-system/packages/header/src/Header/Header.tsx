@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import { Plus, Minus, ArrowUp, ArrowDown, ArrowUpDown, Filter } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
-import { IconButton } from '@ds/button';
 
 export const HeaderAlignments = ['left', 'right'] as const;
 export type HeaderAlignment = (typeof HeaderAlignments)[number];
@@ -92,23 +91,19 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
               <ArrowUpDown size={16} />
             </span>
           )}
-        </div>
-
-        {filter && (
-          <span className={`${prefix}--header__filter`}>
-            <IconButton
-              kind="ghost"
-              size="sm"
-              iconSize={16}
-              renderIcon={Filter}
+          {filter && (
+            <button
+              type="button"
+              className={`${prefix}--header__filter`}
               aria-label="Filter column"
               onClick={(e) => {
                 e.stopPropagation();
                 onFilterClick?.();
-              }}
-            />
-          </span>
-        )}
+              }}>
+              <Filter size={16} />
+            </button>
+          )}
+        </div>
       </div>
     );
   }

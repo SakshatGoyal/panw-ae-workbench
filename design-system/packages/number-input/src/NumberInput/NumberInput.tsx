@@ -8,8 +8,11 @@ import { IconButton } from '@ds/button';
 export const NumberInputBackgrounds = ['grey-00', 'grey-10'] as const;
 export type NumberInputBackground = (typeof NumberInputBackgrounds)[number];
 
-export const NumberInputForceStates = ['active', 'disabled'] as const;
+export const NumberInputForceStates = ['active', 'error', 'success', 'disabled'] as const;
 export type NumberInputForceState = (typeof NumberInputForceStates)[number];
+
+export const NumberInputValidations = ['error', 'success'] as const;
+export type NumberInputValidation = (typeof NumberInputValidations)[number];
 
 export interface NumberInputProps
   extends Omit<
@@ -27,6 +30,8 @@ export interface NumberInputProps
   min?: number;
   max?: number;
   forceState?: NumberInputForceState | null;
+  /** Validation state — error or success swaps the field border family only. */
+  validation?: NumberInputValidation;
   className?: string;
 }
 
@@ -45,6 +50,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       max = Infinity,
       disabled,
       forceState = null,
+      validation,
       className,
       ...rest
     },
@@ -53,6 +59,8 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
     const prefix = usePrefix();
     const isDisabled = disabled || forceState === 'disabled';
     const isActive = forceState === 'active';
+    const isError = forceState === 'error' || (validation === 'error' && !isActive && !isDisabled);
+    const isSuccess = forceState === 'success' || (validation === 'success' && !isActive && !isDisabled);
 
     const decrement = useCallback(() => {
       if (isDisabled) return;
@@ -79,6 +87,8 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
       `${prefix}--number-input--${background}`,
       {
         [`${prefix}--number-input--active`]: isActive,
+        [`${prefix}--number-input--error`]: isError,
+        [`${prefix}--number-input--success`]: isSuccess,
         [`${prefix}--number-input--disabled`]: isDisabled,
       },
       className
@@ -150,6 +160,7 @@ NumberInput.propTypes = {
   min: PropTypes.number,
   max: PropTypes.number,
   forceState: PropTypes.oneOf([...NumberInputForceStates, null]),
+  validation: PropTypes.oneOf(NumberInputValidations),
   className: PropTypes.string,
 };
 

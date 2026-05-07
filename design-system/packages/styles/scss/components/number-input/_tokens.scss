@@ -1,9 +1,29 @@
-// NumberInput — tokens copied from PANW source
+// =============================================================================
+// NumberInput — Stage tokens.
+//
+// Conforms to the field contract. radius.tight on the field. Steppers compose
+// the IconButton ghost kind.
+// =============================================================================
+
 :root {
-  --panw-ni-bg-grey00:    #ffffff;
-  --panw-ni-bg-grey10:    #f9f9f9;
-  --panw-ni-border-focus: #006fcc;
-  --panw-ni-text:         #0e1317;
-  --panw-ni-description:  #404a52;
-  --panw-ni-disabled:     #c5ccd1;
+  --panw-ni-bg:                var(--ds-field-rest);
+  --panw-ni-bg-hover:          var(--ds-field-hover);
+  --panw-ni-bg-pressed:        var(--ds-field-pressed);
+  --panw-ni-bg-active:         var(--ds-field-selected);
+  --panw-ni-bg-disabled:       var(--ds-field-disabled);
+  --panw-ni-bg-alt:            var(--ds-field-alt-rest);
+  --panw-ni-bg-alt-hover:      var(--ds-field-alt-hover);
+
+  --panw-ni-border:            var(--ds-lines-neutral-rest);
+  --panw-ni-border-focus:      var(--ds-lines-brand-rest);
+  --panw-ni-border-error:      var(--ds-lines-danger-rest);
+  --panw-ni-border-success:    var(--ds-lines-status-success);
+  --panw-ni-border-disabled:   var(--ds-lines-neutral-disabled);
+
+  --panw-ni-title:             var(--ds-text-secondary-rest);
+  --panw-ni-title-disabled:    var(--ds-text-secondary-disabled);
+  --panw-ni-text:              var(--ds-text-primary);
+  --panw-ni-text-disabled:     var(--ds-text-secondary-disabled);
+  --panw-ni-description:       var(--ds-text-tertiary-rest);
+  --panw-ni-description-disabled: var(--ds-text-tertiary-disabled);
 }

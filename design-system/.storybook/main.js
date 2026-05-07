@@ -1,4 +1,10 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { transformWithEsbuild } from 'vite';
+
+const here = path.dirname(fileURLToPath(import.meta.url));
+const reactDir = path.resolve(here, '..', 'node_modules', 'react');
+const reactDomDir = path.resolve(here, '..', 'node_modules', 'react-dom');
 
 /**
  * Allows `.js` story files that contain JSX to be processed by Vite.
@@ -36,8 +42,35 @@ const config = {
     return {
       ...viteConfig,
       plugins: [jsxInJsPlugin, ...(viteConfig.plugins ?? [])],
+      // Force a single React copy across the page, addon-docs, and
+      // @mdx-js/react. Without dedupe + alias, Vite's prebundler splits
+      // React across multiple chunks, leaving useMDXComponents calling
+      // useContext against a null internals object on every Docs page.
+      resolve: {
+        ...viteConfig.resolve,
+        dedupe: [
+          ...(viteConfig.resolve?.dedupe ?? []),
+          'react',
+          'react-dom',
+          'react/jsx-runtime',
+          'react/jsx-dev-runtime',
+        ],
+        alias: {
+          ...viteConfig.resolve?.alias,
+          react: reactDir,
+          'react-dom': reactDomDir,
+        },
+      },
       optimizeDeps: {
         ...viteConfig.optimizeDeps,
+        include: [
+          ...(viteConfig.optimizeDeps?.include ?? []),
+          'react',
+          'react-dom',
+          'react/jsx-runtime',
+          'react/jsx-dev-runtime',
+          '@mdx-js/react',
+        ],
         esbuildOptions: {
           ...viteConfig.optimizeDeps?.esbuildOptions,
           loader: {

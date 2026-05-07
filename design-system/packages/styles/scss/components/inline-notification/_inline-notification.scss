@@ -9,6 +9,7 @@ $panw-prefix: 'panw';
   width: 100%;
   font-family: var(--ds-type-font-family-sans);
   box-sizing: border-box;
+  border-radius: 8px; // radius.standard — banners hold prose with a defined edge.
 }
 
 .#{$panw-prefix}--inline-notification__icon-container {
@@ -62,14 +63,29 @@ $panw-prefix: 'panw';
   .#{$panw-prefix}--inline-notification__text { color: var(--panw-in-text-inverse); }
 }
 
+// Warning (yellow). Aliased from PANW's "alert" — both class names route here.
+.#{$panw-prefix}--inline-notification--warning.#{$panw-prefix}--inline-notification--page-level,
 .#{$panw-prefix}--inline-notification--alert.#{$panw-prefix}--inline-notification--page-level {
-  background-color: var(--panw-in-alert-page-bg);
-  .#{$panw-prefix}--inline-notification__icon { color: var(--panw-in-alert-page-icon); }
+  background-color: var(--panw-in-warning-page-bg);
+  .#{$panw-prefix}--inline-notification__icon { color: var(--panw-in-warning-page-icon); }
   .#{$panw-prefix}--inline-notification__text { color: var(--panw-in-text-page); }
 }
+.#{$panw-prefix}--inline-notification--warning.#{$panw-prefix}--inline-notification--product-level,
 .#{$panw-prefix}--inline-notification--alert.#{$panw-prefix}--inline-notification--product-level {
-  background-color: var(--panw-in-alert-product-bg);
-  .#{$panw-prefix}--inline-notification__icon { color: var(--panw-in-alert-product-icon); }
+  background-color: var(--panw-in-warning-product-bg);
+  .#{$panw-prefix}--inline-notification__icon { color: var(--panw-in-warning-product-icon); }
+  .#{$panw-prefix}--inline-notification__text { color: var(--panw-in-text-page); }
+}
+
+// Caution (orange) — new fifth category.
+.#{$panw-prefix}--inline-notification--caution.#{$panw-prefix}--inline-notification--page-level {
+  background-color: var(--panw-in-caution-page-bg);
+  .#{$panw-prefix}--inline-notification__icon { color: var(--panw-in-caution-page-icon); }
+  .#{$panw-prefix}--inline-notification__text { color: var(--panw-in-text-page); }
+}
+.#{$panw-prefix}--inline-notification--caution.#{$panw-prefix}--inline-notification--product-level {
+  background-color: var(--panw-in-caution-product-bg);
+  .#{$panw-prefix}--inline-notification__icon { color: var(--panw-in-caution-product-icon); }
   .#{$panw-prefix}--inline-notification__text { color: var(--panw-in-text-page); }
 }
 

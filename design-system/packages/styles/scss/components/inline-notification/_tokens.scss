@@ -1,22 +1,51 @@
-// InlineNotification — CSS tokens copied from PANW source
+// InlineNotification — Stage tokens.
+//
+// Page-level grounds use status.*.subtle. Notification text exception fires:
+// text inside a banner is always text.primary regardless of subtle ground
+// (overrides the matching-family rule, preserves long-message legibility).
+// Page-level icons use icons.status.* — the static-label family one stop
+// darker than interactive icons.*.
+//
+// Product-level grounds use status.*.strong. Solid dark fills (info, error,
+// success) take text.inverse + icons.inverse. Light-luminance exception
+// fires for warning (yellow40) and caution (orange50) — those keep
+// text.primary and icons.primary.
+//
+// Caution is a new fifth category per the system-level decision to adopt it
+// alongside warning. Aliased to "alert" for back-compat with PANW's
+// previous single warning/caution slot.
 :root {
-  // Page-level (low contrast)
-  --panw-in-info-page-bg:    #eff8ff;
-  --panw-in-info-page-icon:  #006fcc;
-  --panw-in-alert-page-bg:   #fff4c7;
-  --panw-in-alert-page-icon: #846b06;
-  --panw-in-error-page-bg:   #fcd4d4;
-  --panw-in-error-page-icon: #b22d2d;
-  --panw-in-success-page-bg:  #c5f9f2;
-  --panw-in-success-page-icon: #137669;
-  --panw-in-text-page:       #0e1317;
+  // Page-level grounds
+  --panw-in-info-page-bg:        var(--ds-status-info-subtle);
+  --panw-in-info-page-icon:      var(--ds-icons-status-info);
+  --panw-in-warning-page-bg:     var(--ds-status-warning-subtle);
+  --panw-in-warning-page-icon:   var(--ds-icons-status-warning);
+  --panw-in-caution-page-bg:     var(--ds-status-caution-subtle);
+  --panw-in-caution-page-icon:   var(--ds-icons-status-caution);
+  --panw-in-error-page-bg:       var(--ds-status-error-subtle);
+  --panw-in-error-page-icon:     var(--ds-icons-status-danger);
+  --panw-in-success-page-bg:     var(--ds-status-success-subtle);
+  --panw-in-success-page-icon:   var(--ds-icons-status-success);
 
-  // Product-level (high contrast)
-  --panw-in-info-product-bg:    #006fcc;
-  --panw-in-alert-product-bg:   #fad957;
-  --panw-in-alert-product-icon: #404a52;
-  --panw-in-error-product-bg:   #b22d2d;
-  --panw-in-success-product-bg: #33ccb8;
-  --panw-in-text-inverse:       #ffffff;
-  --panw-in-product-close:      #dfe5eb;
+  // Page-level text — always primary per the notification exception.
+  --panw-in-text-page:           var(--ds-text-primary);
+
+  // Product-level grounds
+  --panw-in-info-product-bg:     var(--ds-status-info-strong);
+  --panw-in-warning-product-bg:  var(--ds-status-warning-strong);
+  --panw-in-warning-product-icon: var(--ds-icons-primary);
+  --panw-in-caution-product-bg:  var(--ds-status-caution-strong);
+  --panw-in-caution-product-icon: var(--ds-icons-primary);
+  --panw-in-error-product-bg:    var(--ds-status-error-strong);
+  --panw-in-success-product-bg:  var(--ds-status-success-strong);
+
+  --panw-in-text-inverse:        var(--ds-text-inverse-rest);
+  --panw-in-product-close:       var(--ds-text-inverse-rest);
+
+  // Back-compat alias: "alert" → warning. Any callers using --alert- flavor
+  // will resolve to warning until they migrate to category="warning".
+  --panw-in-alert-page-bg:       var(--panw-in-warning-page-bg);
+  --panw-in-alert-page-icon:     var(--panw-in-warning-page-icon);
+  --panw-in-alert-product-bg:    var(--panw-in-warning-product-bg);
+  --panw-in-alert-product-icon:  var(--panw-in-warning-product-icon);
 }

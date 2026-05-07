@@ -1,12 +1,12 @@
 // Content switcher — Stage tokens.
 //
-// Selected = alpha-brand ground (surface.rest.selected) → text and icons
+// Selected = alpha-brand ground (surface.selected) → text and icons
 // route to text.brand / icons.brand per the matching-family rule.
 // Unselected = surface.rest. Hover/pressed on unselected items move to
 // highlight.* (alpha-brand) so the interactivity preview matches the
 // selected state's family.
 :root {
-  --panw-cs-selected-bg:        var(--ds-surface-rest-selected);
+  --panw-cs-selected-bg:        var(--ds-surface-selected);
   --panw-cs-selected-text:      var(--ds-text-brand-rest);
   --panw-cs-selected-icon:      var(--ds-icons-brand-rest);
   --panw-cs-unselected-bg:      var(--ds-surface-rest);

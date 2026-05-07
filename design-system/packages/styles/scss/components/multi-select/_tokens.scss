@@ -1,17 +1,40 @@
-// MultiSelect — CSS tokens (mirrors Dropdown)
+// =============================================================================
+// MultiSelect — Stage tokens.
+//
+// Same field contract as Dropdown: always-line at rest, focus-on-color with
+// stable geometry (1px inset box-shadow), validation = border-swap, family-
+// aware disabled. radius.tight on trigger; radius.standard on the flyout.
+// =============================================================================
+
 :root {
-  --panw-ms-bg-grey10:        #ffffff;
-  --panw-ms-bg-grey00:        #f9f9f9;
-  --panw-ms-bg-hover:         #eaebeb;
-  --panw-ms-bg-onclick:       #dadbdb;
-  --panw-ms-border-active:    #006fcc;
-  --panw-ms-text:             #0e1317;
-  --panw-ms-placeholder:      #a6adb2;
-  --panw-ms-chevron:          #404a52;
-  --panw-ms-description:      #656f76;
-  --panw-ms-disabled:         #c5ccd1;
-  --panw-ms-readonly:         #656f76;
-  --panw-ms-menu-bg:          #ffffff;
-  --panw-ms-menu-selected-bg: #cfe8fc;
-  --panw-ms-menu-selected-fg: #006fcc;
+  --panw-ms-bg:                var(--ds-field-rest);
+  --panw-ms-bg-hover:          var(--ds-field-hover);
+  --panw-ms-bg-pressed:        var(--ds-field-pressed);
+  --panw-ms-bg-active:         var(--ds-field-selected);
+  --panw-ms-bg-disabled:       var(--ds-field-disabled);
+  --panw-ms-bg-alt:            var(--ds-field-alt-rest);
+  --panw-ms-bg-alt-hover:      var(--ds-field-alt-hover);
+  --panw-ms-bg-alt-pressed:    var(--ds-field-alt-pressed);
+
+  --panw-ms-border:            var(--ds-lines-neutral-rest);
+  --panw-ms-border-hover:      var(--ds-lines-neutral-hover);
+  --panw-ms-border-focus:      var(--ds-lines-brand-rest);
+  --panw-ms-border-error:      var(--ds-lines-danger-rest);
+  --panw-ms-border-success:    var(--ds-lines-status-success);
+  --panw-ms-border-disabled:   var(--ds-lines-neutral-disabled);
+
+  --panw-ms-title:             var(--ds-text-secondary-rest);
+  --panw-ms-title-disabled:    var(--ds-text-secondary-disabled);
+  --panw-ms-text:              var(--ds-text-primary);
+  --panw-ms-text-disabled:     var(--ds-text-secondary-disabled);
+  --panw-ms-placeholder:       var(--ds-text-placeholder-rest);
+  --panw-ms-description:       var(--ds-text-tertiary-rest);
+  --panw-ms-description-disabled: var(--ds-text-tertiary-disabled);
+  --panw-ms-chevron:           var(--ds-icons-secondary-rest);
+  --panw-ms-chevron-disabled:  var(--ds-icons-secondary-disabled);
+
+  --panw-ms-menu-bg:           var(--ds-surface-rest);
+  --panw-ms-menu-item-hover:   var(--ds-ghost-hover);
+  --panw-ms-menu-selected-bg:  var(--ds-highlight-rest);
+  --panw-ms-menu-selected-fg:  var(--ds-text-brand-rest);
 }

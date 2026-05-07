@@ -16,10 +16,15 @@ export const MultiSelectStates = [
   'hover',
   'onclick',
   'active',
+  'error',
+  'success',
   'disabled',
   'readonly',
 ] as const;
 export type MultiSelectState = (typeof MultiSelectStates)[number];
+
+export const MultiSelectValidations = ['error', 'success'] as const;
+export type MultiSelectValidation = (typeof MultiSelectValidations)[number];
 
 export interface MultiSelectOption {
   label: string;
@@ -41,6 +46,8 @@ export interface MultiSelectProps {
   disabled?: boolean;
   readOnly?: boolean;
   forceState?: MultiSelectState;
+  /** Validation state — error or success swaps the field border family only. */
+  validation?: MultiSelectValidation;
   onChange?: (values: string[]) => void;
   className?: string;
 }
@@ -67,6 +74,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       disabled = false,
       readOnly = false,
       forceState,
+      validation,
       onChange,
       className,
     },
@@ -119,6 +127,8 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     else if (disabled) visualState = 'disabled';
     else if (readOnly) visualState = 'readonly';
     else if (isOpen) visualState = 'active';
+    else if (validation === 'error') visualState = 'error';
+    else if (validation === 'success') visualState = 'success';
 
     const selectedLabels = internal.map(
       (v) => options.find((o) => o.value === v)?.label ?? v
@@ -234,6 +244,7 @@ MultiSelect.propTypes = {
   disabled: PropTypes.bool,
   readOnly: PropTypes.bool,
   forceState: PropTypes.oneOf(MultiSelectStates),
+  validation: PropTypes.oneOf(MultiSelectValidations),
   onChange: PropTypes.func,
   className: PropTypes.string,
 };

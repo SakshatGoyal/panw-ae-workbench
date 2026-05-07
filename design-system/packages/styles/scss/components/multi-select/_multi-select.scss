@@ -124,7 +124,8 @@ $panw-prefix: 'panw';
   background-color: var(--panw-ms-bg-alt-hover);
 }
 
-.#{$panw-prefix}--multi-select--state-onclick .#{$panw-prefix}--multi-select__text-container {
+.#{$panw-prefix}--multi-select--state-onclick .#{$panw-prefix}--multi-select__text-container,
+.#{$panw-prefix}--multi-select--state-default .#{$panw-prefix}--multi-select__text-container:active {
   background-color: var(--panw-ms-bg-pressed);
 }
 

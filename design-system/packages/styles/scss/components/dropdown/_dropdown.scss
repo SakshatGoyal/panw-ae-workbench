@@ -110,6 +110,13 @@ $panw-prefix: 'panw';
 
 // ─── Sizes ───────────────────────────────────────────────────────────────────
 
+.#{$panw-prefix}--dropdown--size-small .#{$panw-prefix}--dropdown__text-container {
+  height: 32px;
+  padding: 0 12px;
+  font-size: 13px;
+}
+.#{$panw-prefix}--dropdown--size-small .#{$panw-prefix}--dropdown__placeholder,
+.#{$panw-prefix}--dropdown--size-small .#{$panw-prefix}--dropdown__value { font-size: 13px; }
 .#{$panw-prefix}--dropdown--size-large .#{$panw-prefix}--dropdown__text-container { height: 48px; }
 
 // ─── States ──────────────────────────────────────────────────────────────────
@@ -128,7 +135,11 @@ $panw-prefix: 'panw';
   background-color: var(--panw-dropdown-bg-alt-hover);
 }
 
-.#{$panw-prefix}--dropdown--state-onclick .#{$panw-prefix}--dropdown__text-container {
+.#{$panw-prefix}--dropdown--state-onclick .#{$panw-prefix}--dropdown__text-container,
+// Real-click pressed flash — the runtime path goes rest -> hover -> active
+// (open) on click, so without :active there's no perceptible pressed beat
+// between hover and active. This restores the three-state ladder.
+.#{$panw-prefix}--dropdown--state-default .#{$panw-prefix}--dropdown__text-container:active {
   background-color: var(--panw-dropdown-bg-pressed);
 }
 

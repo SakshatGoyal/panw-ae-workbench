@@ -1,0 +1,33 @@
+// Border-radius tokens are mode-agnostic and emitted at :root.
+//
+// Usage:
+//   radius-square     page-level surfaces, app shell
+//   radius-tight      buttons, fields, chips, toggles
+//   radius-standard   cards, panels, info boxes
+//   radius-generous   modals, dialogs, sheets
+//   radius-pill       tags, badges, toggle handles
+
+@use 'sass:map';
+
+:root {
+  --ds-radius-square:   0px;
+  --ds-radius-tight:    4px;
+  --ds-radius-standard: 8px;
+  --ds-radius-generous: 12px;
+  --ds-radius-pill:     9999px;
+}
+
+$_radii: (
+  'square':   var(--ds-radius-square),
+  'tight':    var(--ds-radius-tight),
+  'standard': var(--ds-radius-standard),
+  'generous': var(--ds-radius-generous),
+  'pill':     var(--ds-radius-pill),
+);
+
+@function radius($key) {
+  @if map.has-key($_radii, $key) {
+    @return map.get($_radii, $key);
+  }
+  @error 'Unknown radius key: #{$key}';
+}

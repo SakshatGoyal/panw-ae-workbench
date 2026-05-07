@@ -1,0 +1,43 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { InlineNotification } from './index';
+import * as Stories from './InlineNotification.stories';
+
+<Meta isTemplate />
+
+# InlineNotification
+
+[Source code](packages/inline-notification/src/InlineNotification/InlineNotification.tsx)
+
+## Overview
+
+A horizontal banner with severity icon, message, and optional close
+button. Four severity types and two prominence levels.
+
+## Composition
+
+Close button is the `IconButton` from `@ds/button` (imported, not redefined).
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+
+## Variants
+
+```jsx
+<InlineNotification type="info">Info</InlineNotification>
+<InlineNotification type="alert">Alert</InlineNotification>
+<InlineNotification type="error">Error</InlineNotification>
+<InlineNotification type="success">Success</InlineNotification>
+<InlineNotification type="info" infoType="product-level">High contrast</InlineNotification>
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The root has `role="status"` for screen-reader announcements.
+- The close button is a real `IconButton` with `aria-label="Close notification"`.
+
+{/* TODO: confirm PANW guidance for live region politeness (assertive vs polite) per type */}

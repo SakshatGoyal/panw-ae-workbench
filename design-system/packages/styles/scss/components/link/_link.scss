@@ -1,0 +1,117 @@
+// =============================================================================
+// Link — inline text link
+// CSS class prefix: .panw--link
+// =============================================================================
+
+.panw--link {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  // packages/type yet; values copied verbatim from PANW source.
+  font-family: var(--ds-type-font-family-sans);
+  font-weight: 400;
+  letter-spacing: 0.25px;
+  text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  border: none;
+  background: none;
+  padding: 0;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 2px;
+  }
+}
+
+// ─── Sizes ───────────────────────────────────────────────────────────────────
+
+.panw--link--14px {
+  font-size: 14px;
+  line-height: 18px;
+
+  .panw--link__icon-wrap svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.panw--link--18px {
+  font-size: 18px;
+  line-height: 22px;
+
+  .panw--link__icon-wrap svg {
+    width: 24px;
+    height: 24px;
+  }
+}
+
+// ─── Icon wrapper ────────────────────────────────────────────────────────────
+
+.panw--link__icon-wrap {
+  display: inline-flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+}
+
+// ─── Blue palette ────────────────────────────────────────────────────────────
+
+.panw--link--blue {
+  color: var(--panw-link-blue-default);
+
+  .panw--link__icon-wrap { color: var(--panw-link-blue-default); }
+
+  &:hover,
+  &.panw--link--hover {
+    color: var(--panw-link-blue-hover);
+    text-decoration: underline;
+
+    .panw--link__icon-wrap { color: var(--panw-link-blue-hover); }
+  }
+
+  &:active,
+  &.panw--link--pressed {
+    color: var(--panw-link-blue-pressed);
+    text-decoration: underline;
+
+    .panw--link__icon-wrap { color: var(--panw-link-blue-pressed); }
+  }
+}
+
+// ─── Black palette ───────────────────────────────────────────────────────────
+
+.panw--link--black {
+  color: var(--panw-link-black-default);
+
+  .panw--link__icon-wrap { color: var(--panw-link-black-default); }
+
+  &:hover,
+  &.panw--link--hover {
+    color: var(--panw-link-black-hover);
+    text-decoration: underline;
+
+    .panw--link__icon-wrap { color: var(--panw-link-black-hover-icon); }
+  }
+
+  &:active,
+  &.panw--link--pressed {
+    color: var(--panw-link-black-pressed);
+    text-decoration: underline;
+
+    .panw--link__icon-wrap { color: var(--panw-link-black-pressed); }
+  }
+}
+
+// ─── Disabled ────────────────────────────────────────────────────────────────
+
+.panw--link--disabled,
+.panw--link[aria-disabled='true'] {
+  color: var(--panw-link-disabled);
+  pointer-events: none;
+  cursor: not-allowed;
+
+  .panw--link__icon-wrap { color: var(--panw-link-disabled); }
+}

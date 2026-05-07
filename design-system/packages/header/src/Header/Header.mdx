@@ -1,0 +1,48 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Header } from './index';
+import * as HeaderStories from './Header.stories';
+
+<Meta isTemplate />
+
+# Header
+
+[Source code](packages/header/src/Header/Header.tsx)
+
+## Overview
+
+Column header for tables and lists. Three sizes, two alignments, five
+column types (basic + four PANW extensions), and an optional filter
+button rendered with the `@ds/button` `IconButton`.
+
+## Composition
+
+The optional filter button is the `IconButton` from `@ds/button`
+(imported, not redefined).
+
+## Live Demo
+
+<Canvas of={HeaderStories.Default} />
+
+## PANW extensions
+
+`condensed` and `lengthened` are PANW-specific column types not present in
+Carbon. They render a `+` / `−` glyph beside the title to denote a
+collapsible group column. `ascending` / `descending` render an arrow.
+
+```jsx
+<Header type="condensed">Group</Header>
+<Header type="ascending">Sorted asc</Header>
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The root has `role="columnheader"`.
+- The filter button is a real `IconButton` with `aria-label="Filter column"`.
+- The filter button uses `event.stopPropagation()` so it does not also
+  trigger `onHeaderClick`.
+
+{/* TODO: confirm PANW guidance for sortable header keyboard interaction */}

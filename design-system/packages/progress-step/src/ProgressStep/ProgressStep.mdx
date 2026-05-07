@@ -1,0 +1,78 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { ProgressStep, ProgressStepItem } from '../index';
+import * as ProgressStepStories from './ProgressStep.stories';
+
+<Meta isTemplate />
+
+# ProgressStep
+
+[Source code](packages/progress-step/src/ProgressStep/ProgressStep.tsx)
+
+## Overview
+
+A horizontal stepper. Each step has a colored top border and an indicator
+(numbered circle for `active` / `inactive`, status icon for `success` /
+`warning` / `error`). Steps can optionally render a description and be made
+clickable.
+
+{/* TODO: replace with PANW design intent for ProgressStep usage and ordering */}
+
+## Live Demo
+
+<Canvas of={ProgressStepStories.Default} />
+
+## Code
+
+```jsx
+<ProgressStep>
+  <ProgressStepItem label="Setup" status="success" />
+  <ProgressStepItem label="Details" status="active" description="Now" />
+  <ProgressStepItem label="Review" status="inactive" />
+</ProgressStep>
+```
+
+## API Change: `steps` array → compound children
+
+PANW's source accepted a `steps: StepData[]` array and rendered each step
+internally. **The port adopts Carbon's compound-children pattern** — pass
+`<ProgressStepItem>` children directly. `<ProgressStep>` automatically forwards
+`size`, `showDescription`, and the zero-based `index` to each child via
+`React.cloneElement`.
+
+```jsx
+// PANW (old)
+<ProgressStep steps={[
+  { label: 'Setup', status: 'success' },
+  { label: 'Details', status: 'active' },
+]} />
+
+// Ported (Carbon convention)
+<ProgressStep>
+  <ProgressStepItem label="Setup" status="success" />
+  <ProgressStepItem label="Details" status="active" />
+</ProgressStep>
+```
+
+## Component API
+
+### `ProgressStep`
+
+<ArgTypes of={ProgressStep} />
+
+### `ProgressStepItem`
+
+<ArgTypes of={ProgressStepItem} />
+
+## Accessibility
+
+- When `onClick` is set on a `ProgressStepItem`, it gains `role="button"`,
+  `tabIndex={0}`, and Enter/Space activation.
+- Status icons are `aria-hidden` (decorative); status meaning is conveyed by
+  the visible label.
+- {/* TODO: confirm PANW guidance on aria-current for the active step */}
+
+## API Change: status icons
+
+PANW's source rendered hand-coded SVG paths. The port uses lucide-react icons
+(`CheckCircle2`, `AlertCircle`, `XCircle`) sized to match the original (24px
+default / 16px compact).

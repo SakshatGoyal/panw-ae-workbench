@@ -1,0 +1,52 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Chip } from './index';
+import * as ChipStories from './Chip.stories';
+
+<Meta isTemplate />
+
+# Chip
+
+[Source code](packages/chips/src/Chip/Chip.tsx)
+
+## Overview
+
+A pill-shaped interactive element used for filters, selections, tokenized
+inputs, and tags-with-actions. Supports a leading icon **or** image (mutually
+exclusive), an optional close button, an optional dropdown chevron, and an
+active/selected state. Dark theme variants are included.
+
+{/* TODO: replace with PANW design intent for Chip vs Tag */}
+
+## Live Demo
+
+<Canvas of={ChipStories.Default} />
+
+## Code
+
+```jsx
+<Chip label="Filter" icon onClick={() => apply()} />
+<Chip label="Removable" closeable onClose={() => remove()} />
+<Chip label="Open menu" dropdown closeable={false} onClick={() => openMenu()} />
+<Chip label="Selected" active />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The chip body has `role="button"`, `tabIndex={0}`, and supports Enter/Space
+  activation when `onClick` is supplied.
+- `active` is reflected as `aria-pressed="true"` (toggle-button semantics).
+- `disabled` sets `aria-disabled` and removes the chip from the tab order.
+- The close button is a real `<button>` with an `aria-label` describing the
+  removal target ("Remove \{label\}").
+- Leading icon and dropdown chevron are `aria-hidden="true"` (decorative).
+- {/* TODO: confirm PANW guidance on combining filter chips with a fieldset/legend */}
+
+## API Change: `renderLeadingIcon` / `renderCloseIcon`
+
+PANW's source rendered fixed inline SVGs for the checkmark and close. The port
+exposes `renderLeadingIcon` / `renderCloseIcon` as `ElementType` overrides
+defaulting to lucide-react `Check` / `XCircle`.

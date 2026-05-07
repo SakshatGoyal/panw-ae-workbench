@@ -1,0 +1,54 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { CellContents } from './index';
+import * as CellStories from './CellContents.stories';
+
+<Meta isTemplate />
+
+# CellContents
+
+[Source code](packages/cell-contents/src/CellContents/CellContents.tsx)
+
+## Overview
+
+Atomic content for a single table cell. Supports text and numeric values
+with optional trend indicators, an inline tag, and a trailing status icon.
+
+{/* TODO: replace with PANW design intent */}
+
+## Live Demo
+
+<Canvas of={CellStories.Default} />
+
+## Variants
+
+```jsx
+<CellContents content="text" />
+<CellContents content="numbers" text="1,234,567.00" />
+<CellContents content="numberUp" trendValue="$123" />
+<CellContents content="numberDown" trendValue="$123" />
+```
+
+## With Tag
+
+The optional inline tag renders the `@ds/tags` `Tags` component (imported,
+not redefined).
+
+```jsx
+<CellContents content="text" tags tagLabel="New" />
+```
+
+## Status icon
+
+```jsx
+<CellContents state="success" />
+<CellContents state="error" />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+Decorative icons use `aria-hidden`. Cells are non-interactive — wrap in a
+`<td>` and rely on the table for semantics.

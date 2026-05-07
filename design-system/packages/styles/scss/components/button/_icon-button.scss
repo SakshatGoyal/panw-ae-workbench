@@ -1,0 +1,145 @@
+@use 'mixins' as *;
+
+// =============================================================================
+// IconButton — icon-only button
+// CSS class prefix: .panw--btn-icon
+// Axes: Kind(3) × Size(3) × Shape(3) × IconSize(2) × State(3)
+// =============================================================================
+
+// ─── Base ────────────────────────────────────────────────────────────────────
+
+.panw--btn-icon {
+  @include button-reset;
+  padding: 0.5rem; /* 8px default (sm) */
+  border: none;
+  line-height: 0;
+  color: var(--panw-icon-button-ghost-color);
+}
+
+// ─── Icon wrapper ─────────────────────────────────────────────────────────────
+
+.panw--btn-icon__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    fill: currentColor;
+  }
+}
+
+.panw--btn-icon__icon--16 {
+  width: 1rem; /* 16px */
+  height: 1rem;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+  }
+}
+
+.panw--btn-icon__icon--20 {
+  width: 1.25rem; /* 20px */
+  height: 1.25rem;
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+// ─── Sizes (padding-based) ────────────────────────────────────────────────────
+// sm: 8px padding → total 32px (16px icon) / 36px (20px icon)
+// md: 12px padding → total 40px (16px icon) / 44px (20px icon)
+// lg: 16px padding → total 48px (16px icon) / 52px (20px icon)
+
+.panw--btn-icon--sm {
+  padding: 0.5rem; /* 8px */
+}
+
+.panw--btn-icon--md {
+  padding: 0.75rem; /* 12px */
+}
+
+.panw--btn-icon--lg {
+  padding: 1rem; /* 16px */
+}
+
+// ─── Shapes ───────────────────────────────────────────────────────────────────
+
+.panw--btn-icon--square {
+  border-radius: 0;
+}
+
+.panw--btn-icon--rounded {
+  border-radius: 0.25rem; /* 4px */
+}
+
+.panw--btn-icon--pill {
+  border-radius: 50%;
+}
+
+// ─── Kinds ────────────────────────────────────────────────────────────────────
+
+// Ghost (default: transparent bg, gray icon)
+.panw--btn-icon--ghost {
+  background-color: transparent;
+  color: var(--panw-icon-button-ghost-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-icon-button-ghost-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-icon-button-ghost-bg-active);
+  }
+
+  &:disabled {
+    background-color: var(--panw-icon-button-ghost-disabled-bg);
+    color: var(--panw-icon-button-ghost-disabled-color);
+  }
+
+  // Selected state (ghost only)
+  &.panw--btn-icon--selected {
+    background-color: var(--panw-icon-button-ghost-bg-hover);
+  }
+}
+
+// Primary
+.panw--btn-icon--primary {
+  background-color: var(--panw-icon-button-primary-bg);
+  color: var(--panw-icon-button-primary-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-icon-button-primary-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-icon-button-primary-bg-active);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-disabled-bg);
+    color: var(--panw-icon-button-primary-color);
+  }
+}
+
+// Secondary
+.panw--btn-icon--secondary {
+  background-color: var(--panw-icon-button-secondary-bg);
+  color: var(--panw-icon-button-secondary-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-icon-button-secondary-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-icon-button-secondary-bg-active);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-disabled-bg);
+    color: var(--panw-button-disabled-bg); /* icon disappears into bg when disabled */
+  }
+}

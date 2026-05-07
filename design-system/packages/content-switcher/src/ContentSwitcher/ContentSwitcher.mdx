@@ -1,0 +1,61 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { ContentSwitcher } from './index';
+import * as ContentSwitcherStories from './ContentSwitcher.stories';
+
+<Meta isTemplate />
+
+# ContentSwitcher
+
+[Source code](packages/content-switcher/src/ContentSwitcher/ContentSwitcher.tsx)
+
+## Overview
+
+A segmented control / tablist used to switch between two or more peer views.
+Controlled by `selectedIndex` and `onChange`. Built on `role="tablist"` with
+`role="tab"` segments and roving tabindex.
+
+{/* TODO: replace with PANW design intent for ContentSwitcher vs Tabs */}
+
+## Live Demo
+
+<Canvas of={ContentSwitcherStories.Default} />
+
+## Code
+
+```jsx
+const [idx, setIdx] = useState(0);
+
+<ContentSwitcher
+  items={[{ label: 'List' }, { label: 'Grid' }, { label: 'Calendar' }]}
+  selectedIndex={idx}
+  onChange={setIdx}
+/>
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Container has `role="tablist"`, segments have `role="tab"` and
+  `aria-selected` reflecting state.
+- Roving `tabIndex`: only the selected segment has `tabIndex={0}`.
+- Each segment is a real `<button type="button">` so Enter/Space activate it.
+- Disabled propagates to the native `disabled` attribute on every segment.
+- {/* TODO: confirm PANW guidance on associating an aria-controls panel id */}
+
+## API Change: `icon` (ReactNode) → `renderIcon` (ElementType)
+
+PANW's `ContentSwitcherItem.icon` accepted a `ReactNode`. The port renames it
+to `renderIcon: ElementType` to match Carbon's icon convention. Pass the
+component, not a rendered element:
+
+```jsx
+import { List } from 'lucide-react';
+
+<ContentSwitcher
+  items={[{ label: 'List', renderIcon: List }]}
+  selectedIndex={0}
+/>
+```

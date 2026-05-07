@@ -1,0 +1,91 @@
+// =============================================================================
+// Breadcrumbs — chevron-separated nav trail
+// =============================================================================
+
+.panw--breadcrumbs {
+  display: flex;
+  align-items: center;
+  padding-left: 8px;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+}
+
+.panw--breadcrumbs__list {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.panw--breadcrumbs__item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panw--breadcrumbs__separator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  color: var(--panw-breadcrumb-text);
+  flex-shrink: 0;
+
+  svg { width: 16px; height: 16px; }
+}
+
+.panw--breadcrumbs__link {
+  color: var(--panw-breadcrumb-link);
+  text-decoration: none;
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  transition: color 100ms ease-out;
+
+  &:hover {
+    color: var(--panw-breadcrumb-link-hover);
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+  }
+
+  &:active {
+    color: var(--panw-breadcrumb-link-pressed);
+    text-decoration: underline;
+    text-decoration-skip-ink: none;
+  }
+
+  &[aria-disabled='true'],
+  &.panw--breadcrumbs__link--disabled {
+    color: var(--panw-breadcrumb-link-disabled);
+    text-decoration: none;
+    cursor: default;
+    pointer-events: none;
+  }
+}
+
+.panw--breadcrumbs__current { color: var(--panw-breadcrumb-text); }
+
+.panw--breadcrumbs__continuation {
+  color: var(--panw-breadcrumb-link);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  transition: color 100ms ease-out;
+
+  &:hover  { color: var(--panw-breadcrumb-link-hover); }
+  &:active { color: var(--panw-breadcrumb-link-pressed); }
+}

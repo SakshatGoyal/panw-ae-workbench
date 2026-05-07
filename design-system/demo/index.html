@@ -1,0 +1,400 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Design System Token Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../packages/styles/css/styles.css" />
+    <link rel="stylesheet" href="../dist/demo.css" />
+  </head>
+  <body>
+    <main class="demo">
+      <p style="margin: 0 0 18px;">
+        <a href="./typography.html">Open typography specimen</a> ·
+        <a href="./elevation.html">Open elevation tokens</a> ·
+        <a href="./radius.html">Open radius tokens</a> ·
+        <a href="./spacing.html">Open spacing tokens</a>
+      </p>
+
+      <section class="typography-panel">
+        <h2 class="typography-panel__title">Typography styles (preview)</h2>
+        <p class="typography-panel__subtitle">
+          These are the style names that will map to tokens later. For now, the preview uses simple demo CSS (so you can
+          judge Inter + JetBrains Mono without the unmapped fallback).
+        </p>
+
+        <section class="type-status" aria-label="Font loading status">
+          <h3 class="type-category__title">Font loading status</h3>
+          <div class="type-status__grid">
+            <div class="type-status__item">
+              <div class="type-status__label">Inter 400 / 600 loaded</div>
+              <div class="type-status__value" data-font-check="inter">Checking…</div>
+            </div>
+            <div class="type-status__item">
+              <div class="type-status__label">JetBrains Mono 400 / 600 loaded</div>
+              <div class="type-status__value" data-font-check="mono">Checking…</div>
+            </div>
+            <div class="type-status__item">
+              <div class="type-status__label">Computed weights (same size)</div>
+              <div class="type-status__value" data-font-check="computed">Checking…</div>
+            </div>
+          </div>
+          <div class="type-status__compare" aria-label="Weight comparison samples">
+            <div class="type-status__pill">Sans regular</div>
+            <div class="type-status__sample type-status__sample--sans type-status__sample--regular" data-weight-sample="sans-regular">
+              Inter weight test: handgloves 0123456789
+            </div>
+            <div class="type-status__pill">Sans semibold</div>
+            <div class="type-status__sample type-status__sample--sans type-status__sample--semibold" data-weight-sample="sans-semibold">
+              Inter weight test: handgloves 0123456789
+            </div>
+            <div class="type-status__pill">Mono regular</div>
+            <div class="type-status__sample type-status__sample--mono type-status__sample--regular" data-weight-sample="mono-regular">
+              JetBrains Mono weight test: SELECT status, durationMs FROM logs;
+            </div>
+            <div class="type-status__pill">Mono semibold</div>
+            <div class="type-status__sample type-status__sample--mono type-status__sample--semibold" data-weight-sample="mono-semibold">
+              JetBrains Mono weight test: SELECT status, durationMs FROM logs;
+            </div>
+          </div>
+          <p class="type-status__note">
+            If this says “NO”, your browser did not load that weight and will silently render both samples the same.
+          </p>
+        </section>
+
+        <div class="type-category">
+          <h3 class="type-category__title">Utility</h3>
+          <div class="typography-panel__grid">
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">code-01</div>
+                <div class="type-notes">Mono · Regular</div>
+              </div>
+              <div class="type-sample ds-type-code-01">npm run build && npm run serve · 0123456789</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">code-02</div>
+                <div class="type-notes">Mono · Regular</div>
+              </div>
+              <div class="type-sample ds-type-code-02">SELECT * FROM invoices WHERE status = 'ready';</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">label-01</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-label-01">Account settings</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">label-02</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-label-02">Payment methods</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">helper-text-01</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-helper-text-01">Tip: keep helper text short. If it’s long, it becomes body copy.</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">helper-text-02</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-helper-text-02">Shown under inputs, tables, and settings panels.</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">legal-01</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-legal-01">By continuing, you agree to the terms and confirm you are authorized.</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">legal-02</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-legal-02">This is a preview only. No italics are loaded.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="type-category">
+          <h3 class="type-category__title">Body</h3>
+          <div class="typography-panel__grid">
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">body-compact-01</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-body-compact-01">
+                This is for short paragraphs (components, cards, dense UI) where you don’t want more than ~4 lines.
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">body-compact-02</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-body-compact-02">
+                Slightly larger for expressive moments—still compact, but with more presence.
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">body-01</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-body-01">
+                With a slightly taller line-height, this body style works for longer copy in components like accordions,
+                lists, and help content.
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">body-02</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-body-02">
+                A larger reading size for expressive layouts or marketing-style sections in product surfaces.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="type-category">
+          <h3 class="type-category__title">Heading</h3>
+          <div class="typography-panel__grid">
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-compact-01</div>
+                <div class="type-notes">Sans · Semibold</div>
+              </div>
+              <div class="type-sample ds-type-heading-compact-01">Compact headings for tiles and dashboards</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-compact-02</div>
+                <div class="type-notes">Sans · Semibold</div>
+              </div>
+              <div class="type-sample ds-type-heading-compact-02">Section title with more emphasis</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-01</div>
+                <div class="type-notes">Sans · Semibold</div>
+              </div>
+              <div class="type-sample ds-type-heading-01">Heading 01</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-02</div>
+                <div class="type-notes">Sans · Semibold</div>
+              </div>
+              <div class="type-sample ds-type-heading-02">Heading 02</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-03</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-heading-03">Heading 03</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-04</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-heading-04">Heading 04</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-05</div>
+                <div class="type-notes">Sans · Regular</div>
+              </div>
+              <div class="type-sample ds-type-heading-05">Heading 05</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-06</div>
+                <div class="type-notes">Sans · Light</div>
+              </div>
+              <div class="type-sample ds-type-heading-06">Heading 06</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">heading-07</div>
+                <div class="type-notes">Sans · Light</div>
+              </div>
+              <div class="type-sample ds-type-heading-07">Heading 07</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="type-category">
+          <h3 class="type-category__title">Fluid</h3>
+          <div class="typography-panel__grid">
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-display-01</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-display-01">Fluid display 01</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-display-02</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-display-02">Fluid display 02</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-display-03</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-display-03">Fluid display 03</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-display-04</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-display-04">Fluid display 04</div>
+            </div>
+
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-heading-03</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-heading-03">Fluid heading 03</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-heading-04</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-heading-04">Fluid heading 04</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-heading-05</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-heading-05">Fluid heading 05</div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-heading-06</div>
+                <div class="type-notes">Sans · Semibold · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-heading-06">Fluid heading 06</div>
+            </div>
+
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-paragraph-01</div>
+                <div class="type-notes">Sans · Regular · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-paragraph-01">
+                A paragraph that scales smoothly: readable on small screens, comfortable on large screens.
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-quotation-01</div>
+                <div class="type-notes">Sans · Regular · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-quotation-01">
+                “A short quotation that shows rhythm and punctuation without italics.”
+              </div>
+            </div>
+            <div class="type-row">
+              <div class="type-meta">
+                <div class="type-name">fluid-quotation-02</div>
+                <div class="type-notes">Sans · Regular · clamp()</div>
+              </div>
+              <div class="type-sample ds-type-fluid-quotation-02">“A slightly larger quotation for expressive surfaces.”</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (function () {
+        var cssVars = {
+          sans: getComputedStyle(document.documentElement).getPropertyValue('--ds-type-font-family-sans').trim(),
+          mono: getComputedStyle(document.documentElement).getPropertyValue('--ds-type-font-family-mono').trim(),
+          w400: getComputedStyle(document.documentElement).getPropertyValue('--ds-type-font-weight-regular').trim(),
+          w600: getComputedStyle(document.documentElement).getPropertyValue('--ds-type-font-weight-semibold').trim()
+        };
+
+        function setText(selector, text) {
+          var el = document.querySelector(selector);
+          if (!el) return;
+          el.textContent = text;
+        }
+
+        function boolToYesNo(value) {
+          return value ? 'YES' : 'NO';
+        }
+
+        function checkFonts() {
+          var sansFamily = cssVars.sans || 'Inter';
+          var monoFamily = cssVars.mono || 'JetBrains Mono';
+          var w400 = cssVars.w400 || '400';
+          var w600 = cssVars.w600 || '600';
+
+          var inter400 = document.fonts.check(w400 + ' 16px ' + sansFamily);
+          var inter600 = document.fonts.check(w600 + ' 16px ' + sansFamily);
+          var mono400 = document.fonts.check(w400 + ' 16px ' + monoFamily);
+          var mono600 = document.fonts.check(w600 + ' 16px ' + monoFamily);
+
+          var interText = '400: ' + boolToYesNo(inter400) + ' · 600: ' + boolToYesNo(inter600);
+          var monoText = '400: ' + boolToYesNo(mono400) + ' · 600: ' + boolToYesNo(mono600);
+
+          setText('[data-font-check="inter"]', interText);
+          setText('[data-font-check="mono"]', monoText);
+
+          var sansRegular = document.querySelector('[data-weight-sample="sans-regular"]');
+          var sansSemibold = document.querySelector('[data-weight-sample="sans-semibold"]');
+          var monoRegular = document.querySelector('[data-weight-sample="mono-regular"]');
+          var monoSemibold = document.querySelector('[data-weight-sample="mono-semibold"]');
+
+          if (!sansRegular || !sansSemibold || !monoRegular || !monoSemibold) {
+            setText('[data-font-check="computed"]', 'Missing sample nodes');
+            return;
+          }
+
+          var sw1 = getComputedStyle(sansRegular).fontWeight;
+          var sw2 = getComputedStyle(sansSemibold).fontWeight;
+          var mw1 = getComputedStyle(monoRegular).fontWeight;
+          var mw2 = getComputedStyle(monoSemibold).fontWeight;
+
+          setText('[data-font-check="computed"]', 'Sans: ' + sw1 + ' vs ' + sw2 + ' · Mono: ' + mw1 + ' vs ' + mw2);
+        }
+
+        if (!document.fonts || !document.fonts.ready) {
+          setText('[data-font-check="inter"]', 'Font API unavailable');
+          setText('[data-font-check="mono"]', 'Font API unavailable');
+          setText('[data-font-check="computed"]', 'Font API unavailable');
+          return;
+        }
+
+        document.fonts.ready.then(checkFonts).catch(checkFonts);
+        setTimeout(checkFonts, 1000);
+        setTimeout(checkFonts, 2500);
+      })();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,202 @@
+@use 'mixins' as *;
+
+// =============================================================================
+// Button — standard (text) button
+// CSS class prefix: .panw--btn
+// Axes: Kind(6) × Size(3) × Shape(3) × State(3)
+// =============================================================================
+
+// ─── Base ────────────────────────────────────────────────────────────────────
+
+.panw--btn {
+  @include button-reset;
+  @include button-typography;
+  gap: 4px; /* itemSpacing: 4 */
+}
+
+// ─── Icon slot ───────────────────────────────────────────────────────────────
+
+.panw--btn__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1rem; /* 16px */
+  height: 1rem;
+  flex-shrink: 0;
+
+  svg {
+    width: 1rem;
+    height: 1rem;
+    fill: currentColor;
+  }
+}
+
+// ─── Sizes ───────────────────────────────────────────────────────────────────
+
+.panw--btn--default {
+  height: 2.5rem; /* 40px */
+  padding: 0.75rem 1rem; /* 12px 16px */
+}
+
+.panw--btn--small {
+  height: 2rem; /* 32px */
+  padding: 0.5rem 0.75rem; /* 8px 12px */
+
+  &.panw--btn--standard,
+  &.panw--btn--rounded {
+    padding: 0.5rem 1rem; /* 8px 16px */
+  }
+}
+
+.panw--btn--large {
+  height: 3rem; /* 48px */
+  padding: 1rem; /* 16px all sides */
+}
+
+// ─── Shapes ──────────────────────────────────────────────────────────────────
+
+.panw--btn--pill {
+  border-radius: 3.125rem; /* 50px */
+}
+
+.panw--btn--standard {
+  border-radius: 0;
+}
+
+.panw--btn--rounded {
+  border-radius: 0.25rem; /* 4px */
+}
+
+// ─── Kinds ───────────────────────────────────────────────────────────────────
+
+// Primary
+.panw--btn--primary {
+  background-color: var(--panw-button-primary-bg);
+  color: var(--panw-button-primary-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-primary-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-primary-bg-active);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-disabled-bg);
+    color: var(--panw-button-disabled-text);
+  }
+}
+
+// Danger
+.panw--btn--danger {
+  background-color: var(--panw-button-danger-bg);
+  color: var(--panw-button-danger-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-danger-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-danger-bg-active);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-disabled-bg);
+    color: var(--panw-button-disabled-text);
+  }
+}
+
+// Secondary-Accent (PANW extension: white bg + blue text + gray border)
+.panw--btn--secondary-accent {
+  background-color: var(--panw-button-secondary-accent-bg);
+  border-color: var(--panw-button-secondary-accent-border);
+  color: var(--panw-button-secondary-accent-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-secondary-accent-bg-hover);
+    border-color: var(--panw-button-secondary-accent-border-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-secondary-accent-bg-active);
+    border-color: var(--panw-button-secondary-accent-border-hover);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-disabled-bg);
+    border-color: transparent;
+    color: var(--panw-button-disabled-text);
+  }
+}
+
+// Secondary-Gray (PANW extension: white bg + dark text + gray border)
+.panw--btn--secondary-gray {
+  background-color: var(--panw-button-secondary-gray-bg);
+  border-color: var(--panw-button-secondary-gray-border);
+  color: var(--panw-button-secondary-gray-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-secondary-gray-bg-hover);
+    border-color: var(--panw-button-secondary-gray-border);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-secondary-gray-bg-active);
+    border-color: var(--panw-button-secondary-gray-border);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-disabled-bg);
+    border-color: transparent;
+    color: var(--panw-button-disabled-text);
+  }
+}
+
+// Ghost-Accent (PANW extension: transparent bg + blue text)
+.panw--btn--ghost-accent {
+  background-color: var(--panw-button-ghost-accent-bg);
+  color: var(--panw-button-ghost-accent-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-ghost-accent-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-ghost-accent-bg-active);
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: var(--panw-button-disabled-text);
+  }
+}
+
+// Ghost-Gray (PANW extension: transparent bg + dark text)
+.panw--btn--ghost-gray {
+  background-color: var(--panw-button-ghost-gray-bg);
+  color: var(--panw-button-ghost-gray-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-ghost-gray-bg-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-ghost-gray-bg-active);
+  }
+
+  &:disabled {
+    background-color: transparent;
+    color: var(--panw-button-disabled-text);
+  }
+}
+
+// ─── Skeleton ─────────────────────────────────────────────────────────────────
+
+.panw--btn.panw--skeleton {
+  background-color: #e5e5e5;
+  border-color: transparent;
+  color: transparent;
+  pointer-events: none;
+  user-select: none;
+}

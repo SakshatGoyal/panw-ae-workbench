@@ -1,0 +1,8 @@
+dist
+node_modules
+momentum
+packages/*/lib
+packages/*/generated
+packages/themes/scss/generated
+packages/styles/css
+package-lock.json

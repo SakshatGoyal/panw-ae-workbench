@@ -1,0 +1,21 @@
+// ProgressStep — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
+:root {
+  --panw-ps-success-icon:    #29a393;
+  --panw-ps-warning-icon:    #ebbe0a;
+  --panw-ps-error-icon:      #e14e4e;
+
+  --panw-ps-active-bg:       #006fcc;
+  --panw-ps-active-text:     #ffffff;
+  --panw-ps-inactive-bg:     #ffffff;
+  --panw-ps-inactive-text:   #0e1317;
+  --panw-ps-inactive-border: #858e94;
+
+  --panw-ps-border-success:  #33ccb8;
+  --panw-ps-border-warning:  #fad957;
+  --panw-ps-border-error:    #e14e4e;
+  --panw-ps-border-active:   #006fcc;
+  --panw-ps-border-inactive: #e4e8eb;
+
+  --panw-ps-title:           #0e1317;
+  --panw-ps-description:     #656f76;
+}

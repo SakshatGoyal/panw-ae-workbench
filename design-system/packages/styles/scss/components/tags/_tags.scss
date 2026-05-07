@@ -1,0 +1,142 @@
+@use 'mixins' as *;
+
+// =============================================================================
+// Tags — pill-shaped label component
+// CSS class prefix: .panw--tag
+// Axes: Color(17) × Contrast(2) × Size(2) × Icon × Close
+// =============================================================================
+
+.panw--tag {
+  @include tag-base;
+}
+
+// ─── Sizes ───────────────────────────────────────────────────────────────────
+
+.panw--tag--size-default {
+  padding: 4px 8px;
+  gap: 4px;
+
+  .panw--tag__icon,
+  .panw--tag__close-btn {
+    width: 12px;
+    height: 12px;
+  }
+
+  .panw--tag__icon svg,
+  .panw--tag__close-btn svg {
+    width: 12px;
+    height: 12px;
+  }
+
+  .panw--tag__label {
+    @include tag-typography(12px, 16px);
+  }
+}
+
+.panw--tag--size-large {
+  padding: 8px 12px;
+  gap: 8px;
+
+  .panw--tag__icon,
+  .panw--tag__close-btn {
+    width: 16px;
+    height: 16px;
+  }
+
+  .panw--tag__icon svg,
+  .panw--tag__close-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+
+  .panw--tag__label {
+    @include tag-typography(14px, 18px);
+  }
+}
+
+// ─── Slots ───────────────────────────────────────────────────────────────────
+
+.panw--tag__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+
+  svg {
+    display: block;
+  }
+}
+
+.panw--tag__close-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  border-radius: 50%;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+  }
+
+  svg {
+    display: block;
+  }
+}
+
+// ─── Low contrast colors ─────────────────────────────────────────────────────
+
+.panw--tag--low {
+  color: var(--panw-tag-text-low);
+
+  &.panw--tag--grey     { background-color: var(--panw-tag-low-grey-bg); }
+  &.panw--tag--accent   { background-color: var(--panw-tag-low-accent-bg); }
+  &.panw--tag--red      { background-color: var(--panw-tag-low-red-bg); }
+  &.panw--tag--green    { background-color: var(--panw-tag-low-green-bg); }
+  &.panw--tag--orange   { background-color: var(--panw-tag-low-orange-bg); }
+  &.panw--tag--slate    { background-color: var(--panw-tag-low-slate-bg); }
+  &.panw--tag--lavender { background-color: var(--panw-tag-low-lavender-bg); }
+  &.panw--tag--purple   { background-color: var(--panw-tag-low-purple-bg); }
+  &.panw--tag--pink     { background-color: var(--panw-tag-low-pink-bg); }
+  &.panw--tag--magenta  { background-color: var(--panw-tag-low-magenta-bg); }
+  &.panw--tag--yellow   { background-color: var(--panw-tag-low-yellow-bg); }
+  &.panw--tag--bronze   { background-color: var(--panw-tag-low-bronze-bg); }
+  &.panw--tag--olive    { background-color: var(--panw-tag-low-olive-bg); }
+  &.panw--tag--lime     { background-color: var(--panw-tag-low-lime-bg); }
+  &.panw--tag--jade     { background-color: var(--panw-tag-low-jade-bg); }
+  &.panw--tag--teal     { background-color: var(--panw-tag-low-teal-bg); }
+  &.panw--tag--cobalt   { background-color: var(--panw-tag-low-cobalt-bg); }
+}
+
+// ─── High contrast colors ────────────────────────────────────────────────────
+
+.panw--tag--high {
+  color: var(--panw-tag-text-high);
+
+  &.panw--tag--grey     { background-color: var(--panw-tag-high-grey-bg); }
+  &.panw--tag--accent   { background-color: var(--panw-tag-high-accent-bg); }
+  &.panw--tag--red      { background-color: var(--panw-tag-high-red-bg); }
+  &.panw--tag--green    { background-color: var(--panw-tag-high-green-bg); }
+  &.panw--tag--orange   { background-color: var(--panw-tag-high-orange-bg); }
+  &.panw--tag--slate    { background-color: var(--panw-tag-high-slate-bg); }
+  &.panw--tag--lavender { background-color: var(--panw-tag-high-lavender-bg); }
+  &.panw--tag--purple   { background-color: var(--panw-tag-high-purple-bg); }
+  &.panw--tag--pink     { background-color: var(--panw-tag-high-pink-bg); }
+  &.panw--tag--magenta  { background-color: var(--panw-tag-high-magenta-bg); }
+  &.panw--tag--yellow {
+    background-color: var(--panw-tag-high-yellow-bg);
+    color: var(--panw-tag-text-yellow-high);
+  }
+  &.panw--tag--bronze   { background-color: var(--panw-tag-high-bronze-bg); }
+  &.panw--tag--olive    { background-color: var(--panw-tag-high-olive-bg); }
+  &.panw--tag--lime     { background-color: var(--panw-tag-high-lime-bg); }
+  &.panw--tag--jade     { background-color: var(--panw-tag-high-jade-bg); }
+  &.panw--tag--teal     { background-color: var(--panw-tag-high-teal-bg); }
+  &.panw--tag--cobalt   { background-color: var(--panw-tag-high-cobalt-bg); }
+}

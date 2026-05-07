@@ -1,0 +1,42 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { TextEntryRounded } from './index';
+import * as Stories from './TextEntryRounded.stories';
+
+<Meta isTemplate />
+
+# TextEntryRounded
+
+[Source code](packages/text-entry-rounded/src/TextEntryRounded/TextEntryRounded.tsx)
+
+## Overview
+
+A general-purpose rounded text input. Three sizes, two background tones,
+and a `Type=area` variant rendering a `<textarea>` instead of a single
+line `<input>`. Eight visual states (default, hover, on-click, active,
+error, success, read-only, disabled).
+
+PANW source for this component is Figma-only; the React port was assembled
+to match the variant matrix. The clear button (visible in the active
+state when the field has content) is the `IconButton` from `@ds/button`.
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+
+## Composition
+
+The clear button is rendered with the `@ds/button` `IconButton` (imported,
+not redefined).
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Field is a real `<input>` or `<textarea>` and inherits its semantics.
+- `aria-label` is set from the title when title is a string.
+- Clear button is a real `IconButton` with `aria-label="Clear text"` and
+  `tabIndex={-1}` so it does not steal focus from the field.
+
+{/* TODO: confirm PANW guidance for inline error/success messaging vs. external description slot */}

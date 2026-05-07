@@ -1,0 +1,40 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { MultiSelect } from './index';
+import * as MultiSelectStories from './MultiSelect.stories';
+
+<Meta isTemplate />
+
+# MultiSelect
+
+[Source code](packages/multi-select/src/MultiSelect/MultiSelect.tsx)
+
+## Overview
+
+Multi-select rounded dropdown. Selected values render as chip-tags; values
+beyond `visibleChipCount` collapse into a `+N` badge.
+
+## API change: split from PANW `DropdownRounded`
+
+PANW's unified `DropdownRounded` is split into `@ds/dropdown` (single
+select) and `@ds/multi-select` (this component). Use this when more than
+one value can be chosen at once.
+
+## Composition
+
+The chips are rendered with `@ds/tags` `Tags` (imported, not redefined).
+
+## Live Demo
+
+<Canvas of={MultiSelectStories.Default} />
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Trigger has `role="combobox"`, `aria-multiselectable="true"`,
+  `aria-expanded`, `aria-haspopup="listbox"`.
+- Options use `role="option"` with `aria-selected`.
+
+{/* TODO: confirm PANW guidance for keyboard navigation through options */}

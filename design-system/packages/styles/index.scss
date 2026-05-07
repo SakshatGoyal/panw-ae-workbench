@@ -1,0 +1,39 @@
+@forward '@ds/colors/scss';
+@forward '@ds/themes/scss';
+@forward '@ds/type/scss';
+@forward 'scss/elevation';
+@forward 'scss/radius';
+@forward 'scss/spacing';
+
+@use '@ds/colors/scss' as colors;
+@use '@ds/themes/scss' as themes;
+@use '@ds/type/scss' as type;
+
+@include type.reset();
+
+:root {
+  @include themes.emit-map(colors.$primitive-colors);
+  @include themes.global;
+
+  @include themes.declaration('type-font-family-sans', type.$font-family-sans);
+  @include themes.declaration('type-font-family-mono', type.$font-family-mono);
+  @include themes.declaration('type-font-weight-light', type.$font-weight-light);
+  @include themes.declaration('type-font-weight-regular', type.$font-weight-regular);
+  @include themes.declaration('type-font-weight-semibold', type.$font-weight-semibold);
+}
+
+.shell {
+  @include themes.mode('shell');
+}
+
+.stage {
+  @include themes.mode('stage');
+}
+
+.emphasis {
+  @include themes.mode('emphasis');
+}
+
+.global {
+  @include themes.global;
+}

@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Radius Tokens</title>
+    <link rel="stylesheet" href="../packages/styles/css/styles.css" />
+    <style>
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: #f5f5f4;
+        font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+        color: #1a1a1a;
+      }
+
+      .page {
+        padding: 96px 120px;
+      }
+
+      .back {
+        display: inline-block;
+        margin-bottom: 56px;
+        font-size: 13px;
+        color: #555;
+        text-decoration: none;
+      }
+
+      .back:hover {
+        color: #1a1a1a;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(5, 160px);
+        gap: 64px;
+        align-items: end;
+      }
+
+      .cell {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+      }
+
+      .shape {
+        width: 120px;
+        height: 120px;
+        background: #ffffff;
+        box-shadow: var(--ds-shadow-tile-on-tile);
+      }
+
+      .shape--square   { border-radius: var(--ds-radius-square); }
+      .shape--tight    { border-radius: var(--ds-radius-tight); }
+      .shape--standard { border-radius: var(--ds-radius-standard); }
+      .shape--generous { border-radius: var(--ds-radius-generous); }
+      .shape--pill     { border-radius: var(--ds-radius-pill); }
+
+      .cell__meta {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 3px;
+        text-align: center;
+      }
+
+      .cell__name {
+        font-size: 14px;
+        font-weight: 600;
+        letter-spacing: -0.01em;
+      }
+
+      .cell__value {
+        font-size: 11px;
+        color: #555;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .cell__token {
+        font-size: 10px;
+        color: #888;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      }
+
+      .cell__usage {
+        font-size: 11px;
+        color: #777;
+        margin-top: 2px;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <a class="back" href="./index.html">← Token demo</a>
+      <div class="grid">
+
+        <div class="cell">
+          <div class="shape shape--square"></div>
+          <div class="cell__meta">
+            <div class="cell__name">square</div>
+            <div class="cell__value">0px</div>
+            <div class="cell__token">--ds-radius-square</div>
+            <div class="cell__usage">app shell, page surfaces</div>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="shape shape--tight"></div>
+          <div class="cell__meta">
+            <div class="cell__name">tight</div>
+            <div class="cell__value">4px</div>
+            <div class="cell__token">--ds-radius-tight</div>
+            <div class="cell__usage">buttons, fields, chips</div>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="shape shape--standard"></div>
+          <div class="cell__meta">
+            <div class="cell__name">standard</div>
+            <div class="cell__value">8px</div>
+            <div class="cell__token">--ds-radius-standard</div>
+            <div class="cell__usage">cards, panels, info boxes</div>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="shape shape--generous"></div>
+          <div class="cell__meta">
+            <div class="cell__name">generous</div>
+            <div class="cell__value">12px</div>
+            <div class="cell__token">--ds-radius-generous</div>
+            <div class="cell__usage">modals, dialogs, sheets</div>
+          </div>
+        </div>
+
+        <div class="cell">
+          <div class="shape shape--pill"></div>
+          <div class="cell__meta">
+            <div class="cell__name">pill</div>
+            <div class="cell__value">9999px</div>
+            <div class="cell__token">--ds-radius-pill</div>
+            <div class="cell__usage">tags, badges, toggles</div>
+          </div>
+        </div>
+
+      </div>
+    </main>
+  </body>
+</html>

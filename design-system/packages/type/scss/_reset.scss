@@ -1,0 +1,28 @@
+@use 'font-family' as *;
+@use 'font-weight' as *;
+
+@mixin reset(
+  $body-font-family: font-family('sans'),
+  $mono-font-family: font-family('mono')
+) {
+  html {
+    font-size: 100%;
+  }
+
+  body {
+    font-family: $body-font-family;
+    font-weight: font-weight('regular');
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  code {
+    font-family: $mono-font-family;
+  }
+
+  strong {
+    font-weight: font-weight('semibold');
+  }
+}
+

@@ -1,0 +1,43 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Pagination } from './index';
+import * as Stories from './Pagination.stories';
+
+<Meta isTemplate />
+
+# Pagination
+
+[Source code](packages/pagination/src/Pagination/Pagination.tsx)
+
+## Overview
+
+Page navigation with First / Previous / page number buttons / ellipsis /
+Next / Last, plus an optional "Items per page" dropdown.
+
+## Composition
+
+This component composes three tier-0/tier-1 components — all imported,
+none redefined:
+
+- **Page number buttons** — `Button` from `@ds/button` (kind=`ghost-accent`,
+  shape=`pill`, size=`small`).
+- **Navigation buttons** (first/prev/next/last) — `IconButton` from
+  `@ds/button` (kind=`ghost`, shape=`square`).
+- **Items-per-page selector** — `Dropdown` from `@ds/dropdown`
+  (single-select, NOT MultiSelect).
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The active page button gets `aria-current="page"`.
+- Each navigation `IconButton` has an explicit `aria-label`
+  (`First page`, `Previous page`, `Next page`, `Last page`).
+- Page number buttons get `aria-label="Page N"`.
+
+{/* TODO: confirm PANW guidance for screen-reader announcement of page changes */}

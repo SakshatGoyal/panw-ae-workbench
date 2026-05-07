@@ -1,0 +1,177 @@
+@use 'sass:list';
+@use 'sass:map';
+@use 'sass:meta';
+@use 'sass:string';
+@use 'config';
+@use 'custom-property';
+@use 'generated/tokens';
+
+$use-custom-properties: '__ds-use-custom-properties__';
+$theme: $use-custom-properties !default;
+$fallback: config.$unmapped-color !default;
+
+@function _replace($value, $search, $replacement: '') {
+  $index: string.index($value, $search);
+
+  @if $index {
+    @return string.slice($value, 1, $index - 1) + $replacement +
+      _replace(
+        string.slice($value, $index + string.length($search)),
+        $search,
+        $replacement
+      );
+  }
+
+  @return $value;
+}
+
+@function _name($segments) {
+  $name: '';
+
+  @each $segment in $segments {
+    $safe-segment: _replace('#{$segment}', '.', '-');
+
+    @if $name == '' {
+      $name: $safe-segment;
+    } @else {
+      $name: '#{$name}-#{$safe-segment}';
+    }
+  }
+
+  @return $name;
+}
+
+@function _path($path) {
+  @if meta.type-of($path) == list {
+    @return $path;
+  }
+
+  @if string.index($path, '.') == null {
+    @return ($path,);
+  }
+
+  $segments: ();
+  $remaining: $path;
+  $index: string.index($remaining, '.');
+
+  @while $index {
+    $segments: list.append($segments, string.slice($remaining, 1, $index - 1));
+    $remaining: string.slice($remaining, $index + 1);
+    $index: string.index($remaining, '.');
+  }
+
+  @return list.append($segments, $remaining);
+}
+
+@function _join($segments, $separator: '.') {
+  $value: '';
+
+  @each $segment in $segments {
+    @if $value == '' {
+      $value: '#{$segment}';
+    } @else {
+      $value: '#{$value}#{$separator}#{$segment}';
+    }
+  }
+
+  @return $value;
+}
+
+@function _slice($segments, $start, $end: null) {
+  $result: ();
+  $length: list.length($segments);
+
+  @if $end == null {
+    $end: $length;
+  }
+
+  @for $index from $start through $end {
+    @if $index >= 1 and $index <= $length {
+      $result: list.append($result, list.nth($segments, $index));
+    }
+  }
+
+  @return $result;
+}
+
+@function _resolve($token-map, $segments) {
+  @if list.length($segments) == 0 {
+    @return $token-map;
+  }
+
+  @for $size from list.length($segments) through 1 {
+    $key: _join(_slice($segments, 1, $size));
+
+    @if map.has-key($token-map, $key) {
+      $value: map.get($token-map, $key);
+
+      @if $size == list.length($segments) {
+        @return $value;
+      }
+
+      @if meta.type-of($value) != map {
+        @return null;
+      }
+
+      @return _resolve($value, _slice($segments, $size + 1));
+    }
+  }
+
+  @return null;
+}
+
+@function _value-or-fallback($value) {
+  @if $value == null {
+    @return $fallback;
+  }
+
+  @return $value;
+}
+
+@function get($path, $active-theme: $theme) {
+  @if $active-theme == $use-custom-properties {
+    @return custom-property.get-var(_name(_path($path)), $fallback);
+  }
+
+  @return _value-or-fallback(_resolve($active-theme, _path($path)));
+}
+
+@mixin emit-map($token-map, $path: ()) {
+  @each $key, $value in $token-map {
+    $next-path: list.append($path, $key);
+
+    @if meta.type-of($value) == map {
+      @include emit-map($value, $next-path);
+    } @else {
+      @include custom-property.declaration(_name($next-path), _value-or-fallback($value));
+    }
+  }
+}
+
+@mixin _emit-mode-aliases($mode-name, $token-map, $path: ()) {
+  @each $key, $value in $token-map {
+    $next-path: list.append($path, $key);
+
+    @if meta.type-of($value) == map {
+      @include _emit-mode-aliases($mode-name, $value, $next-path);
+    } @else {
+      $local-name: _name($next-path);
+      $full-name: _name(list.join(($mode-name,), $next-path));
+      @include custom-property.declaration($local-name, custom-property.get-var($full-name, _value-or-fallback($value)));
+    }
+  }
+}
+
+@mixin mode($mode) {
+  @if not map.has-key(tokens.$semantic-tokens, $mode) {
+    @error 'Unknown mode: #{$mode}';
+  }
+
+  $mode-map: map.get(tokens.$semantic-tokens, $mode);
+  @include emit-map($mode-map, ($mode,));
+  @include _emit-mode-aliases($mode, $mode-map);
+}
+
+@mixin global {
+  @include mode('global');
+}

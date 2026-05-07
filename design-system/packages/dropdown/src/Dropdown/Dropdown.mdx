@@ -1,0 +1,52 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Dropdown } from './index';
+import * as DropdownStories from './Dropdown.stories';
+
+<Meta isTemplate />
+
+# Dropdown
+
+[Source code](packages/dropdown/src/Dropdown/Dropdown.tsx)
+
+## Overview
+
+Single-select rounded dropdown. Two background tones, two heights, with
+title and description slots.
+
+## API change: split from PANW `DropdownRounded`
+
+PANW's `DropdownRounded` accepted a `multiselect` flag and rendered chips
+inline when multiple values were selected. This port splits that surface
+into two components, matching Carbon:
+
+- `@ds/dropdown` (`Dropdown`) — single-select (this package)
+- `@ds/multi-select` (`MultiSelect`) — multi-select with chips
+
+Use `Dropdown` when only one value can be chosen.
+
+## Live Demo
+
+<Canvas of={DropdownStories.Default} />
+
+## Variants
+
+```jsx
+<Dropdown title="Default" />
+<Dropdown title="Large" size="large" />
+<Dropdown title="Grey 00" background="grey00" />
+<Dropdown title="Disabled" disabled />
+<Dropdown title="Read only" readOnly selectedValue="option-1" />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The trigger has `role="combobox"`, `aria-expanded`, `aria-haspopup="listbox"`.
+- Menu uses `role="listbox"`, items `role="option"` with `aria-selected`.
+- `Enter` / `Space` toggles open/close from the trigger.
+- Click outside closes the menu.
+
+{/* TODO: confirm PANW guidance for full keyboard navigation through options (arrow keys) */}

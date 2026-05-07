@@ -1,0 +1,49 @@
+// =============================================================================
+// Button — shared SCSS mixins
+// =============================================================================
+
+/// Base reset applied to both .panw--btn and .panw--btn-icon
+@mixin button-reset {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  cursor: pointer;
+  box-sizing: border-box;
+  text-decoration: none;
+  white-space: nowrap;
+  transition:
+    background-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9),
+    border-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9),
+    color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9);
+
+  &:focus-visible {
+    outline: 2px solid var(--panw-button-focus-color);
+    outline-offset: 2px;
+  }
+
+  &:disabled,
+  &[aria-disabled='true'] {
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+}
+
+/// Typography for standard (text) buttons.
+/// font-size 14px / font-weight 700 / line-height 18px / letter-spacing 0.25px
+///
+/// font-family:   var(--ds-type-font-family-sans) — Inter (design system token)
+/// font-weight:   700 hardcoded — PANW button text is bold; closest token is
+///                semibold (600) via --ds-type-font-weight-semibold, but PANW
+///                spec calls for 700. No bold token exists in @ds/type.
+/// font-size:     14px / 0.875rem — PANW-specific; no token equivalent in @ds/type
+///                (available type scale: label-01=12px, label-02=14px via rem).
+/// line-height:   18px / 1.286 — matches body-compact-01 approximately
+/// letter-spacing: 0.25px — PANW-specific; no token equivalent
+@mixin button-typography {
+  font-family: var(--ds-type-font-family-sans, 'Inter', sans-serif);
+  font-weight: 700; /* PANW-specific: bold button text; no token equivalent (semibold=600) */
+  font-size: 0.875rem; /* PANW-specific: 14px button label */
+  line-height: 1.286; /* 18px / 14px ≈ 1.286 */
+  letter-spacing: 0.25px; /* PANW-specific */
+}

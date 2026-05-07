@@ -1,0 +1,17 @@
+@use 'config';
+
+@function get-name($name) {
+  @return --#{config.$prefix}-#{$name};
+}
+
+@function get-var($name, $fallback: false) {
+  @if $fallback {
+    @return var(#{get-name($name)}, #{$fallback});
+  }
+
+  @return var(#{get-name($name)});
+}
+
+@mixin declaration($name, $value) {
+  #{get-name($name)}: #{$value};
+}

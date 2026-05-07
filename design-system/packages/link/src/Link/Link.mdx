@@ -1,0 +1,57 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Link } from './index';
+import * as LinkStories from './Link.stories';
+
+<Meta isTemplate />
+
+# Link
+
+[Source code](packages/link/src/Link/Link.tsx)
+
+## Overview
+
+Inline text link with two color palettes (`blue`, `black`), two sizes (`14px`,
+`18px`), optional leading/trailing arrow icons, and a disabled state. Renders
+as `<a>` when `href` is provided, otherwise as a `<span role="link">`.
+
+{/* TODO: replace with PANW design intent for when to use Link vs Button */}
+
+## Live Demo
+
+<Canvas of={LinkStories.Default} />
+
+## Code
+
+```jsx
+<Link href="/path">Inline link</Link>
+<Link href="/back" leftIcon>Back</Link>
+<Link href="/next" rightIcon size="18px">Continue</Link>
+<Link disabled>Unavailable</Link>
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Renders as `<a>` when `href` is provided — native focus, activation, and
+  screen reader announcement work out of the box.
+- Without `href`, renders as `<span role="link">` for click-only handlers.
+- Disabled links use `aria-disabled="true"` and `tabIndex={-1}` so they remain
+  in the DOM but are not focusable or interactive.
+- Icons (`leftIcon`, `rightIcon`) are wrapped in a span with `aria-hidden="true"`.
+- {/* TODO: confirm PANW guidance on whether disabled links should remain in tab order */}
+
+## API Change: `renderLeftIcon` / `renderRightIcon`
+
+PANW's source rendered fixed inline arrow SVGs. The port keeps `leftIcon` /
+`rightIcon` as the boolean toggle (matches PANW behavior) but exposes
+`renderLeftIcon` / `renderRightIcon` as `ElementType` overrides, defaulting to
+lucide-react `ArrowLeft` / `ArrowRight`.
+
+```jsx
+import { ChevronRight } from 'lucide-react';
+
+<Link href="#" rightIcon renderRightIcon={ChevronRight}>Continue</Link>
+```

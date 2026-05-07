@@ -1,0 +1,24 @@
+{
+  "name": "@ds/colors",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "lib/src/index.js",
+  "types": "lib/src/index.d.ts",
+  "scripts": {
+    "build": "node tasks/build.js && tsc -p tsconfig.json"
+  },
+  "exports": {
+    ".": {
+      "types": "./lib/src/index.d.ts",
+      "default": "./lib/src/index.js"
+    },
+    "./colors": {
+      "types": "./lib/src/colors.d.ts",
+      "default": "./lib/src/colors.js"
+    },
+    "./scss": "./scss/index.scss"
+  },
+  "sass": "scss/index.scss",
+  "sideEffects": false
+}

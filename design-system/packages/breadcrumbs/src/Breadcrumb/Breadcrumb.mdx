@@ -1,0 +1,79 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Breadcrumb, BreadcrumbItem } from '../index';
+import * as BreadcrumbStories from './Breadcrumb.stories';
+
+<Meta isTemplate />
+
+# Breadcrumb
+
+[Source code](packages/breadcrumbs/src/Breadcrumb/Breadcrumb.tsx)
+
+## Overview
+
+A chevron-separated navigation trail. Renders as `<nav aria-label="Breadcrumb">
+<ol>…</ol></nav>`. Last visible `<BreadcrumbItem>` is automatically marked with
+`aria-current="page"`. When `collapsed` is set on a list of more than two
+items, middle items are hidden behind a `…` button that fires `onExpand`.
+
+{/* TODO: replace with PANW design intent for Breadcrumb usage / depth */}
+
+## Live Demo
+
+<Canvas of={BreadcrumbStories.Default} />
+
+## Code
+
+```jsx
+<Breadcrumb>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/products">Products</BreadcrumbItem>
+  <BreadcrumbItem>MacBook Pro</BreadcrumbItem>
+</Breadcrumb>
+
+<Breadcrumb collapsed onExpand={() => expand()}>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem href="/a">Level 1</BreadcrumbItem>
+  <BreadcrumbItem href="/b">Level 2</BreadcrumbItem>
+  <BreadcrumbItem>Current</BreadcrumbItem>
+</Breadcrumb>
+```
+
+## API Change: `items` array → compound children
+
+PANW's source accepted an `items: BreadcrumbItem[]` array prop. **The port
+adopts Carbon's compound-children pattern** — pass `<BreadcrumbItem>` children
+directly. This matches Carbon's API and gives consumers full control over the
+content of each item (icons, custom links, etc.).
+
+```jsx
+// PANW (old)
+<Breadcrumbs items={[{ label: 'Home', href: '/' }, { label: 'Settings' }]} />
+
+// Ported (Carbon convention)
+<Breadcrumb>
+  <BreadcrumbItem href="/">Home</BreadcrumbItem>
+  <BreadcrumbItem>Settings</BreadcrumbItem>
+</Breadcrumb>
+```
+
+## Component API
+
+### `Breadcrumb`
+
+<ArgTypes of={Breadcrumb} />
+
+### `BreadcrumbItem`
+
+<ArgTypes of={BreadcrumbItem} />
+
+## Accessibility
+
+- Wrapping element is `<nav aria-label="Breadcrumb">` (override via
+  `aria-label`).
+- Items live inside an `<ol>` so the order is conveyed to assistive tech.
+- The last visible item is rendered as `<span aria-current="page">` — not a
+  link.
+- Disabled items render as anchors with `aria-disabled="true"` and
+  `pointer-events: none`.
+- The collapsed `…` button has `aria-label="Show hidden breadcrumbs"`.
+- {/* TODO: confirm PANW guidance for Breadcrumb separators with screen readers */}

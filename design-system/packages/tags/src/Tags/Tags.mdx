@@ -1,0 +1,131 @@
+import { Story, ArgTypes, Canvas, Unstyled, Meta } from '@storybook/addon-docs/blocks';
+import { Sun } from 'lucide-react';
+import { Tags } from './index';
+import * as TagsStories from './Tags.stories';
+
+<Meta isTemplate />
+
+# Tags
+
+[Source code](packages/tags/src/Tags/Tags.tsx)
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Live Demo](#live-demo)
+- [Colors](#colors)
+- [Contrast](#contrast)
+- [Sizes](#sizes)
+- [With Icon](#with-icon)
+- [Dismissable](#dismissable)
+- [Component API](#component-api)
+- [Accessibility](#accessibility)
+- [API Change: renderIcon](#api-change-rendericon)
+
+## Overview
+
+Tags are pill-shaped labels used to categorize, filter, or mark content. The
+PANW Tags component supports 17 colors across two contrast levels, two sizes,
+an optional leading icon, and an optional close (dismiss) button.
+
+{/* TODO: replace with PANW design intent for when to use Tags */}
+
+## Live Demo
+
+<Canvas of={TagsStories.Default} />
+
+## Colors
+
+17 colors are available: `grey`, `accent`, `red`, `green`, `orange`, `slate`,
+`lavender`, `purple`, `pink`, `magenta`, `yellow`, `bronze`, `olive`, `lime`,
+`jade`, `teal`, `cobalt`. See the AllVariants story for a visual matrix.
+
+```jsx
+<Tags label="Accent" color="accent" />
+<Tags label="Red" color="red" />
+<Tags label="Cobalt" color="cobalt" />
+```
+
+## Contrast
+
+`low` (default) uses a pastel background with dark text. `high` uses a
+saturated background with light text.
+
+<Canvas of={TagsStories.HighContrast} />
+
+```jsx
+<Tags label="Low" color="accent" contrast="low" />
+<Tags label="High" color="accent" contrast="high" />
+```
+
+## Sizes
+
+Two sizes: `default` (12px text, 4×8 padding) and `large` (14px text, 8×12
+padding).
+
+```jsx
+<Tags label="Default" size="default" />
+<Tags label="Large" size="large" />
+```
+
+## With Icon
+
+Pass a lucide-react (or any React) component to `renderIcon` and set
+`icon=\{true\}`. Defaults to `Sun` (matches PANW's default "light" SVG).
+
+<Canvas of={TagsStories.WithIcon} />
+
+```jsx
+import { Star } from 'lucide-react';
+
+<Tags label="Featured" icon renderIcon={Star} />
+```
+
+## Dismissable
+
+Set `close=\{true\}` and pass an `onClose` handler. The close button receives an
+auto-generated `aria-label` of `Remove \{label\}`.
+
+<Canvas of={TagsStories.Dismissable} />
+
+```jsx
+<Tags label="Dismissable" close onClose={() => removeTag()} />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The leading icon is `aria-hidden="true"` — it is decorative.
+- The close button is a real `<button>` with an `aria-label` describing the
+  removal action ("Remove \{label\}").
+- The close button has a visible `:focus-visible` outline.
+- Tags are non-interactive by default (`cursor: default`, `user-select: none`).
+- {/* TODO: confirm PANW's accessibility guidance for tag groups (filter chips, etc.) */}
+
+## API Change: `renderIcon`
+
+**Deliberate change from PANW `Tags`:**
+
+PANW's source accepted `customIcon` and `customCloseIcon` as `ReactNode` — you
+passed already-rendered elements:
+
+```jsx
+// PANW (old)
+<Tags label="Foo" icon customIcon={<MyIcon />} />
+```
+
+The ported `Tags` uses Carbon's `renderIcon: ElementType` convention — pass the
+component, not a rendered element:
+
+```jsx
+// Ported (Carbon convention)
+import { Star } from 'lucide-react';
+
+<Tags label="Foo" icon renderIcon={Star} />
+```
+
+This lets the component control sizing (12px / 16px depending on `size`) and
+inject `aria-hidden` correctly.

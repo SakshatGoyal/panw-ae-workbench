@@ -1,0 +1,14 @@
+// Content switcher — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
+:root {
+  --panw-cs-selected-bg:           #dff0fd; // VariableID:7203:1788
+  --panw-cs-selected-text:         #003474; // VariableID:7203:1800
+  --panw-cs-unselected-bg:         #ffffff; // VariableID:7203:1767 (was --static-surfaces-primary)
+  --panw-cs-unselected-text:       #0e1317; // VariableID:7203:1790
+  --panw-cs-unselected-icon:       #404a52; // VariableID:7208:6383
+  --panw-cs-hover-bg-gray10:       #eff8ff; // VariableID:7203:1772
+  --panw-cs-pressed-bg-gray10:     #dff0fd; // VariableID:7203:1777
+  --panw-cs-hover-bg-gray00:       #eff8ff; // VariableID:7203:1773
+  --panw-cs-pressed-bg-gray00:     #dff0fd; // VariableID:7203:1777
+  --panw-cs-disabled-text:         #c5ccd1; // VariableID:7203:1807
+  --panw-cs-focus:                 #003474;
+}

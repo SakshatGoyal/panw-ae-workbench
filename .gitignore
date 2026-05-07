@@ -1,0 +1,18 @@
+# Dependencies
+node_modules/
+.venv/
+
+# Build outputs
+dist/
+graphify-out/
+
+# Tooling caches
+.tmp/
+.playwright-mcp/
+
+# OS
+.DS_Store
+
+# Editor
+.vscode/
+.idea/

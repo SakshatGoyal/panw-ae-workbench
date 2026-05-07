@@ -1,0 +1,23 @@
+// =============================================================================
+// Tags — mixins
+// =============================================================================
+
+@mixin tag-base {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  border-radius: 20px;
+  box-sizing: border-box;
+  cursor: default;
+  user-select: none;
+  white-space: nowrap;
+}
+
+@mixin tag-typography($size: 12px, $line-height: 16px) {
+  // packages/type yet (sans-serif tokens use Inter), so values are hardcoded.
+  font-family: var(--ds-type-font-family-sans);
+  font-weight: 400;
+  font-size: $size;
+  line-height: $line-height;
+  letter-spacing: 0.25px;
+}

@@ -1,0 +1,22 @@
+// InlineNotification — CSS tokens copied from PANW source
+:root {
+  // Page-level (low contrast)
+  --panw-in-info-page-bg:    #eff8ff;
+  --panw-in-info-page-icon:  #006fcc;
+  --panw-in-alert-page-bg:   #fff4c7;
+  --panw-in-alert-page-icon: #846b06;
+  --panw-in-error-page-bg:   #fcd4d4;
+  --panw-in-error-page-icon: #b22d2d;
+  --panw-in-success-page-bg:  #c5f9f2;
+  --panw-in-success-page-icon: #137669;
+  --panw-in-text-page:       #0e1317;
+
+  // Product-level (high contrast)
+  --panw-in-info-product-bg:    #006fcc;
+  --panw-in-alert-product-bg:   #fad957;
+  --panw-in-alert-product-icon: #404a52;
+  --panw-in-error-product-bg:   #b22d2d;
+  --panw-in-success-product-bg: #33ccb8;
+  --panw-in-text-inverse:       #ffffff;
+  --panw-in-product-close:      #dfe5eb;
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@ds/styles",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node tasks/build-css.js"
+  },
+  "exports": {
+    ".": "./index.scss",
+    "./css": "./css/styles.css",
+    "./css/min": "./css/styles.min.css"
+  },
+  "sass": "index.scss",
+  "dependencies": {
+    "@ds/colors": "0.1.0",
+    "@ds/themes": "0.1.0",
+    "@ds/type": "0.1.0"
+  },
+  "sideEffects": true
+}

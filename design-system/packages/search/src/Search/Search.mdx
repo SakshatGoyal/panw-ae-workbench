@@ -1,0 +1,47 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Search } from './index';
+import * as Stories from './Search.stories';
+
+<Meta isTemplate />
+
+# Search
+
+[Source code](packages/search/src/Search/Search.tsx)
+
+## Overview
+
+A text input with leading search glyph and an inline clear button. Three
+sizes, three corner shapes (standard / rounded / pill), and two background
+tones.
+
+## Composition
+
+The clear button is the `IconButton` from `@ds/button` (imported, not
+redefined).
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The wrapper has `role="search"`.
+- Clear button is a real `IconButton` with `aria-label="Clear search"`,
+  `tabIndex={-1}` so it does not steal focus from the input.
+- `aria-label` on the input falls through from `placeholder`.
+
+{/* TODO: confirm PANW guidance for clearing via keyboard (Esc to clear?) */}
+
+## API Change: `searchIcon` (ReactNode) → `renderSearchIcon` (ElementType)
+
+PANW accepted a pre-rendered `searchIcon: ReactNode`. This port follows
+Carbon's convention — pass a component:
+
+```jsx
+import { Search as SearchIcon } from 'lucide-react';
+<Search renderSearchIcon={SearchIcon} />
+```

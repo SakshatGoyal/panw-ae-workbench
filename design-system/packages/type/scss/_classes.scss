@@ -1,0 +1,38 @@
+@use 'sass:map';
+@use 'generated/styles' as generated;
+@use 'font-family' as *;
+@use 'font-weight' as *;
+@use 'styles' as *;
+
+@mixin type-classes {
+  @each $name, $style in generated.$type-styles {
+    .ds-type-#{$name} {
+      @include type-style($name);
+    }
+  }
+
+  .ds-type-family-sans {
+    font-family: font-family('sans');
+  }
+
+  .ds-type-family-mono {
+    font-family: font-family('mono');
+  }
+
+  .ds-type-weight-light {
+    font-weight: font-weight('light');
+  }
+
+  .ds-type-weight-regular {
+    font-weight: font-weight('regular');
+  }
+
+  .ds-type-weight-semibold {
+    font-weight: font-weight('semibold');
+  }
+
+  .ds-type-italic {
+    font-style: italic;
+  }
+}
+

@@ -1,0 +1,12 @@
+// Cells Standard — CSS custom property tokens. Hex values from PANW source.
+:root {
+  --panw-cell-row-hover-bg:        #eff8ff;
+  --panw-cell-row-press-bg:        #dff0fd;
+  --panw-cell-row-active-bg:       #dff0fd;
+  --panw-cell-row-locked-bg:       var(--static-surfaces-primary, #ffffff);
+  --panw-cell-row-locked-text:     #c5ccd1;
+  --panw-cell-row-locked-tag-bg:   #e0e0e0;
+  --panw-cell-row-locked-tag-text: #404a52;
+  --panw-cell-row-expand-color:    #404a52;
+  --panw-cell-row-active-cb-color: #006fcc;
+}

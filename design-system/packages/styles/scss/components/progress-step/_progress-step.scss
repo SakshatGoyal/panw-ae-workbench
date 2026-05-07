@@ -1,0 +1,136 @@
+// =============================================================================
+// ProgressStep — horizontal stepper
+// =============================================================================
+
+.panw--ps-stepper {
+  display: flex;
+  flex-direction: row;
+  gap: 0;
+}
+
+.panw--ps-step {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  padding: 8px 0;
+  border-top: 2px solid transparent;
+  min-width: 0;
+  flex: 1 1 0;
+  cursor: default;
+  transition: border-color 0.3s ease-out, background-color 0.3s ease-out;
+
+  &[role='button'] { cursor: pointer; }
+}
+
+.panw--ps-step--compact {
+  flex-direction: column;
+  padding: 8px;
+  align-items: flex-start;
+}
+
+.panw--ps-step__indicator-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.panw--ps-step__icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 24px;
+  line-height: 0;
+
+  svg { width: 24px; height: 24px; }
+}
+
+.panw--ps-step--compact .panw--ps-step__icon {
+  width: 16px;
+  height: 16px;
+
+  svg { width: 16px; height: 16px; }
+}
+
+.panw--ps-step__icon--success { color: var(--panw-ps-success-icon); }
+.panw--ps-step__icon--warning { color: var(--panw-ps-warning-icon); }
+.panw--ps-step__icon--error   { color: var(--panw-ps-error-icon); }
+
+.panw--ps-step__number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border-radius: 24px;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+}
+
+.panw--ps-step--compact .panw--ps-step__number {
+  width: 16px;
+  height: 16px;
+  font-size: 10px;
+  line-height: 14px;
+}
+
+.panw--ps-step__number--active {
+  background-color: var(--panw-ps-active-bg);
+  color: var(--panw-ps-active-text);
+  border: 1px solid var(--panw-ps-active-bg);
+}
+
+.panw--ps-step__number--inactive {
+  background-color: var(--panw-ps-inactive-bg);
+  color: var(--panw-ps-inactive-text);
+  border: 1px solid var(--panw-ps-inactive-border);
+}
+
+.panw--ps-step__text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 2px 0;
+  min-width: 0;
+  flex: 1 1 0;
+}
+
+.panw--ps-step__title {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+  color: var(--panw-ps-title);
+  text-align: left;
+}
+
+.panw--ps-step__description {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 16px;
+  letter-spacing: 0.25px;
+  color: var(--panw-ps-description);
+  text-align: left;
+}
+
+.panw--ps-step--success  { border-top-color: var(--panw-ps-border-success); }
+.panw--ps-step--warning  { border-top-color: var(--panw-ps-border-warning); }
+.panw--ps-step--error    { border-top-color: var(--panw-ps-border-error); }
+.panw--ps-step--active   { border-top-color: var(--panw-ps-border-active); }
+.panw--ps-step--inactive {
+  border-top-color: var(--panw-ps-border-inactive);
+  border-top-style: dashed;
+}
+
+.panw--ps-step--hover,
+.panw--ps-step:hover {
+  background-color: rgba(0, 0, 0, 0.02);
+}

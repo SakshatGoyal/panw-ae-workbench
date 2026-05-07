@@ -1,0 +1,43 @@
+@use 'tokens';
+
+$panw-prefix: 'panw';
+
+.#{$panw-prefix}--pagination {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-family: var(--ds-type-font-family-sans);
+}
+
+.#{$panw-prefix}--pagination__page-numbers {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.#{$panw-prefix}--pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 24px;
+  font-size: 14px;
+  color: var(--panw-pagination-ellipsis);
+}
+
+.#{$panw-prefix}--pagination__items-per-page {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.#{$panw-prefix}--pagination__items-per-page-label {
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+  color: var(--panw-pagination-text-secondary);
+}
+
+.#{$panw-prefix}--pagination__dropdown-wrapper {
+  width: 96px;
+}

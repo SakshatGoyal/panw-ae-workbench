@@ -1,0 +1,55 @@
+// =============================================================================
+// Tags — CSS custom property tokens
+//
+// FUTURE TOKEN SWAP POINT: Hex literals copied directly from PANW Figma source
+// (see PANW design-system/src/components/Tags/Tags.css). When the design token
+// pipeline is ready, replace each hex with a reference to the appropriate
+// semantic token from @ds/themes.
+//
+// VariableID comments are preserved from PANW's Figma export for traceability.
+// =============================================================================
+
+:root {
+  // ── Shared ────────────────────────────────────────────────────────────────
+  --panw-tag-text-low:           #404a52; // VariableID:7203:1789
+  --panw-tag-text-high:          #ffffff;
+  --panw-tag-text-yellow-high:   #0e1317; // dark text on yellow-high
+
+  // ── Low contrast (pastel) backgrounds ─────────────────────────────────────
+  --panw-tag-low-grey-bg:      #e0e0e0;
+  --panw-tag-low-accent-bg:    #cfe8fc;
+  --panw-tag-low-red-bg:       #ffd7d9;
+  --panw-tag-low-green-bg:     #a6f2e8;
+  --panw-tag-low-orange-bg:    #ffd98c;
+  --panw-tag-low-slate-bg:     #e3e7fa;
+  --panw-tag-low-lavender-bg:  #ead7f7;
+  --panw-tag-low-purple-bg:    #e8daff;
+  --panw-tag-low-pink-bg:      #ffe0e7;
+  --panw-tag-low-magenta-bg:   #ffd6e8;
+  --panw-tag-low-yellow-bg:    #fbeaac;
+  --panw-tag-low-bronze-bg:    #eddbb4;
+  --panw-tag-low-olive-bg:     #e7edb7;
+  --panw-tag-low-lime-bg:      #ddf2ae;
+  --panw-tag-low-jade-bg:      #d5e0dc;
+  --panw-tag-low-teal-bg:      #9ef0f0;
+  --panw-tag-low-cobalt-bg:    #d0e2ff;
+
+  // ── High contrast (saturated) backgrounds ─────────────────────────────────
+  --panw-tag-high-grey-bg:     #48455e;
+  --panw-tag-high-accent-bg:   #004c9d;
+  --panw-tag-high-red-bg:      #da1e28;
+  --panw-tag-high-green-bg:    #137669;
+  --panw-tag-high-orange-bg:   #a85f00;
+  --panw-tag-high-slate-bg:    #6f739e;
+  --panw-tag-high-lavender-bg: #80659e;
+  --panw-tag-high-purple-bg:   #8a3ffc;
+  --panw-tag-high-pink-bg:     #d43b52;
+  --panw-tag-high-magenta-bg:  #d02670;
+  --panw-tag-high-yellow-bg:   #ebbe0a;
+  --panw-tag-high-bronze-bg:   #876d48;
+  --panw-tag-high-olive-bg:    #7d7a18;
+  --panw-tag-high-lime-bg:     #588219;
+  --panw-tag-high-jade-bg:     #5d756b;
+  --panw-tag-high-teal-bg:     #007d79;
+  --panw-tag-high-cobalt-bg:   #0f62fe;
+}

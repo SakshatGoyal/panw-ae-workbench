@@ -1,0 +1,93 @@
+@use 'tokens';
+
+$panw-prefix: 'panw';
+
+.#{$panw-prefix}--number-input {
+  display: flex;
+  flex-direction: column;
+  width: 240px;
+  box-sizing: border-box;
+}
+
+.#{$panw-prefix}--number-input__title-row {
+  display: flex;
+  align-items: center;
+  padding-bottom: 4px;
+}
+
+.#{$panw-prefix}--number-input__title {
+  flex: 1;
+  font-family: var(--ds-type-font-family-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+  color: var(--panw-ni-text);
+  margin: 0;
+}
+
+.#{$panw-prefix}--number-input__field {
+  display: flex;
+  align-items: center;
+  height: 40px;
+  border-radius: 4px;
+  padding-left: 16px;
+  border: 1px solid transparent;
+  box-sizing: border-box;
+  transition: border-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9),
+              background-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9);
+}
+
+.#{$panw-prefix}--number-input__value {
+  flex: 1;
+  font-family: var(--ds-type-font-family-sans);
+  font-weight: 400;
+  font-size: 14px;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+  color: var(--panw-ni-text);
+  border: none;
+  background: transparent;
+  outline: none;
+  padding: 0;
+  min-width: 0;
+  -moz-appearance: textfield;
+
+  &::-webkit-inner-spin-button,
+  &::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
+
+.#{$panw-prefix}--number-input__description-row {
+  display: flex;
+  align-items: center;
+  padding-top: 4px;
+}
+
+.#{$panw-prefix}--number-input__description {
+  flex: 1;
+  font-family: var(--ds-type-font-family-sans);
+  font-weight: 400;
+  font-size: 12px;
+  line-height: 16px;
+  letter-spacing: 0.25px;
+  color: var(--panw-ni-description);
+  margin: 0;
+}
+
+.#{$panw-prefix}--number-input--grey-00 .#{$panw-prefix}--number-input__field { background-color: var(--panw-ni-bg-grey00); }
+.#{$panw-prefix}--number-input--grey-10 .#{$panw-prefix}--number-input__field { background-color: var(--panw-ni-bg-grey10); }
+
+.#{$panw-prefix}--number-input--active .#{$panw-prefix}--number-input__field {
+  border: 2px solid var(--panw-ni-border-focus);
+}
+
+.#{$panw-prefix}--number-input--disabled {
+  cursor: not-allowed;
+  .#{$panw-prefix}--number-input__title,
+  .#{$panw-prefix}--number-input__value,
+  .#{$panw-prefix}--number-input__description { color: var(--panw-ni-disabled); }
+  .#{$panw-prefix}--number-input__value { cursor: not-allowed; }
+}

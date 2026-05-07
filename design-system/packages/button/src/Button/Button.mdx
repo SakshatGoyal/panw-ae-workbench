@@ -1,0 +1,193 @@
+import { Story, ArgTypes, Canvas, Unstyled, Meta } from '@storybook/addon-docs/blocks';
+import { Plus } from 'lucide-react';
+import Button from './Button';
+import * as ButtonStories from './Button.stories';
+
+<Meta isTemplate />
+
+# Button
+
+[Source code](packages/button/src/Button/Button.tsx)
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Kinds](#kinds)
+- [Sizes](#sizes)
+- [Shapes](#shapes)
+- [With Icons](#with-icons)
+- [Disabled](#disabled)
+- [PANW Extensions](#panw-extensions)
+- [Component API](#component-api)
+- [Accessibility](#accessibility)
+- [API Change: renderIcon](#api-change-rendericon)
+- [Feedback](#feedback)
+
+## Overview
+
+Buttons are clickable elements used to trigger actions. They communicate calls
+to action and allow users to interact with pages in a variety of ways. Button
+labels express what action will occur when the user interacts with it.
+
+{/* TODO: replace with PANW design intent for when to use each button kind */}
+
+<Canvas of={ButtonStories.Default} />
+
+## Kinds
+
+PANW Button has six kinds. `primary` and `danger` map directly to Carbon's
+equivalent kinds. The remaining four (`secondary-accent`, `secondary-gray`,
+`ghost-accent`, `ghost-gray`) are PANW-specific extensions with no direct
+Carbon equivalent — see [PANW Extensions](#panw-extensions) below.
+
+<Unstyled>
+  <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', padding: '16px' }}>
+    <Button kind="primary">Primary</Button>
+    <Button kind="danger">Danger</Button>
+    <Button kind="secondary-accent">Secondary Accent</Button>
+    <Button kind="secondary-gray">Secondary Gray</Button>
+    <Button kind="ghost-accent">Ghost Accent</Button>
+    <Button kind="ghost-gray">Ghost Gray</Button>
+  </div>
+</Unstyled>
+
+```jsx
+<Button kind="primary">Primary</Button>
+<Button kind="danger">Danger</Button>
+<Button kind="secondary-accent">Secondary Accent</Button>
+<Button kind="secondary-gray">Secondary Gray</Button>
+<Button kind="ghost-accent">Ghost Accent</Button>
+<Button kind="ghost-gray">Ghost Gray</Button>
+```
+
+## Sizes
+
+Three sizes are available: `small` (32px), `default` (40px), and `large` (48px).
+
+<Unstyled>
+  <div style={{ display: 'flex', gap: '8px', alignItems: 'center', padding: '16px' }}>
+    <Button size="small">Small</Button>
+    <Button size="default">Default</Button>
+    <Button size="large">Large</Button>
+  </div>
+</Unstyled>
+
+```jsx
+<Button size="small">Small</Button>
+<Button size="default">Default</Button>
+<Button size="large">Large</Button>
+```
+
+## Shapes
+
+Three corner shapes are available: `pill` (50px radius), `standard` (no
+radius), and `rounded` (4px radius).
+
+{/* TODO: replace with PANW design guidance on when to use each shape */}
+
+<Unstyled>
+  <div style={{ display: 'flex', gap: '8px', padding: '16px' }}>
+    <Button shape="pill">Pill</Button>
+    <Button shape="standard">Standard</Button>
+    <Button shape="rounded">Rounded</Button>
+  </div>
+</Unstyled>
+
+```jsx
+<Button shape="pill">Pill</Button>
+<Button shape="standard">Standard</Button>
+<Button shape="rounded">Rounded</Button>
+```
+
+## With Icons
+
+Pass a lucide-react (or any React) component to `renderIcon`. The icon renders
+in the `left` or `right` position relative to the label, controlled by
+`iconPosition`.
+
+<Unstyled>
+  <div style={{ display: 'flex', gap: '8px', padding: '16px' }}>
+    <Button
+      renderIcon={(props) => <Plus size={16} {...props} />}
+      iconPosition="left"
+      iconDescription="Add"
+    >
+      Add Item
+    </Button>
+  </div>
+</Unstyled>
+
+```jsx
+import { Plus } from 'lucide-react';
+
+<Button
+  renderIcon={(props) => <Plus size={16} {...props} />}
+  iconPosition="left"
+  iconDescription="Add"
+>
+  Add Item
+</Button>
+```
+
+## Disabled
+
+<Canvas of={ButtonStories.Disabled} />
+
+## PANW Extensions
+
+The following props have no Carbon equivalent and are PANW-specific:
+
+| Prop | Values | Notes |
+|------|--------|-------|
+| `shape` | `pill` \| `standard` \| `rounded` | Corner radius axis |
+| `kind="secondary-accent"` | — | White bg + blue text + gray border |
+| `kind="secondary-gray"` | — | White bg + dark text + gray border |
+| `kind="ghost-accent"` | — | Transparent + blue text |
+| `kind="ghost-gray"` | — | Transparent + dark text |
+
+{/* TODO: replace with PANW design intent for when to use each PANW-specific kind */}
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- The `<button>` element is used by default, which provides native keyboard
+  focus, `Enter`/`Space` activation, and screen reader role announcement.
+- When `href` is provided, the component renders as `<a>` — add `role="button"`
+  only if you need button semantics on a link.
+- When `renderIcon` is used without children, provide `iconDescription` so
+  screen readers can announce the icon purpose.
+- Disabled buttons use the native HTML `disabled` attribute, which removes
+  them from the tab order. This is intentional — disabled actions should not
+  receive focus. {/* TODO: confirm PANW's accessibility guidance on disabled focus */}
+
+## API Change: `renderIcon`
+
+**Deliberate change from PANW `ButtonStandard`:**
+
+PANW's `ButtonStandard` accepted `leftIconSlot` and `rightIconSlot` as
+`ReactNode` — you passed already-rendered elements:
+
+```jsx
+// PANW (old)
+<ButtonStandard leftIcon leftIconSlot={<MyIcon />} label="Add" />
+```
+
+The ported `Button` uses Carbon's `renderIcon: ElementType` convention — you
+pass the component class/function, not a rendered element:
+
+```jsx
+// Ported (Carbon convention)
+<Button renderIcon={(props) => <Plus size={16} {...props} />} iconPosition="left">
+  Add
+</Button>
+```
+
+This change enables the component to control `aria-hidden`, size, and class
+injection on the icon — which is not possible when a ReactNode is passed in.
+
+## Feedback
+
+{/* TODO: add link to feedback channel / GitHub issues for this design system */}

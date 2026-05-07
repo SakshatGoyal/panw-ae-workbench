@@ -1,0 +1,46 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Tooltip } from './index';
+import * as Stories from './Tooltip.stories';
+
+<Meta isTemplate />
+
+# Tooltip
+
+[Source code](packages/tooltip/src/Tooltip/Tooltip.tsx)
+
+## Overview
+
+Two variants:
+
+- **default** — dark background with a single line of text. Use for short
+  contextual hints.
+- **descriptive** — light card with heading, image slot, body text, and a
+  page stepper. Use for guided onboarding-style hints. The descriptive
+  variant's stepper navigation is built with the `@ds/button` `IconButton`
+  (imported, not redefined).
+
+This component renders the popup itself; positioning relative to a
+trigger is the consumer's responsibility (compose with your own anchor
+strategy or wrap in a future `Popover` primitive).
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+<Canvas of={Stories.Descriptive} />
+
+## Composition
+
+The descriptive variant's stepper buttons use `@ds/button`'s `IconButton`.
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Root has `role="tooltip"`.
+- Decorative arrow uses `aria-hidden="true"`.
+- Stepper buttons are real `IconButton`s with `aria-label="Previous"` and
+  `"Next"`. They become `disabled` at the boundaries.
+
+{/* TODO: confirm PANW guidance for the trigger pattern (hover vs focus) and whether the descriptive tooltip should trap focus while open */}

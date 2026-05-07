@@ -1,0 +1,53 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { CellsStandard } from './index';
+import * as Stories from './CellsStandard.stories';
+
+<Meta isTemplate />
+
+# CellsStandard
+
+[Source code](packages/cells-standard/src/CellsStandard/CellsStandard.tsx)
+
+## Overview
+
+Standard table-row cell wrapper. Composes the optional row-level affordances
+(expand toggle, selection checkbox) with `@ds/cell-contents` for the inline
+text/number/tag/state content.
+
+This component imports `Checkbox` from `@ds/checkbox`, `CellContents` from
+`@ds/cell-contents`, and `Tags` (transitively, via CellContents) from `@ds/tags`.
+Nothing is redefined locally.
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+
+## Variants
+
+```jsx
+<CellsStandard text="Plain row" />
+<CellsStandard checkbox text="Row with checkbox" />
+<CellsStandard expandable text="Row with expand toggle" />
+<CellsStandard checkbox forceState="active" text="Selected row" />
+<CellsStandard checkbox forceState="locked" text="Locked row" />
+```
+
+## Sizes
+
+`small` (32px), `default` (40px), `large` (48px).
+
+## Interaction states
+
+`static` · `hover` · `onPress` · `active` · `locked`. The `forceState`
+prop pins a state for documentation purposes; otherwise the row reacts
+to native `:hover` / `:active` and `state` controls the visual.
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+Decorative icons use `aria-hidden`. The expand affordance is a real `<button>`
+with `aria-label="Expand row"`. When `onClick` is supplied, the wrapper takes
+`role="row"`. Locked rows set `aria-disabled="true"` and disable pointer events.

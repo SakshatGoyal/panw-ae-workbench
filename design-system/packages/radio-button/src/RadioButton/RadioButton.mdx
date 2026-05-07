@@ -1,0 +1,51 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { RadioButton } from './index';
+import * as RadioButtonStories from './RadioButton.stories';
+
+<Meta isTemplate />
+
+# RadioButton
+
+[Source code](packages/radio-button/src/RadioButton/RadioButton.tsx)
+
+## Overview
+
+A controlled radio input rendered with a custom 16×16 SVG ring + dot. Wraps a
+visually-hidden native `<input type="radio">` so keyboard, screen reader, and
+form-submission semantics behave like a standard radio.
+
+{/* TODO: replace with PANW design intent for when to use radios vs other selectors */}
+
+## Live Demo
+
+<Canvas of={RadioButtonStories.Default} />
+
+## Code
+
+```jsx
+const [value, setValue] = useState('a');
+
+<RadioButton name="group" value="a" checked={value === 'a'} onChange={() => setValue('a')} label="Option A" />
+<RadioButton name="group" value="b" checked={value === 'b'} onChange={() => setValue('b')} label="Option B" />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Uses a real `<input type="radio">` (visually hidden via clip rect) so native
+  keyboard activation, focus, and screen reader semantics all work.
+- The custom SVG icon is `aria-hidden="true"` — assistive tech reads the input.
+- The wrapping `<label>` makes the entire row clickable and associates the
+  label text with the input.
+- `disabled` sets the native `disabled` attribute, which removes the input
+  from the tab order.
+- {/* TODO: confirm PANW guidance on grouping multiple radios with a fieldset/legend */}
+
+## API Change: `onChange` signature
+
+PANW's source emitted `onChange(checked: boolean)` — a single boolean. The
+port emits `onChange(checked, event)` so consumers have access to the native
+`ChangeEvent` (Carbon convention).

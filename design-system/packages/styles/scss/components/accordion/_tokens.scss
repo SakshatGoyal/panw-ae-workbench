@@ -1,0 +1,16 @@
+// =============================================================================
+// Accordion — CSS custom property tokens
+// FUTURE TOKEN SWAP: hex literals copied from PANW source (Accordion.css).
+// =============================================================================
+
+:root {
+  --panw-accordion-bg-gray00:           #ffffff;
+  --panw-accordion-bg-gray10:           #f9f9f9;
+  --panw-accordion-bg-hover-gray00:     #eff8ff;
+  --panw-accordion-bg-hover-gray10:     #e8f0f8;
+  --panw-accordion-bg-pressing-gray00:  #e0f0ff;
+  --panw-accordion-bg-pressing-gray10:  #dde8f0;
+  --panw-accordion-icon-color:          #404a52;
+  --panw-accordion-title-color:         #0e1317;
+  --panw-accordion-description-color:   #656f76;
+}

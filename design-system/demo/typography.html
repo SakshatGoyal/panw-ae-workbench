@@ -1,0 +1,532 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Typography Specimen</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../packages/styles/css/styles.css" />
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #0c0e14;
+        --panel: rgba(255, 255, 255, 0.04);
+        --border: rgba(255, 255, 255, 0.12);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.68);
+        --subtle: rgba(255, 255, 255, 0.52);
+        --accent: #79d6ff;
+
+        --sans: var(
+          --ds-type-font-family-sans,
+          Inter,
+          ui-sans-serif,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif
+        );
+        --mono: var(
+          --ds-type-font-family-mono,
+          'JetBrains Mono',
+          ui-monospace,
+          SFMono-Regular,
+          Menlo,
+          Monaco,
+          Consolas,
+          'Liberation Mono',
+          'Courier New',
+          monospace
+        );
+
+        --w-light: var(--ds-type-font-weight-light, 300);
+        --w-regular: var(--ds-type-font-weight-regular, 400);
+        --w-semibold: var(--ds-type-font-weight-semibold, 600);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(900px 650px at 15% 0%, rgba(121, 214, 255, 0.16), transparent 55%),
+          radial-gradient(900px 650px at 85% 15%, rgba(163, 255, 199, 0.12), transparent 60%), var(--bg);
+        color: var(--text);
+        font-family: var(--sans);
+        font-weight: var(--w-regular);
+        line-height: 1.5;
+      }
+
+      a {
+        color: inherit;
+        text-decoration-thickness: 2px;
+        text-underline-offset: 3px;
+      }
+
+      a:hover {
+        color: var(--accent);
+      }
+
+      .page {
+        max-width: 980px;
+        margin: 0 auto;
+        padding: 28px 18px 60px;
+      }
+
+      header {
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.02));
+        padding: 22px;
+      }
+
+      header h1 {
+        margin: 0 0 8px;
+        font-size: 42px;
+        line-height: 1.05;
+        font-weight: var(--w-semibold);
+        letter-spacing: -0.02em;
+      }
+
+      header p {
+        margin: 0;
+        color: var(--muted);
+        max-width: 75ch;
+      }
+
+      header .meta {
+        margin-top: 12px;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--subtle);
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+      }
+
+      header .chip {
+        border: 1px solid rgba(255, 255, 255, 0.16);
+        border-radius: 999px;
+        padding: 2px 10px;
+        background: rgba(0, 0, 0, 0.18);
+      }
+
+      section {
+        margin-top: 18px;
+        border: 1px solid var(--border);
+        border-radius: 18px;
+        background: var(--panel);
+        padding: 18px;
+      }
+
+      section h2 {
+        margin: 0 0 12px;
+        font-size: 13px;
+        font-weight: var(--w-semibold);
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+
+      .row {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr);
+        gap: 14px;
+        align-items: start;
+        padding: 12px 12px;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        background: rgba(0, 0, 0, 0.16);
+      }
+
+      .row + .row {
+        margin-top: 10px;
+      }
+
+      @media (max-width: 760px) {
+        .row {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      .kicker {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .kicker .sub {
+        margin-top: 6px;
+        color: var(--subtle);
+        font-size: 12px;
+        line-height: 1.4;
+      }
+
+      .sample {
+        margin: 0;
+      }
+
+      .sample p {
+        margin: 0;
+        color: var(--muted);
+      }
+
+      .stack > * + * {
+        margin-top: 10px;
+      }
+
+      .sans {
+        font-family: var(--sans);
+      }
+
+      .mono {
+        font-family: var(--mono);
+      }
+
+      .w-light {
+        font-weight: var(--w-light);
+      }
+
+      .w-regular {
+        font-weight: var(--w-regular);
+      }
+
+      .w-semibold {
+        font-weight: var(--w-semibold);
+      }
+
+      .h-xl {
+        font-size: 44px;
+        line-height: 1.05;
+        letter-spacing: -0.02em;
+      }
+
+      .h-lg {
+        font-size: 32px;
+        line-height: 1.12;
+        letter-spacing: -0.02em;
+      }
+
+      .h-md {
+        font-size: 24px;
+        line-height: 1.2;
+        letter-spacing: -0.01em;
+      }
+
+      .h-sm {
+        font-size: 18px;
+        line-height: 1.25;
+      }
+
+      .body-lg {
+        font-size: 18px;
+        line-height: 1.6;
+      }
+
+      .body-md {
+        font-size: 16px;
+        line-height: 1.55;
+      }
+
+      .body-sm {
+        font-size: 14px;
+        line-height: 1.5;
+      }
+
+      .ui-sm {
+        font-size: 13px;
+        line-height: 1.45;
+        letter-spacing: 0.01em;
+      }
+
+      .ui-xs {
+        font-size: 12px;
+        line-height: 1.35;
+        letter-spacing: 0.02em;
+      }
+
+      .code {
+        font-size: 13px;
+        line-height: 1.65;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        background: rgba(0, 0, 0, 0.22);
+        padding: 12px 14px;
+        overflow-x: auto;
+        white-space: pre;
+      }
+
+      .table {
+        width: 100%;
+        border-collapse: collapse;
+        overflow: hidden;
+        border-radius: 14px;
+        border: 1px solid rgba(255, 255, 255, 0.12);
+      }
+
+      .table th,
+      .table td {
+        text-align: left;
+        padding: 10px 12px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        vertical-align: top;
+      }
+
+      .table th {
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.72);
+        font-weight: var(--w-semibold);
+      }
+
+      .table tr:last-child td {
+        border-bottom: 0;
+      }
+
+      .note {
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--subtle);
+      }
+
+      .fluid-display {
+        font-size: clamp(2.1rem, 2.6vw + 1.2rem, 3.6rem);
+        line-height: 1.02;
+        letter-spacing: -0.03em;
+      }
+
+      .fluid-heading {
+        font-size: clamp(1.55rem, 1.7vw + 0.95rem, 2.35rem);
+        line-height: 1.08;
+        letter-spacing: -0.02em;
+      }
+
+      .fluid-paragraph {
+        font-size: clamp(1rem, 0.6vw + 0.88rem, 1.25rem);
+        line-height: 1.6;
+        max-width: 72ch;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="page">
+      <header>
+        <h1>Typography specimen</h1>
+        <p>
+          Simple, scrollable page to judge the fonts. Families + weights come from design system CSS variables. Sizes are
+          local to this page (no type tokens, no italics).
+        </p>
+        <div class="meta">
+          <span class="chip">Sans: <code>var(--ds-type-font-family-sans)</code></span>
+          <span class="chip">Mono: <code>var(--ds-type-font-family-mono)</code></span>
+          <span class="chip">Weights: <code>300</code> / <code>400</code> / <code>600</code></span>
+          <a href="./index.html">Back to token demo</a>
+        </div>
+      </header>
+
+      <section>
+        <h2>Inter (sans) — headings</h2>
+        <div class="row">
+          <div class="kicker">
+            Display
+            <div class="sub">44px / semibold</div>
+          </div>
+          <div class="sample sans w-semibold h-xl">Readable, expressive, and disciplined type</div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            H2
+            <div class="sub">32px / semibold</div>
+          </div>
+          <div class="sample sans w-semibold h-lg">Design is the quiet work of guidance</div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            H3
+            <div class="sub">24px / semibold</div>
+          </div>
+          <div class="sample sans w-semibold h-md">Hierarchy should feel intentional, not noisy</div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            H4
+            <div class="sub">18px / semibold</div>
+          </div>
+          <div class="sample sans w-semibold h-sm">Short titles that still read clearly</div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Inter (sans) — body + UI</h2>
+        <div class="row">
+          <div class="kicker">
+            Body large
+            <div class="sub">18px / regular</div>
+          </div>
+          <div class="sample stack sans w-regular body-lg">
+            <p>
+              Typography should hold up in real layouts: longer sentences, short labels, and dense UI. This paragraph is
+              here so you can judge rhythm, spacing, and reading comfort at a larger size.
+            </p>
+            <p>
+              Keep an eye on letter shapes (especially <span class="w-semibold">rn</span>, <span class="w-semibold">0</span>,
+              and punctuation) and how comfortably you can scan without relying on italics.
+            </p>
+          </div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            Body medium
+            <div class="sub">16px / regular</div>
+          </div>
+          <div class="sample sans w-regular body-md">
+            A medium body size for general product copy. Useful for descriptions, empty states, or help content that
+            should feel calm and consistent.
+          </div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            Body small
+            <div class="sub">14px / regular</div>
+          </div>
+          <div class="sample sans w-regular body-sm">
+            Small body text for secondary surfaces. It should remain readable without looking cramped.
+          </div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            UI label
+            <div class="sub">13px / semibold</div>
+          </div>
+          <div class="sample stack sans ui-sm">
+            <div class="w-semibold">Account settings</div>
+            <div class="w-regular" style="color: var(--subtle);">
+              Manage notifications, teams, and billing preferences.
+            </div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            Microcopy
+            <div class="sub">12px / light</div>
+          </div>
+          <div class="sample sans w-light ui-xs" style="color: var(--subtle);">
+            Tip: keep helper text short. If it’s long, it becomes body copy.
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Weights (same text)</h2>
+        <div class="row">
+          <div class="kicker">
+            Sans weights
+            <div class="sub">18px</div>
+          </div>
+          <div class="sample stack sans body-lg">
+            <div class="w-light">The quick brown fox jumps over 0123456789.</div>
+            <div class="w-regular">The quick brown fox jumps over 0123456789.</div>
+            <div class="w-semibold">The quick brown fox jumps over 0123456789.</div>
+          </div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            Mono weights
+            <div class="sub">16px</div>
+          </div>
+          <div class="sample stack mono" style="font-size: 16px; line-height: 1.5;">
+            <div class="w-light">SELECT * FROM invoices WHERE status = 'ready';</div>
+            <div class="w-regular">SELECT * FROM invoices WHERE status = 'ready';</div>
+            <div class="w-semibold">SELECT * FROM invoices WHERE status = 'ready';</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>JetBrains Mono — code + data</h2>
+        <div class="row">
+          <div class="kicker">
+            Code block
+            <div class="sub">13px / regular</div>
+          </div>
+          <pre class="sample code mono w-regular">git checkout -b feature/typography
+npm run build
+npm run serve
+
+// No italics loaded; avoid faux styles.
+const label = 'JetBrains Mono';
+const weights = [300, 400, 600];</pre>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            Table
+            <div class="sub">12–13px</div>
+          </div>
+          <div class="sample">
+            <table class="table mono" aria-label="Example data table">
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Value</th>
+                  <th>Notes</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>service</td>
+                  <td>payments</td>
+                  <td>Monospace helps alignment for logs and identifiers.</td>
+                </tr>
+                <tr>
+                  <td>durationMs</td>
+                  <td>184</td>
+                  <td>Look at numeric legibility: 0, 1, and 8 shapes.</td>
+                </tr>
+                <tr>
+                  <td>status</td>
+                  <td>ready</td>
+                  <td>Short tokens remain distinct at small sizes.</td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="note">Everything here uses <code>var(--ds-type-font-family-mono)</code> + weight tokens.</div>
+          </div>
+        </div>
+      </section>
+
+      <section>
+        <h2>Fluid (clamp) examples</h2>
+        <div class="row">
+          <div class="kicker">
+            Fluid display
+            <div class="sub">clamp()</div>
+          </div>
+          <div class="sample sans w-semibold fluid-display">Hierarchy that adapts without breakpoints</div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            Fluid heading
+            <div class="sub">clamp()</div>
+          </div>
+          <div class="sample sans w-semibold fluid-heading">A heading that stays stable in dense layouts</div>
+        </div>
+        <div class="row">
+          <div class="kicker">
+            Fluid paragraph
+            <div class="sub">clamp()</div>
+          </div>
+          <div class="sample sans w-regular fluid-paragraph">
+            Resize the window to see smooth scaling. This is purely a specimen page technique; it does not rely on the
+            design system’s per-style tokens (those are intentionally unset).
+          </div>
+        </div>
+      </section>
+    </main>
+  </body>
+</html>

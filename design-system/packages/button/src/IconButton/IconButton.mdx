@@ -1,0 +1,150 @@
+import { ArgTypes, Canvas, Unstyled, Meta } from '@storybook/addon-docs/blocks';
+import { Plus } from 'lucide-react';
+import { IconButton } from './IconButton';
+import * as IconButtonStories from './IconButton.stories';
+
+<Meta isTemplate />
+
+# IconButton
+
+[Source code](packages/button/src/IconButton/IconButton.tsx)
+
+## Table of Contents
+
+- [Overview](#overview)
+- [Kinds](#kinds)
+- [Sizes](#sizes)
+- [Shapes](#shapes)
+- [Selected State](#selected-state)
+- [Disabled](#disabled)
+- [PANW Extensions](#panw-extensions)
+- [Component API](#component-api)
+- [Accessibility](#accessibility)
+- [API Change: renderIcon](#api-change-rendericon)
+- [Tooltip (Coming Soon)](#tooltip-coming-soon)
+- [Feedback](#feedback)
+
+## Overview
+
+IconButton is an icon-only button — no visible label text. It is used when
+space is constrained and the icon is universally understood, or when the action
+is supplementary to nearby context. Every `IconButton` requires an `aria-label`
+for screen reader accessibility.
+
+{/* TODO: replace with PANW design intent for when to use IconButton vs Button */}
+
+<Canvas of={IconButtonStories.Default} />
+
+## Kinds
+
+Three kinds: `ghost` (default), `primary`, and `secondary`.
+
+<Unstyled>
+  <div style={{ display: 'flex', gap: '8px', padding: '16px' }}>
+    <IconButton kind="ghost" renderIcon={() => <Plus size={16} />} aria-label="Ghost" />
+    <IconButton kind="primary" renderIcon={() => <Plus size={16} />} aria-label="Primary" />
+    <IconButton kind="secondary" renderIcon={() => <Plus size={16} />} aria-label="Secondary" />
+  </div>
+</Unstyled>
+
+```jsx
+import { Plus } from 'lucide-react';
+
+<IconButton kind="ghost" renderIcon={() => <Plus size={16} />} aria-label="Add" />
+<IconButton kind="primary" renderIcon={() => <Plus size={16} />} aria-label="Add" />
+<IconButton kind="secondary" renderIcon={() => <Plus size={16} />} aria-label="Add" />
+```
+
+## Sizes
+
+Three sizes: `sm` (32px), `md` (40px), `lg` (48px). Heights are padding-based;
+the icon pixel size is controlled separately via `iconSize`.
+
+<Canvas of={IconButtonStories.Sizes} />
+
+## Shapes
+
+Three corner shapes: `square` (no radius), `rounded` (4px), `pill` (full
+circle). PANW extension — Carbon does not have this axis on IconButton.
+
+<Canvas of={IconButtonStories.ShapeSquare} />
+<Canvas of={IconButtonStories.ShapeRounded} />
+<Canvas of={IconButtonStories.ShapePill} />
+
+## Selected State
+
+The `isSelected` prop applies a visual selected state. Only meaningful for the
+`ghost` kind — use this for toggle-like actions such as active filter buttons.
+
+<Canvas of={IconButtonStories.Selected} />
+
+## Disabled
+
+<Canvas of={IconButtonStories.Disabled} />
+
+## PANW Extensions
+
+| Prop | Values | Notes |
+|------|--------|-------|
+| `shape` | `square` \| `rounded` \| `pill` | Corner radius axis |
+| `iconSize` | `16` \| `20` | Icon pixel dimensions |
+
+{/* TODO: replace with PANW design intent for when to use each shape/iconSize */}
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- `aria-label` is **required** — there is no visible text to announce.
+  Provide a concise, action-oriented label (e.g. `"Close dialog"`, `"Add item"`).
+- The icon is wrapped in `aria-hidden="true"` so screen readers skip it.
+- The `disabled` attribute removes the button from the tab order. {/* TODO: confirm PANW a11y guidance */}
+- `isSelected` on ghost buttons sets `aria-pressed` to expose the toggle
+  state to assistive technology.
+
+## API Change: `renderIcon`
+
+**Deliberate change from PANW `ButtonIcon`:**
+
+PANW's `ButtonIcon` accepted `icon: ReactNode` — a pre-rendered element:
+
+```jsx
+// PANW (old)
+<ButtonIcon icon={<MyIcon />} aria-label="Add" />
+```
+
+The ported `IconButton` uses Carbon's `renderIcon: ElementType` convention:
+
+```jsx
+// Ported (Carbon convention)
+import { Plus } from 'lucide-react';
+
+<IconButton renderIcon={(props) => <Plus size={16} {...props} />} aria-label="Add" />
+```
+
+This aligns with the `Button` component's `renderIcon` API and enables
+consistent icon handling across the system.
+
+## Tooltip (Coming Soon)
+
+{/* TODO(tooltip): This section will be completed when the Tooltip component is ported.
+    The planned API addition:
+      tooltipLabel?: ReactNode  — text shown in tooltip (defaults to aria-label)
+      align?: TooltipAlignment  — tooltip placement (top, bottom, left, right, etc.)
+      enterDelayMs?: number
+      leaveDelayMs?: number
+    The aria-label currently provides the accessible name directly.
+    After Tooltip is integrated, aria-labelledby will be used instead, and
+    aria-label will feed the tooltip content.
+*/}
+
+Carbon's `IconButton` wraps a tooltip component to show the `aria-label` as a
+visible tooltip on hover. This integration is deferred until the `Tooltip`
+component is ported. The `aria-label` serves as the accessible name in the
+interim — full tooltip behavior will be added in a future iteration.
+
+## Feedback
+
+{/* TODO: add link to feedback channel / GitHub issues */}

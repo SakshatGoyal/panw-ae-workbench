@@ -1,0 +1,147 @@
+@use 'sass:map';
+@use 'sass:meta';
+@use 'sass:string';
+@use '@ds/themes/scss' as themes;
+@use 'generated/styles' as generated;
+
+$type-breakpoints: (
+  md: 42rem,
+  lg: 66rem,
+  xlg: 82rem,
+  max: 99rem,
+) !default;
+
+@function _bp-min-width($name) {
+  @if not map.has-key($type-breakpoints, $name) {
+    @error 'Unknown type breakpoint: #{$name}';
+  }
+  @return map.get($type-breakpoints, $name);
+}
+
+@function _emit-value($value) {
+  @if $value == null {
+    @return null;
+  }
+  @if meta.type-of($value) == string {
+    @return string.unquote($value);
+  }
+  @return $value;
+}
+
+@function _is-clamp-tuple($value) {
+  @return meta.type-of($value) == map and map.has-key($value, 'min') and map.has-key($value, 'preferred') and
+    map.has-key($value, 'max');
+}
+
+@function _all-null($style) {
+  @return map.get($style, 'font-size') == null and map.get($style, 'line-height') == null and
+    map.get($style, 'font-weight') == null and map.get($style, 'letter-spacing') == null and
+    map.get($style, 'font-family') == null;
+}
+
+@mixin _unmapped-style-fallback($name) {
+  outline: 2px dashed themes.$unmapped-color;
+  outline-offset: 2px;
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(255, 0, 255, 0.18),
+    rgba(255, 0, 255, 0.18) 6px,
+    rgba(255, 0, 255, 0) 6px,
+    rgba(255, 0, 255, 0) 12px
+  );
+
+  &::before {
+    content: '[unmapped-type: #{$name}] ';
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+      'Courier New', monospace;
+    font-size: 12px;
+    letter-spacing: 0.04em;
+  }
+}
+
+@mixin type-style($name) {
+  @if not map.has-key(generated.$type-styles, $name) {
+    @error 'Unknown type style: #{$name}';
+  }
+
+  $style: map.get(generated.$type-styles, $name);
+
+  @if _all-null($style) {
+    @include _unmapped-style-fallback($name);
+  } @else {
+    $font-size: map.get($style, 'font-size');
+    $line-height: map.get($style, 'line-height');
+    $font-weight: map.get($style, 'font-weight');
+    $letter-spacing: map.get($style, 'letter-spacing');
+    $font-family: map.get($style, 'font-family');
+    $breakpoints: map.get($style, 'breakpoints');
+
+    @if _is-clamp-tuple($font-size) and map.get($font-size, 'min') != null and
+      map.get($font-size, 'preferred') != null and map.get($font-size, 'max') != null
+    {
+      font-size: clamp(
+        _emit-value(map.get($font-size, 'min')),
+        _emit-value(map.get($font-size, 'preferred')),
+        _emit-value(map.get($font-size, 'max'))
+      );
+    } @else if $font-size != null {
+      font-size: _emit-value($font-size);
+    }
+
+    @if $line-height != null {
+      line-height: _emit-value($line-height);
+    }
+
+    @if $font-weight != null {
+      font-weight: _emit-value($font-weight);
+    }
+
+    @if $letter-spacing != null {
+      letter-spacing: _emit-value($letter-spacing);
+    }
+
+    @if $font-family != null {
+      font-family: _emit-value($font-family);
+    }
+
+    @if $breakpoints != null {
+      @each $bp-name, $bp-style in $breakpoints {
+        @media (min-width: _bp-min-width($bp-name)) {
+          $bp-font-size: map.get($bp-style, 'font-size');
+          $bp-line-height: map.get($bp-style, 'line-height');
+          $bp-font-weight: map.get($bp-style, 'font-weight');
+          $bp-letter-spacing: map.get($bp-style, 'letter-spacing');
+          $bp-font-family: map.get($bp-style, 'font-family');
+
+          @if _is-clamp-tuple($bp-font-size) and map.get($bp-font-size, 'min') != null and
+            map.get($bp-font-size, 'preferred') != null and map.get($bp-font-size, 'max') != null
+          {
+            font-size: clamp(
+              _emit-value(map.get($bp-font-size, 'min')),
+              _emit-value(map.get($bp-font-size, 'preferred')),
+              _emit-value(map.get($bp-font-size, 'max'))
+            );
+          } @else if $bp-font-size != null {
+            font-size: _emit-value($bp-font-size);
+          }
+
+          @if $bp-line-height != null {
+            line-height: _emit-value($bp-line-height);
+          }
+
+          @if $bp-font-weight != null {
+            font-weight: _emit-value($bp-font-weight);
+          }
+
+          @if $bp-letter-spacing != null {
+            letter-spacing: _emit-value($bp-letter-spacing);
+          }
+
+          @if $bp-font-family != null {
+            font-family: _emit-value($bp-font-family);
+          }
+        }
+      }
+    }
+  }
+}

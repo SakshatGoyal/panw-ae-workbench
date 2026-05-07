@@ -1,0 +1,27 @@
+{
+  "name": "@ds/themes",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "main": "lib/src/index.js",
+  "types": "lib/src/index.d.ts",
+  "scripts": {
+    "build": "tsx tasks/build.js && tsc -p tsconfig.json"
+  },
+  "exports": {
+    ".": {
+      "types": "./lib/src/index.d.ts",
+      "default": "./lib/src/index.js"
+    },
+    "./generated": {
+      "types": "./lib/generated/tokens.d.ts",
+      "default": "./lib/generated/tokens.js"
+    },
+    "./scss": "./scss/index.scss"
+  },
+  "sass": "scss/index.scss",
+  "dependencies": {
+    "@ds/colors": "0.1.0"
+  },
+  "sideEffects": false
+}

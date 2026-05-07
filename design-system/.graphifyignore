@@ -1,0 +1,11 @@
+# Keep Graphify focused on true source-of-truth inputs for this repo.
+# Same syntax as .gitignore; patterns are relative to the directory Graphify runs on.
+
+node_modules/
+.git/
+**/lib/
+**/generated/
+dist/
+packages/styles/css/
+graphify-out/
+

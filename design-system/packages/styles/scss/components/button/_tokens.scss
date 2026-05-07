@@ -1,0 +1,79 @@
+// =============================================================================
+// Button — CSS custom property tokens
+//
+// FUTURE TOKEN SWAP POINT: All color values here are hex literals copied
+// directly from the PANW Figma source. When the design token pipeline is
+// ready, replace each hex with a reference to the appropriate semantic token
+// from @ds/themes (e.g., var(--ds-button-primary-background)).
+//
+// VariableID comments are preserved from PANW's Figma export for traceability.
+// =============================================================================
+
+:root {
+  // ── Primary ───────────────────────────────────────────────────────────────
+  --panw-button-primary-bg:           #006fcc; // VariableID:7203:1770
+  --panw-button-primary-bg-hover:     #004c9d; // VariableID:7203:1775
+  --panw-button-primary-bg-active:    #003474; // VariableID:7203:1780
+  --panw-button-primary-text:         #ffffff; // VariableID:7203:1794
+
+  // ── Danger ────────────────────────────────────────────────────────────────
+  --panw-button-danger-bg:            #b22d2d; // VariableID:7203:1771
+  --panw-button-danger-bg-hover:      #891a1a; // VariableID:7203:1776
+  --panw-button-danger-bg-active:     #6c0f0f; // VariableID:7203:1781
+  --panw-button-danger-text:          #ffffff; // VariableID:7203:1794
+
+  // ── Secondary-Accent (PANW extension) ─────────────────────────────────────
+  // White background, gray border, blue text — closest Carbon equivalent: tertiary
+  --panw-button-secondary-accent-bg:           #ffffff; // VariableID:7203:1767 (static-surfaces-primary)
+  --panw-button-secondary-accent-bg-hover:     #eff8ff; // VariableID:7354:11256
+  --panw-button-secondary-accent-bg-active:    #dff0fd; // VariableID:7203:1777
+  --panw-button-secondary-accent-border:       #e4e8eb; // VariableID:7203:1809
+  --panw-button-secondary-accent-border-hover: #006fcc; // VariableID:7203:1821
+  --panw-button-secondary-accent-text:         #006fcc; // VariableID:7203:1798
+
+  // ── Secondary-Gray (PANW extension) ───────────────────────────────────────
+  // White background, gray border, dark text
+  --panw-button-secondary-gray-bg:             #ffffff; // VariableID:7203:1767
+  --panw-button-secondary-gray-bg-hover:       #eaebeb; // VariableID:7354:11255
+  --panw-button-secondary-gray-bg-active:      #dadbdb; // VariableID:7354:11257
+  --panw-button-secondary-gray-border:         #e4e8eb; // VariableID:7203:1809
+  --panw-button-secondary-gray-text:           #0e1317; // VariableID:7203:1790
+
+  // ── Ghost-Accent (PANW extension) ─────────────────────────────────────────
+  // Transparent background, blue text — closest Carbon equivalent: ghost
+  --panw-button-ghost-accent-bg:        transparent;
+  --panw-button-ghost-accent-bg-hover:  #eff8ff; // VariableID:7354:11256
+  --panw-button-ghost-accent-bg-active: #dff0fd; // VariableID:7203:1777
+  --panw-button-ghost-accent-text:      #006fcc; // VariableID:7203:1798
+
+  // ── Ghost-Gray (PANW extension) ───────────────────────────────────────────
+  // Transparent background, dark text
+  --panw-button-ghost-gray-bg:          transparent;
+  --panw-button-ghost-gray-bg-hover:    #eaebeb; // VariableID:7354:11255
+  --panw-button-ghost-gray-bg-active:   #dadbdb; // VariableID:7354:11257
+  --panw-button-ghost-gray-text:        #0e1317; // VariableID:7203:1790
+
+  // ── Shared disabled state ─────────────────────────────────────────────────
+  --panw-button-disabled-bg:   #c5ccd1; // VariableID:7203:1783
+  --panw-button-disabled-text: #656f76; // VariableID:7203:1808
+
+  // ── Focus ring ────────────────────────────────────────────────────────────
+  --panw-button-focus-color: #006fcc;
+
+  // ── Icon button kinds ─────────────────────────────────────────────────────
+  --panw-icon-button-ghost-color:                #404a52; // VariableID:7208:6383
+  --panw-icon-button-ghost-bg-hover:             #eaebeb; // VariableID:7354:11255
+  --panw-icon-button-ghost-bg-active:            #dadbdb; // VariableID:7354:11257
+  --panw-icon-button-ghost-disabled-bg:          #ffffff; // VariableID:7203:1782 (static-surfaces-primary)
+  --panw-icon-button-ghost-disabled-color:       #c5ccd1; // VariableID:7208:6384
+
+  --panw-icon-button-primary-bg:                 #006fcc; // VariableID:7203:1770
+  --panw-icon-button-primary-bg-hover:           #004c9d; // VariableID:7203:1775
+  --panw-icon-button-primary-bg-active:          #003474; // VariableID:7203:1780
+  --panw-icon-button-primary-color:              #ffffff; // VariableID:7208:6386
+
+  --panw-icon-button-secondary-bg:               #eaebeb; // VariableID:7203:1769
+  --panw-icon-button-secondary-bg-hover:         #dff0fd; // VariableID:7203:1774
+  --panw-icon-button-secondary-bg-active:        #dff0fd; // VariableID:7203:1777
+  --panw-icon-button-secondary-color:            #404a52; // VariableID:7208:6383
+}

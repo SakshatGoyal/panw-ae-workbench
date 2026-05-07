@@ -1,0 +1,52 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Toggle } from './index';
+import * as ToggleStories from './Toggle.stories';
+
+<Meta isTemplate />
+
+# Toggle
+
+[Source code](packages/toggle/src/Toggle/Toggle.tsx)
+
+## Overview
+
+A switch with an optional label, info icon, and status text (Yes/No). The
+underlying input is a real `<input type="checkbox" role="switch">` so keyboard
+and screen reader behavior match a native switch.
+
+{/* TODO: replace with PANW design intent for Toggle vs Checkbox */}
+
+## Live Demo
+
+<Canvas of={ToggleStories.Default} />
+
+## Code
+
+```jsx
+const [on, setOn] = useState(true);
+
+<Toggle on={on} onChange={(next) => setOn(next)} label="Notifications" />
+<Toggle on={on} labelPosition="right" />
+<Toggle on={on} labelPosition="top" />
+<Toggle on={on} size="small" />
+<Toggle on={on} showInfo />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Renders a real `<input type="checkbox" role="switch">` so AT announces it
+  as a switch and native keyboard activation works.
+- The `<label>` wraps the input, making the entire row clickable.
+- The info icon is `aria-hidden="true"` — provide additional context via the
+  label or a `Tooltip` if you need it announced.
+- Disabled uses the native `disabled` attribute.
+- {/* TODO: confirm PANW guidance on visible status text vs aria-label only */}
+
+## API Change
+
+PANW's source emitted `onChange(on: boolean)`. The port emits
+`onChange(on, event)` so consumers can access the native event.

@@ -1,0 +1,48 @@
+import { ArgTypes, Canvas, Meta } from '@storybook/addon-docs/blocks';
+import { Checkbox } from './index';
+import * as CheckboxStories from './Checkbox.stories';
+
+<Meta isTemplate />
+
+# Checkbox
+
+[Source code](packages/checkbox/src/Checkbox/Checkbox.tsx)
+
+## Overview
+
+A controlled checkbox with three statuses: `checked`, `unchecked`, and
+`indeterminate`. Wraps a real `<input type="checkbox">`; the indeterminate
+state is synced to the DOM via a ref-driven effect (it is not exposed as an
+HTML attribute).
+
+{/* TODO: replace with PANW design intent for indeterminate (parent / select-all) cases */}
+
+## Live Demo
+
+<Canvas of={CheckboxStories.Default} />
+
+## Code
+
+```jsx
+const [status, setStatus] = useState('unchecked');
+
+<Checkbox status={status} onChange={(next) => setStatus(next)} label="Accept terms" />
+<Checkbox status="indeterminate" label="Some selected" />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Real `<input type="checkbox">` so native semantics apply.
+- `aria-checked` is set to `"mixed"` for the indeterminate state.
+- The `<label>` wraps the input — clicking the icon or label toggles.
+- Disabled uses the native `disabled` attribute.
+- {/* TODO: confirm PANW guidance on visual focus ring for the wrapping label */}
+
+## API Change
+
+PANW emitted `onChange(next: CheckboxStatus)`. The port emits
+`onChange(next, event)` to expose the underlying `ChangeEvent`.

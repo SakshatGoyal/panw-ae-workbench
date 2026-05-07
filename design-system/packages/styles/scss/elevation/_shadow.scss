@@ -1,0 +1,36 @@
+// Elevation shadows are mode-agnostic and emitted at :root.
+//
+// Usage:
+//   shadow-tile-on-tile  cards stacked on tiles
+//   shadow-tiles     tiles / cards without an edge
+//   shadow-shell     FAB, raised cards, raised app bars
+//   shadow-flyout    flyouts, popovers, dropdowns
+//   shadow-persistent  bottom sheet, side navigation, raised tab bars
+//   shadow-modals    pop-up dialogs
+
+@use 'sass:map';
+
+:root {
+  --ds-shadow-tile-on-tile: 0 0.5px 1px 0 rgb(0 0 0 / 6%);
+  --ds-shadow-tiles:      0 2px 4px -1px rgb(0 0 0 / 8%);
+  --ds-shadow-shell:      0 4px 8px -2px rgb(0 0 0 / 10%);
+  --ds-shadow-flyout:     0 8px 16px -4px rgb(0 0 0 / 12%);
+  --ds-shadow-persistent: 0 64px 128px -32px rgb(0 0 0 / 18%);
+  --ds-shadow-modals:     0 16px 32px -8px rgb(0 0 0 / 14%);
+}
+
+$_shadows: (
+  'tile-on-tile': var(--ds-shadow-tile-on-tile),
+  'tiles':      var(--ds-shadow-tiles),
+  'shell':      var(--ds-shadow-shell),
+  'flyout':     var(--ds-shadow-flyout),
+  'persistent': var(--ds-shadow-persistent),
+  'modals':     var(--ds-shadow-modals),
+);
+
+@function shadow($level) {
+  @if map.has-key($_shadows, $level) {
+    @return map.get($_shadows, $level);
+  }
+  @error 'Unknown shadow level: #{$level}';
+}

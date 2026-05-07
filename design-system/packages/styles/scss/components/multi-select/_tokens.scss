@@ -1,0 +1,17 @@
+// MultiSelect — CSS tokens (mirrors Dropdown)
+:root {
+  --panw-ms-bg-grey10:        #ffffff;
+  --panw-ms-bg-grey00:        #f9f9f9;
+  --panw-ms-bg-hover:         #eaebeb;
+  --panw-ms-bg-onclick:       #dadbdb;
+  --panw-ms-border-active:    #006fcc;
+  --panw-ms-text:             #0e1317;
+  --panw-ms-placeholder:      #a6adb2;
+  --panw-ms-chevron:          #404a52;
+  --panw-ms-description:      #656f76;
+  --panw-ms-disabled:         #c5ccd1;
+  --panw-ms-readonly:         #656f76;
+  --panw-ms-menu-bg:          #ffffff;
+  --panw-ms-menu-selected-bg: #cfe8fc;
+  --panw-ms-menu-selected-fg: #006fcc;
+}

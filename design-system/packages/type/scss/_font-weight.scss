@@ -1,0 +1,22 @@
+@use '@ds/themes/scss' as themes;
+
+$font-weight-light: 300 !default;
+$font-weight-regular: 400 !default;
+$font-weight-semibold: 600 !default;
+
+@function font-weight($name) {
+  @if $name == 'light' {
+    @return themes.get-var('type-font-weight-light', $font-weight-light);
+  }
+
+  @if $name == 'regular' {
+    @return themes.get-var('type-font-weight-regular', $font-weight-regular);
+  }
+
+  @if $name == 'semibold' {
+    @return themes.get-var('type-font-weight-semibold', $font-weight-semibold);
+  }
+
+  @return null;
+}
+

@@ -1,0 +1,149 @@
+// =============================================================================
+// Chip — interactive pill with optional leading visual, close, dropdown, active
+// =============================================================================
+
+.panw--chip {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 40px;
+  border: 1px solid var(--panw-chip-border);
+  background-color: var(--panw-chip-bg);
+  cursor: pointer;
+  user-select: none;
+  box-sizing: border-box;
+  transition: background-color 0.15s ease-out, border-color 0.15s ease-out, color 0.15s ease-out;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+  color: var(--panw-chip-text);
+  outline: none;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+}
+
+.panw--chip--small { padding: 4px 8px; }
+
+.panw--chip__icon,
+.panw--chip__close,
+.panw--chip__dropdown-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--panw-chip-icon);
+
+  svg { width: 16px; height: 16px; }
+}
+
+.panw--chip__close {
+  border-radius: 50%;
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: inherit;
+  transition: color 0.15s ease-out;
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 1px;
+  }
+}
+
+.panw--chip__image {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.panw--chip__label { white-space: nowrap; }
+
+// ── Light theme states ──────────────────────────────────────────────────────
+
+.panw--chip:hover:not(.panw--chip--disabled):not(.panw--chip--active) {
+  background-color: var(--panw-chip-bg-hover);
+  border-color: transparent;
+}
+
+.panw--chip:active:not(.panw--chip--disabled):not(.panw--chip--active) {
+  background-color: var(--panw-chip-bg-pressed);
+  border-color: transparent;
+}
+
+.panw--chip--active {
+  background-color: var(--panw-chip-active-bg);
+  border-color: transparent;
+  color: var(--panw-chip-active-text);
+
+  .panw--chip__icon,
+  .panw--chip__close,
+  .panw--chip__dropdown-icon { color: var(--panw-chip-active-icon); }
+}
+
+.panw--chip--disabled {
+  background-color: var(--panw-chip-bg);
+  border-color: var(--panw-chip-disabled-border);
+  color: var(--panw-chip-disabled-text);
+  cursor: not-allowed;
+  pointer-events: none;
+
+  .panw--chip__icon,
+  .panw--chip__close { color: var(--panw-chip-disabled-icon); }
+}
+
+.panw--chip--disabled.panw--chip--has-leading-visual:not(.panw--chip--small):not(.panw--chip--dark) {
+  padding: 8px;
+}
+
+// ── Dark theme ──────────────────────────────────────────────────────────────
+
+.panw--chip--dark {
+  background-color: transparent;
+  border-color: var(--panw-chip-dark-border);
+  color: var(--panw-chip-dark-text);
+
+  .panw--chip__icon,
+  .panw--chip__close,
+  .panw--chip__dropdown-icon { color: var(--panw-chip-dark-icon); }
+
+  &:hover:not(.panw--chip--disabled):not(.panw--chip--active) {
+    background-color: var(--panw-chip-dark-bg-hover);
+    border-color: transparent;
+  }
+
+  &:active:not(.panw--chip--disabled):not(.panw--chip--active) {
+    background-color: var(--panw-chip-dark-bg-pressed);
+    border-color: transparent;
+  }
+
+  &.panw--chip--active {
+    background-color: var(--panw-chip-dark-active-bg);
+    border-color: transparent;
+    color: var(--panw-chip-dark-active-text);
+
+    .panw--chip__icon,
+    .panw--chip__close,
+    .panw--chip__dropdown-icon { color: var(--panw-chip-dark-active-icon); }
+  }
+
+  &.panw--chip--disabled {
+    background-color: transparent;
+    border-color: var(--panw-chip-dark-disabled);
+    color: var(--panw-chip-dark-disabled);
+
+    .panw--chip__icon,
+    .panw--chip__close { color: var(--panw-chip-dark-disabled); }
+  }
+}

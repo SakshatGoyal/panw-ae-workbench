@@ -1,0 +1,76 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Accordion } from './index';
+import * as AccordionStories from './Accordion.stories';
+
+<Meta isTemplate />
+
+# Accordion
+
+[Source code](packages/accordion/src/Accordion/Accordion.tsx)
+
+## Overview
+
+A single, expandable disclosure with optional leading icon, supplemental
+description, and an inline tag. Three sizes (`small`, `default`, `large`),
+two themes (`gray00`, `gray10`), and a right-side orientation.
+
+{/* TODO: replace with PANW design intent for Accordion usage */}
+
+## Live Demo
+
+<Canvas of={AccordionStories.Default} />
+
+## Variants
+
+### Sizes
+
+```jsx
+<Accordion size="small" title="Small" />
+<Accordion size="default" title="Default" />
+<Accordion size="large" title="Large" />
+```
+
+### Theme
+
+```jsx
+<Accordion theme="gray10" title="Gray 10 background" />
+```
+
+### Orientation
+
+```jsx
+<Accordion orientation="right" title="Chevron right" />
+```
+
+## Composition
+
+The optional inline tag is rendered using the `@ds/tags` package — it is
+imported, not redefined.
+
+```jsx
+<Accordion showTag tagLabel="Beta" tagColor="green" title="With tag" />
+```
+
+## Component API
+
+<ArgTypes />
+
+## Accessibility
+
+- Header has `role="button"`, `aria-expanded`, `aria-disabled`.
+- `Enter` and `Space` toggle when focused.
+- `tabIndex` is `-1` when disabled.
+- Icons are `aria-hidden="true"`.
+
+{/* TODO: confirm PANW guidance for accordion grouping / single vs. multiple open behavior */}
+
+## API Change: `customIcon` → `renderIcon`
+
+PANW originally accepted `customIcon: ReactNode`. This port follows the
+Carbon convention: `renderIcon: ElementType` so the component controls
+sizing and `aria-hidden`.
+
+```jsx
+import { Star } from 'lucide-react';
+<Accordion showIcon renderIcon={Star} title="With icon" />
+```

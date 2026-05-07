@@ -1,0 +1,49 @@
+import { Canvas, ArgTypes, Meta } from '@storybook/addon-docs/blocks';
+import { Tabs } from './index';
+import * as Stories from './Tabs.stories';
+
+<Meta isTemplate />
+
+# Tabs
+
+[Source code](packages/tabs/src/Tabs/Tabs.tsx)
+
+## Overview
+
+Tabbed navigation. Two layouts: `container` (filled background with top
+accent border) and non-container (transparent with bottom border).
+
+## API change: items array → compound children
+
+PANW originally accepted `items: TabItem[]` and a `selectedIndex` prop.
+This port uses Carbon's compound children pattern: render `Tab` children
+inside `Tabs`. The parent owns `selectedIndex` / `onChange`.
+
+```jsx
+<Tabs selectedIndex={i} onChange={setI}>
+  <Tab label="Overview" />
+  <Tab label="Details" showTag tagLabel="New" />
+  <Tab label="Activity" disabled />
+</Tabs>
+```
+
+## Composition
+
+Tab tags use the `@ds/tags` `Tags` component (imported, not redefined).
+
+## Live Demo
+
+<Canvas of={Stories.Default} />
+
+## Component API
+
+### `Tabs`
+<ArgTypes of={Tabs} />
+
+## Accessibility
+
+- Container has `role="tablist"`. Each `Tab` has `role="tab"`.
+- Selected tab gets `aria-selected="true"` and `tabIndex=0`; unselected
+  tabs get `tabIndex=-1`.
+
+{/* TODO: confirm PANW guidance for keyboard arrow navigation between tabs */}

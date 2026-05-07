@@ -1,0 +1,29 @@
+// Chip — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
+:root {
+  // ── Light theme ───────────────────────────────────────────────────────────
+  --panw-chip-bg:                #ffffff; // VariableID:7203:1767
+  --panw-chip-border:            #e4e8eb; // VariableID:7203:1809
+  --panw-chip-text:              #0e1317; // VariableID:7203:1790
+  --panw-chip-icon:              #404a52; // VariableID:7208:6383
+  --panw-chip-bg-hover:          #eff8ff; // VariableID:7203:1772
+  --panw-chip-bg-pressed:        #dff0fd; // VariableID:7203:1777
+
+  --panw-chip-active-bg:         #404a52; // VariableID:7203:1789
+  --panw-chip-active-text:       #ffffff;
+  --panw-chip-active-icon:       #ffffff;
+
+  --panw-chip-disabled-border:   #c5ccd1; // VariableID:7203:1823
+  --panw-chip-disabled-text:     #c5ccd1;
+  --panw-chip-disabled-icon:     #c5ccd1; // VariableID:7212:13095
+
+  // ── Dark theme ────────────────────────────────────────────────────────────
+  --panw-chip-dark-border:       #768494;
+  --panw-chip-dark-text:         #f0f4f7;
+  --panw-chip-dark-icon:         #f0f4f7; // VariableID:5294:14117
+  --panw-chip-dark-bg-hover:     #475566; // steel-blue-70
+  --panw-chip-dark-bg-pressed:   #354252; // steel-blue-80
+  --panw-chip-dark-active-bg:    #f0f4f7;
+  --panw-chip-dark-active-text:  #0e1317;
+  --panw-chip-dark-active-icon:  #404a52;
+  --panw-chip-dark-disabled:     #475566;
+}

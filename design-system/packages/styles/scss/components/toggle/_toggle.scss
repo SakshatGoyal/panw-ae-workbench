@@ -1,0 +1,106 @@
+// =============================================================================
+// Toggle — switch with optional label / info icon / status text
+// =============================================================================
+
+.panw--toggle-root {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  width: fit-content;
+  cursor: pointer;
+  user-select: none;
+}
+
+.panw--toggle-root--top {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.panw--toggle-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.panw--toggle-label-info-row,
+.panw--toggle-track-status-row {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+}
+
+.panw--toggle-track {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 48px;
+  height: 24px;
+  border-radius: 24px;
+  padding: 3px;
+  flex-shrink: 0;
+  box-sizing: border-box;
+  background-color: var(--panw-toggle-track-on);
+  transition: background-color 0.2s ease;
+}
+
+.panw--toggle-track--off { background-color: var(--panw-toggle-track-off); }
+.panw--toggle-track--small { width: 32px; height: 16px; }
+
+.panw--toggle-knob {
+  width: 18px;
+  height: 18px;
+  border-radius: 18px;
+  background-color: var(--panw-toggle-knob);
+  flex-shrink: 0;
+  transition: transform 0.2s ease;
+}
+
+.panw--toggle-track:not(.panw--toggle-track--off) .panw--toggle-knob {
+  transform: translateX(24px);
+}
+
+.panw--toggle-knob--small { width: 10px; height: 10px; border-radius: 10px; }
+
+.panw--toggle-track--small:not(.panw--toggle-track--off) .panw--toggle-knob {
+  transform: translateX(16px);
+}
+
+.panw--toggle-label,
+.panw--toggle-status {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 18px;
+  letter-spacing: 0.25px;
+  color: var(--panw-toggle-label);
+}
+
+.panw--toggle-info-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  color: var(--panw-toggle-info);
+
+  svg { width: 16px; height: 16px; }
+}
+
+.panw--toggle-root--disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+.panw--toggle-input:focus-visible ~ .panw--toggle-track,
+.panw--toggle-input:focus-visible ~ .panw--toggle-track-status-row .panw--toggle-track {
+  outline: 2px solid var(--panw-toggle-focus);
+  outline-offset: 2px;
+}

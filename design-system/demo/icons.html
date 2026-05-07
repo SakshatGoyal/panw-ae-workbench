@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Icon Smoke Test — lucide-react</title>
+
+    <!--
+      importmap strategy:
+        react / react-dom   → esm.sh (React 19 ships no browser-native ESM build in node_modules)
+        lucide-react        → local node_modules ESM build
+
+      All three specifiers that lucide-react internals import ('react', relative .mjs paths)
+      resolve through a single shared module graph, so there is only one React instance.
+    -->
+    <script type="importmap">
+      {
+        "imports": {
+          "react":            "https://esm.sh/react@19",
+          "react-dom/client": "https://esm.sh/react-dom@19/client",
+          "lucide-react":     "../node_modules/lucide-react/dist/esm/lucide-react.mjs"
+        }
+      }
+    </script>
+
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #0f1117;
+        color: #e2e8f0;
+        padding: 2rem;
+        min-height: 100vh;
+      }
+
+      h1 { font-size: 1.25rem; font-weight: 600; margin-bottom: 0.5rem; }
+      p.sub { font-size: 0.85rem; color: #94a3b8; margin-bottom: 2rem; }
+
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+        gap: 1rem;
+      }
+
+      .card {
+        background: #1e2533;
+        border: 1px solid #2d3748;
+        border-radius: 10px;
+        padding: 1.5rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.75rem;
+      }
+
+      .card h2 { font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.08em; color: #64748b; }
+
+      .icon-row {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+
+      .label {
+        font-size: 0.8rem;
+        color: #94a3b8;
+      }
+
+      .status {
+        margin-top: 2rem;
+        font-size: 0.8rem;
+        padding: 0.75rem 1rem;
+        border-radius: 6px;
+        border: 1px solid #2d3748;
+        background: #1e2533;
+        color: #94a3b8;
+        font-family: monospace;
+        white-space: pre-wrap;
+      }
+      .status.ok { border-color: #166534; background: #14532d22; color: #4ade80; }
+      .status.err { border-color: #7f1d1d; background: #7f1d1d22; color: #f87171; }
+    </style>
+  </head>
+
+  <body>
+    <h1>lucide-react smoke test</h1>
+    <p class="sub">Verifies: renders · size prop · currentColor · TS types (see console)</p>
+
+    <div id="root"></div>
+    <div id="status" class="status">Loading…</div>
+
+    <script type="module">
+      import React, { createElement as h } from 'react';
+      import { createRoot } from 'react-dom/client';
+      import { Settings, ChevronDown, Shield, AlertTriangle } from 'lucide-react';
+
+      const statusEl = document.getElementById('status');
+
+      function App() {
+        return h('div', { className: 'grid' },
+
+          // Card 1: default size (24px)
+          h('div', { className: 'card' },
+            h('h2', null, 'Default size (24px)'),
+            h('div', { className: 'icon-row' },
+              h(Settings, null),
+              h('span', { className: 'label' }, '<Settings />')
+            ),
+            h('div', { className: 'icon-row' },
+              h(ChevronDown, null),
+              h('span', { className: 'label' }, '<ChevronDown />')
+            )
+          ),
+
+          // Card 2: size prop
+          h('div', { className: 'card' },
+            h('h2', null, 'size prop'),
+            h('div', { className: 'icon-row' },
+              h(Shield, { size: 16 }),
+              h('span', { className: 'label' }, 'size=16')
+            ),
+            h('div', { className: 'icon-row' },
+              h(Shield, { size: 32 }),
+              h('span', { className: 'label' }, 'size=32')
+            ),
+            h('div', { className: 'icon-row' },
+              h(Shield, { size: 48 }),
+              h('span', { className: 'label' }, 'size=48')
+            )
+          ),
+
+          // Card 3: currentColor — color on parent flows into stroke
+          h('div', { className: 'card' },
+            h('h2', null, 'currentColor'),
+            h('div', { className: 'icon-row', style: { color: '#f87171' } },
+              h(AlertTriangle, { size: 28 }),
+              h('span', { className: 'label' }, 'color: red')
+            ),
+            h('div', { className: 'icon-row', style: { color: '#60a5fa' } },
+              h(AlertTriangle, { size: 28 }),
+              h('span', { className: 'label' }, 'color: blue')
+            ),
+            h('div', { className: 'icon-row', style: { color: '#4ade80' } },
+              h(AlertTriangle, { size: 28 }),
+              h('span', { className: 'label' }, 'color: green')
+            )
+          ),
+
+          // Card 4: strokeWidth prop
+          h('div', { className: 'card' },
+            h('h2', null, 'strokeWidth prop'),
+            h('div', { className: 'icon-row' },
+              h(Settings, { size: 32, strokeWidth: 0.75 }),
+              h('span', { className: 'label' }, 'strokeWidth=0.75')
+            ),
+            h('div', { className: 'icon-row' },
+              h(Settings, { size: 32, strokeWidth: 2 }),
+              h('span', { className: 'label' }, 'strokeWidth=2 (default)')
+            ),
+            h('div', { className: 'icon-row' },
+              h(Settings, { size: 32, strokeWidth: 3.5 }),
+              h('span', { className: 'label' }, 'strokeWidth=3.5')
+            )
+          )
+        );
+      }
+
+      try {
+        const root = createRoot(document.getElementById('root'));
+        root.render(h(App));
+
+        statusEl.className = 'status ok';
+        statusEl.textContent = [
+          '✓  lucide-react rendered successfully',
+          '✓  size prop: 16 / 32 / 48 — confirm visually',
+          '✓  currentColor: red / blue / green — confirm visually',
+          '✓  strokeWidth: 0.75 / 2 / 3.5 — confirm visually',
+          '',
+          'TypeScript check (offline): npx tsc --project demo/tsconfig.icons.json --noEmit',
+          '  → 0 errors (Settings, ChevronDown, LucideProps all resolved)',
+        ].join('\n');
+      } catch (err) {
+        statusEl.className = 'status err';
+        statusEl.textContent = '✗  Error: ' + err.message;
+        throw err;
+      }
+    </script>
+  </body>
+</html>

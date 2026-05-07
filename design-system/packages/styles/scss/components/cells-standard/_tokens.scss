@@ -1,12 +1,18 @@
-// Cells Standard — CSS custom property tokens. Hex values from PANW source.
+// Cells Standard — Stage tokens.
+//
+// Row hover/pressed default to `ghost` (neutral). Rows are list-item-like
+// surfaces, not brand-engaged — the active (selected) state already does
+// the brand work via highlight.rest, so a neutral hover keeps the
+// hover-vs-active hierarchy clean. The active-state checkbox routes to
+// icons.brand.rest per the matching-family rule on the alpha-brand ground.
 :root {
-  --panw-cell-row-hover-bg:        #eff8ff;
-  --panw-cell-row-press-bg:        #dff0fd;
-  --panw-cell-row-active-bg:       #dff0fd;
-  --panw-cell-row-locked-bg:       var(--static-surfaces-primary, #ffffff);
-  --panw-cell-row-locked-text:     #c5ccd1;
+  --panw-cell-row-hover-bg:        var(--ds-ghost-hover);
+  --panw-cell-row-press-bg:        var(--ds-ghost-pressed);
+  --panw-cell-row-active-bg:       var(--ds-highlight-rest);
+  --panw-cell-row-locked-bg:       var(--ds-surface-rest);
+  --panw-cell-row-locked-text:     var(--ds-text-secondary-disabled);
   --panw-cell-row-locked-tag-bg:   #e0e0e0;
   --panw-cell-row-locked-tag-text: #404a52;
-  --panw-cell-row-expand-color:    #404a52;
-  --panw-cell-row-active-cb-color: #006fcc;
+  --panw-cell-row-expand-color:    var(--ds-icons-secondary-rest);
+  --panw-cell-row-active-cb-color: var(--ds-icons-brand-rest);
 }

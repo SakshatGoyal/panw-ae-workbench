@@ -13,9 +13,17 @@ import {
   cobalt60,
   cobalt70,
   cobalt80,
+  cyan20,
+  cyan70,
+  gold20,
+  gold70,
+  green20,
   green60,
   green70,
   lime20,
+  lime70,
+  mint20,
+  mint70,
   neutral0,
   neutral5,
   neutral10,
@@ -28,9 +36,15 @@ import {
   neutral80,
   neutral90,
   neutral100,
+  olive20,
+  olive70,
   orange10,
+  orange20,
   orange50,
   orange70,
+  pink20,
+  pink70,
+  purple20,
   purple30,
   purple60,
   purple70,
@@ -41,7 +55,12 @@ import {
   red60,
   red70,
   red80,
+  slate20,
+  slate70,
+  violet20,
+  violet70,
   yellow10,
+  yellow20,
   yellow40,
   yellow50,
   yellow70,
@@ -344,6 +363,52 @@ export const StageTokens = {
       "success": green60,
       "danger": red70,
     },
+  },
+  /**
+   * Categorical tag palette.
+   *
+   * Each color is a derived reference into the primitive scales:
+   *   low.bg    → primitive-20  (pastel)
+   *   low.text  → primitive-70  (deep, takes pastel ground)
+   *   high.bg   → primitive-70  (saturated)
+   *   high.text → "#ffffff"     (inverse white)
+   *
+   * If the primitive scale ever shifts, the categorical palette follows.
+   *
+   * Names map to primitive families directly except where Stage's primitive
+   * set has no exact match: lavender → violet, magenta → pink (closest hue),
+   * jade → mint, teal → cyan, bronze → gold. The PANW tag color names are
+   * preserved at the component API level so consumers don't have to migrate.
+   *
+   * Status-overlapping colors (red, green, orange, yellow) are kept for
+   * backward compatibility with the existing Tags API. Convention: tags are
+   * for categorization; for state communication use status.* tokens through
+   * components like InlineNotification.
+   *
+   * High-contrast brightness exception: yellow at the 70 level can read
+   * cleanly on inverse white in this palette, but the convention follows
+   * Stage's status.warning.strong treatment — primary text on the bright
+   * ground — so that any future shift to a brighter yellow-700 stays
+   * legible. yellow.high.text therefore points at neutral100, not white.
+   */
+  "tag": {
+    "grey":     { "low": { "bg": neutral20,  "text": neutral80 }, "high": { "bg": neutral70, "text": "#ffffff" } },
+    "accent":   { "low": { "bg": brand20,    "text": brand70   }, "high": { "bg": brand70,   "text": "#ffffff" } },
+    "red":      { "low": { "bg": red20,      "text": red70     }, "high": { "bg": red70,     "text": "#ffffff" } },
+    "green":    { "low": { "bg": green20,    "text": green70   }, "high": { "bg": green70,   "text": "#ffffff" } },
+    "orange":   { "low": { "bg": orange20,   "text": orange70  }, "high": { "bg": orange70,  "text": "#ffffff" } },
+    "slate":    { "low": { "bg": slate20,    "text": slate70   }, "high": { "bg": slate70,   "text": "#ffffff" } },
+    "lavender": { "low": { "bg": violet20,   "text": violet70  }, "high": { "bg": violet70,  "text": "#ffffff" } },
+    "purple":   { "low": { "bg": purple20,   "text": purple70  }, "high": { "bg": purple70,  "text": "#ffffff" } },
+    "pink":     { "low": { "bg": pink20,     "text": pink70    }, "high": { "bg": pink70,    "text": "#ffffff" } },
+    "magenta":  { "low": { "bg": pink20,     "text": pink70    }, "high": { "bg": pink70,    "text": "#ffffff" } },
+    "yellow":   { "low": { "bg": yellow20,   "text": yellow70  }, "high": { "bg": yellow70,  "text": neutral100 } },
+    "bronze":   { "low": { "bg": gold20,     "text": gold70    }, "high": { "bg": gold70,    "text": "#ffffff" } },
+    "olive":    { "low": { "bg": olive20,    "text": olive70   }, "high": { "bg": olive70,   "text": "#ffffff" } },
+    "lime":     { "low": { "bg": lime20,     "text": lime70    }, "high": { "bg": lime70,    "text": "#ffffff" } },
+    "jade":     { "low": { "bg": mint20,     "text": mint70    }, "high": { "bg": mint70,    "text": "#ffffff" } },
+    "teal":     { "low": { "bg": cyan20,     "text": cyan70    }, "high": { "bg": cyan70,    "text": "#ffffff" } },
+    "cobalt":   { "low": { "bg": cobalt20,   "text": cobalt70  }, "high": { "bg": cobalt70,  "text": "#ffffff" } },
   },
 } as const;
 

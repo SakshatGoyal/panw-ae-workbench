@@ -33,19 +33,29 @@ $panw-prefix: 'panw';
 }
 
 // Container variant
+//
+// Selected signal = surface.rest tile against the surface.accent bar.
+// The previous build added a 2px brand top-accent on top of the surface
+// swap; Stage restraint says the ground change is the signal — the bar
+// was a duplicate. Font weight already stays at 600 across both states,
+// so weight isn't carrying hierarchy here either; the surface does the
+// work.
 .#{$panw-prefix}--tabs__item--container.#{$panw-prefix}--tabs__item--selected {
   background-color: var(--panw-tabs-bg-selected);
   color: var(--panw-tabs-text);
-  border-top: 2px solid var(--panw-tabs-border-accent);
   padding: 12px 16px;
   font-weight: 600;
 }
 
 .#{$panw-prefix}--tabs__item--container.#{$panw-prefix}--tabs__item--unselected {
   background-color: var(--panw-tabs-bg-unselected);
-  color: var(--panw-tabs-text);
+  // Unselected text drops a tier — surface-swap signal is reinforced by
+  // a text-tier shift (secondary → primary on selection) instead of a
+  // duplicate weight bump. Selected reads heavier; unselected stays
+  // legible without competing for attention.
+  color: var(--panw-tabs-text-secondary);
   padding: 12px 16px;
-  font-weight: 600;
+  font-weight: 400;
 
   &:hover, &.#{$panw-prefix}--tabs__item--force-hover { background-color: var(--panw-tabs-bg-hover); }
   &:active, &.#{$panw-prefix}--tabs__item--force-pressed { background-color: var(--panw-tabs-bg-pressed); }
@@ -57,11 +67,16 @@ $panw-prefix: 'panw';
 }
 
 // No-container variant
+//
+// Both states use the same 2px border + 4px text-to-line gap so the
+// baseline stays consistent across the strip — the previous build had
+// selected at 6px and unselected at 4px which shifted the selected
+// label upward by 2px relative to its neighbours.
 .#{$panw-prefix}--tabs__item--no-container.#{$panw-prefix}--tabs__item--selected {
   background-color: transparent;
   color: var(--panw-tabs-text);
   border-bottom: 2px solid var(--panw-tabs-border-accent);
-  padding: 0 16px 6px 16px;
+  padding: 0 16px 4px 16px;
   font-weight: 600;
 }
 

@@ -1,17 +1,24 @@
 // Accordion — Stage tokens.
 //
-// Two themes: gray00 (surface.rest) and gray10 (surface.alt.rest). Hover and
-// pressed move both themes onto highlight.* — alpha-brand grounds. State
-// propagation rule fires: title, description, and expansion icon route to
-// the brand family when the row is on a highlight ground (the audit's
-// "state propagation broken" finding).
+// Two themes: gray00 (surface.rest) and gray10 (surface.alt.rest). Hover
+// and pressed move both themes onto ghost.highlight.* — Stage's row-tier
+// alpha-brand. The previous build routed to highlight.* (the engaged-
+// state fill — "project attached, mode on, special-status item") which
+// is the wrong tier for a row hover: highlight.hover is rgb(56 165 255
+// / 50%) — a saturated brand wash that reads as a commit, when the
+// hover should be a quiet preview. ghost.highlight.hover (rgb(207 232
+// 252 / 50%)) is the rows/flyout-items tier per stage-background-colors,
+// and matches the accordion's role (≤48px tall, list-item-like).
+//
+// State propagation still fires: title and expansion icon route to the
+// brand family when the row picks up an alpha-brand ground.
 :root {
   --panw-accordion-bg-gray00:           var(--ds-surface-rest);
   --panw-accordion-bg-gray10:           var(--ds-surface-alt-rest);
-  --panw-accordion-bg-hover-gray00:     var(--ds-highlight-hover);
-  --panw-accordion-bg-hover-gray10:     var(--ds-highlight-hover);
-  --panw-accordion-bg-pressing-gray00:  var(--ds-highlight-pressed);
-  --panw-accordion-bg-pressing-gray10:  var(--ds-highlight-pressed);
+  --panw-accordion-bg-hover-gray00:     var(--ds-ghost-highlight-hover);
+  --panw-accordion-bg-hover-gray10:     var(--ds-ghost-highlight-hover);
+  --panw-accordion-bg-pressing-gray00:  var(--ds-ghost-highlight-pressed);
+  --panw-accordion-bg-pressing-gray10:  var(--ds-ghost-highlight-pressed);
 
   // Rest-state foreground.
   --panw-accordion-icon-color:          var(--ds-icons-tertiary-rest);

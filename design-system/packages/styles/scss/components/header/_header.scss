@@ -48,9 +48,14 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--header__text {
+  // Stage's system-wide weight call: 600 over 700. The audit landed
+  // tabs at 600 for the same reason — 700 reads as section heading,
+  // 600 reads as label heading, which is what a table column header
+  // is. Combined with text.secondary it sits one tier above cells
+  // (400 + secondary) without competing with section titles.
   color: var(--panw-header-text);
   font-family: var(--ds-type-font-family-sans);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 12px;
   line-height: 16px;
   letter-spacing: 0.25px;

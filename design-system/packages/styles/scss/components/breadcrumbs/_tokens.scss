@@ -1,16 +1,19 @@
 // Breadcrumbs — Stage tokens
 //
-// Trail items route to text.link-neutral (quiet navigation): neutral at rest,
-// brand on hover/pressed. Underline appears on hover to signal interactivity
-// without making the trail visually loud. The current page reads as
-// text.primary — it's not a link.
+// Trail items route to text.link.* (brand): brand at rest, brand-darker on
+// hover/pressed. The current page reads as text.primary — it's not a link.
+// The trail is navigation; brand color signals "go here," neutral keeps the
+// current item from competing.
 //
-// Separator chevrons are icons.tertiary — supplementary metadata between items.
+// Underline appears on hover only — at rest, the brand color does the
+// affordance work without trail-clutter.
+//
+// Separator chevrons are icons.tertiary — supplementary metadata.
 :root {
   --panw-breadcrumb-text:          var(--ds-text-primary);
   --panw-breadcrumb-separator:     var(--ds-icons-tertiary-rest);
-  --panw-breadcrumb-link:          var(--ds-text-link-neutral-rest);
-  --panw-breadcrumb-link-hover:    var(--ds-text-link-neutral-hover);
-  --panw-breadcrumb-link-pressed:  var(--ds-text-link-neutral-pressed);
-  --panw-breadcrumb-link-disabled: var(--ds-text-link-neutral-disabled);
+  --panw-breadcrumb-link:          var(--ds-text-link-rest);
+  --panw-breadcrumb-link-hover:    var(--ds-text-link-hover);
+  --panw-breadcrumb-link-pressed:  var(--ds-text-link-pressed);
+  --panw-breadcrumb-link-disabled: var(--ds-text-link-disabled);
 }

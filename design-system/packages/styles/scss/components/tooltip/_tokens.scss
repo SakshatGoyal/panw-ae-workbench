@@ -1,9 +1,13 @@
-// Tooltip — tokens copied from PANW source
+// Tooltip — Stage tokens.
+//
+// Glanceable label only. Descriptive flyouts (heading + image + stepper)
+// live in @ds/popover now. Stage rules for tooltips:
+//   surface → surface.inverse.rest (the dark inverse ground)
+//   text    → text.inverse.rest
+//   shadow  → none (tooltips are at the chrome layer, not card-stack)
+//   radius  → radius.tight (4px)
+//   padding → 8px / 12px (vertical / horizontal, the static-label rule)
 :root {
-  --panw-tooltip-bg-default: #475566;
-  --panw-tooltip-bg-light:   #ffffff;
-  --panw-tooltip-text-light: #ffffff;
-  --panw-tooltip-heading:    #0e1317;
-  --panw-tooltip-body:       #404a52;
-  --panw-tooltip-secondary:  #656f76;
+  --panw-tooltip-surface: var(--ds-surface-inverse-rest);
+  --panw-tooltip-text:    var(--ds-text-inverse-rest);
 }

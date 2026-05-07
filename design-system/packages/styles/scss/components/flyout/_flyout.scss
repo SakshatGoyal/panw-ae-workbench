@@ -123,6 +123,11 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
+  // 2px gap between rows per stage-spacing.md flyout pattern. The gap
+  // gives a hovered row enough distance from a selected sibling that the
+  // hover ground reads as a preview *next to* the selection, not as one
+  // combined block.
+  gap: 2px;
 }
 
 // ─── Item ────────────────────────────────────────────────────────────────────
@@ -189,6 +194,7 @@
 .panw--flyout__group {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 .panw--flyout__group-header {
@@ -233,6 +239,7 @@
 .panw--flyout__group-children {
   display: flex;
   flex-direction: column;
+  gap: 2px;
 }
 
 // ─── Truncation tooltip ──────────────────────────────────────────────────────

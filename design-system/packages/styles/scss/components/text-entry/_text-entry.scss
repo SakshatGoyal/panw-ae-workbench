@@ -1,0 +1,154 @@
+@use 'tokens';
+
+$panw-prefix: 'panw';
+
+// =============================================================================
+// TextEntry — single/multi-line text input.
+// Conforms to the Stage field contract.
+// =============================================================================
+
+.#{$panw-prefix}--text-entry {
+  display: flex;
+  flex-direction: column;
+  width: 200px;
+  font-family: var(--ds-type-font-family-sans);
+  box-sizing: border-box;
+}
+
+.#{$panw-prefix}--text-entry__title-row {
+  display: flex;
+  align-items: center;
+  padding-bottom: 4px;
+}
+
+.#{$panw-prefix}--text-entry__title {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.286;
+  color: var(--panw-te-title);
+  margin: 0;
+}
+
+.#{$panw-prefix}--text-entry__field {
+  display: flex;
+  align-items: center;
+  border: 1px solid var(--panw-te-border);
+  border-radius: 4px;
+  padding: 0 8px 0 16px;
+  height: 40px;
+  box-sizing: border-box;
+  background-color: var(--panw-te-bg);
+  transition:
+    background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    box-shadow 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+
+.#{$panw-prefix}--text-entry__input {
+  flex: 1;
+  border: none;
+  outline: none;
+  background: transparent;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.286;
+  color: var(--panw-te-text);
+  padding: 0;
+  margin: 0;
+  min-width: 0;
+  resize: vertical;
+
+  &::placeholder { color: var(--panw-te-placeholder); }
+}
+
+.#{$panw-prefix}--text-entry__clear { flex-shrink: 0; }
+
+.#{$panw-prefix}--text-entry__description-row {
+  display: flex;
+  padding-top: 4px;
+}
+
+.#{$panw-prefix}--text-entry__description {
+  flex: 1;
+  font-size: 12px;
+  font-weight: 400;
+  line-height: 1.333;
+  color: var(--panw-te-description);
+}
+
+// ─── Sizes ───────────────────────────────────────────────────────────────────
+.#{$panw-prefix}--text-entry--small  .#{$panw-prefix}--text-entry__field { height: 32px; }
+.#{$panw-prefix}--text-entry--default .#{$panw-prefix}--text-entry__field { height: 40px; }
+.#{$panw-prefix}--text-entry--large  .#{$panw-prefix}--text-entry__field { height: 48px; }
+
+// ─── Type=area ───────────────────────────────────────────────────────────────
+.#{$panw-prefix}--text-entry--type-area .#{$panw-prefix}--text-entry__field {
+  height: auto;
+  min-height: 80px;
+  align-items: flex-start;
+  padding: 8px 8px 8px 16px;
+}
+.#{$panw-prefix}--text-entry--type-area .#{$panw-prefix}--text-entry__input {
+  min-height: 60px;
+  line-height: 1.286;
+}
+
+// ─── Backgrounds — both have a 1px line at rest ──────────────────────────────
+.#{$panw-prefix}--text-entry--grey-10 .#{$panw-prefix}--text-entry__field {
+  background-color: var(--panw-te-bg);
+}
+.#{$panw-prefix}--text-entry--grey-00 .#{$panw-prefix}--text-entry__field {
+  background-color: var(--panw-te-bg-alt);
+}
+
+// ─── States ──────────────────────────────────────────────────────────────────
+// Active: line shifts to brand and a 1px inset box-shadow brings the apparent
+// width to 2px without changing geometry. Validation = border-swap only.
+
+.#{$panw-prefix}--text-entry--state-hover .#{$panw-prefix}--text-entry__field {
+  background-color: var(--panw-te-bg-hover);
+}
+.#{$panw-prefix}--text-entry--grey-00.#{$panw-prefix}--text-entry--state-hover .#{$panw-prefix}--text-entry__field {
+  background-color: var(--panw-te-bg-alt-hover);
+}
+
+.#{$panw-prefix}--text-entry--state-onclick .#{$panw-prefix}--text-entry__field {
+  background-color: var(--panw-te-bg-pressed);
+}
+.#{$panw-prefix}--text-entry--grey-00.#{$panw-prefix}--text-entry--state-onclick .#{$panw-prefix}--text-entry__field {
+  background-color: var(--panw-te-bg-alt-pressed);
+}
+
+.#{$panw-prefix}--text-entry--state-active .#{$panw-prefix}--text-entry__field {
+  background-color: var(--panw-te-bg-active);
+  border-color: var(--panw-te-border-focus);
+  box-shadow: inset 0 0 0 1px var(--panw-te-border-focus);
+}
+
+.#{$panw-prefix}--text-entry--state-error .#{$panw-prefix}--text-entry__field {
+  border-color: var(--panw-te-border-error);
+  box-shadow: inset 0 0 0 1px var(--panw-te-border-error);
+}
+
+.#{$panw-prefix}--text-entry--state-success .#{$panw-prefix}--text-entry__field {
+  border-color: var(--panw-te-border-success);
+  box-shadow: inset 0 0 0 1px var(--panw-te-border-success);
+}
+
+.#{$panw-prefix}--text-entry--state-readonly {
+  pointer-events: none;
+}
+
+.#{$panw-prefix}--text-entry--state-disabled {
+  pointer-events: none;
+  .#{$panw-prefix}--text-entry__field {
+    background-color: var(--panw-te-bg-disabled);
+    border-color: var(--panw-te-border-disabled);
+  }
+  .#{$panw-prefix}--text-entry__title       { color: var(--panw-te-title-disabled); }
+  .#{$panw-prefix}--text-entry__input,
+  .#{$panw-prefix}--text-entry__input::placeholder { color: var(--panw-te-text-disabled); }
+  .#{$panw-prefix}--text-entry__description { color: var(--panw-te-description-disabled); }
+}

@@ -1,17 +1,18 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import {
-  TextEntryRounded,
+  TextEntry,
   TextEntryBackgrounds,
   TextEntrySizes,
   TextEntryTypes,
   TextEntryStates,
 } from './index';
-import mdx from './TextEntryRounded.mdx';
+import mdx from './TextEntry.mdx';
 
 export default {
-  title: 'Components/TextEntryRounded',
-  component: TextEntryRounded,
+  title: 'Components/TextEntry',
+  // Note: 'rounded' variant dropped — Stage collapsed shape variants on fields.
+  component: TextEntry,
   argTypes: {
     background: { options: TextEntryBackgrounds, control: { type: 'radio' } },
     size: { options: TextEntrySizes, control: { type: 'radio' } },
@@ -30,7 +31,7 @@ export default {
 export const Default = (args) => {
   const [v, setV] = useState('');
   return (
-    <TextEntryRounded
+    <TextEntry
       {...args}
       value={v}
       onChange={(val) => {
@@ -53,25 +54,25 @@ Default.args = {
   placeholder: 'Placeholder',
 };
 
-export const Area = () => <TextEntryRounded title="Notes" inputType="area" placeholder="Type a note" />;
-export const Small = () => <TextEntryRounded title="Small" size="small" />;
-export const Large = () => <TextEntryRounded title="Large" size="large" />;
-export const Disabled = () => <TextEntryRounded title="Disabled" disabled />;
-export const ReadOnly = () => <TextEntryRounded title="Read only" readOnly value="Read-only value" />;
-export const Error = () => <TextEntryRounded title="Error" forceState="error" />;
-export const Success = () => <TextEntryRounded title="Success" forceState="success" />;
+export const Area = () => <TextEntry title="Notes" inputType="area" placeholder="Type a note" />;
+export const Small = () => <TextEntry title="Small" size="small" />;
+export const Large = () => <TextEntry title="Large" size="large" />;
+export const Disabled = () => <TextEntry title="Disabled" disabled />;
+export const ReadOnly = () => <TextEntry title="Read only" readOnly value="Read-only value" />;
+export const Error = () => <TextEntry title="Error" forceState="error" />;
+export const Success = () => <TextEntry title="Success" forceState="success" />;
 
 export const AllVariants = () => (
   <div style={{ padding: 24, background: '#f9f9f9', display: 'grid', gridTemplateColumns: 'repeat(2, 200px)', gap: 24 }}>
     {TextEntryStates.map((s) => (
-      <TextEntryRounded
+      <TextEntry
         key={s}
         title={`State: ${s}`}
         forceState={s}
         value={s === 'active' || s === 'readonly' ? 'Sample text' : ''}
       />
     ))}
-    <TextEntryRounded title="Type: area" inputType="area" />
+    <TextEntry title="Type: area" inputType="area" />
   </div>
 );
 AllVariants.storyName = 'All Variants';

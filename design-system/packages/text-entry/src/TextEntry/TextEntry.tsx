@@ -17,6 +17,9 @@ export const TextEntryStates = [
 ] as const;
 export type TextEntryState = (typeof TextEntryStates)[number];
 
+export const TextEntryValidations = ['error', 'success'] as const;
+export type TextEntryValidation = (typeof TextEntryValidations)[number];
+
 export const TextEntryBackgrounds = ['grey-00', 'grey-10'] as const;
 export type TextEntryBackground = (typeof TextEntryBackgrounds)[number];
 
@@ -31,8 +34,8 @@ type SharedInputProps = Omit<
   'type' | 'size' | 'value' | 'defaultValue' | 'onChange'
 >;
 
-export interface TextEntryRoundedProps extends SharedInputProps {
-  /** Visual prominence level */
+export interface TextEntryProps extends SharedInputProps {
+  /** Visual prominence level — bg routes through field.* / field.alt.* */
   background?: TextEntryBackground;
   /** Size variant */
   size?: TextEntrySize;
@@ -45,15 +48,17 @@ export interface TextEntryRoundedProps extends SharedInputProps {
   value?: string;
   onChange?: (value: string, event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
   onClear?: () => void;
+  /** Validation state — error or success swaps the field border family only. */
+  validation?: TextEntryValidation;
   /** Force a visual state for snapshot/All-Variants stories. */
   forceState?: TextEntryState;
   className?: string;
 }
 
-export const TextEntryRounded = React.forwardRef<
+export const TextEntry = React.forwardRef<
   HTMLInputElement | HTMLTextAreaElement,
-  TextEntryRoundedProps
->(function TextEntryRounded(
+  TextEntryProps
+>(function TextEntry(
   {
     background = 'grey-10',
     size = 'default',
@@ -68,6 +73,7 @@ export const TextEntryRounded = React.forwardRef<
     placeholder = 'Placeholder',
     disabled,
     readOnly,
+    validation,
     forceState,
     className,
     onFocus,
@@ -89,6 +95,8 @@ export const TextEntryRounded = React.forwardRef<
   else if (disabled) visualState = 'disabled';
   else if (readOnly) visualState = 'readonly';
   else if (focused || (current?.length ?? 0) > 0) visualState = 'active';
+  else if (validation === 'error') visualState = 'error';
+  else if (validation === 'success') visualState = 'success';
 
   const setRef = useCallback(
     (node: HTMLInputElement | HTMLTextAreaElement | null) => {
@@ -178,9 +186,9 @@ export const TextEntryRounded = React.forwardRef<
   );
 });
 
-TextEntryRounded.displayName = 'TextEntryRounded';
+TextEntry.displayName = 'TextEntry';
 
-TextEntryRounded.propTypes = {
+TextEntry.propTypes = {
   background: PropTypes.oneOf(TextEntryBackgrounds),
   size: PropTypes.oneOf(TextEntrySizes),
   inputType: PropTypes.oneOf(TextEntryTypes),
@@ -191,8 +199,9 @@ TextEntryRounded.propTypes = {
   value: PropTypes.string,
   onChange: PropTypes.func,
   onClear: PropTypes.func,
+  validation: PropTypes.oneOf(TextEntryValidations),
   forceState: PropTypes.oneOf(TextEntryStates),
   className: PropTypes.string,
 };
 
-export default TextEntryRounded;
+export default TextEntry;

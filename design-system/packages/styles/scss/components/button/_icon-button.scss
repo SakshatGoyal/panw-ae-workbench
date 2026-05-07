@@ -53,20 +53,9 @@
 // md: 12px padding → 40px (16px icon) / 44px (20px icon)
 // lg: 16px padding → 48px (16px icon) / 52px (20px icon)
 
-// field=24px tight-pad variant for field-internal affordances (search clear,
-// text-entry clear, number-input steppers). 4px padding around a 16px glyph.
-// Hover/pressed override below routes to ghost.field family (semantic: this is
-// a field-internal button, not a row-tier or stand-alone icon button).
-.panw--btn-icon--field { padding: 4px; }
-.panw--btn-icon--sm    { padding: 0.5rem; }
-.panw--btn-icon--md    { padding: 0.75rem; }
-.panw--btn-icon--lg    { padding: 1rem; }
-
-// field-affordance ghost: semantic override of the ground family.
-.panw--btn-icon--field.panw--btn-icon--ghost {
-  &:hover:not(:disabled)  { background-color: var(--ds-ghost-field-hover); }
-  &:active:not(:disabled) { background-color: var(--ds-ghost-field-pressed); }
-}
+.panw--btn-icon--sm { padding: 0.5rem; }
+.panw--btn-icon--md { padding: 0.75rem; }
+.panw--btn-icon--lg { padding: 1rem; }
 
 // ─── Kinds ────────────────────────────────────────────────────────────────────
 

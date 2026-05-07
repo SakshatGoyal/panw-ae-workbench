@@ -35,7 +35,9 @@ $panw-prefix: 'panw';
   align-items: center;
   border: 1px solid var(--panw-te-border);
   border-radius: 4px;
-  padding: 0 8px 0 16px;
+  // Left-only padding — clear IconButton fills the row height on the right
+  // per the in-field affordance pattern (number-input is the source of truth).
+  padding: 0 0 0 16px;
   height: 40px;
   box-sizing: border-box;
   background-color: var(--panw-te-bg);
@@ -88,7 +90,7 @@ $panw-prefix: 'panw';
   height: auto;
   min-height: 80px;
   align-items: flex-start;
-  padding: 8px 8px 8px 16px;
+  padding: 8px 8px 8px 16px;  // textarea variant restores vertical padding
 }
 .#{$panw-prefix}--text-entry--type-area .#{$panw-prefix}--text-entry__input {
   min-height: 60px;

@@ -17,6 +17,7 @@ $panw-prefix: 'panw';
   gap: 8px;
   box-sizing: border-box;
   width: 240px;
+  height: 40px;
   font-family: var(--ds-type-font-family-sans);
   font-size: 14px;
   font-weight: 400;
@@ -26,7 +27,9 @@ $panw-prefix: 'panw';
   background-color: var(--panw-search-bg);
   border: 1px solid var(--panw-search-border);
   border-radius: 4px;
-  padding: 12px 8px 12px 16px;
+  // Left-only padding for the leading glyph; the inline IconButton fills
+  // the row height on the right (matches number-input's stepper pattern).
+  padding: 0 0 0 16px;
   transition:
     background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
     border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
@@ -62,8 +65,8 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--search__clear {
   display: none;
   flex-shrink: 0;
-  // Inner IconButton uses size="field" — the kind handles geometry; nothing
-  // to constrain here.
+  // Inner IconButton size tracks the search size (sm/md/lg) so the clear
+  // button fills the row height — same pattern as number-input steppers.
 }
 
 .#{$panw-prefix}--search--active .#{$panw-prefix}--search__clear,
@@ -71,10 +74,10 @@ $panw-prefix: 'panw';
   display: flex;
 }
 
-// ─── Sizes (vertical padding only) ───────────────────────────────────────────
-.#{$panw-prefix}--search--sm { padding-top: 8px;  padding-bottom: 8px; }
-.#{$panw-prefix}--search--md { padding-top: 12px; padding-bottom: 12px; }
-.#{$panw-prefix}--search--lg { padding-top: 16px; padding-bottom: 16px; }
+// ─── Sizes (fixed row height — IconButton fills) ─────────────────────────────
+.#{$panw-prefix}--search--sm { height: 32px; }
+.#{$panw-prefix}--search--md { height: 40px; }
+.#{$panw-prefix}--search--lg { height: 48px; }
 
 // ─── Backgrounds ─────────────────────────────────────────────────────────────
 // grey10 routes to field.* (neutral10), grey0 routes to field.alt.* (neutral0).

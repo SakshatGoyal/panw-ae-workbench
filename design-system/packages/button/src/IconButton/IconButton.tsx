@@ -25,13 +25,13 @@ export type IconButtonKind = (typeof IconButtonKinds)[number];
 
 /**
  * sm=32px, md=40px, lg=48px (padding-based; icon dimensions controlled by iconSize).
- * `field` is a tighter 24px variant intended for in-field affordances — search
- * clear, text-entry clear, number-input steppers. It pairs with ghost.field
- * ground per Stage's "ghost.field replaces a field when adding another grey
- * layer would over-crowd the parent" rule. The 4px padding around a 16px glyph
- * keeps geometry stable inside 32–48px field rows.
+ *
+ * In-field affordance pattern: pair the IconButton size with the field's
+ * own size so the button fills the field row height — number-input is the
+ * source of truth (md steppers inside a 40px field). Search and text-entry
+ * follow the same pattern: clear button size = field size.
  */
-export const IconButtonSizes = ['field', 'sm', 'md', 'lg'] as const;
+export const IconButtonSizes = ['sm', 'md', 'lg'] as const;
 
 export type IconButtonSize = (typeof IconButtonSizes)[number];
 

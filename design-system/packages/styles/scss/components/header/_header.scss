@@ -14,8 +14,8 @@ $panw-prefix: 'panw';
   background-color: var(--panw-header-bg);
   border: none;
   border-bottom: 1px solid var(--panw-header-border);
-  transition: background-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9),
-              border-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9);
+  transition: background-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9),
+              border-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
   &:hover:not(.#{$panw-prefix}--header--force-hover):not(.#{$panw-prefix}--header--force-onclick),
   &.#{$panw-prefix}--header--force-hover {
@@ -82,7 +82,7 @@ $panw-prefix: 'panw';
   flex-shrink: 0;
   color: var(--panw-header-icon);
   opacity: 0;
-  transition: opacity 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9);
+  transition: opacity 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
   svg { width: 16px; height: 16px; }
 }
@@ -101,7 +101,7 @@ $panw-prefix: 'panw';
   transform: translateY(-50%);
   opacity: 0;
   pointer-events: none;
-  transition: opacity 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9);
+  transition: opacity 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 .#{$panw-prefix}--header--filter-visible .#{$panw-prefix}--header__filter {

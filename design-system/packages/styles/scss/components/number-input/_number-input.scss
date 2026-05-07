@@ -34,8 +34,8 @@ $panw-prefix: 'panw';
   padding-left: 16px;
   border: 1px solid transparent;
   box-sizing: border-box;
-  transition: border-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9),
-              background-color 100ms cubic-bezier(0.2, 0.2, 0.38, 0.9);
+  transition: border-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9),
+              background-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 .#{$panw-prefix}--number-input__value {

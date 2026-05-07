@@ -1,14 +1,25 @@
-// Content switcher — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
+// Content switcher — Stage tokens.
+//
+// Selected = alpha-brand ground (surface.rest.selected) → text and icons
+// route to text.brand / icons.brand per the matching-family rule.
+// Unselected = surface.rest. Hover/pressed on unselected items move to
+// highlight.* (alpha-brand) so the interactivity preview matches the
+// selected state's family.
 :root {
-  --panw-cs-selected-bg:           #dff0fd; // VariableID:7203:1788
-  --panw-cs-selected-text:         #003474; // VariableID:7203:1800
-  --panw-cs-unselected-bg:         #ffffff; // VariableID:7203:1767 (was --static-surfaces-primary)
-  --panw-cs-unselected-text:       #0e1317; // VariableID:7203:1790
-  --panw-cs-unselected-icon:       #404a52; // VariableID:7208:6383
-  --panw-cs-hover-bg-gray10:       #eff8ff; // VariableID:7203:1772
-  --panw-cs-pressed-bg-gray10:     #dff0fd; // VariableID:7203:1777
-  --panw-cs-hover-bg-gray00:       #eff8ff; // VariableID:7203:1773
-  --panw-cs-pressed-bg-gray00:     #dff0fd; // VariableID:7203:1777
-  --panw-cs-disabled-text:         #c5ccd1; // VariableID:7203:1807
-  --panw-cs-focus:                 #003474;
+  --panw-cs-selected-bg:        var(--ds-surface-rest-selected);
+  --panw-cs-selected-text:      var(--ds-text-brand-rest);
+  --panw-cs-selected-icon:      var(--ds-icons-brand-rest);
+  --panw-cs-unselected-bg:      var(--ds-surface-rest);
+  --panw-cs-unselected-text:    var(--ds-text-secondary-rest);
+  --panw-cs-unselected-icon:    var(--ds-icons-tertiary-rest);
+  --panw-cs-hover-bg-gray00:    var(--ds-highlight-hover);
+  --panw-cs-hover-bg-gray10:    var(--ds-highlight-hover);
+  --panw-cs-hover-text:         var(--ds-text-brand-hover);
+  --panw-cs-pressed-bg-gray00:  var(--ds-highlight-pressed);
+  --panw-cs-pressed-bg-gray10:  var(--ds-highlight-pressed);
+  --panw-cs-pressed-text:       var(--ds-text-brand-pressed);
+  --panw-cs-disabled-text:      var(--ds-text-secondary-disabled);
+  --panw-cs-disabled-icon:      var(--ds-icons-disabled);
+  --panw-cs-focus:              var(--ds-lines-brand-rest);
+  --panw-cs-border:             var(--ds-lines-neutral-rest);
 }

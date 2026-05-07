@@ -13,6 +13,25 @@
   @include tag-base;
 }
 
+// ─── Shapes ──────────────────────────────────────────────────────────────────
+// Pill is the historical default — a height-matched capsule. Rounded is the
+// chip-tier alternative: 2px on the compact size, 4px on the large size,
+// matching the radii used elsewhere in the system for square-ish controls.
+// Shape is orthogonal to size; the size class still controls padding, gap,
+// and typography.
+
+.panw--tag--shape-pill {
+  border-radius: 999px;
+}
+
+.panw--tag--shape-rounded.panw--tag--size-default {
+  border-radius: 2px;
+}
+
+.panw--tag--shape-rounded.panw--tag--size-large {
+  border-radius: 4px;
+}
+
 // ─── Sizes ───────────────────────────────────────────────────────────────────
 
 .panw--tag--size-default {
@@ -102,6 +121,37 @@
     background-color: var(--ds-tag-#{$name}-high-bg);
     color:            var(--ds-tag-#{$name}-high-text);
   }
+}
+
+// ─── Neutral (structural odd-one-out) ───────────────────────────────────────
+// Neutral departs from the categorical palette: low sits on field.alt
+// (neutral0) with a 1px neutral line, high sits on surface.inverse (neutral90)
+// like the tooltip ground. Both carry hover/pressed states sourced from the
+// same families — it's the one tag variant that responds to interaction the
+// way a control would.
+//
+// Color/surface propagation follows the matching-family rule: text and the
+// border on low neutral both move through the neutral family; high neutral
+// uses inverse text.
+
+.panw--tag.panw--tag--low.panw--tag--neutral {
+  background-color: var(--ds-field-alt-rest);
+  color: var(--ds-text-primary);
+  // Inset shadow rather than a real border — keeps neutral the same outer
+  // dimensions as the categorical tags so a chip cloud mixing the two
+  // doesn't ladder by 2px.
+  box-shadow: inset 0 0 0 1px var(--ds-lines-neutral-rest);
+
+  &:hover  { background-color: var(--ds-field-alt-hover); }
+  &:active { background-color: var(--ds-field-alt-pressed); }
+}
+
+.panw--tag.panw--tag--high.panw--tag--neutral {
+  background-color: var(--ds-surface-inverse-rest);
+  color: var(--ds-text-inverse-rest);
+
+  &:hover  { background-color: var(--ds-surface-inverse-hover); }
+  &:active { background-color: var(--ds-surface-inverse-pressed); }
 }
 
 .panw--tag {

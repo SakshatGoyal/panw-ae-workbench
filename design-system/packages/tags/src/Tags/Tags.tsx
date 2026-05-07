@@ -24,6 +24,11 @@ export const TagColors = [
   'jade',
   'teal',
   'cobalt',
+  // Neutral is the structural odd-one-out — instead of a categorical
+  // primitive-20/70 pair, it sits on field.alt (low) or surface.inverse
+  // (high) and carries hover/pressed states + a 1px neutral border on the
+  // low variant. See _tags.scss for the dedicated rule block.
+  'neutral',
 ] as const;
 
 export type TagColor = (typeof TagColors)[number];
@@ -33,6 +38,12 @@ export type TagContrast = (typeof TagContrasts)[number];
 
 export const TagSizes = ['default', 'large'] as const;
 export type TagSize = (typeof TagSizes)[number];
+
+// Pill = current behavior (height-matched radius reads as a fully rounded
+// capsule). Rounded = 2px (default) / 4px (large), the same chip-tier radii
+// used elsewhere in the system for square-ish controls.
+export const TagShapes = ['pill', 'rounded'] as const;
+export type TagShape = (typeof TagShapes)[number];
 
 // ─── Props ───────────────────────────────────────────────────────────────────
 
@@ -46,6 +57,8 @@ export interface TagsProps
   contrast?: TagContrast;
   /** Size — `default` (compact) or `large`. */
   size?: TagSize;
+  /** Shape — `pill` (default, fully rounded) or `rounded` (2px / 4px chip radii). */
+  shape?: TagShape;
   /** Show a leading icon. */
   icon?: boolean;
   /** Show a close/dismiss button. */
@@ -74,6 +87,7 @@ export const Tags = React.forwardRef<HTMLSpanElement, TagsProps>(function Tags(
     color = 'grey',
     contrast = 'low',
     size = 'default',
+    shape = 'pill',
     icon = false,
     close = false,
     onClose,
@@ -89,6 +103,7 @@ export const Tags = React.forwardRef<HTMLSpanElement, TagsProps>(function Tags(
   const classes = classNames(
     `${prefix}--tag`,
     `${prefix}--tag--size-${size}`,
+    `${prefix}--tag--shape-${shape}`,
     `${prefix}--tag--${contrast}`,
     `${prefix}--tag--${color}`,
     className
@@ -124,6 +139,7 @@ Tags.propTypes = {
   color: PropTypes.oneOf(TagColors),
   contrast: PropTypes.oneOf(TagContrasts),
   size: PropTypes.oneOf(TagSizes),
+  shape: PropTypes.oneOf(TagShapes),
   icon: PropTypes.bool,
   close: PropTypes.bool,
   onClose: PropTypes.func,

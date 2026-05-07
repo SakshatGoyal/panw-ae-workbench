@@ -6,7 +6,8 @@
   display: inline-flex;
   flex-direction: row;
   align-items: center;
-  border-radius: 20px;
+  // Radius is set by shape modifier — pill (height-matched capsule) or
+  // rounded (2px default / 4px large). See _tags.scss.
   box-sizing: border-box;
   cursor: default;
   user-select: none;

@@ -62,12 +62,8 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--search__clear {
   display: none;
   flex-shrink: 0;
-  // Constrain inner IconButton to keep field height stable when it appears.
-  .#{$panw-prefix}--btn-icon {
-    width: 16px;
-    height: 16px;
-    padding: 0;
-  }
+  // Inner IconButton uses size="field" — the kind handles geometry; nothing
+  // to constrain here.
 }
 
 .#{$panw-prefix}--search--active .#{$panw-prefix}--search__clear,

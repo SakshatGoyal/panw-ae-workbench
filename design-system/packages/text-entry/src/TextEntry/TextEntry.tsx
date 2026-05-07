@@ -166,7 +166,7 @@ export const TextEntry = React.forwardRef<
           <span className={`${prefix}--text-entry__clear`}>
             <IconButton
               kind="ghost"
-              size="sm"
+              size="field"
               iconSize={16}
               renderIcon={X}
               aria-label="Clear text"

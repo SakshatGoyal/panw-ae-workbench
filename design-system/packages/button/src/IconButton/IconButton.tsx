@@ -23,8 +23,15 @@ export const IconButtonKinds = [
 
 export type IconButtonKind = (typeof IconButtonKinds)[number];
 
-/** sm=32px, md=40px, lg=48px (padding-based; icon dimensions controlled by iconSize) */
-export const IconButtonSizes = ['sm', 'md', 'lg'] as const;
+/**
+ * sm=32px, md=40px, lg=48px (padding-based; icon dimensions controlled by iconSize).
+ * `field` is a tighter 24px variant intended for in-field affordances — search
+ * clear, text-entry clear, number-input steppers. It pairs with ghost.field
+ * ground per Stage's "ghost.field replaces a field when adding another grey
+ * layer would over-crowd the parent" rule. The 4px padding around a 16px glyph
+ * keeps geometry stable inside 32–48px field rows.
+ */
+export const IconButtonSizes = ['field', 'sm', 'md', 'lg'] as const;
 
 export type IconButtonSize = (typeof IconButtonSizes)[number];
 

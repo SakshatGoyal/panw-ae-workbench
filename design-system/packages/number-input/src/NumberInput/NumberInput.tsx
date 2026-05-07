@@ -118,7 +118,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           />
           <IconButton
             kind="ghost"
-            size="md"
+            size="field"
             iconSize={16}
             renderIcon={Minus}
             aria-label="Decrease value"
@@ -127,7 +127,7 @@ export const NumberInput = React.forwardRef<HTMLInputElement, NumberInputProps>(
           />
           <IconButton
             kind="ghost"
-            size="md"
+            size="field"
             iconSize={16}
             renderIcon={Plus}
             aria-label="Increase value"

@@ -131,7 +131,7 @@ export const Search = React.forwardRef<HTMLInputElement, SearchProps>(
         <span className={`${prefix}--search__clear`}>
           <IconButton
             kind="ghost"
-            size="sm"
+            size="field"
             iconSize={16}
             renderIcon={X}
             aria-label="Clear search"

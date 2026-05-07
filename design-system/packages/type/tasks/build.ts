@@ -14,13 +14,6 @@ const breakpointWidthsRem: Record<string, number> = {
   max: 99, // 1584px / 16
 };
 
-function parseRem(value: unknown): number | null {
-  if (typeof value !== 'string') return null;
-  const match = value.trim().match(/^(-?\d+(?:\.\d+)?)rem$/);
-  if (!match) return null;
-  return Number(match[1]);
-}
-
 function subtract(a: string, b: string): number {
   const av = parseFloat(a);
   const bv = parseFloat(b);
@@ -81,7 +74,7 @@ function toSassStyleMap() {
     // expressions that the upstream reference emits.
     const computedBaseFontSize =
       baseFontSizeScalar && Object.keys(breakpointOverrides).length > 0
-        ? fluidFontSize(baseFontSizeScalar, 'sm', breakpointOverrides as any)
+        ? fluidFontSize(baseFontSizeScalar, 'sm', breakpointOverrides as Record<string, { fontSize?: unknown }>)
         : style.fontSize;
 
     for (const [bpName, overrides] of Object.entries(breakpointOverrides)) {
@@ -89,7 +82,7 @@ function toSassStyleMap() {
       const out: Record<string, unknown> = {
         'font-size':
           baseFontSizeScalar && typeof o.fontSize === 'string'
-            ? fluidFontSize(baseFontSizeScalar, bpName, breakpointOverrides as any)
+            ? fluidFontSize(baseFontSizeScalar, bpName, breakpointOverrides as Record<string, { fontSize?: unknown }>)
             : o.fontSize ?? null,
         'line-height': o.lineHeight ?? null,
         'font-weight': o.fontWeight ?? null,

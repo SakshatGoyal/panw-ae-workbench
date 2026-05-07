@@ -65,9 +65,9 @@ describe('type package smoke', () => {
     );
 
     expect(result.css).not.toContain('[unmapped-type: heading-04]');
-    expect(result.css).toContain('font-size: "1.75rem"');
-    expect(result.css).toContain('line-height: "1.28572"');
-    expect(result.css).toContain('font-weight: "var(--ds-type-font-weight-regular)"');
+    expect(result.css).toContain('font-size: 1.75rem');
+    expect(result.css).toContain('line-height: 1.28572');
+    expect(result.css).toContain('font-weight: var(--ds-type-font-weight-regular)');
   });
 
   it('emits family and weight custom properties under :root in styles.css', () => {

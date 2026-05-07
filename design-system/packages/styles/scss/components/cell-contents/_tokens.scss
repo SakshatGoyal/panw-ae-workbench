@@ -1,11 +1,24 @@
-// Cell Contents — CSS custom property tokens. Hex values from PANW source.
+// Cell Contents — Stage tokens.
+//
+// Default routing: text.secondary (Stage's cell-text default — secondary, not
+// primary). Status icons route to icons.status.* (the static-label family —
+// one stop darker than the interactive icons.* family, tuned for tinted
+// grounds and small sizes). Trend up/down use status text + status icon —
+// note the pair offset: text.status.danger is red70, icons.status.danger is
+// red60 (the audit's "wrong family" finding fixed here).
+//
+// State propagation across alpha-brand and alpha-red grounds is wired by
+// cells-standard via descendant selectors that rewrite these custom properties
+// on hover/pressed/selected. Keep these names stable.
 :root {
-  --panw-cell-text-color:        #0e1317;
-  --panw-cell-trend-up-color:    #137669;
-  --panw-cell-trend-down-icon:   #b22d2d;
-  --panw-cell-trend-down-text:   #da1e28;
-  --panw-cell-state-info:        #404a52;
-  --panw-cell-state-success:     #137669;
-  --panw-cell-state-warning:     #fad957;
-  --panw-cell-state-error:       #b22d2d;
+  --panw-cell-text-color:        var(--ds-text-secondary-rest);
+  --panw-cell-trend-up-text:     var(--ds-text-status-success);
+  --panw-cell-trend-up-icon:     var(--ds-icons-status-success);
+  --panw-cell-trend-down-text:   var(--ds-text-status-danger);
+  --panw-cell-trend-down-icon:   var(--ds-icons-status-danger);
+  --panw-cell-state-info:        var(--ds-icons-status-info);
+  --panw-cell-state-success:     var(--ds-icons-status-success);
+  --panw-cell-state-warning:     var(--ds-icons-status-warning);
+  --panw-cell-state-caution:     var(--ds-icons-status-caution);
+  --panw-cell-state-error:       var(--ds-icons-status-danger);
 }

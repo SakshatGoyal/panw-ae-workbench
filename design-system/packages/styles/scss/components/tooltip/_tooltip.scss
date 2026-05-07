@@ -24,6 +24,10 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--tooltip__content-container {
   background-color: var(--panw-tooltip-surface);
   border-radius: var(--ds-radius-tight);
+  // Same shadow family as popover — both are floating overlay layers, so
+  // they share Stage's flyout elevation. Tooltip's dark surface tones the
+  // shadow visually but the token is consistent.
+  box-shadow: var(--ds-shadow-flyout);
   // 8/12 padding (vertical / horizontal) per Stage spacing for static labels
   padding: 8px 12px;
   display: flex;

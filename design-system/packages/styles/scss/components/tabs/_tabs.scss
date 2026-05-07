@@ -19,7 +19,7 @@ $panw-prefix: 'panw';
   border: none;
   cursor: pointer;
   font-family: var(--ds-type-font-family-sans);
-  font-weight: 700;
+  font-weight: 600;
   font-size: 14px;
   line-height: 18px;
   letter-spacing: 0.25px;
@@ -27,7 +27,9 @@ $panw-prefix: 'panw';
   outline: none;
   background: none;
   box-sizing: border-box;
-  transition: background-color 300ms ease-out, color 300ms ease-out, border-color 300ms ease-out;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+              color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+              border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 
 // Container variant
@@ -36,21 +38,20 @@ $panw-prefix: 'panw';
   color: var(--panw-tabs-text);
   border-top: 2px solid var(--panw-tabs-border-accent);
   padding: 12px 16px;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 .#{$panw-prefix}--tabs__item--container.#{$panw-prefix}--tabs__item--unselected {
   background-color: var(--panw-tabs-bg-unselected);
   color: var(--panw-tabs-text);
   padding: 12px 16px;
-  font-weight: 700;
+  font-weight: 600;
 
   &:hover, &.#{$panw-prefix}--tabs__item--force-hover { background-color: var(--panw-tabs-bg-hover); }
   &:active, &.#{$panw-prefix}--tabs__item--force-pressed { background-color: var(--panw-tabs-bg-pressed); }
   &:disabled, &.#{$panw-prefix}--tabs__item--force-disabled {
-    background-color: var(--panw-tabs-bg-selected);
+    background-color: var(--panw-tabs-bg-unselected);
     color: var(--panw-tabs-text-disabled);
-    font-weight: 400;
     cursor: not-allowed;
   }
 }
@@ -59,9 +60,9 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--tabs__item--no-container.#{$panw-prefix}--tabs__item--selected {
   background-color: transparent;
   color: var(--panw-tabs-text);
-  border-bottom: 4px solid var(--panw-tabs-border-accent);
-  padding: 0 16px 4px 16px;
-  font-weight: 700;
+  border-bottom: 2px solid var(--panw-tabs-border-accent);
+  padding: 0 16px 6px 16px;
+  font-weight: 600;
 }
 
 .#{$panw-prefix}--tabs__item--no-container.#{$panw-prefix}--tabs__item--unselected {
@@ -75,8 +76,7 @@ $panw-prefix: 'panw';
   &:active, &.#{$panw-prefix}--tabs__item--force-pressed { border-bottom-color: var(--panw-tabs-border-bold); }
   &:disabled, &.#{$panw-prefix}--tabs__item--force-disabled {
     color: var(--panw-tabs-text-disabled);
-    border-bottom: none;
-    font-weight: 400;
+    border-bottom-color: var(--panw-tabs-border-subtle);
     cursor: not-allowed;
   }
 }

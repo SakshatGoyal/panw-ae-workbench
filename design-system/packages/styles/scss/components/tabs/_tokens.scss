@@ -1,14 +1,27 @@
-// Tabs — tokens copied from PANW source
+// Tabs — Stage tokens.
+//
+// Container variant: selected = surface.rest (white pop), unselected =
+// surface.accent (neutral10/20-ish — Linear/Attio "group-on-grey,
+// selected-on-white" pattern). Hover/pressed on unselected items move to
+// highlight.* (alpha-brand) so interactivity preview reads as the brand
+// family.
+//
+// No-container variant (Carbon-classic underline tabs): bottom border
+// shifts through lines.neutral.rest → .hover → .pressed for the
+// unselected→hover→pressed lifecycle. Selected gets a brand accent bar
+// (lines.brand.rest), kept at 2px (Stage's baseline line weight) — the
+// previous 4px was emphatic per the audit.
 :root {
-  --panw-tabs-bg-selected:        #ffffff;
-  --panw-tabs-bg-unselected:      #eaebeb;
-  --panw-tabs-bg-hover:           #dff0fd;
-  --panw-tabs-bg-pressed:         #cfe8fc;
-  --panw-tabs-border-accent:      #006fcc;
-  --panw-tabs-border-subtle:      #e4e8eb;
-  --panw-tabs-border-medium:      #c5ccd1;
-  --panw-tabs-border-bold:        #404a52;
-  --panw-tabs-text:               #0e1317;
-  --panw-tabs-text-secondary:     #404a52;
-  --panw-tabs-text-disabled:      #c5ccd1;
+  --panw-tabs-bg-selected:        var(--ds-surface-rest);
+  --panw-tabs-bg-unselected:      var(--ds-surface-accent-rest);
+  --panw-tabs-bg-hover:           var(--ds-highlight-hover);
+  --panw-tabs-bg-pressed:         var(--ds-highlight-pressed);
+  --panw-tabs-border-accent:      var(--ds-lines-brand-rest);
+  --panw-tabs-border-subtle:      var(--ds-lines-neutral-rest);
+  --panw-tabs-border-medium:      var(--ds-lines-neutral-hover);
+  --panw-tabs-border-bold:        var(--ds-lines-neutral-pressed);
+  --panw-tabs-text:               var(--ds-text-primary);
+  --panw-tabs-text-secondary:     var(--ds-text-secondary-rest);
+  --panw-tabs-text-disabled:      var(--ds-text-secondary-disabled);
+  --panw-tabs-bg-disabled:        var(--ds-surface-rest);
 }

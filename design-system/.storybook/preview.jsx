@@ -30,7 +30,7 @@ import '../packages/styles/scss/components/inline-notification/index.scss';
 import '../packages/styles/scss/components/number-input/index.scss';
 import '../packages/styles/scss/components/search/index.scss';
 import '../packages/styles/scss/components/tabs/index.scss';
-import '../packages/styles/scss/components/text-entry-rounded/index.scss';
+import '../packages/styles/scss/components/text-entry/index.scss';
 import '../packages/styles/scss/components/tooltip/index.scss';
 import '../packages/styles/scss/components/popover/index.scss';
 import '../packages/styles/scss/components/pagination/index.scss';

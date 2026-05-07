@@ -1,16 +1,19 @@
 // Checkbox — Stage tokens.
 //
-// Checked + indeterminate fill is brand (interactive primary affordance).
-// Unchecked uses lines.neutral.rest — the field-line role at neutral20.
-// The audit's finding was neutral80 — too loud for a rest-state outline,
-// fights the dense data sensibility.
+// Same iconographic-not-structural reasoning as the radio button: the
+// unchecked box border draws a "selectable target" glyph at 16px scale,
+// not a field line. Routing to lines.neutral.rest (neutral20 / #dedede)
+// rendered the unchecked target nearly invisible against white. The fix
+// is icons.secondary (neutral60 rest, neutral80 hover, neutral90 pressed).
 //
-// Label routes to text.secondary (Stage's checkbox/radio default — not
-// primary). Disabled label uses text.secondary.disabled.
+// Checked + indeterminate stay brand. Disabled icon stays icons.disabled.
+// Label stays text.secondary.
 :root {
   --panw-checkbox-checked:        var(--ds-brand-rest);
   --panw-checkbox-indeterminate:  var(--ds-brand-rest);
-  --panw-checkbox-unchecked:      var(--ds-lines-neutral-rest);
+  --panw-checkbox-unchecked:      var(--ds-icons-secondary-rest);
+  --panw-checkbox-unchecked-hover: var(--ds-icons-secondary-hover);
+  --panw-checkbox-unchecked-pressed: var(--ds-icons-secondary-pressed);
   --panw-checkbox-disabled:       var(--ds-icons-disabled);
   --panw-checkbox-label:          var(--ds-text-secondary-rest);
   --panw-checkbox-label-disabled: var(--ds-text-secondary-disabled);

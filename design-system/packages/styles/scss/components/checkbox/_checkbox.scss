@@ -36,7 +36,13 @@
 
 .panw--checkbox-icon--checked,
 .panw--checkbox-icon--indeterminate { color: var(--panw-checkbox-checked); }
-.panw--checkbox-icon--unchecked { color: var(--panw-checkbox-unchecked); }
+.panw--checkbox-icon--unchecked {
+  color: var(--panw-checkbox-unchecked);
+  transition: color 70ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.panw--checkbox-root:hover:not(.panw--checkbox-root--disabled) .panw--checkbox-icon--unchecked { color: var(--panw-checkbox-unchecked-hover); }
+.panw--checkbox-root:active:not(.panw--checkbox-root--disabled) .panw--checkbox-icon--unchecked { color: var(--panw-checkbox-unchecked-pressed); }
+
 .panw--checkbox-icon--disabled { color: var(--panw-checkbox-disabled); }
 
 .panw--checkbox-label {

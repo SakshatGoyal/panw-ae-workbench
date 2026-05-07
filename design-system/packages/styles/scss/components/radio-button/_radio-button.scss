@@ -34,8 +34,11 @@
 
 .panw--rb-icon { display: block; }
 
-.panw--rb-ring { fill: var(--panw-radio-ring); }
+.panw--rb-ring { fill: var(--panw-radio-ring); transition: fill 70ms cubic-bezier(0.2, 0, 0.38, 0.9); }
 .panw--rb-dot  { fill: var(--panw-radio-dot); }
+
+.panw--radio-button:hover:not(.panw--radio-button--disabled) .panw--rb-ring { fill: var(--panw-radio-ring-hover); }
+.panw--radio-button:active:not(.panw--radio-button--disabled) .panw--rb-ring { fill: var(--panw-radio-ring-pressed); }
 
 .panw--radio-button--disabled .panw--rb-ring { fill: var(--panw-radio-ring-disabled); }
 .panw--radio-button--disabled .panw--rb-dot  { fill: var(--panw-radio-dot-disabled); }

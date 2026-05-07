@@ -1,18 +1,21 @@
 // Radio button — Stage tokens.
 //
-// Ring routes to lines.neutral.rest (the field-line role: neutral20 stroke
-// at rest). The audit's finding was neutral80 — too loud; the radio's ring
-// should read as a field outline, not as filled iconography.
+// The outer ring is iconography (it draws the "selectable target" glyph at
+// 16px), not a structural field-line. The previous routing to
+// lines.neutral.rest (neutral20 / #dedede) made the ring functionally
+// invisible on a white ground — and worse, the disabled value (neutral40)
+// rendered louder than rest, inverting the hierarchy.
 //
-// Dot, when checked, routes to brand (interactive primary affordance).
-// Disabled ring/dot route to lines.neutral.disabled / icons.disabled.
-//
-// Label routes to text.secondary (Stage's checkbox/radio default — primary
-// was the wrong tier for an option label).
+// Routing to icons.secondary (neutral60 rest, neutral80 hover, neutral90
+// pressed) puts the ring at workhorse-icon weight, where it reads as a
+// target without competing with body text. The dot stays brand. Focus
+// ring stays brand. Label stays text.secondary.
 :root {
-  --panw-radio-ring:           var(--ds-lines-neutral-rest);
+  --panw-radio-ring:           var(--ds-icons-secondary-rest);
+  --panw-radio-ring-hover:     var(--ds-icons-secondary-hover);
+  --panw-radio-ring-pressed:   var(--ds-icons-secondary-pressed);
   --panw-radio-dot:            var(--ds-brand-rest);
-  --panw-radio-ring-disabled:  var(--ds-lines-neutral-disabled);
+  --panw-radio-ring-disabled:  var(--ds-icons-secondary-disabled);
   --panw-radio-dot-disabled:   var(--ds-icons-disabled);
   --panw-radio-label:          var(--ds-text-secondary-rest);
   --panw-radio-label-disabled: var(--ds-text-secondary-disabled);

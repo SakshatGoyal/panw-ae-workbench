@@ -99,17 +99,20 @@ const STATUS_ICONS: Record<DealStatus, React.ElementType> = {
   cross: IconCross,
 }
 
+// Labels intentionally drop trailing colons — sentence-case, no punctuation.
+// Pattern is value-as-data, label-as-quiet-metadata; weight + tone carry the
+// hierarchy, not glyphs.
 const RENEWAL_ROWS = [
-  { label: 'Subscription End:', value: 'Sept 1, 2025' },
-  { label: 'Renewable TCV:',    value: '$22.7M' },
-  { label: 'ARR:',              value: '$7.9M' },
+  { label: 'Subscription end', value: 'Sept 1, 2025' },
+  { label: 'Renewable TCV',    value: '$22.7M' },
+  { label: 'ARR',              value: '$7.9M' },
 ] as const
 
 const INSTALL_BASE_ROWS = [
-  { label: 'TCV:',             value: '$25.8M' },
-  { label: 'Incremental ACV:', value: '$1.0M',  brand: true },
-  { label: 'Margin:',          value: '12.50%', brand: true },
-  { label: 'RPO',              value: '$3.0M' },
+  { label: 'TCV',             value: '$25.8M' },
+  { label: 'Incremental ACV', value: '$1.0M' },
+  { label: 'Margin',          value: '12.50%' },
+  { label: 'RPO',             value: '$3.0M' },
 ] as const
 
 interface Deal { name: string; status: DealStatus; amount: string }
@@ -180,12 +183,21 @@ const SUGGESTIONS = [
 
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
-function DataRow({ label, value, brand }: { label: string; value: string; brand?: boolean }) {
+function DataRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="ops-data-row">
       <span className="ops-data-row__label">{label}</span>
-      <span className={`ops-data-row__value${brand ? ' ops-data-row__value--brand' : ''}`}>{value}</span>
+      <span className="ops-data-row__value">{value}</span>
     </div>
+  )
+}
+
+function StatusDot({ color, label }: { color: TagColor; label: string }) {
+  return (
+    <span className="ops-status-dot" data-color={color}>
+      <span className="ops-status-dot__glyph" aria-hidden="true" />
+      <span className="ops-status-dot__label">{label}</span>
+    </span>
   )
 }
 
@@ -215,14 +227,10 @@ function SalesPlayAccordion({ play, open, onToggle }: { play: SalesPlay; open: b
       >
         <span className="ops-accordion-chevron"><IconChevronDown /></span>
         <span className="ops-accordion-title">{play.title}</span>
-        <Tags
-          label={play.amount}
-          color="grey"
-          contrast="low"
-          size="default"
-          icon
-          renderIcon={IconMinusCircle}
-        />
+        {/* Amount as plain primary text, tabular numerals — earned its place
+            without a pill. The neutral grey pill + minus-circle icon was a
+            decorative tag for read-only data; the data itself is enough. */}
+        <span className="ops-accordion-amount">{play.amount}</span>
       </div>
       <div className="ops-accordion-content" role="region" aria-label={`${play.title} deals`}>
         {/* Divider between the accordion title row and the first deal row,
@@ -269,28 +277,38 @@ function OpportunityPanel() {
       <div className="ops-panel" role="complementary" aria-label="Opportunity Snapshot">
 
         {/* ── Header ── */}
+        {/* Identity zone: avatar + account name + opportunity link, then a
+            quiet metadata strip below. The header carries the "this is who
+            you're working with" weight that was missing before — the account
+            name is the subject of the entire panel and gets sized for it. */}
         <header className="ops-panel__header">
-          <div className="ops-panel__title-group">
-            <h1 className="ops-panel__account-name">[Account Name]</h1>
-            <Link href="#" color="blue" size="14px">[Opportunity Name]</Link>
+          <div className="ops-panel__identity">
+            <div className="ops-panel__avatar" aria-hidden="true">AC</div>
+            <div className="ops-panel__title-group">
+              <h1 className="ops-panel__account-name">[Account Name]</h1>
+              <Link href="#" color="blue" size="14px">[Opportunity Name]</Link>
+            </div>
           </div>
           <Button kind="ghost" size="small" renderIcon={IconX} iconDescription="Close panel" />
         </header>
+        <div className="ops-panel__meta">
+          <span>Enterprise</span>
+          <span aria-hidden="true">·</span>
+          <span>East Region</span>
+          <span aria-hidden="true">·</span>
+          <span>Owner M. Chen</span>
+          <span aria-hidden="true">·</span>
+          <span>Updated 3d ago</span>
+        </div>
 
         {/* ── RENEWALS ── */}
         <section className="ops-section" aria-label="Renewals">
           <div className="ops-section__hd">RENEWALS</div>
 
           <div className="ops-data-table">
-            {RENEWAL_ROWS.map((r, i) => (
-              <React.Fragment key={r.label}>
-                {i > 0 && <div className="ops-divider" />}
-                <DataRow {...r} />
-              </React.Fragment>
-            ))}
-            <div className="ops-divider" />
+            {RENEWAL_ROWS.map((r) => <DataRow key={r.label} {...r} />)}
             <div className="ops-data-row ops-data-row--outcome">
-              <span className="ops-data-row__label">Renewal Outcome:</span>
+              <span className="ops-data-row__label">Renewal outcome</span>
               <div className="ops-outcome-wrapper">
                 <button
                   ref={outcomeRef}
@@ -384,77 +402,62 @@ function OpportunityPanel() {
           )}
 
           <div className="ops-section__footer">
-            <Link href="#" color="blue" size="14px">Open in Renewal Workspace</Link>
+            <Button kind="ghost-brand" size="small">Open in Renewal Workspace</Button>
           </div>
         </section>
 
-        <div className="ops-sep" aria-hidden="true" />
 
         {/* ── INSTALL BASE ── */}
         <section className="ops-section" aria-label="Install Base">
           <div className="ops-section__hd">INSTALL BASE</div>
           <div className="ops-data-table">
-            {INSTALL_BASE_ROWS.map((r, i) => (
-              <React.Fragment key={r.label}>
-                {i > 0 && <div className="ops-divider" />}
-                <DataRow {...r} />
-              </React.Fragment>
-            ))}
+            {INSTALL_BASE_ROWS.map((r) => <DataRow key={r.label} {...r} />)}
           </div>
           <div className="ops-section__footer">
-            <Link href="#" color="blue" size="14px">Open Customer Estate</Link>
+            <Button kind="ghost-brand" size="small">Open Customer Estate</Button>
           </div>
         </section>
 
-        <div className="ops-sep" aria-hidden="true" />
 
         {/* ── SALES PLAY ── */}
         <section className="ops-section" aria-label="Sales Play">
           <div className="ops-section__hd">SALES PLAY</div>
           <div className="ops-salesplay-list">
-            {SALES_PLAYS.map((p, i) => (
-              <React.Fragment key={p.id}>
-                {i > 0 && <div className="ops-divider" />}
-                <SalesPlayAccordion
-                  play={p}
-                  open={!!openPlays[p.id]}
-                  onToggle={() => togglePlay(p.id)}
-                />
-              </React.Fragment>
+            {SALES_PLAYS.map((p) => (
+              <SalesPlayAccordion
+                key={p.id}
+                play={p}
+                open={!!openPlays[p.id]}
+                onToggle={() => togglePlay(p.id)}
+              />
             ))}
           </div>
           <div className="ops-section__footer">
-            <Link href="#" color="blue" size="14px">Open in Sales Play Console</Link>
+            <Button kind="ghost-brand" size="small">Open in Sales Play Console</Button>
           </div>
         </section>
 
-        <div className="ops-sep" aria-hidden="true" />
 
         {/* ── ACCOUNT HEALTH ── */}
         <section className="ops-section" aria-label="Account Health">
           <div className="ops-section__hd">ACCOUNT HEALTH</div>
 
           <div className="ops-health-rows">
-            {HEALTH_ROWS.map((row, i) => (
-              <React.Fragment key={row.label}>
-                {i > 0 && <div className="ops-divider" />}
-                <div
-                  className={`ops-health-row${row.primary ? ' ops-health-row--primary' : ''}`}
-                >
-                  <span className="ops-health-row__label">{row.label}</span>
-                  <Tags
-                    label={row.value}
-                    color={row.color}
-                    contrast="low"
-                    size="default"
-                    shape="pill"
-                  />
-                </div>
-              </React.Fragment>
+            {HEALTH_ROWS.map((row) => (
+              <div
+                key={row.label}
+                className={`ops-health-row${row.primary ? ' ops-health-row--primary' : ''}`}
+              >
+                <span className="ops-health-row__label">{row.label}</span>
+                <Tags label={row.value} color={row.color} contrast="low" size="default" shape="pill" />
+              </div>
             ))}
           </div>
 
-          <div className="ops-health-subheader">Health of products in this deal:</div>
+          {/* Sub-heading is sentence case, not a second uppercase eyebrow.
+              Two stacked eyebrows in 100px was overkill — this is a regular
+              sub-heading sitting quietly above the product table. */}
+          <div className="ops-health-subheading">Health of products in this deal</div>
 
           <div className="ops-product-table">
             <div className="ops-product-table-header">
@@ -462,24 +465,24 @@ function OpportunityPanel() {
               <span className="ops-product-table-hd">Technical</span>
               <span className="ops-product-table-hd">Adoption</span>
             </div>
-            {PRODUCTS.map((prod, i) => (
-              <React.Fragment key={prod.name}>
-                {i > 0 && <div className="ops-divider" />}
-                <div className="ops-product-row">
-                  <span className="ops-product-row__name">{prod.name}</span>
-                  <span><Tags label={prod.technical.label} color={prod.technical.color} contrast="low" size="default" shape="pill" /></span>
-                  <span><Tags label={prod.adoption.label}  color={prod.adoption.color}  contrast="low" size="default" shape="pill" /></span>
-                </div>
-              </React.Fragment>
+            {PRODUCTS.map((prod) => (
+              <div key={prod.name} className="ops-product-row">
+                <span className="ops-product-row__name">{prod.name}</span>
+                {/* Status as ● glyph + label, not a pill. Six pills across
+                    three rows was visually monotonous — dot-prefixed text
+                    reads as a list, not a sticker collection. The dot
+                    carries the color signal; the word carries the meaning. */}
+                <StatusDot color={prod.technical.color} label={prod.technical.label} />
+                <StatusDot color={prod.adoption.color}  label={prod.adoption.label}  />
+              </div>
             ))}
           </div>
 
           <div className="ops-section__footer">
-            <Link href="#" color="blue" size="14px">Open Account Health</Link>
+            <Button kind="ghost-brand" size="small">Open Account Health</Button>
           </div>
         </section>
 
-        <div className="ops-sep" aria-hidden="true" />
 
         {/* ── SUGGESTIONS ── */}
         <section className="ops-section" aria-label="AI Suggestions">
@@ -641,63 +644,91 @@ const PANEL_CSS = `
     box-sizing: border-box;
   }
 
-  /* ── Section separator — full-bleed 1px rule ─────────────────────────── */
-  .ops-sep {
-    height: 1px;
-    background-color: var(--ds-lines-neutral-tile-rest);
-    flex-shrink: 0;
-    margin: 0;
-  }
-
-  /* ── Panel header ────────────────────────────────────────────────────── */
+  /* ── Panel header — identity zone ────────────────────────────────────────
+     Avatar + account name + opportunity link form the identity row. Below
+     it, a quiet metadata strip gives the AE the context they actually need
+     (industry, region, owner, last activity) without adding controls. */
   .ops-panel__header {
     display: flex;
     align-items: flex-start;
-    gap: var(--ds-spacing-05);
-    padding: var(--ds-spacing-05) var(--ds-spacing-05) var(--ds-spacing-04);
+    gap: var(--ds-spacing-04);
+    padding: var(--ds-spacing-06) var(--ds-spacing-06) var(--ds-spacing-03);
+  }
+  .ops-panel__identity {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: var(--ds-spacing-04);
+  }
+  .ops-panel__avatar {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    border-radius: var(--ds-radius-standard);
+    background-color: var(--ds-surface-accent-rest);
+    color: var(--ds-text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.4px;
+    user-select: none;
   }
   .ops-panel__title-group {
     flex: 1;
     min-width: 0;
     display: flex;
     flex-direction: column;
-    gap: var(--ds-spacing-02);
+    gap: 2px;
   }
   .ops-panel__account-name {
-    font-size: 20px;
-    font-weight: 700;
+    font-size: 22px;
+    font-weight: 600;
     line-height: 28px;
-    letter-spacing: 0.25px;
+    letter-spacing: -0.1px;
     color: var(--ds-text-primary);
     margin: 0;
   }
+  .ops-panel__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--ds-spacing-03);
+    align-items: center;
+    padding: 0 var(--ds-spacing-06) var(--ds-spacing-06);
+    font-size: 12px;
+    line-height: 16px;
+    color: var(--ds-text-tertiary-rest);
+  }
+  .ops-panel__meta > span[aria-hidden="true"] { opacity: 0.6; }
 
-  /* ── Section ─────────────────────────────────────────────────────────── */
+  /* ── Section ─────────────────────────────────────────────────────────────
+     Sections are separated by *space*, not lines. 32px between each section
+     bottom and the next eyebrow gives sections room to breathe and reads as
+     a continuous narrative rather than a stack of bordered widgets. */
   .ops-section {
     display: flex;
     flex-direction: column;
-    gap: var(--ds-spacing-03);
-    padding: 0 var(--ds-spacing-05) var(--ds-spacing-04);
+    padding: 0 var(--ds-spacing-06) var(--ds-spacing-07);
   }
   .ops-section__hd {
     display: flex;
     align-items: center;
-    padding-top: var(--ds-spacing-05);
-    padding-bottom: var(--ds-spacing-03);
-    font-size: 12px;
-    font-weight: 700;
+    padding-bottom: var(--ds-spacing-04);
+    font-size: 11px;
+    font-weight: 600;
     line-height: 16px;
-    letter-spacing: 0.8px;
+    letter-spacing: 0.6px;
     text-transform: uppercase;
     color: var(--ds-text-tertiary-rest);
   }
-  /* Section footer holds a navigation link (Link, not Button). No padding
-     offset to compensate for, so the link sits naturally aligned with the
-     section's left padding edge — same column as data row labels above. */
+  /* Footer button sits at the section's left padding edge with adequate
+     breathing room from the panel right edge (16px+ via section padding). */
   .ops-section__footer {
     display: flex;
     align-items: center;
-    padding-top: var(--ds-spacing-03);
+    padding-top: var(--ds-spacing-04);
   }
 
   /* ── Standalone row divider — 1px hairline between rows ─────────────────
@@ -715,33 +746,34 @@ const PANEL_CSS = `
   .ops-divider:has(+ .ops-accordion-entry.is-open),
   .ops-accordion-entry.is-open + .ops-divider { display: none; }
 
-  /* ── Key-value data rows ─────────────────────────────────────────────── */
-  .ops-data-table { display: flex; flex-direction: column; }
+  /* ── Key-value data rows ─────────────────────────────────────────────────
+     Hierarchy is carried through weight + tone, not color. Labels are
+     quiet (secondary 400). Values are the data — primary text, weight 500,
+     tabular numerals so dollar columns align by digit not by character. */
+  .ops-data-table {
+    display: flex;
+    flex-direction: column;
+  }
   .ops-data-row {
     display: flex;
     align-items: center;
     min-height: 32px;
-    padding: 0 var(--ds-spacing-02);
   }
   .ops-data-row__label {
     flex: 1;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.25px;
+    line-height: 20px;
     color: var(--ds-text-secondary-rest);
   }
   .ops-data-row__value {
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.25px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
     color: var(--ds-text-primary);
     text-align: right;
-  }
-  .ops-data-row__value--brand {
-    color: var(--ds-text-brand-rest);
-    font-weight: 700;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-variant-numeric: tabular-nums;
   }
   .ops-data-row--outcome { cursor: default; }
 
@@ -777,7 +809,10 @@ const PANEL_CSS = `
   }
   .ops-outcome-trigger .panw--tag { cursor: pointer; }
 
-  /* ── Sales Play accordion ────────────────────────────────────────────── */
+  /* ── Sales Play accordion ────────────────────────────────────────────────
+     Each row is title (left, weight 500) + amount (right, tabular). The
+     chevron is the disclosure affordance. The neutral-pill + minus-circle
+     decoration is gone — the data carries itself, the row is the chrome. */
   .ops-salesplay-list { display: flex; flex-direction: column; }
   .ops-accordion-entry { display: flex; flex-direction: column; }
 
@@ -786,16 +821,13 @@ const PANEL_CSS = `
     align-items: center;
     gap: var(--ds-spacing-03);
     min-height: 36px;
-    padding: var(--ds-spacing-03);
+    padding: 0 var(--ds-spacing-02);
     border-radius: var(--ds-radius-tight);
     cursor: pointer;
     user-select: none;
     transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9);
   }
   .ops-accordion-row:hover { background-color: var(--ds-ghost-hover); }
-  /* Hide the divider immediately above a hovered accordion row so the hover
-     ground reads as the only line — keeps the row-as-touch-target legible. */
-  .ops-divider:has(+ .ops-accordion-entry .ops-accordion-row:hover) { visibility: hidden; }
 
   .ops-accordion-chevron {
     display: flex;
@@ -816,11 +848,19 @@ const PANEL_CSS = `
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
-    font-size: 14px;
-    font-weight: 700;
-    line-height: 16px;
-    letter-spacing: 0.25px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
     color: var(--ds-text-primary);
+  }
+  .ops-accordion-amount {
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
+    color: var(--ds-text-primary);
+    flex-shrink: 0;
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-variant-numeric: tabular-nums;
   }
 
   .ops-accordion-content {
@@ -855,14 +895,12 @@ const PANEL_CSS = `
     min-height: 32px;
     padding: 0 var(--ds-spacing-02);
   }
-
   .ops-deal-row__name {
     flex: 1;
     min-width: 0;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.25px;
+    line-height: 20px;
     color: var(--ds-text-secondary-rest);
   }
   .ops-deal-status {
@@ -886,11 +924,12 @@ const PANEL_CSS = `
   .ops-deal-icon--adjust  { color: var(--ds-icons-secondary-rest); }
   .ops-deal-icon--cross   { color: var(--ds-icons-danger-rest); }
   .ops-deal-amount {
-    font-size: 12px;
-    font-weight: 700;
-    line-height: 16px;
-    letter-spacing: 0.25px;
+    font-size: 13px;
+    font-weight: 500;
+    line-height: 20px;
     color: var(--ds-text-primary);
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-variant-numeric: tabular-nums;
   }
 
   /* ── Account health ──────────────────────────────────────────────────── */
@@ -898,61 +937,88 @@ const PANEL_CSS = `
   .ops-health-row {
     display: flex;
     align-items: center;
-    min-height: 40px;
-    padding: 0 var(--ds-spacing-02);
+    min-height: 36px;
   }
   .ops-health-row__label {
     flex: 1;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.25px;
+    line-height: 20px;
     color: var(--ds-text-secondary-rest);
   }
   .ops-health-row--primary .ops-health-row__label {
-    font-weight: 700;
+    font-weight: 600;
     color: var(--ds-text-primary);
   }
-  .ops-health-subheader {
+
+  /* Sub-heading replaces the prior all-caps sub-eyebrow. Sentence case,
+     tertiary, no tracking. Quietly introduces the product table without
+     stacking a second uppercase eyebrow inside the section. */
+  .ops-health-subheading {
     font-size: 12px;
-    font-weight: 700;
+    font-weight: 500;
     line-height: 16px;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
     color: var(--ds-text-tertiary-rest);
-    padding: var(--ds-spacing-04) var(--ds-spacing-02) var(--ds-spacing-03);
+    padding: var(--ds-spacing-05) 0 var(--ds-spacing-03);
   }
 
-  /* Product health mini-table */
+  /* Product health mini-table — pills replaced with dot + label
+     since six pills in a 3 by 2 grid was visually monotonous. */
   .ops-product-table { display: flex; flex-direction: column; width: 100%; }
   .ops-product-table-header {
     display: grid;
-    grid-template-columns: 1fr 80px 80px;
-    padding: var(--ds-spacing-02) var(--ds-spacing-02) var(--ds-spacing-03);
+    grid-template-columns: 1fr 96px 96px;
+    padding: 0 0 var(--ds-spacing-02);
   }
   .ops-product-table-hd {
-    font-size: 12px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 600;
     line-height: 16px;
-    letter-spacing: 0.25px;
-    color: var(--ds-text-secondary-rest);
+    letter-spacing: 0.4px;
+    text-transform: uppercase;
+    color: var(--ds-text-tertiary-rest);
   }
   .ops-product-row {
     display: grid;
-    grid-template-columns: 1fr 80px 80px;
+    grid-template-columns: 1fr 96px 96px;
     align-items: center;
     min-height: 32px;
-    padding: 0 var(--ds-spacing-02);
   }
   .ops-product-row__name {
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
-    line-height: 18px;
-    letter-spacing: 0.25px;
+    line-height: 20px;
     color: var(--ds-text-secondary-rest);
   }
 
-  /* ── AI Suggestion cards ─────────────────────────────────────────────── */
+  /* ── Status dot — color glyph + label, replaces small pills ──────────── */
+  .ops-status-dot {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--ds-spacing-03);
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 20px;
+    color: var(--ds-text-secondary-rest);
+  }
+  .ops-status-dot__glyph {
+    width: 8px;
+    height: 8px;
+    flex-shrink: 0;
+    border-radius: 50%;
+    background-color: currentColor;
+  }
+  .ops-status-dot[data-color="green"]  .ops-status-dot__glyph { color: var(--ds-icons-success-rest); }
+  .ops-status-dot[data-color="red"]    .ops-status-dot__glyph { color: var(--ds-icons-danger-rest); }
+  .ops-status-dot[data-color="orange"] .ops-status-dot__glyph { color: var(--ds-icons-caution-rest); }
+  .ops-status-dot[data-color="grey"]   .ops-status-dot__glyph { color: var(--ds-icons-secondary-rest); }
+  .ops-status-dot[data-color="jade"]   .ops-status-dot__glyph { color: var(--ds-icons-success-rest); }
+
+  /* ── AI Suggestion cards — quiet alt-surface tiles ──────────────────────
+     Dropped the tile-on-tile shadow. Kept a 1px lines-neutral-tile border
+     as the only chrome — the alt-surface tint alone was so subtle the
+     cards melted into the panel ground. Border gives them a footprint
+     without re-introducing the shadow-card weight. */
   .ops-suggestions {
     display: flex;
     flex-direction: column;
@@ -963,34 +1029,36 @@ const PANEL_CSS = `
     align-items: flex-start;
     gap: var(--ds-spacing-04);
     padding: var(--ds-spacing-04);
-    background-color: var(--ds-surface-rest);
-    border: 1px solid var(--ds-lines-neutral-rest);
-    border-radius: var(--ds-radius-standard);
-    box-shadow: var(--ds-shadow-tile-on-tile);
+    background-color: var(--ds-surface-alt-rest);
+    border: 1px solid var(--ds-lines-neutral-tile-rest);
+    border-radius: var(--ds-radius-tight);
     cursor: pointer;
     text-align: left;
     font-family: inherit;
-    transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9);
+    transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9),
+                border-color 110ms cubic-bezier(0.2,0,0.38,0.9);
   }
-  .ops-prompt-card:hover { background-color: var(--ds-ghost-hover); }
+  .ops-prompt-card:hover {
+    background-color: var(--ds-ghost-hover);
+    border-color: var(--ds-lines-neutral-rest);
+  }
   .ops-prompt-card:focus-visible {
     outline: 2px solid var(--ds-lines-brand-rest);
     outline-offset: 2px;
   }
   .ops-prompt-icon {
-    width: 16px;
-    height: 16px;
+    width: 14px;
+    height: 14px;
     flex-shrink: 0;
     color: var(--ds-icons-brand-rest);
-    margin-top: 2px;
+    margin-top: 3px;
   }
   .ops-prompt-text {
     flex: 1;
     min-width: 0;
-    font-size: 14px;
+    font-size: 13px;
     font-weight: 400;
     line-height: 20px;
-    letter-spacing: 0.25px;
     color: var(--ds-text-primary);
   }
 `

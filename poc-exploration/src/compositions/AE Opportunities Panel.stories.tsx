@@ -4,6 +4,8 @@ import { Button } from '@ds/button'
 import { Tags } from '@ds/tags'
 import { Link } from '@ds/link'
 import { Flyout, FlyoutList, FlyoutItem } from '@ds/flyout'
+import { Dropdown } from '@ds/dropdown'
+import { TextEntry } from '@ds/text-entry'
 
 const meta: Meta = {
   title: 'compositions/AE Opportunities Panel',
@@ -223,7 +225,15 @@ function SalesPlayAccordion({ play, open, onToggle }: { play: SalesPlay; open: b
         />
       </div>
       <div className="ops-accordion-content" role="region" aria-label={`${play.title} deals`}>
-        {play.deals.map((d) => <DealRow key={d.name} deal={d} />)}
+        {/* Divider between the accordion title row and the first deal row,
+            since the row no longer carries a border-bottom of its own. */}
+        <div className="ops-divider" />
+        {play.deals.map((d, i) => (
+          <React.Fragment key={d.name}>
+            {i > 0 && <div className="ops-divider" />}
+            <DealRow deal={d} />
+          </React.Fragment>
+        ))}
       </div>
     </div>
   )
@@ -235,10 +245,22 @@ function OpportunityPanel() {
   const [outcomeOpen, setOutcomeOpen]     = useState(false)
   const [outcome, setOutcome]             = useState<string>('unknown')
   const [openPlays, setOpenPlays]         = useState<Record<string, boolean>>({})
+  const [churnReason, setChurnReason]     = useState<string | undefined>(undefined)
+  const [competitor, setCompetitor]       = useState<string | undefined>(undefined)
+  const [notes, setNotes]                 = useState<string>('')
   const outcomeRef = useRef<HTMLButtonElement | null>(null)
 
   const togglePlay = (id: string) => setOpenPlays((p) => ({ ...p, [id]: !p[id] }))
   const currentOutcome = OUTCOMES.find((o) => o.value === outcome) ?? OUTCOMES[0]
+  const formVisible   = outcome !== 'unknown'
+  const churnVisible  = outcome === 'churn'
+
+  const cancelRenewal = () => {
+    setOutcome('unknown')
+    setChurnReason(undefined)
+    setCompetitor(undefined)
+    setNotes('')
+  }
 
   return (
     <div className="stage ops-stage">
@@ -260,8 +282,13 @@ function OpportunityPanel() {
           <div className="ops-section__hd">RENEWALS</div>
 
           <div className="ops-data-table">
-            {RENEWAL_ROWS.map((r) => <DataRow key={r.label} {...r} />)}
-
+            {RENEWAL_ROWS.map((r, i) => (
+              <React.Fragment key={r.label}>
+                {i > 0 && <div className="ops-divider" />}
+                <DataRow {...r} />
+              </React.Fragment>
+            ))}
+            <div className="ops-divider" />
             <div className="ops-data-row ops-data-row--outcome">
               <span className="ops-data-row__label">Renewal Outcome:</span>
               <div className="ops-outcome-wrapper">
@@ -274,10 +301,11 @@ function OpportunityPanel() {
                 >
                   {/*
                     DS Tags only renders icons as leading slot. The original
-                    panel puts the chevron *after* the label, so render the
-                    BEM markup directly to keep the trailing-icon order.
+                    panel puts the chevron *after* the label, so render BEM
+                    markup directly. `panw--tag--shape-pill` is required —
+                    the base `.panw--tag` does not set a radius.
                   */}
-                  <span className={`panw--tag panw--tag--size-default panw--tag--low panw--tag--${currentOutcome.color}`} role="presentation">
+                  <span className={`panw--tag panw--tag--size-default panw--tag--shape-pill panw--tag--low panw--tag--${currentOutcome.color}`} role="presentation">
                     <span className="panw--tag__label">{currentOutcome.label}</span>
                     <span className="panw--tag__icon" aria-hidden="true"><IconChevronDownTag /></span>
                   </span>
@@ -301,8 +329,62 @@ function OpportunityPanel() {
             </div>
           </div>
 
+          {formVisible && (
+            <div className="ops-renewal-form" role="group" aria-label="Renewal details">
+              {churnVisible && (
+                <>
+                  <Dropdown
+                    title="Churn / Dismissal Reason"
+                    placeholder="Select"
+                    showDescription={false}
+                    background="grey00"
+                    selectedValue={churnReason}
+                    onChange={(v) => setChurnReason(v)}
+                    options={[
+                      { label: 'Customer dissatisfied',     value: 'dissatisfied' },
+                      { label: 'Budget cut',                value: 'budget' },
+                      { label: 'Competitive displacement',  value: 'competitive' },
+                      { label: 'End of life',               value: 'eol' },
+                      { label: 'Other',                     value: 'other' },
+                    ]}
+                  />
+                  <Dropdown
+                    title="Competitor Replacement"
+                    placeholder="Select"
+                    showDescription={false}
+                    background="grey00"
+                    selectedValue={competitor}
+                    onChange={(v) => setCompetitor(v)}
+                    options={[
+                      { label: 'Crowdstrike', value: 'crowdstrike' },
+                      { label: 'Fortinet',    value: 'fortinet' },
+                      { label: 'SentinelOne', value: 'sentinelone' },
+                      { label: 'Cisco',       value: 'cisco' },
+                      { label: 'Other',       value: 'other' },
+                    ]}
+                  />
+                </>
+              )}
+
+              <TextEntry
+                title="Notes"
+                inputType="area"
+                placeholder="Optional notes."
+                showDescription={false}
+                background="grey-00"
+                value={notes}
+                onChange={(v) => setNotes(v)}
+              />
+
+              <div className="ops-form-actions">
+                <Button kind="secondary" size="small" onClick={cancelRenewal}>Cancel</Button>
+                <Button kind="primary"   size="small" onClick={() => { /* save */ }}>Save</Button>
+              </div>
+            </div>
+          )}
+
           <div className="ops-section__footer">
-            <Button kind="ghost-brand" size="small">Open in Renewal Workspace</Button>
+            <Link href="#" color="blue" size="14px">Open in Renewal Workspace</Link>
           </div>
         </section>
 
@@ -312,10 +394,15 @@ function OpportunityPanel() {
         <section className="ops-section" aria-label="Install Base">
           <div className="ops-section__hd">INSTALL BASE</div>
           <div className="ops-data-table">
-            {INSTALL_BASE_ROWS.map((r) => <DataRow key={r.label} {...r} />)}
+            {INSTALL_BASE_ROWS.map((r, i) => (
+              <React.Fragment key={r.label}>
+                {i > 0 && <div className="ops-divider" />}
+                <DataRow {...r} />
+              </React.Fragment>
+            ))}
           </div>
           <div className="ops-section__footer">
-            <Button kind="ghost-brand" size="small">Open Customer Estate</Button>
+            <Link href="#" color="blue" size="14px">Open Customer Estate</Link>
           </div>
         </section>
 
@@ -325,17 +412,19 @@ function OpportunityPanel() {
         <section className="ops-section" aria-label="Sales Play">
           <div className="ops-section__hd">SALES PLAY</div>
           <div className="ops-salesplay-list">
-            {SALES_PLAYS.map((p) => (
-              <SalesPlayAccordion
-                key={p.id}
-                play={p}
-                open={!!openPlays[p.id]}
-                onToggle={() => togglePlay(p.id)}
-              />
+            {SALES_PLAYS.map((p, i) => (
+              <React.Fragment key={p.id}>
+                {i > 0 && <div className="ops-divider" />}
+                <SalesPlayAccordion
+                  play={p}
+                  open={!!openPlays[p.id]}
+                  onToggle={() => togglePlay(p.id)}
+                />
+              </React.Fragment>
             ))}
           </div>
           <div className="ops-section__footer">
-            <Button kind="ghost-brand" size="small">Open in Sales Play Console</Button>
+            <Link href="#" color="blue" size="14px">Open in Sales Play Console</Link>
           </div>
         </section>
 
@@ -346,14 +435,22 @@ function OpportunityPanel() {
           <div className="ops-section__hd">ACCOUNT HEALTH</div>
 
           <div className="ops-health-rows">
-            {HEALTH_ROWS.map((row) => (
-              <div
-                key={row.label}
-                className={`ops-health-row${row.primary ? ' ops-health-row--primary' : ''}`}
-              >
-                <span className="ops-health-row__label">{row.label}</span>
-                <Tags label={row.value} color={row.color} contrast="low" size="default" />
-              </div>
+            {HEALTH_ROWS.map((row, i) => (
+              <React.Fragment key={row.label}>
+                {i > 0 && <div className="ops-divider" />}
+                <div
+                  className={`ops-health-row${row.primary ? ' ops-health-row--primary' : ''}`}
+                >
+                  <span className="ops-health-row__label">{row.label}</span>
+                  <Tags
+                    label={row.value}
+                    color={row.color}
+                    contrast="low"
+                    size="default"
+                    shape="pill"
+                  />
+                </div>
+              </React.Fragment>
             ))}
           </div>
 
@@ -365,17 +462,20 @@ function OpportunityPanel() {
               <span className="ops-product-table-hd">Technical</span>
               <span className="ops-product-table-hd">Adoption</span>
             </div>
-            {PRODUCTS.map((prod) => (
-              <div key={prod.name} className="ops-product-row">
-                <span className="ops-product-row__name">{prod.name}</span>
-                <span><Tags label={prod.technical.label} color={prod.technical.color} contrast="low" size="default" /></span>
-                <span><Tags label={prod.adoption.label}  color={prod.adoption.color}  contrast="low" size="default" /></span>
-              </div>
+            {PRODUCTS.map((prod, i) => (
+              <React.Fragment key={prod.name}>
+                {i > 0 && <div className="ops-divider" />}
+                <div className="ops-product-row">
+                  <span className="ops-product-row__name">{prod.name}</span>
+                  <span><Tags label={prod.technical.label} color={prod.technical.color} contrast="low" size="default" shape="pill" /></span>
+                  <span><Tags label={prod.adoption.label}  color={prod.adoption.color}  contrast="low" size="default" shape="pill" /></span>
+                </div>
+              </React.Fragment>
             ))}
           </div>
 
           <div className="ops-section__footer">
-            <Button kind="ghost-brand" size="small">Open Account Health</Button>
+            <Link href="#" color="blue" size="14px">Open Account Health</Link>
           </div>
         </section>
 
@@ -407,12 +507,14 @@ function OpportunityPanel() {
 
 const PANEL_CSS = `
   /*
-   * Workaround for IACVT bug: --panw-button-* tokens in design-system are
-   * declared at :root referencing --ds-* semantics that only exist inside
-   * .stage. Re-declare them inside .stage so the substitution resolves.
-   * Also re-declares Flyout tokens. Track for DS fix.
+   * IACVT-bug workaround. --panw-* component tokens in the DS are declared at
+   * :root referencing --ds-* semantics that only exist inside .stage. Without
+   * a re-declaration inside .stage the :root values resolve to IACVT and
+   * propagate down as invalid even on .stage descendants. Lifted verbatim
+   * from .tmp/drafts/opportunity-snapshot.html. Track for DS fix.
    */
   .stage {
+    /* Button — primary / secondary / ghost / ghost-brand */
     --panw-button-primary-bg:               var(--ds-brand-rest);
     --panw-button-primary-bg-hover:         var(--ds-brand-hover);
     --panw-button-primary-bg-active:        var(--ds-brand-pressed);
@@ -443,6 +545,74 @@ const PANEL_CSS = `
     --panw-button-ghost-brand-text-hover:   var(--ds-text-brand-hover);
     --panw-button-ghost-brand-text-pressed: var(--ds-text-brand-pressed);
     --panw-button-ghost-brand-text-disabled:var(--ds-text-brand-disabled);
+
+    /* Link */
+    --panw-link-blue-default:  var(--ds-text-link-rest);
+    --panw-link-blue-hover:    var(--ds-text-link-hover);
+    --panw-link-blue-pressed:  var(--ds-text-link-pressed);
+    --panw-link-blue-disabled: var(--ds-text-link-disabled);
+
+    /* Dropdown */
+    --panw-dropdown-bg:                var(--ds-field-rest);
+    --panw-dropdown-bg-hover:          var(--ds-field-hover);
+    --panw-dropdown-bg-pressed:        var(--ds-field-pressed);
+    --panw-dropdown-bg-active:         var(--ds-field-selected);
+    --panw-dropdown-bg-disabled:       var(--ds-field-disabled);
+    --panw-dropdown-bg-alt:            var(--ds-field-alt-rest);
+    --panw-dropdown-bg-alt-hover:      var(--ds-field-alt-hover);
+    --panw-dropdown-bg-alt-pressed:    var(--ds-field-alt-pressed);
+    --panw-dropdown-border:            var(--ds-lines-neutral-rest);
+    --panw-dropdown-border-hover:      var(--ds-lines-neutral-hover);
+    --panw-dropdown-border-focus:      var(--ds-lines-brand-rest);
+    --panw-dropdown-border-error:      var(--ds-lines-danger-rest);
+    --panw-dropdown-border-disabled:   var(--ds-lines-neutral-disabled);
+    --panw-dropdown-title:             var(--ds-text-secondary-rest);
+    --panw-dropdown-title-disabled:    var(--ds-text-secondary-disabled);
+    --panw-dropdown-text:              var(--ds-text-primary);
+    --panw-dropdown-text-disabled:     var(--ds-text-secondary-disabled);
+    --panw-dropdown-placeholder:       var(--ds-text-placeholder-rest);
+    --panw-dropdown-description:       var(--ds-text-tertiary-rest);
+    --panw-dropdown-chevron:           var(--ds-icons-secondary-rest);
+    --panw-dropdown-chevron-disabled:  var(--ds-icons-secondary-disabled);
+    --panw-dropdown-icon:              var(--ds-icons-secondary-rest);
+    --panw-dropdown-icon-hover:        var(--ds-icons-secondary-hover);
+    --panw-dropdown-icon-disabled:     var(--ds-icons-disabled);
+    --panw-dropdown-menu-bg:           var(--ds-surface-rest);
+    --panw-dropdown-menu-item-hover:   var(--ds-ghost-hover);
+    --panw-dropdown-menu-item-pressed: var(--ds-ghost-pressed);
+    --panw-dropdown-menu-selected-bg:  var(--ds-highlight-rest);
+    --panw-dropdown-menu-selected-fg:  var(--ds-text-brand-rest);
+    --panw-dropdown-description-disabled: var(--ds-text-tertiary-disabled);
+    --panw-dropdown-helper:            var(--ds-text-tertiary-rest);
+    --panw-dropdown-helper-error:      var(--ds-text-danger-rest);
+    --panw-dropdown-helper-success:    var(--ds-text-success-rest);
+    --panw-dropdown-helper-disabled:   var(--ds-text-tertiary-disabled);
+
+    /* Text entry */
+    --panw-te-bg:               var(--ds-field-rest);
+    --panw-te-bg-hover:         var(--ds-field-hover);
+    --panw-te-bg-pressed:       var(--ds-field-pressed);
+    --panw-te-bg-active:        var(--ds-field-selected);
+    --panw-te-bg-disabled:      var(--ds-field-disabled);
+    --panw-te-bg-alt:           var(--ds-field-alt-rest);
+    --panw-te-bg-alt-hover:     var(--ds-field-alt-hover);
+    --panw-te-bg-alt-pressed:   var(--ds-field-alt-pressed);
+    --panw-te-border:           var(--ds-lines-neutral-rest);
+    --panw-te-border-focus:     var(--ds-lines-brand-rest);
+    --panw-te-border-error:     var(--ds-lines-danger-rest);
+    --panw-te-border-disabled:  var(--ds-lines-neutral-disabled);
+    --panw-te-title:            var(--ds-text-secondary-rest);
+    --panw-te-title-disabled:   var(--ds-text-secondary-disabled);
+    --panw-te-text:             var(--ds-text-primary);
+    --panw-te-text-disabled:    var(--ds-text-secondary-disabled);
+    --panw-te-placeholder:      var(--ds-text-placeholder-rest);
+    --panw-te-description:      var(--ds-text-tertiary-rest);
+    --panw-te-description-disabled: var(--ds-text-tertiary-disabled);
+    --panw-te-counter:          var(--ds-text-tertiary-rest);
+    --panw-te-counter-disabled: var(--ds-text-tertiary-disabled);
+    --panw-te-icon:             var(--ds-icons-secondary-rest);
+    --panw-te-icon-hover:       var(--ds-icons-secondary-hover);
+    --panw-te-icon-disabled:    var(--ds-icons-disabled);
   }
 
   /* ── Page scaffold ───────────────────────────────────────────────────── */
@@ -521,9 +691,29 @@ const PANEL_CSS = `
     text-transform: uppercase;
     color: var(--ds-text-tertiary-rest);
   }
-  /* Ghost-brand button has 12px internal left padding — pull it left so its
-     label aligns with section content. */
-  .ops-section__footer { margin-left: -12px; }
+  /* Section footer holds a navigation link (Link, not Button). No padding
+     offset to compensate for, so the link sits naturally aligned with the
+     section's left padding edge — same column as data row labels above. */
+  .ops-section__footer {
+    display: flex;
+    align-items: center;
+    padding-top: var(--ds-spacing-03);
+  }
+
+  /* ── Standalone row divider — 1px hairline between rows ─────────────────
+     Per stage-spacing.md: dividers are their own elements, not border-bottom
+     on rounded rows (rounded radius peels the line away from the row corners
+     and produces a visible "uplift" gap). */
+  .ops-divider {
+    height: 1px;
+    background-color: var(--ds-lines-neutral-tile-rest);
+    flex-shrink: 0;
+  }
+  /* Hide dividers immediately adjacent to an open accordion entry (the open
+     entry already lifts to its own tile so a divider next to it would
+     double up on visual separation). */
+  .ops-divider:has(+ .ops-accordion-entry.is-open),
+  .ops-accordion-entry.is-open + .ops-divider { display: none; }
 
   /* ── Key-value data rows ─────────────────────────────────────────────── */
   .ops-data-table { display: flex; flex-direction: column; }
@@ -532,8 +722,6 @@ const PANEL_CSS = `
     align-items: center;
     min-height: 32px;
     padding: 0 var(--ds-spacing-02);
-    border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
-    border-radius: var(--ds-radius-tight);
   }
   .ops-data-row__label {
     flex: 1;
@@ -556,6 +744,23 @@ const PANEL_CSS = `
     font-weight: 700;
   }
   .ops-data-row--outcome { cursor: default; }
+
+  /* ── Renewal edit form ───────────────────────────────────────────────── */
+  /* Revealed when outcome ≠ 'unknown'. Churn-only fields surface for 'churn'. */
+  .ops-renewal-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-spacing-05);
+    padding-top: var(--ds-spacing-04);
+  }
+  .ops-renewal-form .panw--dropdown,
+  .ops-renewal-form .panw--text-entry { width: 100%; }
+
+  .ops-form-actions {
+    display: flex;
+    gap: var(--ds-spacing-02);
+    justify-content: flex-end;
+  }
 
   /* ── Outcome trigger (tag-as-button) ─────────────────────────────────── */
   .ops-outcome-wrapper { position: relative; }
@@ -582,21 +787,15 @@ const PANEL_CSS = `
     gap: var(--ds-spacing-03);
     min-height: 36px;
     padding: var(--ds-spacing-03);
-    border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
     border-radius: var(--ds-radius-tight);
     cursor: pointer;
     user-select: none;
-    transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9),
-                border-bottom-color 110ms cubic-bezier(0.2,0,0.38,0.9);
+    transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9);
   }
-  .ops-accordion-row:hover {
-    background-color: var(--ds-ghost-hover);
-    border-bottom-color: transparent;
-  }
-  .ops-accordion-entry:has(+ .ops-accordion-entry .ops-accordion-row:hover) .ops-accordion-row {
-    border-bottom-color: transparent;
-  }
-  .ops-accordion-entry.is-open > .ops-accordion-row { border-bottom-color: transparent; }
+  .ops-accordion-row:hover { background-color: var(--ds-ghost-hover); }
+  /* Hide the divider immediately above a hovered accordion row so the hover
+     ground reads as the only line — keeps the row-as-touch-target legible. */
+  .ops-divider:has(+ .ops-accordion-entry .ops-accordion-row:hover) { visibility: hidden; }
 
   .ops-accordion-chevron {
     display: flex;
@@ -645,9 +844,8 @@ const PANEL_CSS = `
     margin: 4px 0;
     overflow: hidden;
   }
-  .ops-accordion-entry.is-open > .ops-accordion-row {
-    border-bottom-color: var(--ds-lines-neutral-tile-rest);
-  }
+  /* When the accordion entry is open, the row-to-content divider lives inside
+     the entry as a regular .ops-divider sibling. */
 
   /* ── Deal child rows ─────────────────────────────────────────────────── */
   .ops-deal-row {
@@ -656,10 +854,7 @@ const PANEL_CSS = `
     gap: var(--ds-spacing-03);
     min-height: 32px;
     padding: 0 var(--ds-spacing-02);
-    border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
-    border-radius: var(--ds-radius-tight);
   }
-  .ops-accordion-content .ops-deal-row:last-child { border-bottom: none; }
 
   .ops-deal-row__name {
     flex: 1;
@@ -705,8 +900,6 @@ const PANEL_CSS = `
     align-items: center;
     min-height: 40px;
     padding: 0 var(--ds-spacing-02);
-    border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
-    border-radius: var(--ds-radius-tight);
   }
   .ops-health-row__label {
     flex: 1;
@@ -750,8 +943,6 @@ const PANEL_CSS = `
     align-items: center;
     min-height: 32px;
     padding: 0 var(--ds-spacing-02);
-    border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
-    border-radius: var(--ds-radius-tight);
   }
   .ops-product-row__name {
     font-size: 14px;

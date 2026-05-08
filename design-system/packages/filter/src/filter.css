@@ -1,6 +1,11 @@
-/* @ds/filter — button trigger + popover with checkbox list and Apply/Cancel.
-   Tokens read from the host's design-system theme (var(--ds-*)) with safe
-   fallbacks so the component still renders in unthemed contexts. */
+/* @ds/filter — trigger button only. The popover is composed from @ds/flyout
+   so this file deliberately ships no panel/list/footer styles; those live
+   in the flyout's own stylesheet and stay aligned with yesterday's flyout
+   pass (320px width, 2px row gap, motion entrance, divider, shadow).
+
+   Tokens are read bare without hex fallbacks per the design-system
+   convention — the host's .stage scope owns IACVT workarounds for any
+   token that isn't defined natively. */
 
 .panw--filter__wrapper {
   position: relative;
@@ -10,37 +15,37 @@
 .panw--filter {
   display: inline-flex;
   align-items: center;
-  gap: 6px;
-  padding: 4px 8px 4px 10px;
-  background: var(--ds-field-rest, #ffffff);
-  border: 1px solid var(--ds-lines-neutral-rest, #d1d6da);
-  border-radius: var(--ds-radius-tight, 4px);
+  gap: var(--ds-spacing-02);
+  padding: var(--ds-spacing-02) var(--ds-spacing-03);
+  background: var(--ds-field-rest);
+  border: 1px solid var(--ds-lines-neutral-rest);
+  border-radius: var(--ds-radius-tight);
   cursor: pointer;
   font-family: inherit;
   font-size: 13px;
   line-height: 18px;
-  color: var(--ds-text-primary, #0f0f0f);
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+  min-height: 28px;
   transition:
     background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
     border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
     color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
-  white-space: nowrap;
-  min-height: 28px;
 }
 
 .panw--filter:hover {
-  background: var(--ds-ghost-hover, #f4f4f4);
-  border-color: var(--ds-lines-neutral-hover, #b3b3b3);
+  background: var(--ds-ghost-hover);
+  border-color: var(--ds-lines-neutral-hover);
 }
 
 .panw--filter:active,
 .panw--filter--open {
-  background: var(--ds-ghost-pressed, #e4e8eb);
-  border-color: var(--ds-lines-neutral-hover, #b3b3b3);
+  background: var(--ds-ghost-pressed);
+  border-color: var(--ds-lines-neutral-hover);
 }
 
 .panw--filter:focus-visible {
-  outline: 2px solid var(--ds-text-brand-rest, #006fcc);
+  outline: 2px solid var(--ds-text-brand-rest);
   outline-offset: 1px;
 }
 
@@ -57,70 +62,5 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  color: var(--ds-icons-secondary-rest, #404a52);
-}
-
-/* ── Popover panel ───────────────────────────────────────────────────────── */
-.panw--filter__panel {
-  position: absolute;
-  top: calc(100% + 4px);
-  left: 0;
-  z-index: 1000;
-  background: var(--ds-surface-rest, #ffffff);
-  border: 1px solid var(--ds-lines-neutral-rest, #d1d6da);
-  border-radius: var(--ds-radius-tight, 4px);
-  box-shadow:
-    0 2px 4px rgba(15, 15, 15, 0.06),
-    0 4px 12px rgba(15, 15, 15, 0.08);
-  display: flex;
-  flex-direction: column;
-  max-height: 360px;
-  overflow: hidden;
-  font-family: inherit;
-  font-size: 13px;
-  line-height: 18px;
-  color: var(--ds-text-primary, #0f0f0f);
-}
-
-.panw--filter__list {
-  overflow-y: auto;
-  padding: 4px 0;
-  flex: 1;
-  min-height: 0;
-}
-
-.panw--filter__item {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 12px;
-  cursor: pointer;
-  user-select: none;
-  border-radius: 0;
-  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
-}
-
-.panw--filter__item:hover {
-  background: var(--ds-ghost-hover, #f4f4f4);
-}
-
-.panw--filter__item:active {
-  background: var(--ds-ghost-pressed, #e4e8eb);
-}
-
-.panw--filter__item-label {
-  flex: 1;
-  min-width: 0;
-  color: inherit;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.panw--filter__footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 4px;
-  padding: 8px;
-  border-top: 1px solid var(--ds-lines-neutral-rest, #d1d6da);
+  color: var(--ds-icons-secondary-rest);
 }

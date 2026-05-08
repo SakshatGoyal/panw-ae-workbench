@@ -11,7 +11,7 @@
   "dependencies": {
     "classnames": "^2.5.1",
     "@ds/button": "workspace:*",
-    "@ds/checkbox": "workspace:*",
+    "@ds/flyout": "workspace:*",
     "@ds/icons": "workspace:*",
     "@ds/tags": "workspace:*"
   },

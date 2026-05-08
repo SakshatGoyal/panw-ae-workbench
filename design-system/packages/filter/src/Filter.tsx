@@ -2,8 +2,13 @@ import * as React from 'react';
 import classNames from 'classnames';
 import { ChevronDown, ChevronUp } from '@ds/icons';
 import { Tags } from '@ds/tags';
-import { Checkbox } from '@ds/checkbox';
 import { Button } from '@ds/button';
+import {
+  Flyout,
+  FlyoutList,
+  FlyoutItem,
+  FlyoutFooter,
+} from '@ds/flyout';
 import './filter.css';
 
 export interface FilterOption {
@@ -17,71 +22,48 @@ export interface FilterProps {
   selected: string[];
   onApply: (values: string[]) => void;
   className?: string;
-  /** Optional explicit width for the popover panel. Defaults to 240px. */
-  panelWidth?: number;
 }
 
 /**
- * Filter — button trigger that opens a popover with checkbox options and
- * Apply / Cancel commit semantics. Matches the spec described in
- * stage-components.md and the visual pattern of the ProductFilter helper
- * in compositions/opportunity-table.
+ * Filter — button trigger that opens a Flyout of options with Apply / Cancel
+ * commit semantics. Composes @ds/flyout for the popover so the panel inherits
+ * the Stage flyout primitive's width, item rhythm, motion entrance, hover
+ * tokens, divider, truncation, and shadow — everything authored in the
+ * flyout pass. Trigger is hand-rolled for the chip-style affordance (label,
+ * count chip, chevron) which is unique to filter buttons.
  *
- * Composition:
- *   • Trigger button: label, optional count chip (Tags neutral/high), chevron
- *   • Popover: checkbox list of options + footer with Cancel / Apply
- *
- * Selection is staged in `draft` state; only Apply commits via onApply. Cancel
- * resets to the prop value. Outside-click / escape behave as Cancel.
+ * Selection is staged in `draft` state so onSelectionChange-per-click is
+ * absorbed locally and only Apply commits via onApply. Outside-click,
+ * Escape, and Cancel all close without committing — Flyout owns the first
+ * two; Cancel is a Footer button. When the flyout reopens, draft resets
+ * to the prop value.
  */
 export const Filter = React.forwardRef<HTMLButtonElement, FilterProps>(
-  function Filter(
-    { label, options, selected, onApply, className, panelWidth = 240 },
-    ref
-  ) {
+  function Filter({ label, options, selected, onApply, className }, ref) {
     const [open, setOpen] = React.useState(false);
     const [draft, setDraft] = React.useState<string[]>(selected);
-    const wrapperRef = React.useRef<HTMLSpanElement>(null);
     const triggerRef = React.useRef<HTMLButtonElement>(null);
     const setRef = (node: HTMLButtonElement | null) => {
       triggerRef.current = node;
       if (typeof ref === 'function') ref(node);
-      else if (ref) (ref as React.MutableRefObject<HTMLButtonElement | null>).current = node;
+      else if (ref)
+        (ref as React.MutableRefObject<HTMLButtonElement | null>).current = node;
     };
 
+    // Reset draft to current selection each time the flyout opens, so cancel /
+    // outside-click / escape effectively discard pending edits.
     React.useEffect(() => {
       if (open) setDraft(selected);
-    }, [open, selected]);
-
-    React.useEffect(() => {
-      if (!open) return;
-      const onDocClick = (e: MouseEvent) => {
-        if (!wrapperRef.current?.contains(e.target as Node)) setOpen(false);
-      };
-      const onKey = (e: KeyboardEvent) => {
-        if (e.key === 'Escape') setOpen(false);
-      };
-      document.addEventListener('mousedown', onDocClick);
-      document.addEventListener('keydown', onKey);
-      return () => {
-        document.removeEventListener('mousedown', onDocClick);
-        document.removeEventListener('keydown', onKey);
-      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [open]);
-
-    const toggle = (value: string) =>
-      setDraft((d) =>
-        d.includes(value) ? d.filter((v) => v !== value) : [...d, value]
-      );
 
     const apply = () => {
       onApply(draft);
       setOpen(false);
     };
-    const cancel = () => setOpen(false);
 
     return (
-      <span ref={wrapperRef} className={classNames('panw--filter__wrapper', className)}>
+      <span className={classNames('panw--filter__wrapper', className)}>
         <button
           ref={setRef}
           type="button"
@@ -92,7 +74,12 @@ export const Filter = React.forwardRef<HTMLButtonElement, FilterProps>(
           <span className="panw--filter__label">{label}</span>
           {selected.length > 0 && (
             <span className="panw--filter__values">
-              <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" />
+              <Tags
+                label={String(selected.length)}
+                color="neutral"
+                contrast="high"
+                size="default"
+              />
             </span>
           )}
           <span className="panw--filter__chevron" aria-hidden="true">
@@ -100,38 +87,30 @@ export const Filter = React.forwardRef<HTMLButtonElement, FilterProps>(
           </span>
         </button>
 
-        {open && (
-          <div
-            className="panw--filter__panel"
-            role="dialog"
-            aria-label={`${label} filter`}
-            style={{ width: panelWidth }}>
-            <div className="panw--filter__list" role="listbox" aria-multiselectable="true">
-              {options.map((opt) => {
-                const checked = draft.includes(opt.value);
-                return (
-                  <div
-                    key={opt.value}
-                    className="panw--filter__item"
-                    role="option"
-                    aria-selected={checked}
-                    onClick={() => toggle(opt.value)}>
-                    <Checkbox
-                      status={checked ? 'checked' : 'unchecked'}
-                      label=""
-                      tabIndex={-1}
-                    />
-                    <span className="panw--filter__item-label">{opt.label}</span>
-                  </div>
-                );
-              })}
-            </div>
-            <div className="panw--filter__footer">
-              <Button kind="ghost" size="small" onClick={cancel}>Cancel</Button>
-              <Button kind="primary" size="small" onClick={apply}>Apply</Button>
-            </div>
-          </div>
-        )}
+        <Flyout
+          open={open}
+          onOpenChange={setOpen}
+          anchorRef={triggerRef}
+          mode="multiple"
+          selected={draft}
+          onSelectionChange={setDraft}
+          placement="bottom-start">
+          <FlyoutList>
+            {options.map((opt) => (
+              <FlyoutItem key={opt.value} value={opt.value}>
+                {opt.label}
+              </FlyoutItem>
+            ))}
+          </FlyoutList>
+          <FlyoutFooter>
+            <Button kind="ghost" size="small" onClick={() => setOpen(false)}>
+              Cancel
+            </Button>
+            <Button kind="primary" size="small" onClick={apply}>
+              Apply
+            </Button>
+          </FlyoutFooter>
+        </Flyout>
       </span>
     );
   }

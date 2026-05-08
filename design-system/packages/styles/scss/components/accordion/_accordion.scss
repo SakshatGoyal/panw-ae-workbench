@@ -222,18 +222,27 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--accordion--size-default {
   .#{$panw-prefix}--accordion__expansion { width: 40px; height: 40px; }
   .#{$panw-prefix}--accordion__container { padding: 8px 16px 8px 12px; }
+  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
+    padding-bottom: 16px;
+  }
   .#{$panw-prefix}--accordion__content-inner { padding: 12px; }
 }
 
 .#{$panw-prefix}--accordion--size-large {
   .#{$panw-prefix}--accordion__expansion { width: 48px; height: 48px; }
   .#{$panw-prefix}--accordion__container { padding: 12px 16px 12px 16px; }
+  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
+    padding-bottom: 16px;
+  }
   .#{$panw-prefix}--accordion__content-inner { padding: 16px; }
 }
 
 .#{$panw-prefix}--accordion--size-small {
   .#{$panw-prefix}--accordion__expansion { width: 32px; height: 32px; }
   .#{$panw-prefix}--accordion__container { padding: 4px 16px 4px 8px; }
+  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
+    padding-bottom: 16px;
+  }
   .#{$panw-prefix}--accordion__content-inner { padding: 8px; }
 }
 

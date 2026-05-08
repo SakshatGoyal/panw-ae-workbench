@@ -313,7 +313,7 @@ function OpportunityPanel() {
                     markup directly. `panw--tag--shape-pill` is required —
                     the base `.panw--tag` does not set a radius.
                   */}
-                  <span className={`panw--tag panw--tag--size-default panw--tag--shape-pill panw--tag--low panw--tag--${currentOutcome.color}`} role="presentation">
+                  <span className={`panw--tag panw--tag--size-large panw--tag--shape-pill panw--tag--low panw--tag--${currentOutcome.color}`} role="presentation">
                     <span className="panw--tag__label">{currentOutcome.label}</span>
                     <span className="panw--tag__icon" aria-hidden="true"><IconChevronDownTag /></span>
                   </span>
@@ -448,15 +448,15 @@ function OpportunityPanel() {
           <div className="ops-health-rows">
             <div className="ops-health-row ops-health-row--primary">
               <span className="ops-health-row__label">Overall Health</span>
-              <Tags label="Critical" color="red" contrast="low" size="large" shape="pill" />
+              <Tags label="Critical" color="red" contrast="low" size="default" shape="pill" />
             </div>
             <div className="ops-divider" />
-            <div className="ops-health-row ops-health-row--secondary">
+            <div className="ops-health-row ops-health-row--child">
               <span className="ops-health-row__label">Technical Health</span>
               <Tags label="Critical" color="red" contrast="low" size="default" shape="pill" />
             </div>
             <div className="ops-divider" />
-            <div className="ops-health-row ops-health-row--secondary">
+            <div className="ops-health-row ops-health-row--child">
               <span className="ops-health-row__label">Deployment and Adoption</span>
               <Tags label="At-Risk" color="orange" contrast="low" size="default" shape="pill" />
             </div>
@@ -490,11 +490,14 @@ function OpportunityPanel() {
         <section className="ops-section" aria-label="AI Suggestions">
           <div className="ops-section__hd">Suggestions</div>
           <div className="ops-suggestions">
-            {SUGGESTIONS.map((s) => (
-              <button key={s} className="ops-prompt-card" type="button">
-                <span className="ops-prompt-icon"><IconSparkle /></span>
-                <span className="ops-prompt-text">{s}</span>
-              </button>
+            {SUGGESTIONS.map((s, i) => (
+              <React.Fragment key={s}>
+                {i > 0 && <div className="ops-divider" />}
+                <button className="ops-prompt-card" type="button">
+                  <span className="ops-prompt-icon"><IconSparkle /></span>
+                  <span className="ops-prompt-text">{s}</span>
+                </button>
+              </React.Fragment>
             ))}
           </div>
         </section>
@@ -679,25 +682,33 @@ const PANEL_CSS = `
     margin: 0;
   }
 
-  /* ── Section ──────────────────────────────────────────────────────────
-     Sections separated by space, not full-bleed lines. */
+  /* ── Section as a tile ─────────────────────────────────────────────────
+     Each section is its own surface.alt tile sitting on the panel's
+     surface.rest ground. The tile boundary contains the section heading
+     so it reads as the heading of THIS container, not just another row of
+     text in a flow. Tiles are separated by panel-surface visible between
+     them — that's the new rhythm. */
   .ops-section {
     display: flex;
     flex-direction: column;
-    padding: 0 var(--ds-spacing-06) var(--ds-spacing-07);
+    background-color: var(--ds-surface-alt-rest);
+    border-radius: var(--ds-radius-standard);
+    margin: 0 var(--ds-spacing-05) var(--ds-spacing-04);
+    padding: var(--ds-spacing-05);
   }
-  /* Sentence-case section heading. Section labels are quiet supporting
-     copy, not loud uppercase eyebrows. */
+  /* Section heading lives inside the tile and claims it. Larger, weight 600,
+     primary text — bigger than any data row label so the parent always
+     outweighs its children. */
   .ops-section__hd {
     display: flex;
     align-items: center;
     padding-bottom: var(--ds-spacing-04);
-    font-size: 13px;
+    font-size: 15px;
     font-weight: 600;
     line-height: 20px;
-    color: var(--ds-text-secondary-rest);
+    color: var(--ds-text-primary);
   }
-  /* Footer CTA button right-aligned, default size. */
+  /* Footer CTA button right-aligned, default size, inside the tile. */
   .ops-section__footer {
     display: flex;
     align-items: center;
@@ -906,14 +917,11 @@ const PANEL_CSS = `
     font-variant-numeric: tabular-nums;
   }
 
-  /* ── Account health — three-level hierarchy ─────────────────────────────
-     1. Overall Health (primary): largest label, larger pill — claims the
-        section's headline weight.
-     2. Technical Health, Deployment & Adoption (secondary): smaller label,
-        indented 12px from the primary so the eye reads them as children
-        of Overall.
-     3. Per-product breakdown (tertiary): proper table with DS Header
-        components and Tags pills per axis. */
+  /* ── Account health rows ────────────────────────────────────────────────
+     Overall Health is bold so it reads as the headline of the three rows.
+     Same row height, same label size, same pill size as the other two
+     rows — the bold weight alone distinguishes it. Section heading
+     ("Account health") above always outweighs Overall Health below. */
   .ops-health-rows {
     display: flex;
     flex-direction: column;
@@ -930,31 +938,29 @@ const PANEL_CSS = `
     line-height: 20px;
     color: var(--ds-text-secondary-rest);
   }
-  .ops-health-row--primary {
-    min-height: 44px;
-  }
   .ops-health-row--primary .ops-health-row__label {
-    font-size: 15px;
     font-weight: 600;
     color: var(--ds-text-primary);
   }
-  .ops-health-row--secondary .ops-health-row__label {
+  /* Children of Overall Health — indented so the parent-child structure of
+     Overall → Technical / Deployment-Adoption is visible without resorting
+     to size differentiation (which would compete with the section heading). */
+  .ops-health-row--child .ops-health-row__label {
     padding-left: var(--ds-spacing-04);
   }
 
   /* Product mini-table — proper table with DS Header components for the
-     column headers and Tags pills per axis. Subtle dividers separate
-     rows. The whole table sits below the health rows with a gap that
-     reads as "this is the per-product breakdown". */
+     column headers and Tags pills per axis. Row cells get a 16px left
+     padding to align with Header's internal padding so column labels and
+     row values sit at the same x-position. Tags use justify-self: start
+     so they size to content rather than stretching to fill the cell
+     width (otherwise adjacent column pills would touch each other). */
   .ops-product-table {
     display: flex;
     flex-direction: column;
     width: 100%;
     margin-top: var(--ds-spacing-05);
   }
-  /* Wider Technical / Adoption columns so Header (which renders a sort
-     indicator on type="basic") has room for the column label without
-     truncating to "Tech…" / "Ado…". */
   .ops-product-table-header {
     display: grid;
     grid-template-columns: 1fr 120px 120px;
@@ -971,35 +977,35 @@ const PANEL_CSS = `
     font-weight: 400;
     line-height: 20px;
     color: var(--ds-text-secondary-rest);
+    padding-left: 16px;
+  }
+  .ops-product-row > .panw--tag {
+    justify-self: start;
+    margin-left: 16px;
   }
 
-  /* ── AI Suggestion cards — quiet alt-surface tiles ──────────────────────
-     Dropped the tile-on-tile shadow. Kept a 1px lines-neutral-tile border
-     as the only chrome — the alt-surface tint alone was so subtle the
-     cards melted into the panel ground. Border gives them a footprint
-     without re-introducing the shadow-card weight. */
+  /* ── AI Suggestion rows ─────────────────────────────────────────────────
+     The Suggestions section is itself a surface.alt tile, so the prompt
+     items inside drop their card chrome (no border, no separate background)
+     and read as plain rows on the section ground. Hover lifts to ghost. */
   .ops-suggestions {
     display: flex;
     flex-direction: column;
-    gap: var(--ds-spacing-02);
   }
   .ops-prompt-card {
     display: flex;
     align-items: flex-start;
     gap: var(--ds-spacing-04);
-    padding: var(--ds-spacing-04);
-    background-color: var(--ds-surface-alt-rest);
-    border: 1px solid var(--ds-lines-neutral-tile-rest);
-    border-radius: var(--ds-radius-tight);
+    padding: var(--ds-spacing-04) 0;
+    background-color: transparent;
+    border: none;
     cursor: pointer;
     text-align: left;
     font-family: inherit;
-    transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9),
-                border-color 110ms cubic-bezier(0.2,0,0.38,0.9);
+    transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9);
   }
   .ops-prompt-card:hover {
     background-color: var(--ds-ghost-hover);
-    border-color: var(--ds-lines-neutral-rest);
   }
   .ops-prompt-card:focus-visible {
     outline: 2px solid var(--ds-lines-brand-rest);

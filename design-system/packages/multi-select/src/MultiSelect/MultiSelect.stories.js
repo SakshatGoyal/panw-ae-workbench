@@ -1,7 +1,6 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { MultiSelect, MultiSelectBackgrounds, MultiSelectSizes } from './index';
-import mdx from './MultiSelect.mdx';
 
 const sample = [
   { label: 'Option 1', value: 'option-1' },
@@ -20,7 +19,6 @@ export default {
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

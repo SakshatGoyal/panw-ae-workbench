@@ -19,7 +19,6 @@ import {
   Download,
 } from 'lucide-react';
 import { IconButton } from './index';
-import mdx from './IconButton.mdx';
 
 const iconMap = {
   Plus: (props) => <Plus size={16} {...props} />,
@@ -72,9 +71,6 @@ export default {
   title: 'Components/IconButton',
   component: IconButton,
   argTypes: sharedArgTypes,
-  parameters: {
-    docs: { page: mdx },
-  },
   tags: ['autodocs'],
 };
 

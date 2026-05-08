@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { Toggle, ToggleSizes, ToggleLabelPositions } from './index';
-import mdx from './Toggle.mdx';
 
 export default {
   title: 'Components/Toggle',
@@ -17,7 +16,6 @@ export default {
     size: { options: ToggleSizes, control: { type: 'radio' } },
     disabled: { control: 'boolean' },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

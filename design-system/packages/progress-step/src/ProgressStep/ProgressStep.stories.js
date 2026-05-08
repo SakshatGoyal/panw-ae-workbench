@@ -1,7 +1,6 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { ProgressStep, ProgressStepItem, ProgressSizes } from '../index';
-import mdx from './ProgressStep.mdx';
 
 export default {
   title: 'Components/ProgressStep',
@@ -11,7 +10,6 @@ export default {
     size: { options: ProgressSizes, control: { type: 'radio' } },
     showDescription: { control: 'boolean' },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

@@ -7,7 +7,6 @@ import {
   TextEntryTypes,
   TextEntryStates,
 } from './index';
-import mdx from './TextEntry.mdx';
 
 export default {
   title: 'Components/TextEntry',
@@ -24,7 +23,6 @@ export default {
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

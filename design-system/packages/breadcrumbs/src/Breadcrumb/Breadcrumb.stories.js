@@ -1,14 +1,12 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { Breadcrumb, BreadcrumbItem } from '../index';
-import mdx from './Breadcrumb.mdx';
 
 export default {
   title: 'Components/Breadcrumb',
   component: Breadcrumb,
   subcomponents: { BreadcrumbItem },
   argTypes: { collapsed: { control: 'boolean' } },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

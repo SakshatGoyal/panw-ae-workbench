@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { Search, SearchSizes, SearchBackgrounds, SearchValidations } from './index';
-import mdx from './Search.mdx';
 
 export default {
   title: 'Components/Search',
@@ -13,7 +12,6 @@ export default {
     placeholder: { control: 'text' },
     disabled: { control: 'boolean' },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { Checkbox, CheckboxStatuses } from './index';
-import mdx from './Checkbox.mdx';
 
 export default {
   title: 'Components/Checkbox',
@@ -11,7 +10,6 @@ export default {
     disabled: { control: 'boolean' },
     label: { control: 'text' },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

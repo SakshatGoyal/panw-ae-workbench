@@ -1,7 +1,6 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { Chip, ChipSizes, ChipThemes, ChipDropdownDirections } from './index';
-import mdx from './Chip.mdx';
 
 export default {
   title: 'Components/Chip',
@@ -18,7 +17,6 @@ export default {
     active: { control: 'boolean' },
     disabled: { control: 'boolean' },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

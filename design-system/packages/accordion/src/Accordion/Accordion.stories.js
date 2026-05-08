@@ -7,7 +7,6 @@ import {
   AccordionThemes,
   AccordionOrientations,
 } from './index';
-import mdx from './Accordion.mdx';
 
 const iconMap = { Sun, Star, Bell };
 
@@ -27,7 +26,6 @@ export default {
     disabled: { control: 'boolean' },
     renderIcon: { options: ['Sun', 'Star', 'Bell'], control: { type: 'select' } },
   },
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

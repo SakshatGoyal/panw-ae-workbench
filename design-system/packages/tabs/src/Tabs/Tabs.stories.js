@@ -3,12 +3,10 @@ import { action } from '@storybook/addon-actions';
 import { Star } from 'lucide-react';
 import { Tabs } from './index';
 import { Tab } from '../Tab';
-import mdx from './Tabs.mdx';
 
 export default {
   title: 'Components/Tabs',
   component: Tabs,
-  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

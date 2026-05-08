@@ -7,6 +7,7 @@ import { Flyout, FlyoutList, FlyoutItem } from '@ds/flyout'
 import { Dropdown } from '@ds/dropdown'
 import { TextEntry } from '@ds/text-entry'
 import { Header } from '@ds/header'
+import { Accordion } from '@ds/accordion'
 import {
   Close,
   ChevronDown,
@@ -146,55 +147,28 @@ function DealRow({ deal }: { deal: Deal }) {
   )
 }
 
-function SalesPlayAccordion({ play, open, onToggle }: { play: SalesPlay; open: boolean; onToggle: () => void }) {
-  return (
-    <div className={`ops-accordion-entry${open ? ' is-open' : ''}`}>
-      <div
-        className="ops-accordion-row"
-        onClick={onToggle}
-        role="button"
-        aria-expanded={open}
-        tabIndex={0}
-        onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle() } }}
-      >
-        <span className="ops-accordion-chevron"><ChevronDown size={16} /></span>
-        <span className="ops-accordion-title">{play.title}</span>
-        <Tags
-          label={play.amount}
-          color="grey"
-          contrast="low"
-          size="default"
-          icon
-          renderIcon={NotTouched}
-        />
-      </div>
-      <div className="ops-accordion-content" role="region" aria-label={`${play.title} deals`}>
-        {/* Divider between the accordion title row and the first deal row,
-            since the row no longer carries a border-bottom of its own. */}
-        <div className="ops-divider" />
-        {play.deals.map((d, i) => (
-          <React.Fragment key={d.name}>
-            {i > 0 && <div className="ops-divider" />}
-            <DealRow deal={d} />
-          </React.Fragment>
-        ))}
-      </div>
-    </div>
-  )
-}
-
 // ─── Panel ────────────────────────────────────────────────────────────────────
 
 function OpportunityPanel() {
   const [outcomeOpen, setOutcomeOpen]     = useState(false)
   const [outcome, setOutcome]             = useState<string>('unknown')
   const [openPlays, setOpenPlays]         = useState<Record<string, boolean>>({})
+  const [openSections, setOpenSections]   = useState<Record<string, boolean>>({
+    // Renewals starts open — it carries the only primary interactive
+    // affordance (the outcome picker). Other sections are reveal-on-demand.
+    renewals: true,
+    installBase: false,
+    salesPlay: false,
+    accountHealth: false,
+    suggestions: false,
+  })
   const [churnReason, setChurnReason]     = useState<string | undefined>(undefined)
   const [competitor, setCompetitor]       = useState<string | undefined>(undefined)
   const [notes, setNotes]                 = useState<string>('')
   const outcomeRef = useRef<HTMLButtonElement | null>(null)
 
   const togglePlay = (id: string) => setOpenPlays((p) => ({ ...p, [id]: !p[id] }))
+  const toggleSection = (id: string) => setOpenSections((p) => ({ ...p, [id]: !p[id] }))
   const currentOutcome = OUTCOMES.find((o) => o.value === outcome) ?? OUTCOMES[0]
   const formVisible   = outcome !== 'unknown'
   const churnVisible  = outcome === 'churn'
@@ -225,10 +199,31 @@ function OpportunityPanel() {
           <Button kind="ghost" size="small" renderIcon={Close} iconDescription="Close panel" />
         </header>
 
-        {/* ── RENEWALS ── */}
-        <section className="ops-section" aria-label="Renewals">
-          <div className="ops-section__hd">Renewals</div>
+        {/*
+          Each section is a panel-level Accordion. Edge to edge. The right-side
+          tag carries the section's at-a-glance takeaway:
+            Renewals → outcome label
+            Install base → headline number (TCV)
+            Sales play → total value of untouched plays
+            Account health → overall health value
+            Suggestions → count
+          Open the accordion to reveal the section's tables / nested accordions.
+        */}
 
+        {/* ── RENEWALS ── */}
+        <Accordion
+          size="large"
+          theme="gray00"
+          orientation="left"
+          title="Renewals"
+          showIcon={false}
+          showTag
+          tagLabel={currentOutcome.label}
+          tagColor={currentOutcome.color}
+          tagContrast="low"
+          open={openSections.renewals}
+          onToggle={() => toggleSection('renewals')}
+        >
           <div className="ops-data-table">
             {RENEWAL_ROWS.map((r, i) => (
               <React.Fragment key={r.label}>
@@ -248,10 +243,11 @@ function OpportunityPanel() {
                   onClick={() => setOutcomeOpen((v) => !v)}
                 >
                   {/*
-                    DS Tags only renders icons as leading slot. The original
-                    panel puts the chevron *after* the label, so render BEM
-                    markup directly. `panw--tag--shape-pill` is required —
-                    the base `.panw--tag` does not set a radius.
+                    DS Tags only renders icons in the leading slot. The
+                    original draft puts the chevron *after* the label, so
+                    we render BEM markup directly. `panw--tag--shape-pill`
+                    is required — the base `.panw--tag` doesn't set a
+                    radius.
                   */}
                   <span className={`panw--tag panw--tag--size-large panw--tag--shape-pill panw--tag--low panw--tag--${currentOutcome.color}`} role="presentation">
                     <span className="panw--tag__label">{currentOutcome.label}</span>
@@ -331,15 +327,25 @@ function OpportunityPanel() {
             </div>
           )}
 
-          <div className="ops-section__footer">
+          <div className="ops-section-cta">
             <Button kind="ghost-brand" size="default">Open in Renewal Workspace</Button>
           </div>
-        </section>
-
+        </Accordion>
 
         {/* ── INSTALL BASE ── */}
-        <section className="ops-section" aria-label="Install Base">
-          <div className="ops-section__hd">Install base</div>
+        <Accordion
+          size="large"
+          theme="gray00"
+          orientation="left"
+          title="Install base"
+          showIcon={false}
+          showTag
+          tagLabel="$25.8M"
+          tagColor="grey"
+          tagContrast="low"
+          open={openSections.installBase}
+          onToggle={() => toggleSection('installBase')}
+        >
           <div className="ops-data-table">
             {INSTALL_BASE_ROWS.map((r, i) => (
               <React.Fragment key={r.label}>
@@ -348,43 +354,76 @@ function OpportunityPanel() {
               </React.Fragment>
             ))}
           </div>
-          <div className="ops-section__footer">
+          <div className="ops-section-cta">
             <Button kind="ghost-brand" size="default">Open Customer Estate</Button>
           </div>
-        </section>
-
+        </Accordion>
 
         {/* ── SALES PLAY ── */}
-        <section className="ops-section" aria-label="Sales Play">
-          <div className="ops-section__hd">Sales play</div>
+        {/* Tag = total $ value of NotTouched plays. With the demo data all
+            four plays are NotTouched; in real data it would be the sum
+            of only the untouched ones. */}
+        <Accordion
+          size="large"
+          theme="gray00"
+          orientation="left"
+          title="Sales play"
+          showIcon={false}
+          showTag
+          tagLabel="$287K"
+          tagColor="orange"
+          tagContrast="low"
+          open={openSections.salesPlay}
+          onToggle={() => toggleSection('salesPlay')}
+        >
           <div className="ops-salesplay-list">
-            {SALES_PLAYS.map((p, i) => (
-              <React.Fragment key={p.id}>
-                {i > 0 && <div className="ops-divider" />}
-                <SalesPlayAccordion
-                  play={p}
-                  open={!!openPlays[p.id]}
-                  onToggle={() => togglePlay(p.id)}
-                />
-              </React.Fragment>
+            {SALES_PLAYS.map((p) => (
+              <Accordion
+                key={p.id}
+                size="default"
+                theme="gray10"
+                orientation="left"
+                title={p.title}
+                showIcon={false}
+                showTag
+                tagLabel={p.amount}
+                tagColor="grey"
+                tagContrast="low"
+                open={!!openPlays[p.id]}
+                onToggle={() => togglePlay(p.id)}
+              >
+                <div className="ops-deal-rows">
+                  {p.deals.map((d, i) => (
+                    <React.Fragment key={d.name}>
+                      {i > 0 && <div className="ops-divider" />}
+                      <DealRow deal={d} />
+                    </React.Fragment>
+                  ))}
+                </div>
+              </Accordion>
             ))}
           </div>
-          <div className="ops-section__footer">
+          <div className="ops-section-cta">
             <Button kind="ghost-brand" size="default">Open in Sales Play Console</Button>
           </div>
-        </section>
-
+        </Accordion>
 
         {/* ── ACCOUNT HEALTH ── */}
-        <section className="ops-section" aria-label="Account Health">
-          <div className="ops-section__hd">Account health</div>
-
-          {/* Hierarchy moves visible in the markup:
-              1. Overall Health — primary row, larger label, larger pill.
-              2. Technical / Deployment & Adoption — secondary axes, indented
-                 slightly so the eye reads them as children of Overall.
-              3. Per-product breakdown — tertiary, sits under the section as a
-                 proper table with DS Header components for the columns. */}
+        <Accordion
+          size="large"
+          theme="gray00"
+          orientation="left"
+          title="Account health"
+          showIcon={false}
+          showTag
+          tagLabel="Critical"
+          tagColor="red"
+          tagContrast="low"
+          open={openSections.accountHealth}
+          onToggle={() => toggleSection('accountHealth')}
+        >
+          {/* Hierarchy: Overall (parent, bold) → Technical / Deployment-Adoption
+              (children, indented) → per-product breakdown (table). */}
           <div className="ops-health-rows">
             <div className="ops-health-row ops-health-row--primary">
               <span className="ops-health-row__label">Overall Health</span>
@@ -420,15 +459,25 @@ function OpportunityPanel() {
             ))}
           </div>
 
-          <div className="ops-section__footer">
+          <div className="ops-section-cta">
             <Button kind="ghost-brand" size="default">Open Account Health</Button>
           </div>
-        </section>
-
+        </Accordion>
 
         {/* ── SUGGESTIONS ── */}
-        <section className="ops-section" aria-label="AI Suggestions">
-          <div className="ops-section__hd">Suggestions</div>
+        <Accordion
+          size="large"
+          theme="gray00"
+          orientation="left"
+          title="Suggestions"
+          showIcon={false}
+          showTag
+          tagLabel={String(SUGGESTIONS.length)}
+          tagColor="grey"
+          tagContrast="low"
+          open={openSections.suggestions}
+          onToggle={() => toggleSection('suggestions')}
+        >
           <div className="ops-suggestions">
             {SUGGESTIONS.map((s, i) => (
               <React.Fragment key={s}>
@@ -440,7 +489,7 @@ function OpportunityPanel() {
               </React.Fragment>
             ))}
           </div>
-        </section>
+        </Accordion>
 
       </div>
     </div>
@@ -536,6 +585,24 @@ const PANEL_CSS = `
     --panw-dropdown-helper-success:    var(--ds-text-success-rest);
     --panw-dropdown-helper-disabled:   var(--ds-text-tertiary-disabled);
 
+    /* Accordion */
+    --panw-accordion-bg-gray00:           var(--ds-surface-rest);
+    --panw-accordion-bg-gray10:           var(--ds-surface-alt-rest);
+    --panw-accordion-bg-hover-gray00:     var(--ds-ghost-hover);
+    --panw-accordion-bg-hover-gray10:     var(--ds-ghost-hover);
+    --panw-accordion-bg-pressing-gray00:  var(--ds-ghost-pressed);
+    --panw-accordion-bg-pressing-gray10:  var(--ds-ghost-pressed);
+    --panw-accordion-icon-color:          var(--ds-icons-tertiary-rest);
+    --panw-accordion-icon-color-hover:    var(--ds-icons-tertiary-hover);
+    --panw-accordion-icon-color-pressed:  var(--ds-icons-tertiary-pressed);
+    --panw-accordion-title-color:         var(--ds-text-primary);
+    --panw-accordion-title-color-hover:   var(--ds-text-primary);
+    --panw-accordion-title-color-pressed: var(--ds-text-primary);
+    --panw-accordion-description-color:   var(--ds-text-tertiary-rest);
+    --panw-accordion-icon-disabled:       var(--ds-icons-disabled);
+    --panw-accordion-title-disabled:      var(--ds-text-secondary-disabled);
+    --panw-accordion-description-disabled: var(--ds-text-tertiary-disabled);
+
     /* Header (table column header) */
     --panw-header-bg:           var(--ds-surface-accent-rest);
     --panw-header-bg-hover:     var(--ds-surface-accent-hover);
@@ -596,6 +663,11 @@ const PANEL_CSS = `
     overflow-y: auto;
     box-sizing: border-box;
   }
+  /* Prevent flex-shrink on direct children. Without this, the panel's flex
+     column layout compresses closed accordions (which render their natural
+     ~48px header height) down to ~20px when total content overflows the
+     panel viewport, causing visible overlap with neighbors. */
+  .ops-panel > * { flex-shrink: 0; }
 
   /* ── Panel header ──────────────────────────────────────────────────────
      The account name itself is the identity — no avatar. Opportunity link
@@ -628,48 +700,21 @@ const PANEL_CSS = `
      so it reads as the heading of THIS container, not just another row of
      text in a flow. Tiles are separated by panel-surface visible between
      them — that's the new rhythm. */
-  .ops-section {
-    display: flex;
-    flex-direction: column;
-    background-color: var(--ds-surface-alt-rest);
-    border-radius: var(--ds-radius-standard);
-    margin: 0 var(--ds-spacing-05) var(--ds-spacing-04);
-    padding: var(--ds-spacing-05);
-  }
-  /* Section heading lives inside the tile and claims it. Larger, weight 600,
-     primary text — bigger than any data row label so the parent always
-     outweighs its children. */
-  .ops-section__hd {
-    display: flex;
-    align-items: center;
-    padding-bottom: var(--ds-spacing-04);
-    font-size: 15px;
-    font-weight: 600;
-    line-height: 20px;
-    color: var(--ds-text-primary);
-  }
-  /* Footer CTA button right-aligned, default size, inside the tile. */
-  .ops-section__footer {
+  /* Section CTA — right-aligned ghost-brand button at the bottom of an
+     accordion's open content. */
+  .ops-section-cta {
     display: flex;
     align-items: center;
     justify-content: flex-end;
     padding-top: var(--ds-spacing-05);
   }
 
-  /* ── Standalone row divider — 1px hairline between rows ─────────────────
-     Per stage-spacing.md: dividers are their own elements, not border-bottom
-     on rounded rows (rounded radius peels the line away from the row corners
-     and produces a visible "uplift" gap). */
+  /* ── Standalone row divider — 1px hairline between rows ───────────────── */
   .ops-divider {
     height: 1px;
     background-color: var(--ds-lines-neutral-tile-rest);
     flex-shrink: 0;
   }
-  /* Hide dividers immediately adjacent to an open accordion entry (the open
-     entry already lifts to its own tile so a divider next to it would
-     double up on visual separation). */
-  .ops-divider:has(+ .ops-accordion-entry.is-open),
-  .ops-accordion-entry.is-open + .ops-divider { display: none; }
 
   /* ── Key-value data rows ─────────────────────────────────────────────────
      Hierarchy is carried through weight + tone, not color. Labels are
@@ -734,85 +779,21 @@ const PANEL_CSS = `
   }
   .ops-outcome-trigger .panw--tag { cursor: pointer; }
 
-  /* ── Sales Play accordion ────────────────────────────────────────────────
-     Each row is title (left, weight 500) + amount (right, tabular). The
-     chevron is the disclosure affordance. The neutral-pill + minus-circle
-     decoration is gone — the data carries itself, the row is the chrome. */
-  .ops-salesplay-list { display: flex; flex-direction: column; }
-  .ops-accordion-entry { display: flex; flex-direction: column; }
-
-  .ops-accordion-row {
+  /* ── Sales Play sub-accordion list — DS Accordion stack inside the parent
+     panel-level Sales play accordion. Sub-accordions use theme="gray10"
+     (alt-surface tint) so they sit visibly inside the parent's white
+     content area. */
+  .ops-salesplay-list {
     display: flex;
-    align-items: center;
-    gap: var(--ds-spacing-03);
-    min-height: 36px;
-    padding: 0 var(--ds-spacing-02);
-    border-radius: var(--ds-radius-tight);
-    cursor: pointer;
-    user-select: none;
-    transition: background-color 110ms cubic-bezier(0.2,0,0.38,0.9);
+    flex-direction: column;
   }
-  .ops-accordion-row:hover { background-color: var(--ds-ghost-hover); }
 
-  .ops-accordion-chevron {
+  .ops-deal-rows {
     display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
-    flex-shrink: 0;
-    color: var(--ds-icons-tertiary-rest);
-    transition: transform 110ms cubic-bezier(0.2,0,0.38,0.9), color 110ms;
-  }
-  .ops-accordion-entry.is-open .ops-accordion-chevron { transform: rotate(180deg); }
-  .ops-accordion-row:hover .ops-accordion-chevron { color: var(--ds-icons-tertiary-hover); }
-
-  .ops-accordion-title {
-    flex: 1;
-    min-width: 0;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 20px;
-    color: var(--ds-text-primary);
-  }
-  .ops-accordion-amount {
-    font-size: 13px;
-    font-weight: 500;
-    line-height: 20px;
-    color: var(--ds-text-primary);
-    flex-shrink: 0;
-    font-feature-settings: 'tnum' 1, 'lnum' 1;
-    font-variant-numeric: tabular-nums;
+    flex-direction: column;
   }
 
-  .ops-accordion-content {
-    overflow: hidden;
-    max-height: 0;
-    opacity: 0;
-    padding-left: var(--ds-spacing-05);
-    transition: max-height 240ms cubic-bezier(0,0,0.38,0.9),
-                opacity    150ms cubic-bezier(0,0,0.38,0.9);
-  }
-  .ops-accordion-entry.is-open .ops-accordion-content {
-    max-height: 800px;
-    opacity: 1;
-  }
-
-  /* Open state — match DS Accordion behavior: same surface, just a
-     tile-on-tile shadow and a 4px vertical margin so the open entry lifts
-     subtly without changing background. */
-  .ops-accordion-entry.is-open {
-    box-shadow: var(--ds-shadow-tile-on-tile);
-    margin: 4px 0;
-    border-radius: var(--ds-radius-standard);
-  }
-  /* When the accordion entry is open, the row-to-content divider lives inside
-     the entry as a regular .ops-divider sibling. */
-
-  /* ── Deal child rows ─────────────────────────────────────────────────── */
+  /* ── Deal child rows (inside an open sub-accordion) ────────────────────── */
   .ops-deal-row {
     display: flex;
     align-items: center;

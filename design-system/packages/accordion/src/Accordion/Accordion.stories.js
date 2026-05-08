@@ -51,7 +51,7 @@ export const Default = (args) => {
 Default.args = {
   size: 'default',
   theme: 'gray00',
-  orientation: 'left',
+  orientation: 'right',
   open: false,
   title: 'Accordion title',
   description: '',

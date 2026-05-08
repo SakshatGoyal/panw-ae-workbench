@@ -53,7 +53,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       size = 'default',
       open = false,
       theme = 'gray00',
-      orientation = 'left',
+      orientation = 'right',
       title = 'Accordion',
       description,
       showIcon = false,

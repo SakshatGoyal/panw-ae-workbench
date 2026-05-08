@@ -7,6 +7,17 @@ import { Flyout, FlyoutList, FlyoutItem } from '@ds/flyout'
 import { Dropdown } from '@ds/dropdown'
 import { TextEntry } from '@ds/text-entry'
 import { Header } from '@ds/header'
+import {
+  Close,
+  ChevronDown,
+  NotTouched,
+  ClosedLost,
+  ClosedWon,
+  OpenPipeline,
+  Pitched,
+  Deferred,
+  Stars,
+} from '@ds/icons'
 
 const meta: Meta = {
   title: 'compositions/AE Opportunities Panel',
@@ -14,90 +25,19 @@ const meta: Meta = {
 }
 export default meta
 
-// ─── Inline icon SVGs (lucide-react lives in design-system/node_modules only) ─
-
-const IconX: React.ElementType = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <path d="M12 4L4 12M4 4l8 8" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-)
-
-const IconChevronDown = ({ size = 16 }: { size?: number }) => (
-  <svg viewBox="0 0 16 16" width={size} height={size} fill="none" aria-hidden="true">
-    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const IconChevronDownTag = () => (
-  <svg viewBox="0 0 12 12" width="12" height="12" fill="none" aria-hidden="true">
-    <path d="M2.5 4.5L6 8l3.5-3.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const IconMinusCircle = () => (
-  <svg viewBox="0 0 12 12" width="12" height="12" fill="none" aria-hidden="true">
-    <circle cx="6" cy="6" r="4.5" stroke="currentColor" strokeWidth="1.25" />
-    <path d="M3.75 6h4.5" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-  </svg>
-)
-
-const IconAlert = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.25" />
-    <path d="M8 5v3.5M8 10.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-)
-
-const IconNeutral = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <path d="M3 8h10M8 3v10" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-)
-
-const IconCheck = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <path d="M3 8.5l3.5 3.5L13 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-  </svg>
-)
-
-const IconCaution = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <path d="M8 2l6 11H2L8 2z" stroke="currentColor" strokeWidth="1.25" strokeLinejoin="round" />
-    <path d="M8 7v2.5M8 11.5v.5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-)
-
-const IconAdjust = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <circle cx="8" cy="8" r="2.5" stroke="currentColor" strokeWidth="1.25" />
-    <path d="M8 2v1.5M8 12.5V14M2 8h1.5M12.5 8H14" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-  </svg>
-)
-
-const IconCross = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.25" />
-    <path d="M5.5 5.5l5 5M10.5 5.5l-5 5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
-  </svg>
-)
-
-const IconSparkle = () => (
-  <svg viewBox="0 0 16 16" width="16" height="16" fill="none" aria-hidden="true">
-    <path d="M8 1v14M1 8h14M4.17 4.17l7.66 7.66M11.83 4.17l-7.66 7.66" stroke="currentColor" strokeWidth="1.25" strokeLinecap="round" />
-  </svg>
-)
-
 // ─── Data ─────────────────────────────────────────────────────────────────────
-
+// Sales-play deal statuses map onto @ds/icons' sales-play status set. Those
+// icons carry authored fills (semantic color is part of the glyph) and ignore
+// `color` — that's deliberate, per the icons doc.
 type DealStatus = 'danger' | 'caution' | 'success' | 'neutral' | 'adjust' | 'cross'
 
 const STATUS_ICONS: Record<DealStatus, React.ElementType> = {
-  danger: IconAlert,
-  caution: IconCaution,
-  success: IconCheck,
-  neutral: IconNeutral,
-  adjust: IconAdjust,
-  cross: IconCross,
+  danger: ClosedLost,    // at-risk / lost deal — authored red
+  caution: Pitched,      // pitched, watching — authored yellow
+  success: ClosedWon,    // closed-won — authored green
+  neutral: OpenPipeline, // in flight, no critical signal
+  adjust: Deferred,      // paused / deferred
+  cross: ClosedLost,     // hard-lost — authored red
 }
 
 // Labels intentionally drop trailing colons — sentence-case, no punctuation.
@@ -217,7 +157,7 @@ function SalesPlayAccordion({ play, open, onToggle }: { play: SalesPlay; open: b
         tabIndex={0}
         onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onToggle() } }}
       >
-        <span className="ops-accordion-chevron"><IconChevronDown /></span>
+        <span className="ops-accordion-chevron"><ChevronDown size={16} /></span>
         <span className="ops-accordion-title">{play.title}</span>
         <Tags
           label={play.amount}
@@ -225,7 +165,7 @@ function SalesPlayAccordion({ play, open, onToggle }: { play: SalesPlay; open: b
           contrast="low"
           size="default"
           icon
-          renderIcon={IconMinusCircle}
+          renderIcon={NotTouched}
         />
       </div>
       <div className="ops-accordion-content" role="region" aria-label={`${play.title} deals`}>
@@ -282,7 +222,7 @@ function OpportunityPanel() {
             <h1 className="ops-panel__account-name">[Account Name]</h1>
             <Link href="#" color="blue" size="14px">[Opportunity Name]</Link>
           </div>
-          <Button kind="ghost" size="small" renderIcon={IconX} iconDescription="Close panel" />
+          <Button kind="ghost" size="small" renderIcon={Close} iconDescription="Close panel" />
         </header>
 
         {/* ── RENEWALS ── */}
@@ -315,7 +255,7 @@ function OpportunityPanel() {
                   */}
                   <span className={`panw--tag panw--tag--size-large panw--tag--shape-pill panw--tag--low panw--tag--${currentOutcome.color}`} role="presentation">
                     <span className="panw--tag__label">{currentOutcome.label}</span>
-                    <span className="panw--tag__icon" aria-hidden="true"><IconChevronDownTag /></span>
+                    <span className="panw--tag__icon" aria-hidden="true"><ChevronDown size={14} /></span>
                   </span>
                 </button>
                 <Flyout
@@ -494,7 +434,7 @@ function OpportunityPanel() {
               <React.Fragment key={s}>
                 {i > 0 && <div className="ops-divider" />}
                 <button className="ops-prompt-card" type="button">
-                  <span className="ops-prompt-icon"><IconSparkle /></span>
+                  <span className="ops-prompt-icon"><Stars size={16} /></span>
                   <span className="ops-prompt-text">{s}</span>
                 </button>
               </React.Fragment>
@@ -894,20 +834,17 @@ const PANEL_CSS = `
     gap: var(--ds-spacing-02);
     flex-shrink: 0;
   }
+  /* Sales-play status icons from @ds/icons carry authored fills (color is
+     part of the glyph) and ignore CSS color. So this slot is purely a
+     dimension container — no color rules needed per status. */
   .ops-deal-icon {
-    width: 16px;
-    height: 16px;
+    width: 20px;
+    height: 20px;
     display: flex;
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
   }
-  .ops-deal-icon--danger  { color: var(--ds-icons-danger-rest); }
-  .ops-deal-icon--caution { color: var(--ds-icons-caution-rest); }
-  .ops-deal-icon--success { color: var(--ds-icons-success-rest); }
-  .ops-deal-icon--neutral { color: var(--ds-icons-secondary-rest); }
-  .ops-deal-icon--adjust  { color: var(--ds-icons-secondary-rest); }
-  .ops-deal-icon--cross   { color: var(--ds-icons-danger-rest); }
   .ops-deal-amount {
     font-size: 13px;
     font-weight: 500;

@@ -332,9 +332,21 @@ importers:
 
   packages/filter:
     dependencies:
+      '@ds/button':
+        specifier: workspace:*
+        version: link:../button
+      '@ds/flyout':
+        specifier: workspace:*
+        version: link:../flyout
+      '@ds/tags':
+        specifier: workspace:*
+        version: link:../tags
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
+      prop-types:
+        specifier: ^15.8.1
+        version: 15.8.1
       react:
         specifier: '>=18'
         version: 19.2.6
@@ -344,6 +356,9 @@ importers:
       '@ds/button':
         specifier: workspace:*
         version: link:../button
+      '@ds/checkbox':
+        specifier: workspace:*
+        version: link:../checkbox
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
@@ -407,6 +422,9 @@ importers:
       '@ds/button':
         specifier: workspace:*
         version: link:../button
+      '@ds/checkbox':
+        specifier: workspace:*
+        version: link:../checkbox
       '@ds/tags':
         specifier: workspace:*
         version: link:../tags

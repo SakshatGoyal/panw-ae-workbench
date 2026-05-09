@@ -5,7 +5,7 @@
 // Unselected = surface.rest. Hover/pressed on unselected items sit on
 // `ghost` (neutral) — content switchers preview navigation, not brand
 // engagement, and the selected state already does the brand work.
-:root {
+.stage {
   --panw-cs-selected-bg:        var(--ds-surface-selected);
   --panw-cs-selected-text:      var(--ds-text-brand-rest);
   --panw-cs-selected-icon:      var(--ds-icons-brand-rest);

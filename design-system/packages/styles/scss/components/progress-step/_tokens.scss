@@ -13,7 +13,7 @@
 // switches from the previous dashed treatment to solid lines.neutral.rest
 // — Stage doesn't define a dashed line treatment, and dashed reads
 // engineering-spec rather than finance-product.
-:root {
+.stage {
   --panw-ps-success-icon:    var(--ds-icons-status-success);
   --panw-ps-warning-icon:    var(--ds-icons-status-warning);
   --panw-ps-caution-icon:    var(--ds-icons-status-caution);

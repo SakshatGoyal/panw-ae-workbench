@@ -1,7 +1,7 @@
 import React, { useCallback } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Plus, Minus } from 'lucide-react';
+import { Plus, Minus } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 

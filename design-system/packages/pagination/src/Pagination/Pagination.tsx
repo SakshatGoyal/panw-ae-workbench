@@ -1,10 +1,24 @@
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
+import { AngleDoubleLeft as ChevronFirst, ChevronLeft, ChevronRight, AngleDoubleRight as ChevronLast } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
-import { Button, IconButton } from '@ds/button';
+import { IconButton } from '@ds/button';
 import { Dropdown } from '@ds/dropdown';
+
+// ─── Pagination — Ledger style ───────────────────────────────────────────────
+//
+// The aesthetic borrows from financial / Bloomberg-style status bars: hairline
+// rule above, dense single-line layout, all-caps tracked-out captions, and
+// tabular numerals throughout. The interactive surface is composed entirely
+// of design-system components — IconButton chevrons for first/prev/next/last,
+// and Dropdown for rows-per-page — so the component lives inside the system,
+// not next to it.
+//
+// What's gone from the previous version: numbered page buttons (01 02 03 …
+// 12). For finance/sales/accounting users on tables of 100s–1000s of records,
+// numbered buttons translate poorly to "where am I in this dataset?" The
+// Ledger surfaces records and range directly: "1–25 of 1,247 records."
 
 export interface PaginationProps {
   totalItems: number;
@@ -13,37 +27,16 @@ export interface PaginationProps {
   rowsPerPageOptions?: number[];
   showItemsPerPage?: boolean;
   background?: 'grey10' | 'grey00';
+  /** Singular noun for the records (e.g. "deal", "invoice"). Defaults to "record". */
+  recordLabel?: string;
+  /** Plural noun. Defaults to `${recordLabel}s`. */
+  recordLabelPlural?: string;
   onPageChange?: (page: number) => void;
   onRowsPerPageChange?: (rowsPerPage: number) => void;
-  /** Maximum number of visible page buttons (excluding ellipsis). */
-  maxVisiblePages?: number;
   className?: string;
 }
 
-function getPageRange(currentPage: number, totalPages: number, maxVisible: number): (number | null)[] {
-  if (totalPages <= maxVisible) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
-  const pages: (number | null)[] = [];
-  const half = Math.floor((maxVisible - 2) / 2);
-  let start = currentPage - half;
-  let end = currentPage + half;
-  if (start < 2) {
-    start = 2;
-    end = start + maxVisible - 3;
-  }
-  if (end > totalPages - 1) {
-    end = totalPages - 1;
-    start = end - maxVisible + 3;
-  }
-  if (start < 2) start = 2;
-  pages.push(1);
-  if (start > 2) pages.push(null);
-  for (let i = start; i <= end; i++) pages.push(i);
-  if (end < totalPages - 1) pages.push(null);
-  if (totalPages > 1) pages.push(totalPages);
-  return pages;
-}
+const fmt = (n: number) => n.toLocaleString('en-US');
 
 export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
   function Pagination(
@@ -54,9 +47,10 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
       rowsPerPageOptions = [10, 25, 50, 100],
       showItemsPerPage = true,
       background = 'grey00',
+      recordLabel = 'record',
+      recordLabelPlural,
       onPageChange,
       onRowsPerPageChange,
-      maxVisiblePages = 10,
       className,
     },
     ref
@@ -64,14 +58,13 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
     const prefix = usePrefix();
     const totalPages = Math.max(1, Math.ceil(totalItems / rowsPerPage));
     const safeCurrent = Math.min(Math.max(1, currentPage), totalPages);
-
-    const pages = useMemo(
-      () => getPageRange(safeCurrent, totalPages, maxVisiblePages),
-      [safeCurrent, totalPages, maxVisiblePages]
-    );
-
     const isFirst = safeCurrent === 1;
     const isLast = safeCurrent === totalPages;
+
+    const rangeStart = totalItems === 0 ? 0 : (safeCurrent - 1) * rowsPerPage + 1;
+    const rangeEnd = Math.min(safeCurrent * rowsPerPage, totalItems);
+    const plural = recordLabelPlural ?? `${recordLabel}s`;
+    const recordsNoun = totalItems === 1 ? recordLabel : plural;
 
     const goTo = useCallback(
       (page: number) => {
@@ -97,12 +90,23 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
 
     return (
       <div ref={ref} className={classNames(`${prefix}--pagination`, className)}>
-        <div className={`${prefix}--pagination__page-numbers`}>
+        {/* Range read-out: "1–25 of 1,247 records" — caption-styled status text. */}
+        <span className={`${prefix}--pagination__range`}>
+          <span className={`${prefix}--pagination__range-numbers`}>
+            {fmt(rangeStart)}–{fmt(rangeEnd)}
+          </span>
+          <span className={`${prefix}--pagination__range-sep`}>of</span>
+          <span className={`${prefix}--pagination__range-numbers`}>{fmt(totalItems)}</span>
+          <span className={`${prefix}--pagination__range-sep`}>{recordsNoun}</span>
+        </span>
+
+        {/* Nav cluster: chevron icons flanking the page indicator. */}
+        <div className={`${prefix}--pagination__nav`}>
           <IconButton
             kind="ghost"
             size="sm"
-            iconSize={16}
-            renderIcon={ChevronsLeft}
+            iconSize={20}
+            renderIcon={ChevronFirst}
             aria-label="First page"
             disabled={isFirst}
             onClick={() => goTo(1)}
@@ -110,36 +114,22 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           <IconButton
             kind="ghost"
             size="sm"
-            iconSize={16}
+            iconSize={20}
             renderIcon={ChevronLeft}
             aria-label="Previous page"
             disabled={isFirst}
             onClick={() => goTo(safeCurrent - 1)}
           />
-          {pages.map((page, idx) =>
-            page === null ? (
-              <span key={`ellipsis-${idx}`} className={`${prefix}--pagination__ellipsis`}>
-                …
-              </span>
-            ) : (
-              <Button
-                key={page}
-                // Current page wears the brand affordance (tertiary —
-                // bordered chip with brand text); other pages sit at
-                // ghost so the user's location reads at a glance.
-                kind={page === safeCurrent ? 'tertiary' : 'ghost'}
-                size="small"
-                aria-current={page === safeCurrent ? 'page' : undefined}
-                aria-label={`Page ${page}`}
-                onClick={() => goTo(page)}>
-                {String(page).padStart(2, '0')}
-              </Button>
-            )
-          )}
+          <span className={`${prefix}--pagination__page-indicator`}>
+            <span className={`${prefix}--pagination__range-sep`}>page</span>
+            <span className={`${prefix}--pagination__page-current`}>{safeCurrent}</span>
+            <span className={`${prefix}--pagination__range-sep`}>of</span>
+            <span className={`${prefix}--pagination__page-total`}>{totalPages}</span>
+          </span>
           <IconButton
             kind="ghost"
             size="sm"
-            iconSize={16}
+            iconSize={20}
             renderIcon={ChevronRight}
             aria-label="Next page"
             disabled={isLast}
@@ -148,17 +138,18 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
           <IconButton
             kind="ghost"
             size="sm"
-            iconSize={16}
-            renderIcon={ChevronsRight}
+            iconSize={20}
+            renderIcon={ChevronLast}
             aria-label="Last page"
             disabled={isLast}
             onClick={() => goTo(totalPages)}
           />
         </div>
 
+        {/* Rows per page — DS Dropdown sized small to fit the dense row. */}
         {showItemsPerPage && (
           <div className={`${prefix}--pagination__items-per-page`}>
-            <span className={`${prefix}--pagination__items-per-page-label`}>Items per page</span>
+            <span className={`${prefix}--pagination__items-per-page-label`}>Rows per page</span>
             <div className={`${prefix}--pagination__dropdown-wrapper`}>
               <Dropdown
                 background={background}
@@ -187,9 +178,10 @@ Pagination.propTypes = {
   rowsPerPageOptions: PropTypes.arrayOf(PropTypes.number),
   showItemsPerPage: PropTypes.bool,
   background: PropTypes.oneOf(['grey10', 'grey00']),
+  recordLabel: PropTypes.string,
+  recordLabelPlural: PropTypes.string,
   onPageChange: PropTypes.func,
   onRowsPerPageChange: PropTypes.func,
-  maxVisiblePages: PropTypes.number,
   className: PropTypes.string,
 };
 

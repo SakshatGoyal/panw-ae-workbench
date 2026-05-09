@@ -8,7 +8,7 @@
 //
 // Checked + indeterminate stay brand. Disabled icon stays icons.disabled.
 // Label stays text.secondary.
-:root {
+.stage {
   --panw-checkbox-checked:        var(--ds-brand-rest);
   --panw-checkbox-indeterminate:  var(--ds-brand-rest);
   --panw-checkbox-unchecked:      var(--ds-icons-secondary-rest);

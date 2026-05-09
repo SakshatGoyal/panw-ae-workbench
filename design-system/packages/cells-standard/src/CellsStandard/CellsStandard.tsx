@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Plus } from 'lucide-react';
+import { Plus } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { CellContents, type CellContentType, type CellState as CellContentState } from '@ds/cell-contents';
 import { Checkbox, type CheckboxStatus } from '@ds/checkbox';

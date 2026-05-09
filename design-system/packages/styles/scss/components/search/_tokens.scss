@@ -5,7 +5,7 @@
 // carry a 1px line at rest.
 // =============================================================================
 
-:root {
+.stage {
   --panw-search-bg:                var(--ds-field-rest);
   --panw-search-bg-hover:          var(--ds-field-hover);
   --panw-search-bg-pressed:        var(--ds-field-pressed);

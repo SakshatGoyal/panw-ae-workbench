@@ -84,7 +84,7 @@
 
 .panw--chip--active {
   background-color: var(--panw-chip-active-bg);
-  border-color: transparent;
+  border-color: var(--panw-chip-active-border);
   color: var(--panw-chip-active-text);
 
   .panw--chip__icon,

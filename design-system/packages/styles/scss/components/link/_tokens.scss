@@ -9,7 +9,7 @@
 // Disabled fixes the audit's "off by a stop" — was neutral60, Stage's link
 // disabled resolves through the family token (brand30 for link, neutral50
 // for link-neutral).
-:root {
+.stage {
   // Blue (hyperlink) — text.link.
   --panw-link-blue-default:     var(--ds-text-link-rest);
   --panw-link-blue-hover:       var(--ds-text-link-hover);

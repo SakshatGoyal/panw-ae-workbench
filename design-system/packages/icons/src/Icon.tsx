@@ -22,6 +22,7 @@ export const Icon = React.forwardRef<SVGSVGElement, DynamicIconProps>(
     const Cmp = ICON_MANIFEST[name];
     if (!Cmp) {
       if (process.env.NODE_ENV !== 'production') {
+        // eslint-disable-next-line no-console
         console.warn(`[@ds/icons] unknown icon name: "${name}"`);
       }
       return null;

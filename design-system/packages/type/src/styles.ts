@@ -11,6 +11,7 @@ export const styleNames = [
   'body-compact-02',
   'body-01',
   'body-02',
+  'body-03',
   'heading-compact-01',
   'heading-compact-02',
   'heading-01',
@@ -106,40 +107,51 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontWeight: regularWeight,
     letterSpacing: '0.16px',
   },
+  // Helper-text and legal step down one tracking tier from Carbon's
+  // defaults (12px: 0.32 → 0.16, 14px: 0.16 → 0). The original tracking
+  // read airy at our default app density — the optical compensation built
+  // for IBM Plex no longer earns its keep at the sans family we're
+  // running. Smaller-tier helper/legal still get a touch of positive
+  // tracking (0.16) for legibility, but everything 14px and up sits at
+  // metric zero.
   'helper-text-01': {
     fontFamily: sansFamily,
     fontSize: '0.75rem',
     lineHeight: '1.33333',
     fontWeight: regularWeight,
-    letterSpacing: '0.32px',
+    letterSpacing: '0.16px',
   },
   'helper-text-02': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '0.16px',
+    letterSpacing: '0',
   },
   'legal-01': {
     fontFamily: sansFamily,
     fontSize: '0.75rem',
     lineHeight: '1.33333',
     fontWeight: regularWeight,
-    letterSpacing: '0.32px',
+    letterSpacing: '0.16px',
   },
   'legal-02': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '0.16px',
+    letterSpacing: '0',
   },
+  // Body family runs at metric zero across the board. The previous
+  // 0.16 on the 14px tier was the dominant "feels wide" complaint —
+  // workhorse paragraph text doesn't need tracking compensation, and
+  // dropping it tightens lists, table cells, and inline copy noticeably.
   'body-compact-01': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '0.16px',
+    letterSpacing: '0',
   },
   'body-compact-02': {
     fontFamily: sansFamily,
@@ -153,12 +165,29 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '0.875rem',
     lineHeight: '1.42857',
     fontWeight: regularWeight,
-    letterSpacing: '0.16px',
+    letterSpacing: '0',
   },
   'body-02': {
     fontFamily: sansFamily,
     fontSize: '1rem',
     lineHeight: '1.5',
+    fontWeight: regularWeight,
+    letterSpacing: '0',
+  },
+  // body-03 fills the 18px gap between body-02 (16px) and heading-03
+  // (20px). Used wherever paragraph text needs to read a notch larger than
+  // the workhorse 14/16 body — long-form panels, marketing surfaces inside
+  // the app, or any place where "comfortable reading body" beats
+  // "information-dense body." Line-height 1.4444 lands on a 26px leading
+  // grid (18 × 1.4444 = 26), keeping the body tight enough to not feel
+  // headline-y while still giving the larger size room to breathe.
+  // Letter-spacing is 0 — the size is large enough that positive tracking
+  // is no longer needed for legibility (the system applies tracking only
+  // on 14px-and-below tiers, where the optical compensation matters).
+  'body-03': {
+    fontFamily: sansFamily,
+    fontSize: '1.125rem',
+    lineHeight: '1.44444',
     fontWeight: regularWeight,
     letterSpacing: '0',
   },

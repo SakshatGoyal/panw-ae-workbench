@@ -3,10 +3,17 @@
 $panw-prefix: 'panw';
 
 .#{$panw-prefix}--cell-contents {
-  display: inline-flex;
+  // Block-level flex so the wrapper fills the cell. Inline-flex shrank
+  // the wrapper to its content and prevented internal text-align from
+  // reaching the cell wall — consumers had to push alignment up to the
+  // <td>, which broke the "use the component, don't drill around it"
+  // rule. Filling the cell lets the alignment prop drive layout from
+  // inside the component.
+  display: flex;
   flex-direction: row;
   align-items: center;
   gap: 4px;
+  width: 100%;
   box-sizing: border-box;
   font-family: var(--ds-type-font-family-sans);
   font-weight: 400;
@@ -15,6 +22,11 @@ $panw-prefix: 'panw';
   letter-spacing: 0.25px;
   font-feature-settings: 'lnum' 1, 'pnum' 1;
 }
+
+// Alignment: left places content at the start of the cell, right pushes
+// the text and any trailing affordances (trend, state icon) to the end.
+.#{$panw-prefix}--cell-contents--align-left  { justify-content: flex-start; }
+.#{$panw-prefix}--cell-contents--align-right { justify-content: flex-end; }
 
 .#{$panw-prefix}--cell-contents__text {
   flex: 1 1 0;

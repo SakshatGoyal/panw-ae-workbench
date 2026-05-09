@@ -10,7 +10,7 @@
 // State propagation across alpha-brand and alpha-red grounds is wired by
 // cells-standard via descendant selectors that rewrite these custom properties
 // on hover/pressed/selected. Keep these names stable.
-:root {
+.stage {
   --panw-cell-text-color:        var(--ds-text-secondary-rest);
   --panw-cell-trend-up-text:     var(--ds-text-status-success);
   --panw-cell-trend-up-icon:     var(--ds-icons-status-success);

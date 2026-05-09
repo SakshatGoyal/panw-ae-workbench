@@ -1,5 +1,5 @@
 {
-  "name": "@ds/multi-select",
+  "name": "@ds/filter",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -10,7 +10,7 @@
   },
   "dependencies": {
     "@ds/button": "workspace:*",
-    "@ds/checkbox": "workspace:*",
+    "@ds/flyout": "workspace:*",
     "@ds/tags": "workspace:*",
     "classnames": "^2.5.1",
     "prop-types": "^15.8.1"

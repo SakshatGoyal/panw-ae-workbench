@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Check, ChevronDown, ChevronUp, XCircle } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp } from '@ds/icons';
+import { XCircle } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const ChipSizes = ['default', 'small'] as const;

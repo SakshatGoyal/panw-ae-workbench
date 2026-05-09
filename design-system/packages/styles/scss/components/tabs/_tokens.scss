@@ -11,7 +11,7 @@
 // unselected→hover→pressed lifecycle. Selected gets a brand accent bar
 // (lines.brand.rest), kept at 2px (Stage's baseline line weight) — the
 // previous 4px was emphatic per the audit.
-:root {
+.stage {
   --panw-tabs-bg-selected:        var(--ds-surface-rest);
   --panw-tabs-bg-unselected:      var(--ds-surface-accent-rest);
   // Hover/pressed on unselected items sit on `ghost` (neutral). Tabs are

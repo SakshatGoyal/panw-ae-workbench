@@ -10,7 +10,7 @@
 // pressed) puts the ring at workhorse-icon weight, where it reads as a
 // target without competing with body text. The dot stays brand. Focus
 // ring stays brand. Label stays text.secondary.
-:root {
+.stage {
   --panw-radio-ring:           var(--ds-icons-secondary-rest);
   --panw-radio-ring-hover:     var(--ds-icons-secondary-hover);
   --panw-radio-ring-pressed:   var(--ds-icons-secondary-pressed);

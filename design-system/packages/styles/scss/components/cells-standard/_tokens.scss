@@ -5,7 +5,7 @@
 // the brand work via highlight.rest, so a neutral hover keeps the
 // hover-vs-active hierarchy clean. The active-state checkbox routes to
 // icons.brand.rest per the matching-family rule on the alpha-brand ground.
-:root {
+.stage {
   --panw-cell-row-hover-bg:        var(--ds-ghost-hover);
   --panw-cell-row-press-bg:        var(--ds-ghost-pressed);
   --panw-cell-row-active-bg:       var(--ds-highlight-rest);

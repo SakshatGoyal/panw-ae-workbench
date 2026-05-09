@@ -1,9 +1,14 @@
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
+
+// Pointer triangle removed per Stage's "decoration must earn its place" rule.
+// pointerDirection still drives the entrance-animation direction so the panel
+// reads as anchored to its trigger; pointerPosition is retained for API
+// continuity but no longer renders a visible arrow.
 
 export const PopoverDirections = ['top', 'bottom', 'left', 'right'] as const;
 export type PopoverDirection = (typeof PopoverDirections)[number];
@@ -31,36 +36,6 @@ export interface PopoverProps extends Omit<React.HTMLAttributes<HTMLDivElement>,
   onPageChange?: (page: number) => void;
   /** Custom body content. When provided, replaces description/image. Stepper still rendered if `showStepper`. */
   children?: React.ReactNode;
-}
-
-function Arrow({ direction }: { direction: PopoverDirection }) {
-  const cls = 'panw--popover__arrow';
-  if (direction === 'top') {
-    return (
-      <svg className={cls} viewBox="0 0 18 10" fill="currentColor" aria-hidden="true">
-        <path d="M9 0L18 10H0L9 0Z" />
-      </svg>
-    );
-  }
-  if (direction === 'bottom') {
-    return (
-      <svg className={cls} viewBox="0 0 18 10" fill="currentColor" aria-hidden="true">
-        <path d="M9 10L0 0H18L9 10Z" />
-      </svg>
-    );
-  }
-  if (direction === 'left') {
-    return (
-      <svg className={cls} viewBox="0 0 10 18" fill="currentColor" aria-hidden="true">
-        <path d="M0 9L10 0V18L0 9Z" />
-      </svg>
-    );
-  }
-  return (
-    <svg className={cls} viewBox="0 0 10 18" fill="currentColor" aria-hidden="true">
-      <path d="M10 9L0 18V0L10 9Z" />
-    </svg>
-  );
 }
 
 function normalizePosition(direction: PopoverDirection, position: PopoverPosition): string {
@@ -124,9 +99,6 @@ export const Popover = React.forwardRef<HTMLDivElement, PopoverProps>(function P
 
   return (
     <div ref={ref} className={rootClass} role="dialog" {...rest}>
-      <div className={`${prefix}--popover__pointer-container`}>
-        <Arrow direction={pointerDirection} />
-      </div>
       <div className={`${prefix}--popover__content-container`}>
         {showHeading && <p className={`${prefix}--popover__heading`}>{heading}</p>}
         {showRichBody && showImage && (

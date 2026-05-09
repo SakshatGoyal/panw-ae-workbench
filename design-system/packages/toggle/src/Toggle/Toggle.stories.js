@@ -38,7 +38,7 @@ Default.args = {
   on: true,
   label: 'Toggle Label',
   showInfo: false,
-  showStatus: true,
+  showStatus: false,
   labelPosition: 'left',
   size: 'default',
   disabled: false,

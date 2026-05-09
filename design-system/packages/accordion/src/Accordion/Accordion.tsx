@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronDown, Sun } from 'lucide-react';
+import { ChevronDown } from '@ds/icons';
+import { Sun } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import {
   Tags,

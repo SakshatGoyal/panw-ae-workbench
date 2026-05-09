@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Plus, Minus, ArrowUp, ArrowDown, ArrowUpDown, Filter } from 'lucide-react';
+import { Plus, Minus, ArrowUp, ArrowDown, ArrowsDouble as ArrowUpDown, Filter } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const HeaderAlignments = ['left', 'right'] as const;

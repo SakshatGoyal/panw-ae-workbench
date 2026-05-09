@@ -1,0 +1,157 @@
+@use 'tokens';
+
+$panw-prefix: 'panw';
+
+// =============================================================================
+// Filter — flyout-backed selection trigger.
+// CSS class prefix: .panw--filter
+//
+// The trigger is a button-shaped element (not a field). Its width is sized to
+// content because filters live in toolbars / table headers, not form rows.
+// Selected items render inside the trigger as neutral tags so the applied
+// set is legible without opening the panel. The chevron at the end signals
+// the disclosure relationship.
+// =============================================================================
+
+// Wrapper anchors the chip hover popover absolutely below the trigger.
+// Inline-block so the trigger keeps its content-sized width.
+.#{$panw-prefix}--filter__wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.#{$panw-prefix}--filter {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  // Mirror the small Button row: 32px tall, 12px end inset, on Stage's
+  // 4px grid. Vertical padding 0 because height is fixed.
+  height: 32px;
+  padding: 0 12px;
+  background-color: var(--panw-filter-bg);
+  border: 1px solid var(--panw-filter-border);
+  border-radius: 4px;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.286;
+  color: var(--panw-filter-label);
+  cursor: pointer;
+  transition:
+    background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-filter-bg-hover);
+    border-color: var(--panw-filter-border-hover);
+  }
+  &:active:not(:disabled) {
+    background-color: var(--panw-filter-bg-pressed);
+  }
+  &:focus-visible {
+    outline: 2px solid var(--ds-lines-brand-rest);
+    outline-offset: 1px;
+  }
+}
+
+.#{$panw-prefix}--filter--open {
+  background-color: var(--panw-filter-bg-open);
+  border-color: var(--panw-filter-border-open);
+}
+
+.#{$panw-prefix}--filter--disabled,
+.#{$panw-prefix}--filter:disabled {
+  background-color: var(--panw-filter-bg-disabled);
+  border-color: var(--panw-filter-border-disabled);
+  color: var(--panw-filter-label-disabled);
+  cursor: not-allowed;
+
+  .#{$panw-prefix}--filter__chevron {
+    color: var(--panw-filter-chevron-disabled);
+  }
+}
+
+.#{$panw-prefix}--filter__label {
+  font-weight: 400;
+  white-space: nowrap;
+}
+
+// Inline tag row — neutral tags announcing the applied set. Tags are sized
+// `default` (24px tall), gap 4px so the row reads as one cluster, and the
+// row itself never wraps inside the trigger — overflow is invisible because
+// each tag is on Stage's 4px grid.
+.#{$panw-prefix}--filter__values {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  flex-wrap: nowrap;
+}
+
+.#{$panw-prefix}--filter__chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--panw-filter-chevron);
+  flex-shrink: 0;
+}
+
+// Inline-flex hover-target hugs the chip pixels so the popover only fires
+// when the cursor is on the visible chip — not the surrounding trigger.
+.#{$panw-prefix}--filter__chip-target {
+  display: inline-flex;
+  align-items: center;
+}
+
+// ─── Chip hover popover ──────────────────────────────────────────────────────
+// Mirrors the MultiSelect chip popover: panel ground, line, radius, shadow.
+// Each row pairs the option label with a ghost X for removal.
+
+.#{$panw-prefix}--filter__chip-popover {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 4px;
+  min-width: 200px;
+  padding: 8px;
+  background-color: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-rest);
+  border-radius: 8px;
+  box-shadow: var(--ds-shadow-flyout);
+  z-index: 11;
+  animation: panw-flyout-enter 90ms cubic-bezier(0, 0, 0.38, 0.9);
+}
+
+.#{$panw-prefix}--filter__chip-popover-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 4px 4px 12px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.286;
+  color: var(--ds-text-primary);
+
+  &:hover {
+    background-color: var(--ds-surface-hover);
+  }
+}
+
+.#{$panw-prefix}--filter__chip-popover-label {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+// ─── Footer action row ───────────────────────────────────────────────────────
+// FlyoutFooter provides the bordered top edge and 8px inset; this layer
+// arranges the Cancel / Apply pair flush-right with a 8px gap.
+.#{$panw-prefix}--filter__footer-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 8px;
+}

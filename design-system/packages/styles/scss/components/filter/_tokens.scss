@@ -1,0 +1,28 @@
+// =============================================================================
+// Filter — Stage tokens.
+//
+// The Filter trigger is button-shaped (not field-shaped): finite content
+// width, owns its own ground, sits inside toolbars and table headers rather
+// than form rows. Tokens map the trigger to surface.* (the same family as a
+// tertiary button) and the chevron / label to the same text family the
+// MultiSelect uses, so a Filter and a MultiSelect side-by-side read as the
+// same hierarchy of state.
+// =============================================================================
+
+.stage {
+  --panw-filter-bg:           var(--ds-surface-rest);
+  --panw-filter-bg-hover:     var(--ds-surface-hover);
+  --panw-filter-bg-pressed:   var(--ds-surface-pressed);
+  --panw-filter-bg-open:      var(--ds-surface-selected);
+  --panw-filter-bg-disabled:  var(--ds-surface-disabled);
+
+  --panw-filter-border:           var(--ds-lines-neutral-rest);
+  --panw-filter-border-hover:     var(--ds-lines-neutral-hover);
+  --panw-filter-border-open:      var(--ds-lines-brand-rest);
+  --panw-filter-border-disabled:  var(--ds-lines-neutral-disabled);
+
+  --panw-filter-label:            var(--ds-text-primary);
+  --panw-filter-label-disabled:   var(--ds-text-secondary-disabled);
+  --panw-filter-chevron:          var(--ds-icons-secondary-rest);
+  --panw-filter-chevron-disabled: var(--ds-icons-secondary-disabled);
+}

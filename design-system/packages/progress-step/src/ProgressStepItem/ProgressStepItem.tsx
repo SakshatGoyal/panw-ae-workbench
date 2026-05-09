@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
+import { CircleCheck as CheckCircle2, ExclamationCircle as AlertCircle } from '@ds/icons';
+import { XCircle } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const ProgressStatuses = ['success', 'warning', 'error', 'active', 'inactive'] as const;

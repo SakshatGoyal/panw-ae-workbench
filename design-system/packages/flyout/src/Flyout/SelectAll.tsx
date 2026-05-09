@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Square, CheckSquare, MinusSquare } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
+import { Checkbox } from '@ds/checkbox';
 import { useFlyoutContext } from './Flyout';
 
 export interface SelectAllProps {
@@ -45,9 +45,6 @@ export const SelectAll = React.forwardRef<HTMLDivElement, SelectAllProps>(
       else selectNone();
     };
 
-    const Icon =
-      status === 'checked' ? CheckSquare : status === 'indeterminate' ? MinusSquare : Square;
-
     return (
       <>
         <div
@@ -65,8 +62,11 @@ export const SelectAll = React.forwardRef<HTMLDivElement, SelectAllProps>(
               handleToggle();
             }
           }}>
-          <span className={`${prefix}--flyout__select-all-glyph`} aria-hidden="true">
-            <Icon size={16} />
+          <span
+            className={`${prefix}--flyout__select-all-glyph`}
+            aria-hidden="true"
+            style={{ pointerEvents: 'none', display: 'inline-flex' }}>
+            <Checkbox status={status} label="" tabIndex={-1} />
           </span>
         </div>
         <div className={`${prefix}--flyout__divider`} role="separator" aria-hidden="true" />

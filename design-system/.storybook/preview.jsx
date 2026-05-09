@@ -25,6 +25,7 @@ import '../packages/styles/scss/components/accordion/index.scss';
 import '../packages/styles/scss/components/cell-contents/index.scss';
 import '../packages/styles/scss/components/dropdown/index.scss';
 import '../packages/styles/scss/components/multi-select/index.scss';
+import '../packages/styles/scss/components/filter/index.scss';
 import '../packages/styles/scss/components/header/index.scss';
 import '../packages/styles/scss/components/inline-notification/index.scss';
 import '../packages/styles/scss/components/number-input/index.scss';

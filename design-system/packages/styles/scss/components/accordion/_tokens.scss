@@ -11,7 +11,7 @@
 // no state variants, so hover/pressed fall back to rest per the matching-
 // family rule. The result is a quiet darkening on hover with no brand
 // wash — readable as a preview, not a commitment.
-:root {
+.stage {
   --panw-accordion-bg-gray00:           var(--ds-surface-rest);
   --panw-accordion-bg-gray10:           var(--ds-surface-alt-rest);
   --panw-accordion-bg-hover-gray00:     var(--ds-ghost-hover);

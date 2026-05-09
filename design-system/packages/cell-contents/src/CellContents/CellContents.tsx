@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ArrowUp, ArrowDown, Info, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
+import { ArrowUp, ArrowDown, Info, CircleCheck as CheckCircle, ExclamationTriangle as AlertTriangle } from '@ds/icons';
+import { XCircle } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { Tags, type TagColor, type TagContrast } from '@ds/tags';
 
@@ -11,9 +12,19 @@ export type CellContentType = (typeof CellContentTypes)[number];
 export const CellStates = ['none', 'info', 'success', 'warning', 'error'] as const;
 export type CellState = (typeof CellStates)[number];
 
+export const CellAlignments = ['left', 'right'] as const;
+export type CellAlignment = (typeof CellAlignments)[number];
+
 export interface CellContentsProps {
   content?: CellContentType;
   state?: CellState;
+  /**
+   * Horizontal alignment within the cell. Numeric `content` values
+   * (numbers, numberUp, numberDown) default to right; text defaults to
+   * left. Pass explicitly to override — e.g. a right-aligned text column
+   * for currency codes, or a left-aligned numeric column for IDs.
+   */
+  alignment?: CellAlignment;
   text?: string;
   tags?: boolean;
   tagLabel?: string;
@@ -35,6 +46,7 @@ export const CellContents = React.forwardRef<HTMLDivElement, CellContentsProps>(
     {
       content = 'text',
       state = 'none',
+      alignment,
       text,
       tags = false,
       tagLabel = 'Tag',
@@ -52,11 +64,17 @@ export const CellContents = React.forwardRef<HTMLDivElement, CellContentsProps>(
     const isNumeric = content !== 'text';
     const showTrend = content === 'numberUp' || content === 'numberDown';
     const StateIcon = state !== 'none' ? STATE_ICON[state] : null;
+    // Right-align numeric content by default; explicit alignment prop wins.
+    const effectiveAlignment: CellAlignment = alignment ?? (isNumeric ? 'right' : 'left');
 
-    const rootClass = classNames(`${prefix}--cell-contents`, className);
+    const rootClass = classNames(
+      `${prefix}--cell-contents`,
+      `${prefix}--cell-contents--align-${effectiveAlignment}`,
+      className
+    );
 
     const textClass = classNames(`${prefix}--cell-contents__text`, {
-      [`${prefix}--cell-contents__text--right`]: isNumeric,
+      [`${prefix}--cell-contents__text--right`]: effectiveAlignment === 'right',
     });
 
     const trendClass = classNames(
@@ -97,6 +115,7 @@ CellContents.displayName = 'CellContents';
 CellContents.propTypes = {
   content: PropTypes.oneOf(CellContentTypes),
   state: PropTypes.oneOf(CellStates),
+  alignment: PropTypes.oneOf(CellAlignments),
   text: PropTypes.string,
   tags: PropTypes.bool,
   tagLabel: PropTypes.string,

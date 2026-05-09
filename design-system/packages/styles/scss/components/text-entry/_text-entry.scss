@@ -90,7 +90,22 @@ $panw-prefix: 'panw';
   height: auto;
   min-height: 80px;
   align-items: flex-start;
-  padding: 8px 8px 8px 16px;  // textarea variant restores vertical padding
+  // Mirror the default single-field inset: 14px text @ 1.286 line-height in a
+  // 40px row leaves (40 − 18) / 2 = 11px above & below; left=16px keeps the
+  // text-entry origin. Right is symmetric here because there is no inline
+  // IconButton to fill the row in textarea mode.
+  padding: 11px 16px;
+  // Anchor for the absolutely-positioned clear button (textarea mode only).
+  position: relative;
+}
+
+// Textarea variant pulls the clear button out of the flex row and pins it
+// to the top-right corner with a 2px breathing-room inset. Single-field
+// variants keep the row-filling IconButton.
+.#{$panw-prefix}--text-entry--type-area .#{$panw-prefix}--text-entry__clear {
+  position: absolute;
+  top: 2px;
+  right: 2px;
 }
 .#{$panw-prefix}--text-entry--type-area .#{$panw-prefix}--text-entry__input {
   min-height: 60px;

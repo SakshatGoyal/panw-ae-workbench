@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Sun, X } from 'lucide-react';
+import { Close as X } from '@ds/icons';
+import { Sun } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 // ─── Color / contrast / size enumerations ────────────────────────────────────

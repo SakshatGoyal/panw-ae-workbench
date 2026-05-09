@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Search as SearchGlyph, X } from 'lucide-react';
+import { Search as SearchGlyph, Close as X } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 

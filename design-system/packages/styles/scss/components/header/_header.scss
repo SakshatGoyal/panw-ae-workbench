@@ -97,13 +97,20 @@ $panw-prefix: 'panw';
   svg { width: 16px; height: 16px; }
 }
 
-// Sort indicator is hidden until hover (and when forceState says so).
-.#{$panw-prefix}--header__sort-indicator { opacity: 0; }
+// Sort indicator is muted at rest so a sortable column is discoverable
+// without trial-and-error hover, then comes to full presence on hover or
+// active. Hover-to-reveal alone failed the affordance contract: a user
+// looking at the table at rest couldn't tell which columns were sortable.
+.#{$panw-prefix}--header__sort-indicator {
+  opacity: 0.4;
+  color: var(--panw-header-icon-muted);
+}
 .#{$panw-prefix}--header:hover .#{$panw-prefix}--header__sort-indicator,
 .#{$panw-prefix}--header--force-hover .#{$panw-prefix}--header__sort-indicator,
 .#{$panw-prefix}--header:active .#{$panw-prefix}--header__sort-indicator,
 .#{$panw-prefix}--header--force-onclick .#{$panw-prefix}--header__sort-indicator {
   opacity: 1;
+  color: var(--panw-header-icon);
 }
 
 // Filter shows when the filter prop is set (independently of hover).

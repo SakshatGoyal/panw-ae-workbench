@@ -4,7 +4,7 @@
 // right answer — this is the active-state physical control).
 // Off-track is surface.accent (neutral20) — the slot the knob slides in.
 // Disabled tokens are explicit per family (no opacity sledgehammer).
-:root {
+.stage {
   --panw-toggle-track-on:           var(--ds-brand-rest);
   --panw-toggle-track-on-hover:     var(--ds-brand-hover);
   --panw-toggle-track-off:          var(--ds-surface-accent-rest);

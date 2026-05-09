@@ -15,7 +15,7 @@
 // with a defined edge" rule. The trigger field sits at radius.tight (4px).
 // =============================================================================
 
-:root {
+.stage {
   --panw-dropdown-bg:                var(--ds-field-rest);
   --panw-dropdown-bg-hover:          var(--ds-field-hover);
   --panw-dropdown-bg-pressed:        var(--ds-field-pressed);

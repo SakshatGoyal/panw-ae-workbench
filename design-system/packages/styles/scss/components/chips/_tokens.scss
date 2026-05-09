@@ -1,5 +1,5 @@
 // Chip — CSS custom property tokens (FUTURE TOKEN SWAP POINT)
-:root {
+.stage {
   // ── Light theme ───────────────────────────────────────────────────────────
   --panw-chip-bg:                #ffffff; // VariableID:7203:1767
   --panw-chip-border:            #e4e8eb; // VariableID:7203:1809
@@ -13,9 +13,17 @@
   --panw-chip-bg-hover:          var(--ds-ghost-hover);
   --panw-chip-bg-pressed:        var(--ds-ghost-pressed);
 
-  --panw-chip-active-bg:         #404a52; // VariableID:7203:1789
-  --panw-chip-active-text:       #ffffff;
-  --panw-chip-active-icon:       #ffffff;
+  // Active = "chosen", expressed as a brand-tinted ground with a brand-colored
+  // ring + brand text/icon. The pale wash carries the chosen state without
+  // shouting; the 1px brand border is what locks the chip in as unmistakably
+  // selected — without the ring, the wash alone reads as a hover or a
+  // passive pastel. The ring + text + icon all share the brand hue, so the
+  // chip reads as a single coherent "engaged" object instead of a fill with
+  // a stranger color sitting on top.
+  --panw-chip-active-bg:         #E5EFFB; /* alpha brand-rest 12% on white */
+  --panw-chip-active-border:     var(--ds-text-brand-rest);
+  --panw-chip-active-text:       var(--ds-text-brand-rest);
+  --panw-chip-active-icon:       var(--ds-text-brand-rest);
 
   --panw-chip-disabled-border:   #c5ccd1; // VariableID:7203:1823
   --panw-chip-disabled-text:     #c5ccd1;

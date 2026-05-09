@@ -53,6 +53,20 @@ A flyout holds interactive items the user is about to act on, not narrative cont
 
 Respect `prefers-reduced-motion: reduce` on every component entrance — drop the slide, drop the fade, render in final position.
 
+## Component entrances
+
+Different surfaces earn different volumes of motion. The rule of thumb: motion volume scales with how much the surface narrates versus how much it serves a task.
+
+| Surface | Motion |
+|---|---|
+| Tooltip | opacity fade + 8px directional slide, 70ms (`fast-01`), entrance easing |
+| Popover | opacity fade + 8px directional slide, 70ms (`fast-01`), entrance easing |
+| Flyout | opacity fade + 2px settle, 90ms, entrance easing |
+
+A flyout holds interactive items the user is about to act on, not narrative content they're being shown — so the entrance is quieter than a popover's. The 2px settle reads as the panel arriving in place, not flying in from somewhere. Tooltips and popovers explain; their motion can be more present because the user's attention is already drawn there.
+
+Respect `prefers-reduced-motion: reduce` on every component entrance — drop the slide, drop the fade, render in final position.
+
 ## When no named scale fits
 
 Calculate from the same logic. Duration scaled to distance traveled — a 200px slide takes longer than a 20px nudge. Easing matched to whether the element is entering view, leaving view, or transitioning in place. Author values that would feel native to Carbon's system; do not invent a parallel one.

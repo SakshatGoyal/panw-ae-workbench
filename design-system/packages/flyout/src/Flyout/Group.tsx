@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronRight, ChevronDown } from 'lucide-react';
+import { ChevronRight, ChevronDown } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import {
   useFlyoutDepth,

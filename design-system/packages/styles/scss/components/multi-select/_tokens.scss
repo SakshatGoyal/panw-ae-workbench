@@ -6,7 +6,7 @@
 // aware disabled. radius.tight on trigger; radius.standard on the flyout.
 // =============================================================================
 
-:root {
+.stage {
   --panw-ms-bg:                var(--ds-field-rest);
   --panw-ms-bg-hover:          var(--ds-field-hover);
   --panw-ms-bg-pressed:        var(--ds-field-pressed);

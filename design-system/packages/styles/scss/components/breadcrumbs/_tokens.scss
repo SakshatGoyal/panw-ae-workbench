@@ -9,7 +9,7 @@
 // affordance work without trail-clutter.
 //
 // Separator chevrons are icons.tertiary — supplementary metadata.
-:root {
+.stage {
   --panw-breadcrumb-text:          var(--ds-text-primary);
   --panw-breadcrumb-separator:     var(--ds-icons-tertiary-rest);
   --panw-breadcrumb-link:          var(--ds-text-link-rest);

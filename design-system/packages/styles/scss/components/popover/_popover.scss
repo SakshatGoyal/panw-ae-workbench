@@ -50,59 +50,8 @@ $panw-prefix: 'panw';
   align-items: stretch;
 }
 
-.#{$panw-prefix}--popover__pointer-container {
-  display: flex;
-  flex-shrink: 0;
-  box-sizing: border-box;
-}
-
-.#{$panw-prefix}--popover--direction-top .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-bottom .#{$panw-prefix}--popover__pointer-container {
-  flex-direction: row;
-  width: 100%;
-}
-
-.#{$panw-prefix}--popover--direction-left .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-right .#{$panw-prefix}--popover__pointer-container {
-  flex-direction: column;
-  height: 100%;
-}
-
-// Pointer position alignment (16px inset matches the parent rounded corner)
-.#{$panw-prefix}--popover--direction-top.#{$panw-prefix}--popover--position-left .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-bottom.#{$panw-prefix}--popover--position-left .#{$panw-prefix}--popover__pointer-container { justify-content: flex-start; padding: 0 16px; }
-
-.#{$panw-prefix}--popover--direction-top.#{$panw-prefix}--popover--position-middle .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-bottom.#{$panw-prefix}--popover--position-middle .#{$panw-prefix}--popover__pointer-container { justify-content: center; }
-
-.#{$panw-prefix}--popover--direction-top.#{$panw-prefix}--popover--position-right .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-bottom.#{$panw-prefix}--popover--position-right .#{$panw-prefix}--popover__pointer-container { justify-content: flex-end; padding: 0 16px; }
-
-.#{$panw-prefix}--popover--direction-left.#{$panw-prefix}--popover--position-top .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-right.#{$panw-prefix}--popover--position-top .#{$panw-prefix}--popover__pointer-container { justify-content: flex-start; padding: 16px 0; }
-
-.#{$panw-prefix}--popover--direction-left.#{$panw-prefix}--popover--position-middle .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-right.#{$panw-prefix}--popover--position-middle .#{$panw-prefix}--popover__pointer-container { justify-content: center; }
-
-.#{$panw-prefix}--popover--direction-left.#{$panw-prefix}--popover--position-bottom .#{$panw-prefix}--popover__pointer-container,
-.#{$panw-prefix}--popover--direction-right.#{$panw-prefix}--popover--position-bottom .#{$panw-prefix}--popover__pointer-container { justify-content: flex-end; padding: 16px 0; }
-
-// Pointer order
-.#{$panw-prefix}--popover--direction-bottom .#{$panw-prefix}--popover__pointer-container { order: 1; }
-.#{$panw-prefix}--popover--direction-bottom .#{$panw-prefix}--popover__content-container { order: 0; }
-.#{$panw-prefix}--popover--direction-right .#{$panw-prefix}--popover__pointer-container { order: 1; }
-.#{$panw-prefix}--popover--direction-right .#{$panw-prefix}--popover__content-container { order: 0; }
-
-.#{$panw-prefix}--popover__arrow {
-  display: block;
-  flex-shrink: 0;
-  fill: var(--panw-popover-surface);
-}
-
-.#{$panw-prefix}--popover--direction-top .#{$panw-prefix}--popover__arrow,
-.#{$panw-prefix}--popover--direction-bottom .#{$panw-prefix}--popover__arrow { width: 18px; height: 10px; }
-.#{$panw-prefix}--popover--direction-left .#{$panw-prefix}--popover__arrow,
-.#{$panw-prefix}--popover--direction-right .#{$panw-prefix}--popover__arrow { width: 10px; height: 18px; }
+// Pointer triangle removed — direction still flips the layout for entrance
+// animation and any future side-anchored variants, but no arrow renders.
 
 .#{$panw-prefix}--popover__content-container {
   background-color: var(--panw-popover-surface);

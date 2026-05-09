@@ -14,7 +14,7 @@
 // Caution is a new fifth category per the system-level decision to adopt it
 // alongside warning. Aliased to "alert" for back-compat with PANW's
 // previous single warning/caution slot.
-:root {
+.stage {
   // Page-level grounds
   --panw-in-info-page-bg:        var(--ds-status-info-subtle);
   --panw-in-info-page-icon:      var(--ds-icons-status-info);

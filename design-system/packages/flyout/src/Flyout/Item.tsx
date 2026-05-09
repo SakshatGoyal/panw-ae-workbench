@@ -2,8 +2,8 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Square, CheckSquare } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
+import { Checkbox } from '@ds/checkbox';
 import { useFlyoutContext, useFlyoutDepth } from './Flyout';
 
 export interface ItemProps {
@@ -157,8 +157,18 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>(function Item(
         }}
         style={depth > 0 ? { paddingLeft: 12 + depth * INDENT_PX } : undefined}>
         {mode === 'multiple' && (
-          <span className={`${prefix}--flyout__item-checkbox`} aria-hidden="true">
-            {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+          // Presentational Checkbox — the row owns the click. pointer-events:
+          // none keeps the input from firing a second change; aria-hidden
+          // hands a11y to the row's aria-selected.
+          <span
+            className={`${prefix}--flyout__item-checkbox`}
+            aria-hidden="true"
+            style={{ pointerEvents: 'none', display: 'inline-flex' }}>
+            <Checkbox
+              status={isSelected ? 'checked' : 'unchecked'}
+              label=""
+              tabIndex={-1}
+            />
           </span>
         )}
         {IconElement && (

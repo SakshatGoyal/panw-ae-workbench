@@ -8,6 +8,34 @@ $panw-prefix: 'panw';
   width: 100%;
   box-sizing: border-box;
   font-family: var(--ds-type-font-family-sans);
+  // Root carries the accordion's ground so the entire shell — header strip
+  // AND drawer area around the inner panel — reads as one continuous tile.
+  // Without this the drawer sits transparent, revealing whatever's behind
+  // the page and breaking the elevated tile illusion when open.
+  background-color: var(--panw-accordion-bg-gray00);
+  // Closed and open share the same radius.tight (4px) so the accordion
+  // doesn't change shape on toggle — only its elevation. overflow:hidden
+  // clips the inner item bg into the rounded shell at all times.
+  border-radius: var(--ds-radius-tight);
+  overflow: hidden;
+  // Smoothly animate the open-state lift when toggling.
+  transition:
+    margin 150ms cubic-bezier(0.2, 0, 0.38, 0.9),
+    box-shadow 150ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+
+.#{$panw-prefix}--accordion--theme-gray10 {
+  background-color: var(--panw-accordion-bg-gray10);
+}
+
+// ─── Open-state lift ─────────────────────────────────────────────────────────
+// When open, the accordion floats slightly out of the row: 4px breathing room
+// above and below, tile-on-tile shadow so it reads as elevated next to its
+// closed siblings. Radius and overflow inherit from the root so the shape
+// stays consistent across closed and open — only the elevation changes.
+.#{$panw-prefix}--accordion--open {
+  margin: 4px 0;
+  box-shadow: var(--ds-shadow-tile-on-tile);
 }
 
 .#{$panw-prefix}--accordion__item {
@@ -151,7 +179,10 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--accordion__text-container {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  // 4px between title and description — they're a tightly-coupled pair
+  // (heading + supplemental subtitle), so the gap reads as unit-cohesion,
+  // not proximity between distinct elements.
+  gap: 4px;
   flex: 1;
   min-width: 0;
 }
@@ -200,30 +231,50 @@ $panw-prefix: 'panw';
   opacity: 1;
 }
 
+// Children land inside a contained panel so they never touch the accordion
+// edges. The panel inherits the accordion ground (via the root background-color)
+// — no border, no radius — and earns its containment from the surrounding
+// margin alone. Lines and fills are reserved for actual hierarchy; the
+// panel is just breathing room expressed as space.
 .#{$panw-prefix}--accordion__content-inner {
-  background-color: var(--panw-accordion-bg-gray00);
   box-sizing: border-box;
 }
 
-.#{$panw-prefix}--accordion--theme-gray10 .#{$panw-prefix}--accordion__content-inner {
-  background-color: var(--panw-accordion-bg-gray10);
-}
-
 // Sizes
+// Content-inner padding aligns content with the title column past the
+// chevron — left padding equals the chevron width per size — so children
+// read as continuing the title's left grid line, not a separate inset.
+// Top/right/bottom = 16px is enough breathing room without the redundant
+// padding stack the previous version had.
+//
+// Closed-state header padding: when no description, the existing 8/12/4
+// bottom paddings are right and untouched. When a description IS rendered,
+// the container's bottom padding bumps to 16px so the description doesn't
+// hug the accordion's bottom edge — :has() detects the description's
+// presence without needing a JS class flag.
 .#{$panw-prefix}--accordion--size-default {
   .#{$panw-prefix}--accordion__expansion { width: 40px; height: 40px; }
   .#{$panw-prefix}--accordion__container { padding: 8px 16px 8px 0; }
-  .#{$panw-prefix}--accordion__content-inner { padding: 12px; }
+  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
+    padding-bottom: 16px;
+  }
+  .#{$panw-prefix}--accordion__content-inner { padding: 16px 16px 16px 40px; }
 }
 
 .#{$panw-prefix}--accordion--size-large {
   .#{$panw-prefix}--accordion__expansion { width: 48px; height: 48px; }
   .#{$panw-prefix}--accordion__container { padding: 12px 16px 12px 0; }
-  .#{$panw-prefix}--accordion__content-inner { padding: 16px; }
+  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
+    padding-bottom: 16px;
+  }
+  .#{$panw-prefix}--accordion__content-inner { padding: 16px 16px 16px 48px; }
 }
 
 .#{$panw-prefix}--accordion--size-small {
   .#{$panw-prefix}--accordion__expansion { width: 32px; height: 32px; }
   .#{$panw-prefix}--accordion__container { padding: 4px 16px 4px 0; }
-  .#{$panw-prefix}--accordion__content-inner { padding: 8px; }
+  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
+    padding-bottom: 16px;
+  }
+  .#{$panw-prefix}--accordion__content-inner { padding: 16px 16px 16px 32px; }
 }

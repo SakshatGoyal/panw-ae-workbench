@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Info } from 'lucide-react';
+import { Info } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const ToggleLabelPositions = ['left', 'right', 'top'] as const;
@@ -18,7 +18,10 @@ export interface ToggleProps
   label?: string;
   /** Show the info icon next to the label. */
   showInfo?: boolean;
-  /** Show status text (Yes/No). */
+  /** Show Yes/No status text next to the track. Off by default — the track
+   *  position and color already communicate state, and the text reads as
+   *  redundant noise next to the label. Opt in only when status genuinely
+   *  needs to be readable independent of the track. */
   showStatus?: boolean;
   /** Custom on-status text. */
   onStatusText?: string;
@@ -41,7 +44,7 @@ export const Toggle = React.forwardRef<HTMLInputElement, ToggleProps>(function T
     on = true,
     label = 'Toggle Label',
     showInfo = false,
-    showStatus = true,
+    showStatus = false,
     onStatusText = 'Yes',
     offStatusText = 'No',
     labelPosition = 'left',

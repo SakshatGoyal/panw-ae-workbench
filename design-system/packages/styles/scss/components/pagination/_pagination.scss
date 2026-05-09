@@ -2,48 +2,110 @@
 
 $panw-prefix: 'panw';
 
+// Pagination — Ledger style.
+// Hairline rule above (anchors the pagination to the table it follows),
+// dense single-line layout, three sections justified to the row's ends:
+// [range read-out]   [nav cluster]   [rows per page]
+//
+// Typography is the meta-treatment: 11px uppercase tracked-out captions
+// for the labels around the numbers, regular case + tabular-nums for the
+// numerals themselves. Reads as a financial status bar — the same idiom
+// as Bloomberg, FactSet, Workday, and modern accounting software.
+
 .#{$panw-prefix}--pagination {
   display: flex;
   align-items: center;
-  gap: 16px;
+  justify-content: space-between;
+  gap: 24px;
+  padding-top: 12px;
+  border-top: 1px solid var(--ds-lines-neutral-rest);
   font-family: var(--ds-type-font-family-sans);
+  font-variant-numeric: tabular-nums;
 }
 
-.#{$panw-prefix}--pagination__page-numbers {
-  display: flex;
-  align-items: center;
-  gap: 4px;
+// ─── Range read-out ─────────────────────────────────────────────────────────
+// "1–25 of 1,247 records" — caption typography, with numerals leading in
+// primary text color and the surrounding labels in secondary uppercase.
+
+.#{$panw-prefix}--pagination__range {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--panw-pagination-text-secondary);
 }
 
-.#{$panw-prefix}--pagination__ellipsis {
+.#{$panw-prefix}--pagination__range-numbers {
+  font-weight: 600;
+  color: var(--panw-pagination-text);
+  font-variant-numeric: tabular-nums;
+  text-transform: none;       // numbers stay regular case; only labels are caps
+  letter-spacing: 0;
+}
+
+.#{$panw-prefix}--pagination__range-sep {
+  color: var(--panw-pagination-text-secondary);
+  font-weight: 400;
+}
+
+// ─── Nav cluster ────────────────────────────────────────────────────────────
+// Center group: « ‹  page 5 of 50  › »
+// Chevrons are DS IconButtons — same ghost size=sm used elsewhere in the
+// system. The page indicator sits between as a caption pair, not a button.
+
+.#{$panw-prefix}--pagination__nav {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  min-width: 24px;
-  font-size: 14px;
-  color: var(--panw-pagination-ellipsis);
+  gap: 4px;
+
+  // Lucide chevrons default to stroke-width 2 — at 18px that reads as a
+  // chunky caret rather than an elegant chevron arrow. Thinning the stroke
+  // to 1.5 gives the icons the sleek directional shape the Ledger aesthetic
+  // needs (Bloomberg/FactSet chevrons are always thin).
+  svg { stroke-width: 1.5; }
 }
 
+.#{$panw-prefix}--pagination__page-indicator {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 0 12px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--panw-pagination-text-secondary);
+}
+
+.#{$panw-prefix}--pagination__page-current,
+.#{$panw-prefix}--pagination__page-total {
+  font-weight: 600;
+  color: var(--panw-pagination-text);
+  font-variant-numeric: tabular-nums;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+// ─── Rows per page ──────────────────────────────────────────────────────────
+// Right-side cluster: caption label + DS Dropdown size=small. The wrapper
+// constrains width so the dropdown doesn't flex into the row.
+
 .#{$panw-prefix}--pagination__items-per-page {
-  display: flex;
+  display: inline-flex;
   align-items: center;
   gap: 8px;
 }
 
 .#{$panw-prefix}--pagination__items-per-page-label {
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.25px;
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
   color: var(--panw-pagination-text-secondary);
 }
 
-// The items-per-page dropdown sits in a row of 32px chevron buttons; the
-// wrapper constrains the dropdown to a compact width and the inner trigger
-// size lives at 'small' so the row doesn't gain a 40px tile.
 .#{$panw-prefix}--pagination__dropdown-wrapper {
   width: 80px;
-
   // Override Dropdown's 320px default so it fits the slot.
   .#{$panw-prefix}--dropdown { width: 80px; }
 }

@@ -7,7 +7,7 @@
 //   shadow  → none (tooltips are at the chrome layer, not card-stack)
 //   radius  → radius.tight (4px)
 //   padding → 8px / 12px (vertical / horizontal, the static-label rule)
-:root {
+.stage {
   --panw-tooltip-surface: var(--ds-surface-inverse-rest);
   --panw-tooltip-text:    var(--ds-text-inverse-rest);
 }

@@ -158,9 +158,9 @@ export const StageTokens = {
     },
   },
   "field": {
-    "rest": neutral10,
-    "hover": "#e7e7e7",     // alpha(neutral20, 40) over neutral10
-    "pressed": "#dbdbdb",   // alpha(neutral30, 50) over neutral10
+    "rest": neutral5,
+    "hover": "#ededed",     // alpha(neutral20, 40) over neutral5
+    "pressed": "#e0e0e0",   // alpha(neutral30, 50) over neutral5
     "selected": neutral0,
     "disabled": neutral5,
   },

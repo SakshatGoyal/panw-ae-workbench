@@ -1,9 +1,11 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Close as X } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
+import { IconButton } from '@ds/button';
 import { Tags } from '@ds/tags';
+import { Checkbox } from '@ds/checkbox';
 
 export const MultiSelectBackgrounds = ['grey10', 'grey00'] as const;
 export type MultiSelectBackground = (typeof MultiSelectBackgrounds)[number];
@@ -85,6 +87,22 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
     const [internal, setInternal] = useState<string[]>(selectedValues ?? []);
     const wrapperRef = useRef<HTMLDivElement>(null);
 
+    // Hover popover state for the selection chip. Small close-delay so the
+    // user can move from chip → popover without the panel disappearing.
+    const [chipPopoverOpen, setChipPopoverOpen] = useState(false);
+    const closeTimerRef = useRef<number | null>(null);
+    const cancelClose = useCallback(() => {
+      if (closeTimerRef.current !== null) {
+        window.clearTimeout(closeTimerRef.current);
+        closeTimerRef.current = null;
+      }
+    }, []);
+    const scheduleClose = useCallback(() => {
+      cancelClose();
+      closeTimerRef.current = window.setTimeout(() => setChipPopoverOpen(false), 180);
+    }, [cancelClose]);
+    useEffect(() => () => cancelClose(), [cancelClose]);
+
     useEffect(() => {
       if (!selectedValues) return;
       setInternal((prev) => {
@@ -121,6 +139,22 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
       },
       [internal, onChange]
     );
+
+    const removeOne = useCallback(
+      (value: string) => {
+        const next = internal.filter((v) => v !== value);
+        setInternal(next);
+        onChange?.(next);
+        if (next.length === 0) setChipPopoverOpen(false);
+      },
+      [internal, onChange]
+    );
+
+    const clearAll = useCallback(() => {
+      setInternal([]);
+      onChange?.([]);
+      setChipPopoverOpen(false);
+    }, [onChange]);
 
     let visualState: MultiSelectState = 'default';
     if (forceState) visualState = forceState;
@@ -173,29 +207,81 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
               <span className={`${prefix}--multi-select__placeholder`}>{placeholder}</span>
             ) : (
               <div className={`${prefix}--multi-select__values-row`}>
-                {selectedLabels.slice(0, visibleChipCount).map((label, i) => (
+                {/* Hover-target wrapper — ONLY the chip itself opens the
+                    selected-items popover. Hovering the surrounding field
+                    row must not trigger it. The wrapper hugs the chip via
+                    inline-flex so the hover region matches the visible
+                    pixels. The chip owns its own X (which clears one or
+                    all via stopPropagation) so the field-row click that
+                    opens the main menu still works elsewhere. */}
+                <span
+                  className={`${prefix}--multi-select__chip-target`}
+                  onMouseEnter={() => {
+                    cancelClose();
+                    setChipPopoverOpen(true);
+                  }}
+                  onMouseLeave={scheduleClose}>
                   <Tags
-                    key={`${label}-${i}`}
-                    label={label}
-                    color="grey"
-                    contrast="low"
+                    label={
+                      selectedLabels.length === 1
+                        ? selectedLabels[0]
+                        : `${selectedLabels.length} selected`
+                    }
+                    color="neutral"
+                    contrast="high"
                     size="default"
+                    close
+                    onClose={(e) => {
+                      e.stopPropagation();
+                      if (selectedLabels.length === 1) {
+                        removeOne(internal[0]);
+                      } else {
+                        clearAll();
+                      }
+                    }}
                   />
-                ))}
-                {selectedLabels.length > visibleChipCount && (
-                  <Tags
-                    label={`+${selectedLabels.length - visibleChipCount}`}
-                    color="grey"
-                    contrast="low"
-                    size="default"
-                  />
-                )}
+                </span>
               </div>
             )}
             <span className={`${prefix}--multi-select__chevron`} aria-hidden="true">
               {visualState === 'active' ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
             </span>
           </div>
+
+          {/* Hover popover — flyout-styled list of currently-selected items,
+              each with a per-item remove. Shown when the chip is hovered and
+              there is at least one selection. Suppressed when the main menu
+              is already open to avoid two stacked panels. */}
+          {hasValues && chipPopoverOpen && !isOpen && !disabled && !readOnly && (
+            <div
+              className={`${prefix}--multi-select__chip-popover`}
+              role="dialog"
+              aria-label="Selected items"
+              onMouseEnter={cancelClose}
+              onMouseLeave={scheduleClose}>
+              {internal.map((value) => {
+                const label = options.find((o) => o.value === value)?.label ?? value;
+                return (
+                  <div key={value} className={`${prefix}--multi-select__chip-popover-row`}>
+                    <span className={`${prefix}--multi-select__chip-popover-label`}>
+                      {label}
+                    </span>
+                    <IconButton
+                      kind="ghost"
+                      size="sm"
+                      iconSize={16}
+                      renderIcon={X}
+                      aria-label={`Remove ${label}`}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        removeOne(value);
+                      }}
+                    />
+                  </div>
+                );
+              })}
+            </div>
+          )}
 
           {isOpen && !disabled && !readOnly && (
             <div className={`${prefix}--multi-select__menu`} role="listbox">
@@ -210,6 +296,19 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     role="option"
                     aria-selected={selected}
                     onClick={() => select(opt.value)}>
+                    {/* Presentational checkbox — the row owns the click.
+                        pointer-events:none keeps the input from firing a
+                        second change event; aria-hidden hands a11y to the
+                        row's aria-selected. */}
+                    <span
+                      aria-hidden="true"
+                      style={{ pointerEvents: 'none', display: 'inline-flex' }}>
+                      <Checkbox
+                        status={selected ? 'checked' : 'unchecked'}
+                        label=""
+                        tabIndex={-1}
+                      />
+                    </span>
                     {opt.label}
                   </div>
                 );

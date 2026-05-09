@@ -46,7 +46,15 @@
   justify-content: center;
   flex-shrink: 0;
 
-  svg {
+  // Respect the SVG's own fill attribute. Lucide icons declare
+  // fill="none" stroke="currentColor" — they're outlined glyphs whose
+  // shape comes from stroke, not fill. Forcing fill: currentColor on
+  // them turns chevrons into filled triangles, which is what shipped
+  // and went unnoticed because at small sizes the V outline reads
+  // similarly to a filled triangle (until you actually look). The
+  // :not([fill="none"]) guard preserves filled-icon support for the
+  // rare custom SVG that needs it.
+  svg:not([fill='none']) {
     fill: currentColor;
   }
 }

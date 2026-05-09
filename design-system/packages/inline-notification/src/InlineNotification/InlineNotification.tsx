@@ -1,7 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Info, AlertTriangle, XCircle, CheckCircle, X } from 'lucide-react';
+import { Info, ExclamationTriangle as AlertTriangle, CircleCheck as CheckCircle, Close as X } from '@ds/icons';
+import { XCircle } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 

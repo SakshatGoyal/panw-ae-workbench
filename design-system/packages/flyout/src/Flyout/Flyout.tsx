@@ -102,9 +102,14 @@ function usePosition(
     // Clamp horizontally inside the viewport (8px page-edge breathing room).
     left = Math.max(8, Math.min(left, viewportWidth - flyoutWidth - 8));
 
+    // Coordinates are viewport-relative. The flyout uses position: fixed (set
+    // on the root element below) so its containing block is always the viewport
+    // regardless of any positioned ancestor (e.g. .panw--filter__wrapper which
+    // is position: relative). Do NOT add scrollY/scrollX — fixed elements do
+    // not scroll with the page.
     setStyle({
-      top: top + window.scrollY,
-      left: left + window.scrollX,
+      top,
+      left,
       width: flyoutWidth,
       maxHeight: Math.max(120, maxHeight),
       visibility: 'visible',
@@ -272,7 +277,12 @@ export const Flyout = React.forwardRef<HTMLDivElement, FlyoutProps>(function Fly
           role="listbox"
           aria-multiselectable={mode === 'multiple'}
           style={{
-            position: 'absolute',
+            // position: fixed anchors the flyout to the viewport, not to the
+            // nearest positioned ancestor. usePosition computes viewport-
+            // relative coords; fixed positioning makes those coords resolve
+            // correctly regardless of where the trigger is mounted in the
+            // DOM tree (e.g. inside a position: relative wrapper).
+            position: 'fixed',
             top: position.top,
             left: position.left,
             width: position.width,

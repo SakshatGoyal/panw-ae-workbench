@@ -335,9 +335,15 @@ importers:
       '@ds/button':
         specifier: workspace:*
         version: link:../button
+      '@ds/checkbox':
+        specifier: workspace:*
+        version: link:../checkbox
       '@ds/flyout':
         specifier: workspace:*
         version: link:../flyout
+      '@ds/icons':
+        specifier: workspace:*
+        version: link:../icons
       '@ds/tags':
         specifier: workspace:*
         version: link:../tags

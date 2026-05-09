@@ -101,6 +101,11 @@ $panw-prefix: 'panw';
 // without trial-and-error hover, then comes to full presence on hover or
 // active. Hover-to-reveal alone failed the affordance contract: a user
 // looking at the table at rest couldn't tell which columns were sortable.
+//
+// When the column is actively sorted (--active modifier), the indicator
+// stays at full opacity and full color regardless of hover state — the
+// active sort direction (ArrowUp/ArrowDown) replaces the muted ArrowsDouble
+// glyph in the same trailing slot. No teleport between left and right.
 .#{$panw-prefix}--header__sort-indicator {
   opacity: 0.4;
   color: var(--panw-header-icon-muted);
@@ -108,7 +113,8 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--header:hover .#{$panw-prefix}--header__sort-indicator,
 .#{$panw-prefix}--header--force-hover .#{$panw-prefix}--header__sort-indicator,
 .#{$panw-prefix}--header:active .#{$panw-prefix}--header__sort-indicator,
-.#{$panw-prefix}--header--force-onclick .#{$panw-prefix}--header__sort-indicator {
+.#{$panw-prefix}--header--force-onclick .#{$panw-prefix}--header__sort-indicator,
+.#{$panw-prefix}--header__sort-indicator--active {
   opacity: 1;
   color: var(--panw-header-icon);
 }

@@ -49,7 +49,7 @@ import {
   Calendar, Stars, Eye, ChevronDown, ChevronUp, ChevronRight, Folder,
 } from '@ds/icons'
 import { Search } from '@ds/search'
-import { Filter, type FilterOption } from '@ds/filter'
+import { Filter, Sort, TreeFilter, type FilterOption, type TreeNode } from '@ds/filter'
 import { Header } from '@ds/header'
 import { CellContents } from '@ds/cell-contents'
 import { Pagination } from '@ds/pagination'
@@ -592,10 +592,15 @@ function AEOpportunityTable() {
                 onClear={() => setSearch('')}
               />
             </div>
-            <SortFlyout
-              sortKey={sortKey}
-              sortDir={sortDir}
-              onChange={setSortKey}
+            {/* Sort lives in @ds/filter as the single-select sibling of
+                Filter — same trigger chrome (32px tall, neutral border,
+                content-sized) so it reads as part of the filter family. */}
+            <Sort
+              options={SORT_OPTIONS.map(o => ({ value: o.key, label: o.label }))}
+              value={sortKey}
+              direction={sortDir}
+              onChange={(v) => setSortKey(v as SortKey)}
+              onDirectionChange={setSortDir}
             />
           </div>
 
@@ -611,7 +616,16 @@ function AEOpportunityTable() {
                   onApply={(values: string[]) => setFacet(facet.id, values)}
                 />
               ))}
-              <ProductFilter selected={products} onApply={setProducts} />
+              {/* TreeFilter is the @ds/filter tree variant — Apply/Cancel
+                  commit semantics like Filter, but with parent groups and
+                  cascading checkbox state. */}
+              <TreeFilter
+                label="product"
+                options={PRODUCT_TREE as TreeNode[]}
+                selected={products}
+                selectAllLabel="All Products"
+                onApply={setProducts}
+              />
             </div>
             <span className="opp-counts">47 deals · $12.4M ARR</span>
           </div>
@@ -746,25 +760,14 @@ const LAYOUT_CSS = `
   flex: 1;
   min-width: 0;
 }
-/* Filter trigger height normalization. The DS Filter button grows from 28px
-   to 30px when a count chip (Tags) is rendered inside it because the chip
-   carries its own intrinsic height that the trigger doesn't absorb. Pin a
-   uniform min-height so all 9 triggers align to the same baseline whether
-   or not a count chip is present. */
-.opp-filter-group .panw--filter { min-height: 30px; }
+/* Filter trigger height — pinned at the component level (32px on all sides
+   regardless of whether a count chip is rendered). No override needed here. */
 
-/* Flyout containing-block fix.
-   @ds/flyout's usePosition writes viewport-relative left/top into the
-   flyout inline style and relies on the flyout containing block being the
-   initial one (the viewport). But @ds/filter — and the custom ProductFilter
-   that mirrors its markup — wraps the flyout inside .panw--filter__wrapper
-   declared position: relative, which becomes the containing block. The
-   inline left: 564px then resolves INSIDE the wrapper, throwing the flyout
-   ~800px to the right and overflowing the viewport for any trigger that
-   is not anchored at x=0. Neutralize the wrapper positioning so the
-   absolute flyout falls back to the viewport. Root-cause fix belongs in
-   @ds/filter. */
-.opp-filter-group .panw--filter__wrapper { position: static; }
+/* Flyout containing-block — no longer needs a workaround.
+   @ds/flyout now uses position: fixed for the dropdown panel, anchoring
+   it to the viewport regardless of any positioned ancestor (e.g. the
+   .panw--filter__wrapper that's position: relative for the chip-hover
+   popover). Wrapper positioning stays at its component default. */
 .opp-counts {
   margin-left: auto;
   padding-top: var(--ds-spacing-03); /* 8 — top-aligned with first row of filter chips */

@@ -408,23 +408,38 @@ export const StageTokens = {
    * AA where neutral100 on the same ground was a borderline categorical
    * choice that failed accessibility on certain backgrounds.
    */
+  /**
+   * Icon tokens follow `stage-text-and-icons.md` — icons mirror text 1:1,
+   * with a per-family lightness offset:
+   *   - default categorical: icon sits one stop lighter than text
+   *     (text=primitive-70 → icon.rest=primitive-60)
+   *   - warning/caution-tier (yellow, orange): two-stop offset
+   *     (text=primitive-70 → icon.rest=primitive-50)
+   *   - info/success-tier (cobalt, green): icon shares the text hex
+   *     (primitive-70 at both scales — these primitives read at icon sizes
+   *     without a lightening step)
+   *
+   * Hover/pressed: low icons step deeper toward text on engagement so the
+   * icon "pulls in" alongside the inset-currentColor border the chip uses
+   * for hover. High icons are white on dark grounds — no further change.
+   */
   "tag": {
-    "grey":     { "low": { "bg": neutral20,  "text": neutral80 }, "high": { "bg": neutral70, "bg-hover": neutral60, "text": "#ffffff" } },
-    "accent":   { "low": { "bg": brand20,    "text": brand70   }, "high": { "bg": brand70,   "bg-hover": brand60,   "text": "#ffffff" } },
-    "red":      { "low": { "bg": red20,      "text": red70     }, "high": { "bg": red70,     "bg-hover": red60,     "text": "#ffffff" } },
-    "green":    { "low": { "bg": green20,    "text": green70   }, "high": { "bg": green70,   "bg-hover": green60,   "text": "#ffffff" } },
-    "orange":   { "low": { "bg": orange20,   "text": orange70  }, "high": { "bg": orange70,  "bg-hover": orange60,  "text": "#ffffff" } },
-    "slate":    { "low": { "bg": slate20,    "text": slate70   }, "high": { "bg": slate70,   "bg-hover": slate60,   "text": "#ffffff" } },
-    "lavender": { "low": { "bg": violet20,   "text": violet70  }, "high": { "bg": violet70,  "bg-hover": violet60,  "text": "#ffffff" } },
-    "purple":   { "low": { "bg": purple20,   "text": purple70  }, "high": { "bg": purple70,  "bg-hover": purple60,  "text": "#ffffff" } },
-    "pink":     { "low": { "bg": pink20,     "text": pink70    }, "high": { "bg": pink70,    "bg-hover": pink60,    "text": "#ffffff" } },
-    "yellow":   { "low": { "bg": yellow20,   "text": yellow70  }, "high": { "bg": yellow70,  "bg-hover": yellow60,  "text": "#ffffff" } },
-    "bronze":   { "low": { "bg": gold20,     "text": gold70    }, "high": { "bg": gold70,    "bg-hover": gold60,    "text": "#ffffff" } },
-    "olive":    { "low": { "bg": olive20,    "text": olive70   }, "high": { "bg": olive70,   "bg-hover": olive60,   "text": "#ffffff" } },
-    "lime":     { "low": { "bg": lime20,     "text": lime70    }, "high": { "bg": lime70,    "bg-hover": lime60,    "text": "#ffffff" } },
-    "jade":     { "low": { "bg": mint20,     "text": mint70    }, "high": { "bg": mint70,    "bg-hover": mint60,    "text": "#ffffff" } },
-    "teal":     { "low": { "bg": cyan20,     "text": cyan70    }, "high": { "bg": cyan70,    "bg-hover": cyan60,    "text": "#ffffff" } },
-    "cobalt":   { "low": { "bg": cobalt20,   "text": cobalt70  }, "high": { "bg": cobalt70,  "bg-hover": cobalt60,  "text": "#ffffff" } },
+    "grey":     { "low": { "bg": neutral20, "text": neutral80, "icon": { "rest": neutral70, "hover": neutral80, "pressed": neutral90 } }, "high": { "bg": neutral70, "bg-hover": neutral60, "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "accent":   { "low": { "bg": brand20,   "text": brand70,   "icon": { "rest": brand60,   "hover": brand70,   "pressed": brand80   } }, "high": { "bg": brand70,   "bg-hover": brand60,   "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "red":      { "low": { "bg": red20,     "text": red70,     "icon": { "rest": red60,     "hover": red70,     "pressed": red80     } }, "high": { "bg": red70,     "bg-hover": red60,     "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "green":    { "low": { "bg": green20,   "text": green70,   "icon": { "rest": green70,   "hover": green70,   "pressed": green70   } }, "high": { "bg": green70,   "bg-hover": green60,   "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "orange":   { "low": { "bg": orange20,  "text": orange70,  "icon": { "rest": orange50,  "hover": orange60,  "pressed": orange70  } }, "high": { "bg": orange70,  "bg-hover": orange60,  "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "slate":    { "low": { "bg": slate20,   "text": slate70,   "icon": { "rest": slate60,   "hover": slate70,   "pressed": slate70   } }, "high": { "bg": slate70,   "bg-hover": slate60,   "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "lavender": { "low": { "bg": violet20,  "text": violet70,  "icon": { "rest": violet60,  "hover": violet70,  "pressed": violet70  } }, "high": { "bg": violet70,  "bg-hover": violet60,  "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "purple":   { "low": { "bg": purple20,  "text": purple70,  "icon": { "rest": purple60,  "hover": purple70,  "pressed": purple80  } }, "high": { "bg": purple70,  "bg-hover": purple60,  "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "pink":     { "low": { "bg": pink20,    "text": pink70,    "icon": { "rest": pink60,    "hover": pink70,    "pressed": pink70    } }, "high": { "bg": pink70,    "bg-hover": pink60,    "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "yellow":   { "low": { "bg": yellow20,  "text": yellow70,  "icon": { "rest": yellow50,  "hover": yellow60,  "pressed": yellow70  } }, "high": { "bg": yellow70,  "bg-hover": yellow60,  "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "bronze":   { "low": { "bg": gold20,    "text": gold70,    "icon": { "rest": gold60,    "hover": gold70,    "pressed": gold70    } }, "high": { "bg": gold70,    "bg-hover": gold60,    "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "olive":    { "low": { "bg": olive20,   "text": olive70,   "icon": { "rest": olive60,   "hover": olive70,   "pressed": olive70   } }, "high": { "bg": olive70,   "bg-hover": olive60,   "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "lime":     { "low": { "bg": lime20,    "text": lime70,    "icon": { "rest": lime60,    "hover": lime70,    "pressed": lime70    } }, "high": { "bg": lime70,    "bg-hover": lime60,    "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "jade":     { "low": { "bg": mint20,    "text": mint70,    "icon": { "rest": mint60,    "hover": mint70,    "pressed": mint70    } }, "high": { "bg": mint70,    "bg-hover": mint60,    "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "teal":     { "low": { "bg": cyan20,    "text": cyan70,    "icon": { "rest": cyan60,    "hover": cyan70,    "pressed": cyan70    } }, "high": { "bg": cyan70,    "bg-hover": cyan60,    "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
+    "cobalt":   { "low": { "bg": cobalt20,  "text": cobalt70,  "icon": { "rest": cobalt70,  "hover": cobalt80,  "pressed": cobalt80  } }, "high": { "bg": cobalt70,  "bg-hover": cobalt60,  "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
   },
 } as const;
 

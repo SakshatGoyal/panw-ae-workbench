@@ -55,8 +55,23 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
     ref
   ) {
     const prefix = usePrefix();
-    const TypeIcon = type !== 'basic' ? TYPE_ICON[type] : null;
-    const showSortIndicator = type === 'basic';
+
+    // Sort affordance pins to ONE slot — the trailing edge of the header,
+    // alongside the optional filter glyph. Sortable columns show a muted
+    // up-down indicator at rest; sorted columns swap that indicator for a
+    // single up or down arrow at full opacity in the same slot.
+    //
+    // condensed/lengthened are PANW-specific column-density indicators (not
+    // sort-related). Their glyphs render in the leading slot; `basic` is
+    // the only type that participates in sorting.
+    const isSorted = type === 'ascending' || type === 'descending';
+    const isDensityType = type === 'condensed' || type === 'lengthened';
+    const TypeIcon = isDensityType ? TYPE_ICON[type] : null;
+    const SortIcon =
+      type === 'ascending' ? ArrowUp :
+      type === 'descending' ? ArrowDown :
+      ArrowUpDown;
+    const showSortIndicator = !isDensityType;
 
     const rootClass = classNames(
       `${prefix}--header`,
@@ -78,6 +93,8 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
         onClick={onHeaderClick}
         {...rest}>
         <div className={`${prefix}--header__container`}>
+          {/* Density glyph (condensed/lengthened) — leading slot, like
+              before. Not sort-related. */}
           {TypeIcon && (
             <span
               className={`${prefix}--header__type-icon ${prefix}--header__type-icon--${type}`}
@@ -85,10 +102,36 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
               <TypeIcon size={16} />
             </span>
           )}
+          {/* For right-aligned (numeric) columns, the sort indicator lives
+              on the LEFT of the text — at the trailing edge relative to the
+              cell content, which for right-aligned columns is the left.
+              For left-aligned columns it lives on the RIGHT. Same logical
+              slot ("trailing edge"); position flips with alignment. */}
+          {showSortIndicator && alignment === 'right' && (
+            <span
+              className={classNames(
+                `${prefix}--header__sort-indicator`,
+                {
+                  [`${prefix}--header__sort-indicator--active`]: isSorted,
+                  [`${prefix}--header__sort-indicator--${type}`]: isSorted,
+                }
+              )}
+              aria-hidden="true">
+              <SortIcon size={16} />
+            </span>
+          )}
           <span className={`${prefix}--header__text`}>{children}</span>
-          {showSortIndicator && (
-            <span className={`${prefix}--header__sort-indicator`} aria-hidden="true">
-              <ArrowUpDown size={16} />
+          {showSortIndicator && alignment !== 'right' && (
+            <span
+              className={classNames(
+                `${prefix}--header__sort-indicator`,
+                {
+                  [`${prefix}--header__sort-indicator--active`]: isSorted,
+                  [`${prefix}--header__sort-indicator--${type}`]: isSorted,
+                }
+              )}
+              aria-hidden="true">
+              <SortIcon size={16} />
             </span>
           )}
           {filter && (

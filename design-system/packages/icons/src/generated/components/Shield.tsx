@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/shield.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Shield = React.forwardRef<SVGSVGElement, IconProps>(
+  function Shield({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M16.7339 3.70105C14.1656 2.30203 11.6725 2 10 2C8.32748 2 5.83441 2.30203 3.26605 3.70105C3.10363 3.78952 3 3.9654 3 4.15035V11.7039C3 12.2844 3.27234 12.8339 3.74121 13.1993L9.69569 17.7666C9.8752 17.9043 10.1248 17.9043 10.3043 17.7666L16.2588 13.1993C16.7277 12.8339 17 12.2844 17 11.7039V4.15035C17 3.9654 16.8964 3.78952 16.7339 3.70105Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Shield.displayName = 'Shield';

@@ -1,0 +1,30 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/upgrade.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Upgrade = React.forwardRef<SVGSVGElement, IconProps>(
+  function Upgrade({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M10.3595 2.75705L14.1524 6.55693C14.4674 6.87192 14.2443 7.40693 13.7988 7.40693H11.0059V10.4963C11.0059 10.7724 10.7821 10.9963 10.5059 10.9963H9.50593C9.22979 10.9963 9.00593 10.7727 9.00593 10.4966C9.00593 9.12919 9.00593 7.40693 9.00593 7.40693H6.21304C5.76759 7.40693 5.5445 6.87192 5.85948 6.55693L9.65238 2.75704C9.84764 2.56177 10.1642 2.56179 10.3595 2.75705Z" fill="currentColor"/>
+<path d="M9 12.5C9 12.2239 9.22386 12 9.5 12H10.5C10.7761 12 11 12.2239 11 12.5V14C11 14.2762 10.7761 14.5 10.5 14.5H9.5C9.22386 14.5 9 14.2762 9 14V12.5Z" fill="currentColor"/>
+<path d="M9 16C9 15.7239 9.22386 15.5 9.5 15.5H10.5C10.7761 15.5 11 15.7239 11 16V16.5C11 16.7762 10.7761 17 10.5 17H9.5C9.22386 17 9 16.7762 9 16.5V16Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Upgrade.displayName = 'Upgrade';

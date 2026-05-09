@@ -1,0 +1,29 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/map-marker-alt-slash.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const MapMarkerAltSlash = React.forwardRef<SVGSVGElement, IconProps>(
+  function MapMarkerAltSlash({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path fillRule="evenodd" clipRule="evenodd" d="M15.9618 16.0325L3.43844 3.50963C3.24318 3.31437 3.24317 2.99777 3.43843 2.80251L3.79187 2.44907C3.98713 2.25382 4.30371 2.25381 4.49897 2.44907L5.96189 3.91194C7.29797 2.52928 9.26345 1.75847 11.3977 2.06794C14.7248 2.55039 16.971 5.53279 16.6936 8.88328C16.5576 10.5254 15.8925 11.8432 15.0395 12.9892L17.0223 14.972C17.2176 15.1672 17.2176 15.4838 17.0223 15.6791L16.6689 16.0325C16.4736 16.2278 16.1571 16.2278 15.9618 16.0325ZM11.6499 9.59981C12.1395 9.23524 12.4609 8.65712 12.4609 7.99983C12.4609 6.89522 11.5654 5.99984 10.4609 5.99984C9.80357 5.99984 9.22538 6.32125 8.86082 6.81081L11.6499 9.59981Z" fill="currentColor"/>
+<path d="M12.9906 15.2934C13.0088 15.2747 13.027 15.256 13.0452 15.2372L4.4237 6.61597C4.28027 7.13904 4.20263 7.68921 4.20263 8.25806C4.20263 11.4615 6.17034 13.4844 7.93017 15.2935C8.73377 16.1196 9.49402 16.9012 10.0038 17.7302C10.2096 18.0649 10.6934 18.101 10.8969 17.7648C11.4059 16.924 12.1772 16.1304 12.9906 15.2934Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+MapMarkerAltSlash.displayName = 'MapMarkerAltSlash';

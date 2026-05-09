@@ -1,0 +1,29 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/monitor-heart-rate.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const MonitorHeartRate = React.forwardRef<SVGSVGElement, IconProps>(
+  function MonitorHeartRate({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M2.5 3H17.5C17.7761 3 18 3.22388 18 3.5V14.5C18 14.7761 17.7761 15 17.5 15H2.5C2.22388 15 2 14.7761 2 14.5V9.75H8.28173L8.85693 8.79053L10.3038 12.0059C10.3866 12.1899 10.6422 12.205 10.7461 12.0319L12.1157 9.75H14.5C14.7761 9.75 15 9.52612 15 9.25V8.75C15 8.47388 14.7761 8.25 14.5 8.25H11.2661L10.6904 9.20947L9.24365 5.99426C9.16077 5.81006 8.90515 5.79516 8.80127 5.96826L7.43213 8.25H2V3.5C2 3.22388 2.22388 3 2.5 3Z" fill="currentColor"/>
+<path d="M6.5 16H13.5C13.7761 16 14 16.2239 14 16.5V17.5C14 17.7761 13.7761 18 13.5 18H6.5C6.22386 18 6 17.7761 6 17.5V16.5C6 16.2239 6.22386 16 6.5 16Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+MonitorHeartRate.displayName = 'MonitorHeartRate';

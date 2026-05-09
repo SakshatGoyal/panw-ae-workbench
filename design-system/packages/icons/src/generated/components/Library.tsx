@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/library.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Library = React.forwardRef<SVGSVGElement, IconProps>(
+  function Library({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M17.5 3H6.25C5.97388 3 5.75 3.22388 5.75 3.5V12.125C5.75 12.6082 5.35828 13 4.875 13C4.39172 13 4 12.6082 4 12.125V6.5C4 6.22388 3.77612 6 3.5 6H2.5C2.22388 6 2 6.22388 2 6.5V14C2 15.1045 2.89545 16 4 16H16C17.1046 16 18 15.1045 18 14V3.5C18 3.22388 17.7761 3 17.5 3ZM11 11.25C11 11.5261 10.7761 11.75 10.5 11.75H8.5C8.22388 11.75 8 11.5261 8 11.25V10.75C8 10.4739 8.22388 10.25 8.5 10.25H10.5C10.7761 10.25 11 10.4739 11 10.75V11.25ZM16 11.25C16 11.5261 15.7761 11.75 15.5 11.75H13.5C13.2239 11.75 13 11.5261 13 11.25V10.75C13 10.4739 13.2239 10.25 13.5 10.25H15.5C15.7761 10.25 16 10.4739 16 10.75V11.25ZM16 7.25C16 7.52612 15.7761 7.75 15.5 7.75H8.5C8.22388 7.75 8 7.52612 8 7.25V6.75C8 6.47388 8.22388 6.25 8.5 6.25H15.5C15.7761 6.25 16 6.47388 16 6.75V7.25Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Library.displayName = 'Library';

@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/notification-important.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const NotificationImportant = React.forwardRef<SVGSVGElement, IconProps>(
+  function NotificationImportant({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M15 9.07983V6.99987C15 5.00451 13.1237 4.06005 10.2799 2.18542C10.1132 2.07556 9.88678 2.07556 9.72016 2.18542C6.87628 4.06005 5 5.00451 5 6.99987V9.07983C5 11.9598 3 11.7799 3 12.9198V13.4999C3 13.7799 3.21997 13.9999 3.5 13.9999H16.5C16.78 13.9999 17 13.7799 17 13.4999V12.9198C17 11.7799 15 11.9598 15 9.07983ZM9.51233 4.99987H10.4877C10.7507 4.99987 10.9575 5.23437 10.9354 5.50768L10.7087 8.31884C10.6891 8.56164 10.4945 8.74816 10.2609 8.74816H9.73907C9.50549 8.74816 9.31091 8.56164 9.29132 8.31884L9.06457 5.50768C9.04254 5.23436 9.24933 4.99987 9.51233 4.99987ZM10 11.9999C9.43378 11.9999 8.97485 11.5409 8.97485 10.9747C8.97485 10.4086 9.43377 9.94957 10 9.94957C10.5662 9.94957 11.0252 10.4086 11.0252 10.9747C11.0252 11.5409 10.5662 11.9999 10 11.9999ZM12.4219 16.1223C12.1453 17.2018 11.1658 17.9999 10 17.9999C8.83416 17.9999 7.85474 17.2018 7.57812 16.1223C7.49755 15.808 7.74639 15.4999 8.07092 15.4999H11.9291C12.2536 15.4999 12.5024 15.808 12.4219 16.1223Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+NotificationImportant.displayName = 'NotificationImportant';

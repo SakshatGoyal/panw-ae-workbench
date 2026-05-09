@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/project-diagram.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const ProjectDiagram = React.forwardRef<SVGSVGElement, IconProps>(
+  function ProjectDiagram({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M16.7495 11.6482V9C16.7495 8.58594 16.4136 8.25 15.9995 8.25H10.7495V6H12.5C12.7761 6 13 5.77612 13 5.5V2.5C13 2.22388 12.7761 2 12.5 2H7.5C7.22388 2 7 2.22388 7 2.5V5.5C7 5.77612 7.22388 6 7.5 6H9.24951V8.25H4C3.58594 8.25 3.25 8.58594 3.25 9V11.6483C2.51764 11.9453 2 12.6611 2 13.5C2 14.6045 2.89545 15.5 4 15.5C5.10455 15.5 6 14.6045 6 13.5C6 12.6611 5.48236 11.9453 4.75 11.6483V9.75H9.24951V13.3879C8.37787 13.698 7.75 14.522 7.75 15.5C7.75 16.7427 8.75739 17.75 10 17.75C11.2426 17.75 12.25 16.7427 12.25 15.5C12.25 14.5215 11.6216 13.6975 10.7495 13.3877V12L10.75 9.75H15.2495V11.6484C14.5174 11.9456 14 12.6613 14 13.5C14 14.6045 14.8954 15.5 16 15.5C17.1046 15.5 18 14.6045 18 13.5C18 12.6609 17.4821 11.9451 16.7495 11.6482Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+ProjectDiagram.displayName = 'ProjectDiagram';

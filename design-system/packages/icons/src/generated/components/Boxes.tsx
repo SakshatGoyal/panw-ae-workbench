@@ -1,0 +1,29 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/boxes.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Boxes = React.forwardRef<SVGSVGElement, IconProps>(
+  function Boxes({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M13.25 4H17.27C17.67 4 18 4.32996 18 4.72998V15.27C18 15.67 17.67 16 17.27 16H12.5V9.5C12.5 8.95001 12.05 8.5 11.5 8.5H6V4.72998C6 4.32996 6.33002 4 6.72998 4H11.75V5.5C11.75 5.77612 11.9739 6 12.25 6H12.75C13.0261 6 13.25 5.77612 13.25 5.5V4Z" fill="currentColor"/>
+<path d="M7.25 10H10.4227C10.7415 10 11 10.2585 11 10.5773V16.4226C11 16.7415 10.7415 17 10.4227 17H2.57733C2.25848 17 2 16.7415 2 16.4226V10.5773C2 10.2585 2.25848 10 2.57733 10H5.75V11.5C5.75 11.7761 5.97388 12 6.25 12H6.75C7.02612 12 7.25 11.7761 7.25 11.5V10Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Boxes.displayName = 'Boxes';

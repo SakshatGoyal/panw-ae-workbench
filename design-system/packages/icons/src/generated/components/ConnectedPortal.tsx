@@ -1,0 +1,31 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/connected-portal.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const ConnectedPortal = React.forwardRef<SVGSVGElement, IconProps>(
+  function ConnectedPortal({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M15.4286 12.3573H17.6C17.8209 12.3573 18 12.5364 18 12.7573V13.7573C18 13.9782 17.8209 14.1573 17.6 14.1573H15.4286V15.176C15.4286 15.4671 15.0641 15.6193 14.8441 15.4076L12.8503 13.4885C12.7179 13.3611 12.7179 13.1526 12.8503 13.0252L14.8441 11.1061C15.0641 10.8944 15.4286 11.0466 15.4286 11.3378L15.4286 12.3573Z" fill="currentColor"/>
+<path d="M12.5479 16.0857L9.71943 13.2573L12.5479 10.4289L13.0729 10.9539L13.78 10.2468C13.9753 10.0515 13.9753 9.73494 13.78 9.53968L12.9014 8.6611C12.7062 8.46584 12.3896 8.46584 12.1943 8.6611L7.95167 12.9037C7.75641 13.099 7.75641 13.4156 7.95167 13.6108L12.1943 17.8535C12.3896 18.0487 12.7062 18.0487 12.9014 17.8535L13.78 16.9749C13.9753 16.7796 13.9753 16.4631 13.78 16.2678L13.0729 15.5607L12.5479 16.0857Z" fill="currentColor"/>
+<path d="M9.08709 9.64575C8.5948 9.52378 8.06491 9.44446 7.50002 9.44446C5.18361 9.44446 3.36879 10.7057 2.78847 11.1617C2.65847 11.2638 2.57631 11.4031 2.54372 11.5635L2.01393 14.1696C1.92659 14.5992 2.26113 15 2.70711 15H7.21914L5.82954 13.6104C5.63427 13.4151 5.63427 13.0986 5.82954 12.9033L9.08709 9.64575Z" fill="currentColor"/>
+<path d="M5.02138 5.16223C5.02138 3.59503 6.03988 2.5 7.50002 2.5C8.96017 2.5 9.97866 3.59503 9.97866 5.16223V5.39331C9.97866 6.96057 8.96017 8.05554 7.50002 8.05554C6.03987 8.05554 5.02138 6.96057 5.02138 5.39331V5.16223Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+ConnectedPortal.displayName = 'ConnectedPortal';

@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/key.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Key = React.forwardRef<SVGSVGElement, IconProps>(
+  function Key({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M12.5004 2C9.27283 2 7.00043 4.23645 7.00043 7.31946V7.68048C7.00043 8.52051 7.18201 9.28888 7.49262 9.97497L2.29456 15.173C2.19037 15.2772 2.13184 15.4185 2.13184 15.5658V17.4445C2.13184 17.7513 2.38062 18 2.68744 18H6.41199C6.71881 18 6.96759 17.7513 6.96759 17.4445V16.0555C6.96759 15.7487 7.21631 15.5 7.52313 15.5H10.162C10.4688 15.5 10.7176 15.2513 10.7176 14.9445V12.7248C11.272 12.8898 11.8606 13 12.5004 13C15.7281 13 18.0004 10.7635 18.0004 7.68048V7.31946C18.0004 4.23566 15.7281 2 12.5004 2L12.5004 2ZM13.5004 8C12.6731 8 12.0004 7.32703 12.0004 6.5C12.0004 5.67291 12.6731 5 13.5004 5C14.3278 5 15.0004 5.67291 15.0004 6.5C15.0004 7.32703 14.3278 8 13.5004 8Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Key.displayName = 'Key';

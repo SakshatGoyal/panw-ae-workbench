@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/users.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Users = React.forwardRef<SVGSVGElement, IconProps>(
+  function Users({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M11 5.53595V5.35303C11 4.11231 11.8219 3.24536 13 3.24536C14.1782 3.24536 15 4.1123 15 5.35303V5.53595C15 6.77673 14.1782 7.64362 13 7.64362C11.8219 7.64362 11 6.77674 11 5.53595ZM17.5058 10.9072C17.4761 10.7628 17.4014 10.6375 17.2833 10.5455C16.7556 10.1352 15.1059 9.00007 13 9.00007C11.6007 9.00007 10.4119 9.50001 9.61075 9.95674C10.8432 10.387 11.7592 11.0155 12.2041 11.3614C12.6006 11.67 12.875 12.1134 12.9756 12.6095L13.2616 14.0001H17.3572C17.7627 14.0001 18.0667 13.6394 17.9874 13.2526L17.5058 10.9072ZM11.2833 12.5455C10.7556 12.1352 9.10586 11.0001 7.00003 11.0001C4.8942 11.0001 3.24441 12.1352 2.71677 12.5455C2.59861 12.6375 2.52396 12.7628 2.4943 12.9072L2.01265 15.2526C1.9333 15.6393 2.23738 16.0001 2.64284 16.0001H11.3572C11.7627 16.0001 12.0667 15.6393 11.9874 15.2526L11.5058 12.9072C11.4761 12.7628 11.4014 12.6375 11.2833 12.5455V12.5455ZM7.00003 9.64362C8.17819 9.64362 9.00003 8.77674 9.00003 7.53595V7.35303C9.00003 6.11231 8.17819 5.24536 7.00003 5.24536C5.82187 5.24536 5.00003 6.1123 5.00003 7.35303V7.53595C5.00003 8.77673 5.82187 9.64362 7.00003 9.64362Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Users.displayName = 'Users';

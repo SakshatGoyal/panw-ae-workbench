@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import { IconButton, IconButtonKinds, IconButtonSizes } from '../IconButton';
-import { Plus, Search } from '@ds/icons';
+import { Plus, Search } from 'lucide-react';
 
 const DefaultIcon = (props) => <Plus size={16} data-testid="icon" {...props} />;
 

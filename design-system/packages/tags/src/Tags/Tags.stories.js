@@ -5,8 +5,9 @@
 
 import React from 'react';
 import { action } from '@storybook/addon-actions';
-import { Lightbulb as Sun, Star, Tag as TagIcon } from '@ds/icons';
+import { Sun, Star, Tag as TagIcon } from 'lucide-react';
 import { Tags, TagColors, TagContrasts, TagSizes, TagShapes } from './index';
+import mdx from './Tags.mdx';
 
 const iconMap = {
   None: undefined,
@@ -50,6 +51,7 @@ export default {
   title: 'Components/Tags',
   component: Tags,
   argTypes: sharedArgTypes,
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

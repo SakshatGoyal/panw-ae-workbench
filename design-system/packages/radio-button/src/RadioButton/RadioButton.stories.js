@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { RadioButton } from './index';
+import mdx from './RadioButton.mdx';
 
 export default {
   title: 'Components/RadioButton',
@@ -10,6 +11,7 @@ export default {
     disabled: { control: 'boolean' },
     label: { control: 'text' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ArrowUp, ArrowDown, Info, CircleCheck, Critical, MinusCircle } from '@ds/icons';
+import { ArrowUp, ArrowDown, Info, CheckCircle, AlertTriangle, XCircle } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { Tags, type TagColor, type TagContrast } from '@ds/tags';
 
@@ -25,9 +25,9 @@ export interface CellContentsProps {
 
 const STATE_ICON: Record<Exclude<CellState, 'none'>, React.ElementType> = {
   info: Info,
-  success: CircleCheck,
-  warning: Critical,
-  error: MinusCircle,
+  success: CheckCircle,
+  warning: AlertTriangle,
+  error: XCircle,
 };
 
 export const CellContents = React.forwardRef<HTMLDivElement, CellContentsProps>(

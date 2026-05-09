@@ -1,6 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { Header, HeaderAlignments, HeaderSizes, HeaderTypes } from './index';
+import mdx from './Header.mdx';
 
 export default {
   title: 'Components/Header',
@@ -12,6 +13,7 @@ export default {
     filter: { control: 'boolean' },
     children: { control: 'text' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

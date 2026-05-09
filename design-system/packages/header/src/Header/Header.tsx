@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Plus, Minus, ArrowUp, ArrowDown, Sort, Filter } from '@ds/icons';
+import { Plus, Minus, ArrowUp, ArrowDown, ArrowUpDown, Filter } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const HeaderAlignments = ['left', 'right'] as const;
@@ -88,7 +88,7 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
           <span className={`${prefix}--header__text`}>{children}</span>
           {showSortIndicator && (
             <span className={`${prefix}--header__sort-indicator`} aria-hidden="true">
-              <Sort size={16} />
+              <ArrowUpDown size={16} />
             </span>
           )}
           {filter && (

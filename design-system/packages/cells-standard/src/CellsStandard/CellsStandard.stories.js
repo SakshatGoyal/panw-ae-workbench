@@ -1,5 +1,6 @@
 import React from 'react';
 import { CellsStandard, CellInteractionStates, CellSizes } from './index';
+import mdx from './CellsStandard.mdx';
 
 export default {
   title: 'Components/CellsStandard',
@@ -18,6 +19,7 @@ export default {
       control: { type: 'radio' },
     },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

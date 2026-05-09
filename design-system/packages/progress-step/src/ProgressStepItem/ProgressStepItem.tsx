@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { CircleCheck, ExclamationCircle, MinusCircle } from '@ds/icons';
+import { CheckCircle2, AlertCircle, XCircle } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const ProgressStatuses = ['success', 'warning', 'error', 'active', 'inactive'] as const;
@@ -35,9 +35,9 @@ export interface ProgressStepItemProps {
 }
 
 const STATUS_ICON: Record<Exclude<ProgressStatus, 'active' | 'inactive'>, React.ElementType> = {
-  success: CircleCheck,
-  warning: ExclamationCircle,
-  error: MinusCircle,
+  success: CheckCircle2,
+  warning: AlertCircle,
+  error: XCircle,
 };
 
 export const ProgressStepItem = React.forwardRef<HTMLDivElement, ProgressStepItemProps>(

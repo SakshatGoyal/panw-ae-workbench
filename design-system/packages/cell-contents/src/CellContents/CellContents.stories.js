@@ -1,5 +1,6 @@
 import React from 'react';
 import { CellContents, CellContentTypes, CellStates } from './index';
+import mdx from './CellContents.mdx';
 
 export default {
   title: 'Components/CellContents',
@@ -12,6 +13,7 @@ export default {
     tagLabel: { control: 'text' },
     trendValue: { control: 'text' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

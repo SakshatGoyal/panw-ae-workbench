@@ -1,6 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { InlineNotification, InlineNotificationTypes, InlineNotificationInfoTypes } from './index';
+import mdx from './InlineNotification.mdx';
 
 export default {
   title: 'Components/InlineNotification',
@@ -11,6 +12,7 @@ export default {
     closeButton: { control: 'boolean' },
     children: { control: 'text' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

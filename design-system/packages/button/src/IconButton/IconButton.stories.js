@@ -11,14 +11,15 @@ import { action } from '@storybook/addon-actions';
 import {
   Plus,
   Search,
-  Delete as Trash2,
+  Trash2,
   Settings,
-  Notification as Bell,
-  Close as X,
+  Bell,
+  X,
   ChevronRight,
   Download,
-} from '@ds/icons';
+} from 'lucide-react';
 import { IconButton } from './index';
+import mdx from './IconButton.mdx';
 
 const iconMap = {
   Plus: (props) => <Plus size={16} {...props} />,
@@ -71,6 +72,9 @@ export default {
   title: 'Components/IconButton',
   component: IconButton,
   argTypes: sharedArgTypes,
+  parameters: {
+    docs: { page: mdx },
+  },
   tags: ['autodocs'],
 };
 

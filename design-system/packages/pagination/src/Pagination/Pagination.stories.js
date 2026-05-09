@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { Pagination } from './index';
+import mdx from './Pagination.mdx';
 
 export default {
   title: 'Components/Pagination',
@@ -12,6 +13,7 @@ export default {
     background: { options: ['grey00', 'grey10'], control: 'radio' },
     maxVisiblePages: { control: 'number' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

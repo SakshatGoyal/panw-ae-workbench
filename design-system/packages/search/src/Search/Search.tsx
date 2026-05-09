@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Search as SearchGlyph, Close } from '@ds/icons';
+import { Search as SearchGlyph, X } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 
@@ -133,7 +133,7 @@ export const Search = React.forwardRef<HTMLInputElement, SearchProps>(
             kind="ghost"
             size={size}
             iconSize={16}
-            renderIcon={Close}
+            renderIcon={X}
             aria-label="Clear search"
             onClick={(e) => {
               e.stopPropagation();

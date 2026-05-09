@@ -8,8 +8,9 @@
 
 import React from 'react';
 import { action } from '@storybook/addon-actions';
-import { Plus, ChevronRight, Delete as Trash2 } from '@ds/icons';
+import { Plus, ChevronRight, Trash2 } from 'lucide-react';
 import Button, { ButtonSkeleton } from './index';
+import mdx from './Button.mdx';
 
 const iconMap = {
   None: undefined,
@@ -69,6 +70,9 @@ export default {
   component: Button,
   subcomponents: { ButtonSkeleton },
   argTypes: sharedArgTypes,
+  parameters: {
+    docs: { page: mdx },
+  },
   tags: ['autodocs'],
 };
 

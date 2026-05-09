@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { Popover, PopoverDirections, PopoverPositions, PopoverDensities } from './index';
+import mdx from './Popover.mdx';
 
 export default {
   title: 'Components/Popover',
@@ -12,6 +13,7 @@ export default {
     heading: { control: 'text' },
     description: { control: 'text' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

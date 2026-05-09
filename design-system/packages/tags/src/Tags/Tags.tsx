@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Lightbulb, Close } from '@ds/icons';
+import { Sun, X } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 // ─── Color / contrast / size enumerations ────────────────────────────────────
@@ -90,8 +90,8 @@ export const Tags = React.forwardRef<HTMLSpanElement, TagsProps>(function Tags(
     icon = false,
     close = false,
     onClose,
-    renderIcon: IconElement = Lightbulb,
-    renderCloseIcon: CloseIconElement = Close,
+    renderIcon: IconElement = Sun,
+    renderCloseIcon: CloseIconElement = X,
     className,
     ...rest
   },

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronDown, Lightbulb } from '@ds/icons';
+import { ChevronDown, Sun } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import {
   Tags,
@@ -53,11 +53,11 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       size = 'default',
       open = false,
       theme = 'gray00',
-      orientation = 'right',
+      orientation = 'left',
       title = 'Accordion',
       description,
       showIcon = false,
-      renderIcon: IconElement = Lightbulb,
+      renderIcon: IconElement = Sun,
       showTag = false,
       tagLabel = 'Placeholder',
       tagColor = 'orange',

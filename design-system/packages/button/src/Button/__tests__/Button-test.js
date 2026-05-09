@@ -7,7 +7,7 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
 import Button, { ButtonKinds, ButtonSizes } from '../Button';
-import { Plus } from '@ds/icons';
+import { Plus } from 'lucide-react';
 
 describe('Button', () => {
   it('renders without crashing', () => {

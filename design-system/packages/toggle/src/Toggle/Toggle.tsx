@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Info } from '@ds/icons';
+import { Info } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const ToggleLabelPositions = ['left', 'right', 'top'] as const;

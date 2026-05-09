@@ -1,6 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { Link, LinkSizes, LinkColors, LinkForceStates } from './index';
+import mdx from './Link.mdx';
 
 const argTypes = {
   size: { options: LinkSizes, control: { type: 'radio' } },
@@ -16,6 +17,7 @@ export default {
   title: 'Components/Link',
   component: Link,
   argTypes,
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

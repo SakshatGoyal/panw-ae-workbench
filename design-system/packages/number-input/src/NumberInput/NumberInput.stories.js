@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
 import { NumberInput, NumberInputBackgrounds } from './index';
+import mdx from './NumberInput.mdx';
 
 export default {
   title: 'Components/NumberInput',
@@ -14,6 +15,7 @@ export default {
     max: { control: 'number' },
     disabled: { control: 'boolean' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

@@ -4,7 +4,7 @@
 
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { Star } from '@ds/icons';
+import { Star } from 'lucide-react';
 import { Tags, TagColors, TagContrasts, TagSizes } from '../Tags';
 
 describe('Tags', () => {

@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Close } from '@ds/icons';
+import { X } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 
@@ -31,7 +31,7 @@ export type TextEntryType = (typeof TextEntryTypes)[number];
 
 type SharedInputProps = Omit<
   React.InputHTMLAttributes<HTMLInputElement>,
-  'type' | 'size' | 'value' | 'defaultValue' | 'onChange' | 'title'
+  'type' | 'size' | 'value' | 'defaultValue' | 'onChange'
 >;
 
 export interface TextEntryProps extends SharedInputProps {
@@ -168,7 +168,7 @@ export const TextEntry = React.forwardRef<
               kind="ghost"
               size={size === 'small' ? 'sm' : size === 'large' ? 'lg' : 'md'}
               iconSize={16}
-              renderIcon={Close}
+              renderIcon={X}
               aria-label="Clear text"
               onClick={handleClear}
               tabIndex={-1}

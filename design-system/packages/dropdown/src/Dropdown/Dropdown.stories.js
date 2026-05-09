@@ -1,6 +1,7 @@
 import React from 'react';
 import { action } from '@storybook/addon-actions';
 import { Dropdown, DropdownBackgrounds, DropdownSizes } from './index';
+import mdx from './Dropdown.mdx';
 
 const sampleOptions = [
   { label: 'Option 1', value: 'option-1' },
@@ -22,6 +23,7 @@ export default {
     disabled: { control: 'boolean' },
     readOnly: { control: 'boolean' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

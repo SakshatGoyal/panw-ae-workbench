@@ -79,12 +79,9 @@ export type ButtonProps<T extends React.ElementType = 'button'> =
       as?: T;
     };
 
-export type ButtonComponent = (<T extends React.ElementType = 'button'>(
+export type ButtonComponent = <T extends React.ElementType = 'button'>(
   props: ButtonProps<T> & { ref?: React.Ref<unknown> }
-) => React.ReactElement | null) & {
-  displayName?: string;
-  propTypes?: Record<string, unknown>;
-};
+) => React.ReactElement | null;
 
 // ─── Component ───────────────────────────────────────────────────────────────
 
@@ -152,6 +149,7 @@ const Button: ButtonComponent = React.forwardRef(function Button<
 
 Button.displayName = 'Button';
 
+// @ts-expect-error -- forwardRef result is typed as ButtonComponent
 Button.propTypes = {
   as: PropTypes.oneOfType([PropTypes.string, PropTypes.func, PropTypes.elementType]),
   children: PropTypes.node,

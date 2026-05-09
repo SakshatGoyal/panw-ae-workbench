@@ -1,7 +1,7 @@
 import React, { useCallback, useState } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronLeft, ChevronRight } from '@ds/icons';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 

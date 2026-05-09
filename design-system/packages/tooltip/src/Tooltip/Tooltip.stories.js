@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Tooltip, TooltipDirections } from './index';
+import mdx from './Tooltip.mdx';
 
 export default {
   title: 'Components/Tooltip',
@@ -8,6 +9,7 @@ export default {
     pointerDirection: { options: TooltipDirections, control: { type: 'select' } },
     content: { control: 'text' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

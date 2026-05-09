@@ -1,5 +1,5 @@
 import { Story, ArgTypes, Canvas, Unstyled, Meta } from '@storybook/addon-docs/blocks';
-import { Lightbulb as Sun } from '@ds/icons';
+import { Sun } from 'lucide-react';
 import { Tags } from './index';
 import * as TagsStories from './Tags.stories';
 
@@ -77,7 +77,7 @@ Pass a lucide-react (or any React) component to `renderIcon` and set
 <Canvas of={TagsStories.WithIcon} />
 
 ```jsx
-import { Star } from '@ds/icons';
+import { Star } from 'lucide-react';
 
 <Tags label="Featured" icon renderIcon={Star} />
 ```
@@ -123,7 +123,7 @@ component, not a rendered element:
 
 ```jsx
 // Ported (Carbon convention)
-import { Star } from '@ds/icons';
+import { Star } from 'lucide-react';
 
 <Tags label="Foo" icon renderIcon={Star} />
 ```

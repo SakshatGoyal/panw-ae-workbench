@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
-import { List, GridHorizontal as Grid, Calendar } from '@ds/icons';
+import { List, Grid, Calendar } from 'lucide-react';
 import { ContentSwitcher, ContentSwitcherSizes, ContentSwitcherBackgrounds } from './index';
+import mdx from './ContentSwitcher.mdx';
 
 const baseItems = [{ label: 'First' }, { label: 'Second' }, { label: 'Third' }];
 
@@ -13,6 +14,7 @@ export default {
     background: { options: ContentSwitcherBackgrounds, control: { type: 'radio' } },
     disabled: { control: 'boolean' },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 

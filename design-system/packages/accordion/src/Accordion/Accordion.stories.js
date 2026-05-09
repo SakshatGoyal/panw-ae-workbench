@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
-import { Lightbulb as Sun, Star, Notification as Bell } from '@ds/icons';
+import { Sun, Star, Bell } from 'lucide-react';
 import {
   Accordion,
   AccordionSizes,
   AccordionThemes,
   AccordionOrientations,
 } from './index';
+import mdx from './Accordion.mdx';
 
 const iconMap = { Sun, Star, Bell };
 
@@ -26,6 +27,7 @@ export default {
     disabled: { control: 'boolean' },
     renderIcon: { options: ['Sun', 'Star', 'Bell'], control: { type: 'select' } },
   },
+  parameters: { docs: { page: mdx } },
   tags: ['autodocs'],
 };
 
@@ -49,7 +51,7 @@ export const Default = (args) => {
 Default.args = {
   size: 'default',
   theme: 'gray00',
-  orientation: 'right',
+  orientation: 'left',
   open: false,
   title: 'Accordion title',
   description: '',

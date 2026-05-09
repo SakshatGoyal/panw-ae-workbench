@@ -3,7 +3,8 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "storybook": "storybook dev -p 38274 --no-open",
+    "storybook": "node ../scripts/storybook-prestart.mjs 38274 && storybook dev -p 38274 --no-open --ci",
+    "storybook:port-check": "node ../scripts/storybook-prestart.mjs 38274",
     "build-storybook": "storybook build"
   },
   "dependencies": {

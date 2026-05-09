@@ -5,7 +5,7 @@
 
 import React from 'react';
 import { action } from '@storybook/addon-actions';
-import { Sun, Star, Tag as TagIcon } from 'lucide-react';
+import { Lightbulb as Sun, Star, Tag as TagIcon } from '@ds/icons';
 import { Tags, TagColors, TagContrasts, TagSizes, TagShapes } from './index';
 
 const iconMap = {

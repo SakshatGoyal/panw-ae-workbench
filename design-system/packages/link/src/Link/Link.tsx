@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { ArrowLeft, ArrowRight } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const LinkSizes = ['14px', '18px'] as const;

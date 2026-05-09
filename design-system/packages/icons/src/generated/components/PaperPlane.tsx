@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/paper-plane.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const PaperPlane = React.forwardRef<SVGSVGElement, IconProps>(
+  function PaperPlane({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M17.023 9.54666L2.85639 2.96931C2.49233 2.80028 2.08754 3.1075 2.15241 3.50361L2.72864 7.02263C2.89361 8.03008 3.63516 8.84654 4.62213 9.10741L7.9998 10.0001L4.62218 10.8928C3.63518 11.1536 2.8936 11.9701 2.72863 12.9776L2.1524 16.4967C2.08754 16.8928 2.49233 17.2 2.85638 17.031L17.023 10.4536C17.4089 10.2745 17.4089 9.72583 17.023 9.54666Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+PaperPlane.displayName = 'PaperPlane';

@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/user-lock.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const UserLock = React.forwardRef<SVGSVGElement, IconProps>(
+  function UserLock({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M7.50002 9.44446C8.2264 9.44446 8.89492 9.57562 9.50002 9.75995V9.76856C8.90236 10.1147 8.50002 10.7612 8.50002 11.5V13.2969C8.50002 13.8965 8.62252 14.4636 8.80996 15H2.70711C2.26113 15 1.92659 14.5992 2.01393 14.1696L2.54372 11.5635C2.57631 11.4031 2.65847 11.2638 2.78847 11.1617C3.36879 10.7057 5.18361 9.44446 7.50002 9.44446ZM18 11.5V13.2967C18 15.342 16.342 17 14.2968 17H13.7033C11.658 17 10 15.342 10 13.2967V11.5C10 11.2238 10.2239 11 10.5 11H11V8.78564C11 7.24951 12.3457 6 14 6C15.6543 6 17 7.24951 17 8.78564V11H17.5C17.7761 11 18 11.2238 18 11.5ZM14.75 13.5C14.75 13.2238 14.5261 13 14.25 13H13.75C13.4739 13 13.25 13.2238 13.25 13.5V14.5C13.25 14.7761 13.4739 15 13.75 15H14.25C14.5261 15 14.75 14.7761 14.75 14.5V13.5ZM15.3548 8.54907C15.3548 8.02563 14.7343 7.58331 14 7.58331C13.2657 7.58331 12.6452 8.02563 12.6452 8.54907V11H15.3548L15.3548 8.54907ZM7.50002 2.5C6.03988 2.5 5.02138 3.59503 5.02138 5.16223V5.39331C5.02138 6.96057 6.03987 8.05554 7.50002 8.05554C8.96017 8.05554 9.97866 6.96057 9.97866 5.39331V5.16223C9.97866 3.59503 8.96017 2.5 7.50002 2.5Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+UserLock.displayName = 'UserLock';

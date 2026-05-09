@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/clouds.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Clouds = React.forwardRef<SVGSVGElement, IconProps>(
+  function Clouds({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M13 14.6875C13 15.8266 12.0766 16.75 10.9375 16.75H4.75C3.2312 16.75 2 15.5188 2 14C2 12.4812 3.2312 11.25 4.75 11.25C4.7735 11.25 4.79523 11.2563 4.81861 11.2569C5.13458 9.68462 6.52217 8.5 8.1875 8.5C10.086 8.5 11.625 10.039 11.625 11.9375C11.625 12.2081 11.5862 12.4683 11.5271 12.7209C12.3768 12.9758 13 13.7547 13 14.6875ZM16.79 6.70001C16.84 6.5 16.88 6.27997 16.88 6.06C16.88 4.51001 15.62 3.25 14.06 3.25C12.7 3.25 11.56 4.21997 11.31 5.51001C11.29 5.51001 11.27 5.5 11.25 5.5C10.3409 5.5 9.55342 6.04274 9.20093 6.82201C9.13853 6.95995 9.23355 7.11409 9.38057 7.15022C10.7826 7.49478 11.9565 8.44469 12.5978 9.71592C12.684 9.88675 12.8513 9.99998 13.0427 9.99998L16.206 10C17.0583 10 17.8506 9.41576 17.9797 8.57334C18.1135 7.70103 17.5695 6.93383 16.79 6.70001Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Clouds.displayName = 'Clouds';

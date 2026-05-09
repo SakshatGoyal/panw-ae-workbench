@@ -1,0 +1,29 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/command-center.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const CommandCenter = React.forwardRef<SVGSVGElement, IconProps>(
+  function CommandCenter({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M6.875 9.89941C6.875 8.1477 8.16612 6.87695 10 6.87695C11.8339 6.87695 13.125 8.14719 13.125 9.89941V10.1045C13.125 11.8562 11.8339 13.127 10 13.127C8.16612 13.127 6.875 11.8566 6.875 10.1045V9.89941Z" fill="currentColor"/>
+<path d="M10 2.5C5.59869 2.5 2.5 5.5498 2.5 9.75391V10.2461C2.5 12.8778 3.71371 15.0567 5.70084 16.3187C5.91987 16.4578 6.20616 16.386 6.34987 16.17L6.89207 15.3549C7.05844 15.1048 6.96658 14.7671 6.71472 14.6034C5.32399 13.6994 4.5 12.165 4.5 10.2461V9.7539C4.5 6.61132 6.70996 4.49999 10 4.49999C13.29 4.49999 15.5 6.61132 15.5 9.7539V10.2461C15.5 12.165 14.676 13.6994 13.2853 14.6034C13.0334 14.7671 12.9416 15.1048 13.1079 15.3549L13.65 16.1698C13.7937 16.3858 14.08 16.4576 14.2991 16.3185C16.2863 15.0563 17.5 12.8773 17.5 10.2461V9.75391C17.5 5.54858 14.4014 2.5 10 2.5Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+CommandCenter.displayName = 'CommandCenter';

@@ -8,7 +8,7 @@
 
 import React from 'react';
 import { action } from '@storybook/addon-actions';
-import { Plus, ChevronRight, Trash2 } from 'lucide-react';
+import { Plus, ChevronRight, Delete as Trash2 } from '@ds/icons';
 import Button, { ButtonSkeleton } from './index';
 
 const iconMap = {

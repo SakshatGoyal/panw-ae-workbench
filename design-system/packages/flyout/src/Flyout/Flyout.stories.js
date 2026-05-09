@@ -7,7 +7,7 @@
 
 import React, { useRef, useState } from 'react';
 import { action } from '@storybook/addon-actions';
-import { Folder, Star, Tag } from 'lucide-react';
+import { Folder, Star, Tag } from '@ds/icons';
 import { Button } from '@ds/button';
 import {
   Flyout,

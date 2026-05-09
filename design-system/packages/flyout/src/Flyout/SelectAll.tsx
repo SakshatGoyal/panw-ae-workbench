@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Square, CheckSquare, MinusSquare } from 'lucide-react';
+import { CheckboxEmpty, CheckboxFilled, CheckboxIndeterminate } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { useFlyoutContext } from './Flyout';
 
@@ -46,7 +46,7 @@ export const SelectAll = React.forwardRef<HTMLDivElement, SelectAllProps>(
     };
 
     const Icon =
-      status === 'checked' ? CheckSquare : status === 'indeterminate' ? MinusSquare : Square;
+      status === 'checked' ? CheckboxFilled : status === 'indeterminate' ? CheckboxIndeterminate : CheckboxEmpty;
 
     return (
       <>

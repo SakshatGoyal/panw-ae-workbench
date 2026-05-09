@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/pushpin.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Pushpin = React.forwardRef<SVGSVGElement, IconProps>(
+  function Pushpin({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M12.7513 15.0787C12.7498 15.2093 12.6972 15.3341 12.6049 15.4265L11.8884 16.1429C11.73 16.3013 11.4732 16.3013 11.3148 16.1429L3.8572 8.68534C3.69879 8.52693 3.69879 8.27009 3.8572 8.11168L4.57365 7.39523C4.66599 7.30289 4.7908 7.25034 4.92139 7.24882L7.03169 7.22428C7.14407 7.22297 7.25274 7.18384 7.34015 7.1132L11.4763 3.77063L11.0688 3.36312C10.9331 3.22748 10.9516 2.9891 11.11 2.83068L11.6837 2.25702C11.8421 2.09861 12.0804 2.08015 12.2161 2.2158L17.7843 7.78402C17.92 7.91966 17.9015 8.15804 17.7431 8.31646L17.1694 8.89012C17.011 9.04853 16.7726 9.06699 16.637 8.93134L16.2295 8.52383L12.8869 12.66C12.8163 12.7474 12.7771 12.856 12.7758 12.9684L12.7513 15.0787ZM5.79425 12.7939L3.12833 15.7739C2.95142 15.9717 2.95979 16.2732 3.1474 16.4608L3.53924 16.8527C3.72687 17.0403 4.02841 17.0487 4.22618 16.8718L7.20614 14.206L5.79425 12.7939Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Pushpin.displayName = 'Pushpin';

@@ -1,6 +1,6 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import { List } from 'lucide-react';
+import { List } from '@ds/icons';
 import { ContentSwitcher, ContentSwitcherSizes } from '../ContentSwitcher';
 
 const items = [{ label: 'A' }, { label: 'B' }, { label: 'C' }];

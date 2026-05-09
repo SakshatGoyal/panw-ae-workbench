@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/compliance.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Compliance = React.forwardRef<SVGSVGElement, IconProps>(
+  function Compliance({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path fillRule="evenodd" clipRule="evenodd" d="M3.5 3H16.5C16.7761 3 17 3.22388 17 3.5V10.98C17 12.0801 16.1 12.98 15 12.98H13.51C13.2295 12.98 13 13.2095 13 13.49V15C13 16.1001 12.1 17 11 17H3.5C3.22388 17 3 16.7761 3 16.5V3.5C3 3.22388 3.22388 3 3.5 3ZM13.7626 6.80857L8.85331 11.7174C8.65804 11.9127 8.34143 11.9127 8.14618 11.7174L5.8183 9.38911C5.62306 9.19385 5.62307 8.87728 5.81832 8.68203L6.17175 8.3286C6.36702 8.13333 6.68363 8.13334 6.87889 8.32864L8.49972 9.94988L12.7021 5.748C12.8973 5.55275 13.2139 5.55275 13.4092 5.74801L13.7626 6.10145C13.9579 6.29672 13.9579 6.61331 13.7626 6.80857Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Compliance.displayName = 'Compliance';

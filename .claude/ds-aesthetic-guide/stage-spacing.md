@@ -87,7 +87,7 @@ Applies to dropdowns, popovers, context menus, and submenus — any pattern wher
 | Property | Value |
 |---|---|
 | Trigger-to-flyout offset | 4px |
-| Flyout internal padding | minimum 4px on all four sides |
+| Flyout internal padding | 8px on all four sides |
 | Item padding | 8px vertical, 12px horizontal |
 | Gap between items | 2px |
 | Divider clearance | 4px above and 4px below the line |

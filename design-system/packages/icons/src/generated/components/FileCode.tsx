@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/file-code.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const FileCode = React.forwardRef<SVGSVGElement, IconProps>(
+  function FileCode({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M16.5 2H3.5C3.22388 2 3 2.22388 3 2.5V17.5C3 17.7761 3.22388 18 3.5 18H11C12.1 18 13 17.1001 13 16V14.49C13 14.2095 13.2295 13.98 13.51 13.98H15C16.1 13.98 17 13.0801 17 11.98V2.5C17 2.22388 16.7761 2 16.5 2ZM8.79514 10.4267C8.97293 10.6046 8.97293 10.8928 8.79514 11.0707L8.47334 11.3923C8.29561 11.5701 8.00736 11.5701 7.82957 11.3923L5.41996 8.98267C5.15336 8.71613 5.15336 8.28387 5.41996 8.0171L7.82957 5.60772C8.00736 5.42987 8.29561 5.42987 8.47334 5.60772L8.79514 5.92934C8.97293 6.10719 8.97293 6.39544 8.79514 6.57329L6.86843 8.5L8.79514 10.4267ZM14.5801 8.98267L12.1704 11.3923C11.9927 11.5701 11.7044 11.5701 11.5267 11.3923L11.2049 11.0707C11.0271 10.8928 11.0271 10.6046 11.2049 10.4267L13.1316 8.5L11.2049 6.57329C11.0271 6.39544 11.0271 6.10719 11.2049 5.92934L11.5267 5.60772C11.7044 5.42987 11.9927 5.42987 12.1704 5.60772L14.5801 8.0171C14.8467 8.28388 14.8467 8.71613 14.5801 8.98267Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+FileCode.displayName = 'FileCode';

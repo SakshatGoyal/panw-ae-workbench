@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/sign-out.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const SignOut = React.forwardRef<SVGSVGElement, IconProps>(
+  function SignOut({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M7 10.5V9.5C7 9.22386 7.22386 9 7.5 9H11V11H14V13.1C14 13.46 14.45 13.6499 14.7 13.39L17.81 10.29C17.96 10.13 17.96 9.86998 17.81 9.70995L14.7 6.60997C14.45 6.34996 14 6.54003 14 6.89989V8.99999L11 9V3.5C11 3.22386 10.7761 3 10.5 3H3.5C3.22386 3 3 3.22386 3 3.5V16.5C3 16.7761 3.22386 17 3.5 17H10.5C10.7761 17 11 16.7761 11 16.5V11L7.5 11C7.22386 11 7 10.7761 7 10.5Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+SignOut.displayName = 'SignOut';

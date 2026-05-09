@@ -33,7 +33,7 @@ Engineering decisions carry the same posture. When a request would create a new 
 
 ## Workflow
 
-For new work from a sketch, description, or reference image: draft first on a basic HTML page using Stage tokens. The draft lives at `.tmp/drafts/<feature-name>.html`, imports the compiled `@ds/styles/css/styles.css` bundle, and uses the BEM class names already present in the design system (`.panw--btn`, `.panw--accordion`, etc.). The class vocabulary lives in the SCSS source under `design-system/packages/styles/scss/` — read it when you need to know which class to reach for. The user previews the draft in Claude Code. Once approved, rebuild as a technical implementation: proper component structure, props, value bindings, no shortcuts carried over from the draft phase.
+For new work from a sketch, description, or reference image: draft as a `.tsx` file at `poc-exploration/src/explorations/<feature-name>.tsx`. Import real `@ds/*` components from source — the full Stage token + component CSS is already loaded by `src/system.scss` (imported once in `src/main.tsx`), so new exploration files need no CSS import of their own unless they have page-level layout rules, which go in a sibling `.css` file using only `var(--ds-*)` tokens. The compiler enforces correct props, BEM classes, and token resolution, so no approximation is possible. The active exploration is selected by URL query param (`?e=<feature-name>`); `src/main.tsx` is never modified during ideation. Serve with the Vite dev server at port 5173 (the `poc` entry in `.claude/launch.json`). The user previews in Claude Code. Once approved, promote to a proper package in `design-system/packages/`.
 
 For Figma input — component sets or freeform frames — take screenshots, extract minimal properties, redesign with Stage's aesthetic. Use judgment to identify which existing components fit the intent. An accordion-like interaction means reaching for the `accordion` package, not rebuilding the pattern.
 
@@ -72,6 +72,7 @@ The two specialized table-cell packages, `cell-contents` and `cells-standard`, s
 Read these files first:
 
 - `/Users/sakshatgoyal/Documents/GitHub/panw-ae-workbench/.claude/ds-aesthetic-guide/stage-background-colors.md`
+- `/Users/sakshatgoyal/Documents/GitHub/panw-ae-workbench/.claude/ds-aesthetic-guide/stage-components.md`
 - `/Users/sakshatgoyal/Documents/GitHub/panw-ae-workbench/.claude/ds-aesthetic-guide/stage-lines.md`
 - `/Users/sakshatgoyal/Documents/GitHub/panw-ae-workbench/.claude/ds-aesthetic-guide/stage-motion.md`
 - `/Users/sakshatgoyal/Documents/GitHub/panw-ae-workbench/.claude/ds-aesthetic-guide/stage-radius.md`

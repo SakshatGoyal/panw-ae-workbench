@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/desktop.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Desktop = React.forwardRef<SVGSVGElement, IconProps>(
+  function Desktop({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M13.7257 17.3142C13.8571 17.6426 13.6152 18 13.2615 18H6.73853C6.38477 18 6.14289 17.6426 6.2743 17.3142L6.51209 16.7197C6.80677 15.9832 7.52033 15.5 8.31379 15.5H11.6862C12.4797 15.5 13.1933 15.9832 13.4879 16.7197L13.7257 17.3142ZM18 4.5V13.5C18 13.7761 17.7761 14 17.5 14H2.5C2.22388 14 2 13.7761 2 13.5V4.5C2 4.22388 2.22388 4 2.5 4H17.5C17.7761 4 18 4.22388 18 4.5ZM16 6H4V11H16V6Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Desktop.displayName = 'Desktop';

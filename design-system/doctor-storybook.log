@@ -1,13 +1,11 @@
 🩺 The doctor is checking the health of your Storybook..
-(node:67115) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
+(node:25880) [DEP0190] DeprecationWarning: Passing args to a child process with shell option true can lead to security vulnerabilities, as the arguments are not escaped, only concatenated.
 (Use `node --trace-deprecation ...` to show where the warning was created)
 ╭ Incompatible packages found ─────────────────────────────────────────────────╮
 │                                                                              │
 │   The following packages are incompatible with Storybook 8.6.18 as they      │
 │   depend on different major versions of Storybook packages:                  │
-│   - @storybook/addon-essentials@8.6.14 (8.6.18 available!)                   │
-│   Repo: https://github.com/storybookjs/storybook/tree/next/code/addons/ess   │
-│   entials                                                                    │
+│   - @storybook/test-runner@0.24.3                                            │
 │                                                                              │
 │                                                                              │
 │   Please consider updating your packages or contacting the maintainers for   │
@@ -16,7 +14,6 @@
 │   https://github.com/storybookjs/storybook/issues/26031                      │
 │                                                                              │
 ╰──────────────────────────────────────────────────────────────────────────────╯
-WARN An issue occurred while trying to find dependencies metadata using npm.
 
 You can always recheck the health of your project by running:
 npx storybook doctor

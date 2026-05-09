@@ -3,9 +3,16 @@
   "configurations": [
     {
       "name": "storybook",
-      "runtimeExecutable": "npm",
-      "runtimeArgs": ["run", "storybook"],
+      "runtimeExecutable": "pnpm",
+      "runtimeArgs": ["exec", "storybook", "dev", "-p", "6007", "--no-open"],
       "port": 6007
+    },
+    {
+      "name": "compositions",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["storybook", "dev", "-p", "38275", "--no-open"],
+      "port": 38275,
+      "cwd": "../poc-exploration"
     }
   ]
 }

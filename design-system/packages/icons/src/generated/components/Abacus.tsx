@@ -1,0 +1,29 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/abacus.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Abacus = React.forwardRef<SVGSVGElement, IconProps>(
+  function Abacus({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M16 5H16.5C16.7761 5 17 5.22382 17 5.5V6.5C17 6.77612 16.7761 7 16.5 7H16V8.5C16 8.77612 15.7761 9 15.5 9H14.5C14.2239 9 14 8.77612 14 8.5V7H10V8.5C10 8.77612 9.77612 9 9.5 9H8.5C8.22388 9 8 8.77612 8 8.5V7H6V8.5C6 8.77612 5.77612 9 5.5 9H4.5C4.22388 9 4 8.77612 4 8.5V7H3.5C3.22388 7 3 6.77612 3 6.5V5.5C3 5.22382 3.22388 5 3.5 5H4V3.5C4 3.22382 4.22388 3 4.5 3H5.5C5.77612 3 6 3.22382 6 3.5V5H8V3.5C8 3.22382 8.22388 3 8.5 3H9.5C9.77612 3 10 3.22382 10 3.5V5H14V3.5C14 3.22382 14.2239 3 14.5 3H15.5C15.7761 3 16 3.22382 16 3.5V5Z" fill="currentColor"/>
+<path d="M16 13H16.5C16.7761 13 17 13.2238 17 13.5V14.5C17 14.7761 16.7761 15 16.5 15H16V16.5C16 16.7761 15.7761 17 15.5 17H14.5C14.2239 17 14 16.7761 14 16.5V15H12V16.5C12 16.7761 11.7761 17 11.5 17H10.5C10.2239 17 10 16.7761 10 16.5V15H6V16.5C6 16.7761 5.77612 17 5.5 17H4.5C4.22388 17 4 16.7761 4 16.5V15H3.5C3.22388 15 3 14.7761 3 14.5V13.5C3 13.2238 3.22388 13 3.5 13H4V11.5C4 11.2238 4.22388 11 4.5 11H5.5C5.77612 11 6 11.2238 6 11.5V13H10V11.5C10 11.2238 10.2239 11 10.5 11H11.5C11.7761 11 12 11.2238 12 11.5V13H14V11.5C14 11.2238 14.2239 11 14.5 11H15.5C15.7761 11 16 11.2238 16 11.5V13Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Abacus.displayName = 'Abacus';

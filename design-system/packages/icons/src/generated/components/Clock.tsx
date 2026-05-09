@@ -1,0 +1,29 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/clock.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Clock = React.forwardRef<SVGSVGElement, IconProps>(
+  function Clock({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M10.7805 4.02997V3.01001C10.7805 2.72998 10.5605 2.5 10.2805 2.5H9.5105C9.23047 2.5 9.00049 2.72998 9.00049 3.01001V4.06C9.3205 4.01996 9.66046 4 10.0005 4C10.2605 4 10.5205 4.01001 10.7805 4.02997Z" fill="currentColor"/>
+<path d="M17.0103 11.24V10.78C17.0103 7.09998 14.4705 4.37 10.7805 4.02997L10.7803 9.76997L14.2703 12.01C14.3903 12.08 14.4802 12.18 14.5303 12.31C14.5703 12.44 14.5602 12.57 14.5002 12.7L14.1503 13.38C14.0703 13.56 13.8903 13.66 13.7003 13.66C13.6202 13.66 13.5402 13.65 13.4702 13.61L9.28027 11.01C9.11023 10.93 9.00024 10.75 9.00024 10.56L9.00049 4.06C5.43048 4.47998 2.99023 7.17999 2.99023 10.78V11.24C2.99023 15.16 5.89025 18.01 10.0002 18.01C14.1102 18.01 17.0103 15.16 17.0103 11.24Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Clock.displayName = 'Clock';

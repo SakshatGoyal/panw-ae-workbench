@@ -1,7 +1,7 @@
 import React, { useCallback, useMemo } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronsLeft, ChevronLeft, ChevronRight, ChevronsRight } from 'lucide-react';
+import { AngleDoubleLeft, ChevronLeft, ChevronRight, AngleDoubleRight } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { Button, IconButton } from '@ds/button';
 import { Dropdown } from '@ds/dropdown';
@@ -15,6 +15,8 @@ export interface PaginationProps {
   background?: 'grey10' | 'grey00';
   onPageChange?: (page: number) => void;
   onRowsPerPageChange?: (rowsPerPage: number) => void;
+  /** Label for the unit being paginated (e.g. "deal" → "47 deals"). Display-only. */
+  recordLabel?: string;
   /** Maximum number of visible page buttons (excluding ellipsis). */
   maxVisiblePages?: number;
   className?: string;
@@ -102,7 +104,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             kind="ghost"
             size="sm"
             iconSize={16}
-            renderIcon={ChevronsLeft}
+            renderIcon={AngleDoubleLeft}
             aria-label="First page"
             disabled={isFirst}
             onClick={() => goTo(1)}
@@ -149,7 +151,7 @@ export const Pagination = React.forwardRef<HTMLDivElement, PaginationProps>(
             kind="ghost"
             size="sm"
             iconSize={16}
-            renderIcon={ChevronsRight}
+            renderIcon={AngleDoubleRight}
             aria-label="Last page"
             disabled={isLast}
             onClick={() => goTo(totalPages)}

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { createPortal } from 'react-dom';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Square, CheckSquare } from 'lucide-react';
+import { CheckboxEmpty, CheckboxFilled } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { useFlyoutContext, useFlyoutDepth } from './Flyout';
 
@@ -158,7 +158,7 @@ export const Item = React.forwardRef<HTMLDivElement, ItemProps>(function Item(
         style={depth > 0 ? { paddingLeft: 12 + depth * INDENT_PX } : undefined}>
         {mode === 'multiple' && (
           <span className={`${prefix}--flyout__item-checkbox`} aria-hidden="true">
-            {isSelected ? <CheckSquare size={16} /> : <Square size={16} />}
+            {isSelected ? <CheckboxFilled size={16} /> : <CheckboxEmpty size={16} />}
           </span>
         )}
         {IconElement && (

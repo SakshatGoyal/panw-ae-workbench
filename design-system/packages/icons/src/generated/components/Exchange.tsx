@@ -1,0 +1,29 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/exchange.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Exchange = React.forwardRef<SVGSVGElement, IconProps>(
+  function Exchange({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M13.5274 7.99988H5.55081C5.27464 7.99992 5.05078 7.77604 5.05082 7.49988L5.05078 6.50012C5.05082 6.22395 5.27464 6.00013 5.55081 6.00009H13.5274V3.66013C13.5275 3.30524 13.9565 3.12751 14.2074 3.37848L17.5265 6.69749C17.682 6.85299 17.682 7.10525 17.5265 7.26079L14.2074 10.5798C13.9565 10.8307 13.5274 10.653 13.5274 10.2981V7.99988Z" fill="currentColor"/>
+<path d="M6.16644 12.9584H14.1431C14.4192 12.9584 14.6431 13.1822 14.6431 13.4584L14.6431 14.4581C14.6431 14.7343 14.4192 14.9581 14.1431 14.9582H6.16643V17.2981C6.16639 17.653 5.7374 17.8308 5.48643 17.5798L2.16742 14.2608C2.01192 14.1053 2.01188 13.853 2.16742 13.6975L5.48644 10.3785C5.73736 10.1276 6.16644 10.3053 6.16644 10.6601V12.9584Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Exchange.displayName = 'Exchange';

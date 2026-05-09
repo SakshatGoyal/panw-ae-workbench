@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/location.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Location = React.forwardRef<SVGSVGElement, IconProps>(
+  function Location({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M8.87028 2.09141C5.43577 2.64689 3.18608 5.67875 3.53572 9.01414C3.97299 13.1856 7.96473 15.2519 9.5454 17.765C9.75681 18.1012 10.2594 18.0651 10.4732 17.7304C12.1625 15.0857 16.5 12.9245 16.5 8.25821C16.5 4.44609 12.959 1.43009 8.87028 2.09141Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Location.displayName = 'Location';

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Sun } from 'lucide-react';
+import { Lightbulb } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { Tags } from '@ds/tags';
 import { useTabsContext } from '../Tabs/TabsContext';
@@ -27,7 +27,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(function Tab(
     showTag = false,
     tagLabel = 'Tag',
     disabled = false,
-    renderIcon: IconElement = Sun,
+    renderIcon: IconElement = Lightbulb,
     showIcon = false,
     index = 0,
     className,

@@ -1,0 +1,282 @@
+/* ─────────────────────────────────────────────────────────────────────────────
+ * opportunity-table.css
+ *
+ * Page-level layout styles for the opportunity table exploration.
+ * All values reference Stage CSS variables — no raw hex, no raw px outside
+ * the 4px grid. Component styles (buttons, tags, chips, flyout, search,
+ * pagination) come entirely from @ds/styles/css/styles.css.
+ * ───────────────────────────────────────────────────────────────────────── */
+
+/* ─── Page shell ──────────────────────────────────────────────────────────── */
+
+.opp-page {
+  min-height: 100vh;
+  background-color: var(--ds-surface-alt-rest);
+  font-family: var(--ds-type-font-family-sans);
+}
+
+/* ─── Search bar ──────────────────────────────────────────────────────────── */
+/*
+ * Uses the .panw--search component class from @ds/styles.
+ * We override the width so it spans the full table area.
+ */
+.opp-search-bar {
+  display: flex;
+  align-items: center;
+  border-radius: var(--ds-radius-tight) var(--ds-radius-tight) 0 0;
+  border-bottom: none !important;
+  gap: 8px;
+  padding: 0 12px;
+  min-height: 40px;
+}
+
+.opp-search-sep {
+  width: 1px;
+  height: 16px;
+  background-color: var(--ds-lines-neutral-rest);
+  flex-shrink: 0;
+}
+
+.opp-active-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px;
+  flex: 1;
+}
+
+.opp-clear-all {
+  background: none;
+  border: none;
+  padding: 0 4px;
+  cursor: pointer;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ds-text-brand-rest);
+  text-decoration: none;
+  flex-shrink: 0;
+}
+.opp-clear-all:hover { color: var(--ds-text-brand-hover); }
+
+/* ─── Filter row ──────────────────────────────────────────────────────────── */
+
+.opp-filter-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 12px;
+  background-color: var(--ds-surface-rest);
+  border-top: 1px solid var(--ds-lines-neutral-rest);
+  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+  flex-wrap: nowrap;
+  overflow-x: auto;
+}
+
+.opp-counts {
+  font-size: 12px;
+  font-weight: 400;
+  letter-spacing: 0.25px;
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.opp-filter-sep {
+  width: 1px;
+  height: 16px;
+  background-color: var(--ds-lines-neutral-rest);
+  flex-shrink: 0;
+  margin: 0 4px;
+}
+
+.opp-filter-chip-wrapper {
+  position: relative;
+  flex-shrink: 0;
+}
+
+.opp-sort-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+  border-radius: var(--ds-radius-tight);
+  white-space: nowrap;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
+              color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.opp-sort-btn:hover {
+  background-color: var(--ds-ghost-hover);
+  color: var(--ds-text-primary);
+}
+
+/* ─── Table shell ─────────────────────────────────────────────────────────── */
+
+.opp-table-shell {
+  overflow-x: auto;
+  background-color: var(--ds-surface-rest);
+}
+
+.opp-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+}
+
+/* Column widths */
+.opp-c-type     { width: 88px; }
+.opp-c-quote    { width: 80px; }
+.opp-c-opp      { width: auto; min-width: 240px; }
+.opp-c-value    { width: 80px; }
+.opp-c-pipeline { width: 160px; }
+.opp-c-challenges { width: 160px; }
+.opp-c-date     { width: 108px; }
+.opp-c-activity { width: 112px; }
+.opp-c-actions  { width: 104px; }
+
+/* Header */
+.opp-table thead tr {
+  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+}
+
+.opp-table th {
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
+  user-select: none;
+}
+
+.opp-table th.opp-sortable {
+  cursor: pointer;
+}
+.opp-table th.opp-sortable:hover {
+  color: var(--ds-text-primary);
+}
+.opp-table th.opp-sorted {
+  color: var(--ds-text-brand-rest);
+}
+
+.opp-sort-indicator {
+  font-size: 10px;
+  margin-left: 2px;
+}
+
+/* Body rows */
+.opp-table tbody tr {
+  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+  transition: background-color 70ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.opp-table tbody tr:hover {
+  background-color: var(--ds-ghost-hover);
+}
+
+.opp-table td {
+  padding: 12px;
+  vertical-align: middle;
+}
+
+/* Opportunity cell — multi-line */
+.opp-td-opp { vertical-align: top; padding-top: 12px; }
+
+.opp-opp-name {
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.38;
+  color: var(--ds-text-primary);
+  margin-bottom: 2px;
+}
+
+.opp-opp-account {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+  margin-bottom: 2px;
+}
+
+.opp-opp-products {
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* Scalar cells */
+.opp-cell-quote {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+  letter-spacing: 0.25px;
+}
+
+.opp-cell-value {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--ds-text-primary);
+  letter-spacing: -0.01em;
+}
+
+.opp-cell-date {
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--ds-text-primary);
+}
+
+.opp-cell-activity {
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+}
+
+.opp-cell-activity--stale {
+  color: var(--ds-text-danger-rest);
+}
+
+/* Tag pairs */
+.opp-tag-pair {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  align-items: flex-start;
+}
+
+/* Actions cell */
+.opp-actions-cell {
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+
+.opp-actions-cell--visible {
+  opacity: 1;
+}
+
+/* ─── Footer / pagination ─────────────────────────────────────────────────── */
+
+.opp-table-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  background-color: var(--ds-surface-rest);
+  border-top: 1px solid var(--ds-lines-neutral-rest);
+}
+
+/* Current page button highlight */
+.opp-pg-current {
+  background-color: var(--ds-surface-accent-rest) !important;
+  color: var(--ds-text-secondary-rest) !important;
+}

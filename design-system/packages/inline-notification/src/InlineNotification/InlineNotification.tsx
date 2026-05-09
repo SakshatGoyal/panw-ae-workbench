@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Info, AlertTriangle, XCircle, CheckCircle, X } from 'lucide-react';
+import { Info, Critical, MinusCircle, CircleCheck, Close } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 
@@ -22,9 +22,9 @@ export interface InlineNotificationProps
 
 const TYPE_ICON: Record<InlineNotificationType, React.ElementType> = {
   info: Info,
-  alert: AlertTriangle,
-  error: XCircle,
-  success: CheckCircle,
+  alert: Critical,
+  error: MinusCircle,
+  success: CircleCheck,
 };
 
 export const InlineNotification = React.forwardRef<HTMLDivElement, InlineNotificationProps>(
@@ -66,7 +66,7 @@ export const InlineNotification = React.forwardRef<HTMLDivElement, InlineNotific
               kind="ghost"
               size="sm"
               iconSize={16}
-              renderIcon={X}
+              renderIcon={Close}
               aria-label="Close notification"
               onClick={onClose}
             />

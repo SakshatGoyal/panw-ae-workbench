@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
-import { Star } from 'lucide-react';
+import { Star } from '@ds/icons';
 import { Tabs } from './index';
 import { Tab } from '../Tab';
 

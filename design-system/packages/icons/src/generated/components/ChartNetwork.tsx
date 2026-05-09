@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/chart-network.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const ChartNetwork = React.forwardRef<SVGSVGElement, IconProps>(
+  function ChartNetwork({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M13.5 2H6.41833C6.18745 2 6 2.18745 6 2.41833V8.29526L4.53285 10.0718C4.3632 10.025 4.18452 10 4 10C2.89543 10 2 10.8954 2 12C2 13.1046 2.89543 14 4 14C5.10457 14 6 13.1046 6 12C6 11.6296 5.89932 11.2827 5.72383 10.9853L7.36339 9H9.25V14.1454C8.51704 14.4421 8 15.1607 8 16C8 17.1046 8.89543 18 10 18C11.1046 18 12 17.1046 12 16C12 15.1607 11.483 14.4421 10.75 14.1454V9H12.6369L14.2763 10.9851C14.1007 11.2826 14 11.6295 14 12C14 13.1046 14.8954 14 16 14C17.1046 14 18 13.1046 18 12C18 10.8954 17.1046 10 16 10C15.8156 10 15.637 10.025 15.4674 10.0717L14 8.29492V2.5C14 2.22404 13.776 2 13.5 2Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+ChartNetwork.displayName = 'ChartNetwork';

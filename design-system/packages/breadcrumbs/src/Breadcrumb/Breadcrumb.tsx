@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronRight } from 'lucide-react';
+import { ChevronRight } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export interface BreadcrumbProps extends Omit<React.HTMLAttributes<HTMLElement>, 'children'> {

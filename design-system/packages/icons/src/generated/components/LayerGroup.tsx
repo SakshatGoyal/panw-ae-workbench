@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/layer-group.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const LayerGroup = React.forwardRef<SVGSVGElement, IconProps>(
+  function LayerGroup({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M9.73975 9.87425L3.1574 6.2325C2.94754 6.11639 2.94754 5.82474 3.1574 5.70863L9.73975 2.06687C9.90091 1.97771 10.0991 1.97771 10.2603 2.06687L16.8426 5.70863C17.0525 5.82474 17.0525 6.11639 16.8426 6.2325L10.2603 9.87426C10.0991 9.96342 9.90091 9.96342 9.73975 9.87426V9.87425ZM16.8425 9.73621L15.0418 8.73943L10.2601 11.3875C10.1001 11.4781 9.89999 11.4781 9.73989 11.3875L4.95823 8.73943L3.1576 9.73621C2.9475 9.85703 2.9475 10.139 3.1576 10.2598L9.73989 13.9046C9.89998 13.9952 10.1001 13.9952 10.2601 13.9046L16.8425 10.2598C17.0525 10.139 17.0525 9.85703 16.8425 9.73621ZM16.8425 13.7636L15.0418 12.7669L10.2601 15.4149C10.1001 15.5055 9.89999 15.5055 9.73989 15.4149L4.95823 12.7669L3.1576 13.7636C2.9475 13.8845 2.9475 14.1664 3.1576 14.2872L9.73989 17.9321C9.89998 18.0226 10.1001 18.0226 10.2601 17.9321L16.8425 14.2872C17.0525 14.1664 17.0525 13.8845 16.8425 13.7636Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+LayerGroup.displayName = 'LayerGroup';

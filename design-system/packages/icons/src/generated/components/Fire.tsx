@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/fire.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Fire = React.forwardRef<SVGSVGElement, IconProps>(
+  function Fire({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M10.1031 2.72539C7.9795 4.21176 6.98614 5.74322 7.64444 8.47845C7.74043 8.87728 7.34493 9.21764 6.96594 9.06066C6.44122 8.84332 5.92716 8.59703 5.42797 8.3232C5.16922 8.18126 4.83767 8.27991 4.72351 8.55206C4.38912 9.3493 4.1627 10.1762 4.06111 11.0089C3.63879 14.4702 6.14368 17.7754 9.62413 17.9885C13.104 18.2015 16.0002 15.4345 16.0002 12C16.0002 6.485 10.9401 6.88347 10.8963 3.103C10.8918 2.71233 10.4232 2.50136 10.1031 2.72539ZM10.0002 16C8.95606 16 8.10743 15.1515 8.10743 14.1073C8.10743 12.7398 9.96375 12.8231 9.69105 11C10.441 11.1174 11.2235 12.0563 11.5933 12.8612C11.7856 13.2587 11.8929 13.6845 11.8929 14.1073C11.8929 15.1515 11.0444 16 10.0002 16Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Fire.displayName = 'Fire';

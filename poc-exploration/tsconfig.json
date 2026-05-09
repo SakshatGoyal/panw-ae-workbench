@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "baseUrl": ".",
+    "paths": {
+      "@ds/*": ["../design-system/packages/*/src"],
+      "@ds/button/src/internal/usePrefix": ["../design-system/packages/button/src/internal/usePrefix"]
+    }
+  },
+  "include": ["src", ".storybook"],
+  "exclude": ["node_modules"]
+}

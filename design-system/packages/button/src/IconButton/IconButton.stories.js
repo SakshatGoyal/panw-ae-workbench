@@ -11,13 +11,13 @@ import { action } from '@storybook/addon-actions';
 import {
   Plus,
   Search,
-  Trash2,
+  Delete as Trash2,
   Settings,
-  Bell,
-  X,
+  Notification as Bell,
+  Close as X,
   ChevronRight,
   Download,
-} from 'lucide-react';
+} from '@ds/icons';
 import { IconButton } from './index';
 
 const iconMap = {

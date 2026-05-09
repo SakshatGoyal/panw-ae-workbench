@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
-import { List, Grid, Calendar } from 'lucide-react';
+import { List, GridHorizontal as Grid, Calendar } from '@ds/icons';
 import { ContentSwitcher, ContentSwitcherSizes, ContentSwitcherBackgrounds } from './index';
 
 const baseItems = [{ label: 'First' }, { label: 'Second' }, { label: 'Third' }];

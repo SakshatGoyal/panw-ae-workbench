@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { action } from '@storybook/addon-actions';
-import { Sun, Star, Bell } from 'lucide-react';
+import { Lightbulb as Sun, Star, Notification as Bell } from '@ds/icons';
 import {
   Accordion,
   AccordionSizes,

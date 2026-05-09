@@ -21,6 +21,20 @@
       "runtimeArgs": ["-m", "http.server", "4174"],
       "port": 4174,
       "cwd": "."
+    },
+    {
+      "name": "poc",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "5173"],
+      "port": 5173,
+      "cwd": "poc-exploration"
+    },
+    {
+      "name": "compositions",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["storybook", "dev", "-p", "38274", "--no-open"],
+      "port": 38274,
+      "cwd": "poc-exploration"
     }
   ]
 }

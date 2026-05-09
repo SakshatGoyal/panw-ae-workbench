@@ -261,7 +261,7 @@ function OpportunityPanel() {
                   mode="single"
                   selected={[outcome]}
                   onSelectionChange={(vals) => { if (vals[0]) setOutcome(vals[0]) }}
-                  placement="below"
+                  placement="bottom-start"
                 >
                   <FlyoutList>
                     {OUTCOMES.map((o) => (
@@ -651,7 +651,7 @@ const PANEL_CSS = `
     position: fixed;
     top: 0;
     right: 0;
-    width: 480px;
+    width: 400px;
     height: 100vh;
     background-color: var(--ds-surface-rest);
     box-shadow: -4px 0 16px -4px rgb(0 0 0 / 10%);

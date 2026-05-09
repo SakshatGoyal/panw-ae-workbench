@@ -1,0 +1,28 @@
+// AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
+// Source: svg/tags.svg
+import * as React from 'react';
+import type { IconProps } from '../../types';
+
+export const Tags = React.forwardRef<SVGSVGElement, IconProps>(
+  function Tags({ size = 20, className, title, 'aria-label': ariaLabel, ...rest }, ref) {
+    return (
+      <svg
+        ref={ref}
+        width={size}
+        height={size}
+        viewBox="0 0 20 20"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        className={className}
+        aria-hidden={ariaLabel ? undefined : true}
+        aria-label={ariaLabel}
+        role={ariaLabel ? 'img' : undefined}
+        {...rest}>
+        {title ? <title>{title}</title> : null}
+        <path d="M8.56474 13.8275L7.45799 14.9343C7.27434 15.1179 6.97661 15.1179 6.79289 14.9343L2.13774 10.279C1.95409 10.0953 1.95409 9.79773 2.13774 9.61401L7.54203 4.20971C7.64671 4.1051 7.79447 4.05578 7.94102 4.07678L10.2276 4.40344L5.39115 9.23987C5.00065 9.63025 5.00065 10.2635 5.39115 10.6539L8.56474 13.8275ZM17.9952 9.13097C18.0162 9.27755 17.9669 9.42532 17.8623 9.53003L12.458 14.9343C12.2743 15.1179 11.9766 15.1179 11.7929 14.9343L7.13773 10.2791C6.95407 10.0954 6.95407 9.79765 7.13773 9.61403L12.542 4.20975C12.6467 4.10513 12.7945 4.05587 12.941 4.07676L17.0144 4.65862C17.2212 4.68817 17.3838 4.85072 17.4134 5.05768L17.9952 9.13097ZM16.1402 6.65622C16.1402 6.22514 15.7907 5.87579 15.3596 5.87579C14.9286 5.87579 14.5792 6.22514 14.5792 6.65622C14.5792 7.0873 14.9286 7.43674 15.3596 7.43674C15.7907 7.43674 16.1402 7.0873 16.1402 6.65622Z" fill="currentColor"/>
+      </svg>
+    );
+  }
+);
+
+Tags.displayName = 'Tags';

@@ -287,14 +287,6 @@ const SALES_PLAY_LABEL: Record<SalesPlayStatus, string> = {
   'closed-won':  'Closed Won',
   'closed-lost': 'Closed Lost',
 }
-/** Collapse-priority order: which buckets to hide FIRST when column 5
- *  overflows. Deemphasized statuses go first; lifecycle ordering on
- *  display is independent (spec §4.5). */
-const SALES_PLAY_COLLAPSE_ORDER: readonly SalesPlayStatus[] = [
-  'closed-lost', 'closed-won', 'declined',
-  'deferred', 'pitched', 'pursuing', 'not-touched',
-] as const
-
 // Brand icons (forked from opp-table; BrandUnit42 still not exported).
 const BRAND_ICON: Record<Brand, React.ElementType | undefined> = {
   'strata':  BrandStrata,
@@ -1556,18 +1548,11 @@ function EBCPanel({ ebc }: { ebc: EBC }) {
 // Per spec §4.5: render tags in LIFECYCLE order (Not Touched →
 // Pitched → Deferred → Declined → Pursuing → Closed Won → Closed
 // Lost), regardless of how many are present. Emphasis hierarchy pulls
-// the eye to Not Touched first — but using a brand-accent color, NOT
-// red (red would read as "error" instead of "action item" per
-// cr-intent-validator review).
-//
-// Overflow: cr-failure §2 / cr-scale §1 flagged that
-// lifecycle order + naive right-collapse hides the wrong buckets
-// (Closed Won is rightmost-but-still-important; deemphasized statuses
-// are middle). Instead, this cluster collapses by the
-// `SALES_PLAY_COLLAPSE_ORDER` priority (deemphasized first), then
-// renders the kept buckets in lifecycle order at the visible
-// positions. The +N popover lists collapsed buckets with their
-// individual play breakdowns.
+// the eye to Not Touched first via a brand-accent color (purple), NOT
+// red (red would read as "error" instead of "action item").
+// All buckets render — no +N collapse. The cell wraps vertically and
+// uses the row height that column 3's 4-sub-cell stack already
+// reserves, so truncation hides information for no visual gain.
 
 function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
   return (
@@ -1580,34 +1565,6 @@ function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
           <li key={p.name} className="acc-pop__kv">
             <span className="acc-pop__kv-label">{p.name}</span>
             <span className="acc-pop__kv-value">{formatUsdCompact(p.usd)}</span>
-          </li>
-        ))}
-      </ul>
-    </div>
-  )
-}
-
-function SalesPlayOverflowPanel({ buckets }: { buckets: SalesPlayBucket[] }) {
-  return (
-    <div className="acc-pop acc-pop--play-overflow">
-      <div className="acc-pop__heading">
-        {buckets.length} additional {buckets.length === 1 ? 'bucket' : 'buckets'}
-      </div>
-      <ul className="acc-pop__overflow-list">
-        {buckets.map(b => (
-          <li key={b.status} className="acc-pop__overflow-item">
-            <div className="acc-pop__overflow-head">
-              <span>{SALES_PLAY_LABEL[b.status]}</span>
-              <span className="acc-pop__kv-value">{formatUsdCompact(b.usd)}</span>
-            </div>
-            <ul className="acc-pop__kv-list">
-              {b.plays.map(p => (
-                <li key={p.name} className="acc-pop__kv">
-                  <span className="acc-pop__kv-label">{p.name}</span>
-                  <span className="acc-pop__kv-value">{formatUsdCompact(p.usd)}</span>
-                </li>
-              ))}
-            </ul>
           </li>
         ))}
       </ul>
@@ -1641,107 +1598,23 @@ interface SalesPlayClusterProps {
   density: DensityKey[]
 }
 
-function SalesPlayCluster({ buckets, density }: SalesPlayClusterProps) {
-  // Filter by density first. Each status has its own tag-density key.
-  const visibleByDensity = buckets.filter(b =>
-    density.includes(`status-${b.status}` as DensityKey))
-  if (visibleByDensity.length === 0) return null
+// Account-table sales plays wrap vertically rather than collapsing to
+// +N. With column-3's 4-sub-cell stack the row already carries 4 lines
+// of height; column 5 simply uses that same vertical budget. Lifecycle
+// order is preserved across the wrap (Not Touched → ... → Closed Lost).
 
-  // Sort into lifecycle order for display.
-  const lifecycleOrdered = [...visibleByDensity].sort(
+function SalesPlayCluster({ buckets, density }: SalesPlayClusterProps) {
+  const visible = buckets.filter(b =>
+    density.includes(`status-${b.status}` as DensityKey))
+  if (visible.length === 0) return null
+  const lifecycleOrdered = [...visible].sort(
     (a, b) => SALES_PLAY_LIFECYCLE.indexOf(a.status) - SALES_PLAY_LIFECYCLE.indexOf(b.status)
   )
-  // Build a parallel "collapse-priority" list so we know which
-  // buckets to hide first when overflowing.
-  const collapsePriority = [...visibleByDensity].sort(
-    (a, b) => SALES_PLAY_COLLAPSE_ORDER.indexOf(a.status) - SALES_PLAY_COLLAPSE_ORDER.indexOf(b.status)
-  )
-
-  const containerRef = useRef<HTMLDivElement>(null)
-  const measureRef = useRef<HTMLDivElement>(null)
-  const [visibleStatuses, setVisibleStatuses] = useState<SalesPlayStatus[]>(
-    () => lifecycleOrdered.map(b => b.status)
-  )
-
-  useLayoutEffect(() => {
-    const container = containerRef.current
-    const measure = measureRef.current
-    if (!container || !measure) return
-    const recompute = () => {
-      const parentWidth = container.clientWidth
-      if (parentWidth <= 0) { requestAnimationFrame(recompute); return }
-      const widthByStatus: Record<string, number> = {}
-      let badgeWidth = 0
-      for (const child of Array.from(measure.children) as HTMLElement[]) {
-        if (child.dataset.role === 'badge') badgeWidth = child.offsetWidth
-        else if (child.dataset.status) widthByStatus[child.dataset.status] = child.offsetWidth
-      }
-      const lifecycleWidth = (statuses: SalesPlayStatus[]) =>
-        statuses.reduce((s, st, i) => s + (widthByStatus[st] ?? 0) + (i > 0 ? ACC_PRODUCT_GAP : 0), 0)
-      // Small tolerance for sub-pixel rounding and tag padding —
-      // strict math collapses the 7-status row to +N when the only
-      // surviving bucket misses the limit by 2px. Tag overflow is
-      // clipped by .acc-play-cluster overflow:hidden either way.
-      const limit = parentWidth + 4
-      // Check if all fit without a badge.
-      const allStatuses = lifecycleOrdered.map(b => b.status)
-      if (lifecycleWidth(allStatuses) <= limit) {
-        setVisibleStatuses(prev =>
-          prev.length === allStatuses.length && prev.every((s, i) => s === allStatuses[i])
-            ? prev
-            : allStatuses
-        )
-        return
-      }
-      // Otherwise iteratively remove the next-deemphasized bucket until it fits.
-      // `keep` starts as the full lifecycle set; each iteration drops one
-      // entry by collapse priority. Reserve room for the +N badge once we
-      // know at least one collapse will happen.
-      const dropOrder = collapsePriority.map(b => b.status)
-      let keep = new Set(allStatuses)
-      for (const toDrop of dropOrder) {
-        keep.delete(toDrop)
-        const remaining = allStatuses.filter(s => keep.has(s))
-        const w = lifecycleWidth(remaining) + ACC_PRODUCT_GAP + badgeWidth
-        if (w <= limit) {
-          setVisibleStatuses(prev =>
-            prev.length === remaining.length && prev.every((s, i) => s === remaining[i])
-              ? prev
-              : remaining
-          )
-          return
-        }
-      }
-      // Worst case: nothing fits — show empty and badge with full count.
-      setVisibleStatuses([])
-    }
-    recompute()
-    const ro = new ResizeObserver(recompute)
-    ro.observe(container)
-    return () => ro.disconnect()
-  }, [lifecycleOrdered, collapsePriority])
-
-  const visibleBuckets = lifecycleOrdered.filter(b => visibleStatuses.includes(b.status))
-  const hiddenBuckets = lifecycleOrdered.filter(b => !visibleStatuses.includes(b.status))
-
   return (
-    <div className="acc-play-cluster" ref={containerRef}>
-      {visibleBuckets.map(b => (
+    <div className="acc-tag-cluster">
+      {lifecycleOrdered.map(b => (
         <SalesPlayTag key={b.status} bucket={b} />
       ))}
-      {hiddenBuckets.length > 0 && (
-        <HoverShell render={() => <SalesPlayOverflowPanel buckets={hiddenBuckets} />}>
-          <Tags {...TAG_BASE} label={`+${hiddenBuckets.length}`} />
-        </HoverShell>
-      )}
-      <div ref={measureRef} className="acc-play-cluster__measure" aria-hidden="true">
-        {lifecycleOrdered.map(b => (
-          <span key={`m-${b.status}`} data-status={b.status}>
-            <SalesPlayTag bucket={b} />
-          </span>
-        ))}
-        <span data-role="badge"><Tags {...TAG_BASE} label={`+${Math.max(1, lifecycleOrdered.length - 1)}`} /></span>
-      </div>
     </div>
   )
 }
@@ -1771,120 +1644,28 @@ function ProductARRPanel({ product }: { product: Product }) {
   )
 }
 
-function ProductARROverflowPanel({ products }: { products: Product[] }) {
+// ─── Product cluster — wrapping (no +N collapse) ─────────────────────────
+// Account cells are vertically tall (Col 3 already stacks 4 sub-cells),
+// so there's ample vertical space to render all products as a wrapping
+// cluster. Truncating to +N when the row has plenty of unused height
+// hides information for no visual gain. Products are passed in already
+// sorted descending by ARR; the wrap reflows that order top-to-bottom.
+
+function ProductCluster({ products }: { products: Product[] }) {
   return (
-    <div className="acc-pop acc-pop--product-overflow">
-      <div className="acc-pop__heading">
-        {products.length} additional {products.length === 1 ? 'product' : 'products'}
-      </div>
-      <ul className="acc-pop__product-list">
-        {products.map(p => {
-          const Icon = BRAND_ICON[p.brand]
-          return (
-            <li key={p.name} className="acc-pop__product-list-item">
-              <span className="acc-pop__product-icon" aria-hidden="true">
-                {Icon ? <Icon /> : <span className="acc-pop__product-icon--missing" />}
-              </span>
-              <span className="acc-pop__product-name">{p.name}</span>
-              <span className="acc-pop__product-amount">{formatUsdCompact(p.arrUsd)}</span>
-            </li>
-          )
-        })}
-      </ul>
-    </div>
-  )
-}
-
-// ─── Product cluster — measure-and-truncate with +N overflow ─────────────
-// Forked from opp-table ProductCluster. Hover popover differs (ARR not
-// share-of-deal). Products are passed in already sorted descending by
-// ARR — the cell collapses the lowest-ARR products into +N first by
-// virtue of slice order.
-
-const ACC_PRODUCT_GAP = 4
-
-interface ProductClusterProps { products: Product[] }
-
-function ProductCluster({ products }: ProductClusterProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const measureRef = useRef<HTMLDivElement>(null)
-  const [visibleCount, setVisibleCount] = useState(products.length)
-
-  useLayoutEffect(() => {
-    const container = containerRef.current
-    const measure = measureRef.current
-    if (!container || !measure) return
-    const recompute = () => {
-      const parentWidth = container.clientWidth
-      if (parentWidth <= 0) {
-        // Container not laid out yet — retry next frame so we don't
-        // ship the initial all-visible state when it doesn't fit.
-        requestAnimationFrame(recompute)
-        return
-      }
-      const tagWidths: number[] = []
-      let badgeWidth = 0
-      for (const child of Array.from(measure.children) as HTMLElement[]) {
-        if (child.dataset.role === 'badge') badgeWidth = child.offsetWidth
-        else tagWidths.push(child.offsetWidth)
-      }
-      const allWidth = tagWidths.reduce(
-        (s, w, i) => s + w + (i > 0 ? ACC_PRODUCT_GAP : 0), 0)
-      if (allWidth <= parentWidth) {
-        setVisibleCount(prev => (prev === products.length ? prev : products.length))
-        return
-      }
-      const limit = parentWidth - badgeWidth - ACC_PRODUCT_GAP
-      let used = 0
-      let fit = 0
-      for (let i = 0; i < tagWidths.length; i++) {
-        const candidate = used + (i > 0 ? ACC_PRODUCT_GAP : 0) + tagWidths[i]
-        if (candidate <= limit) { used = candidate; fit++ } else break
-      }
-      setVisibleCount(prev => (prev === fit ? prev : fit))
-    }
-    recompute()
-    const ro = new ResizeObserver(recompute)
-    ro.observe(container)
-    return () => ro.disconnect()
-  }, [products])
-
-  const overflow = products.length - visibleCount
-  const overflowedProducts = products.slice(visibleCount)
-  const renderTagPlain = (p: Product, keyHint: string) => {
-    const Icon = BRAND_ICON[p.brand]
-    return Icon
-      ? <Tags key={keyHint} {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
-      : <Tags key={keyHint} {...TAG_BASE} label={p.name} />
-  }
-  return (
-    <div className="acc-product-cluster" ref={containerRef}>
-      {products.slice(0, visibleCount).map((p, i) => (
-        <HoverShell
-          key={`v-${p.name}-${i}`}
-          render={() => <ProductARRPanel product={p} />}>
-          {renderTagPlain(p, `v-tag-${p.name}-${i}`)}
-        </HoverShell>
-      ))}
-      {overflow > 0 && (
-        <HoverShell
-          render={() => <ProductARROverflowPanel products={overflowedProducts} />}>
-          <Tags {...TAG_BASE} label={`+${overflow}`} />
-        </HoverShell>
-      )}
-      <div ref={measureRef} className="acc-product-cluster__measure" aria-hidden="true">
-        {products.map((p, i) => (
-          <span key={`m-${p.name}-${i}`}>
-            {renderTagPlain(p, `m-inner-${p.name}-${i}`)}
-          </span>
-        ))}
-        {/* Badge sample uses a single-digit "+N" rather than "+99" —
-            account-level fixtures cap at <=15 products, so the real
-            badge is always 1–2 digits wide. The "+99" sample
-            over-reserves enough to push the first tag off-screen at
-            account-column widths (~187px). */}
-        <span data-role="badge"><Tags {...TAG_BASE} label={`+${Math.max(1, products.length - 1)}`} /></span>
-      </div>
+    <div className="acc-tag-cluster">
+      {products.map((p, i) => {
+        const Icon = BRAND_ICON[p.brand]
+        return (
+          <HoverShell
+            key={`${p.name}-${i}`}
+            render={() => <ProductARRPanel product={p} />}>
+            {Icon
+              ? <Tags {...TAG_BASE} className="acc-tag--static" icon renderIcon={Icon} label={p.name} />
+              : <Tags {...TAG_BASE} className="acc-tag--static" label={p.name} />}
+          </HoverShell>
+        )
+      })}
     </div>
   )
 }
@@ -2165,34 +1946,22 @@ function AEAccountTable() {
                     </td>
                     <td className="acc-c-equal">
                       {/* Column 2 — four per-quarter pipeline tags
-                          laid out as a 2x2 grid, left-to-right,
-                          top-row earliest. The grid gives every row
-                          a predictable column-2 height regardless of
-                          dollar-value widths, and reads as a
-                          timeline (CQ → Q1FY27 on row 1, Q2FY27 →
-                          Q3FY27 on row 2). Empty quarter renders as
-                          "$—" placeholder per spec §4.2 — absence
-                          is data, not a missing tag. Tag-density
-                          toggles control visibility per-quarter
-                          (hidden quarters leave their grid slot
-                          empty so the spatial timeline still
-                          reads). */}
-                      <div className="acc-quarter-grid">
+                          in a wrapping flex cluster (matches the
+                          opp-table cluster pattern). Empty quarter
+                          renders as "$—" placeholder per spec §4.2 —
+                          absence is data, not a missing tag.
+                          Tag-density toggles per-quarter visibility. */}
+                      <div className="acc-tag-cluster">
                         {row.pipeline.map((q, i) => {
                           const key = QUARTER_DENSITY_KEYS[i]
-                          if (!density.includes(key)) {
-                            return <div key={key} className="acc-quarter-grid__slot" />
-                          }
-                          // Drop the colon-space — at narrow column
-                          // widths the punctuation push made the
-                          // tags wrap inconsistently across rows.
-                          const label = `${q.label} ${formatUsdCompact(q.usd)}`
+                          if (!density.includes(key)) return null
+                          const label = `${q.label}: ${formatUsdCompact(q.usd)}`
                           return (
-                            <div key={key} className="acc-quarter-grid__slot">
-                              <HoverShell render={() => <QuarterPipelinePanel quarter={q} />}>
-                                <Tags {...TAG_BASE} className="acc-tag--static" label={label} />
-                              </HoverShell>
-                            </div>
+                            <HoverShell
+                              key={key}
+                              render={() => <QuarterPipelinePanel quarter={q} />}>
+                              <Tags {...TAG_BASE} className="acc-tag--static" label={label} />
+                            </HoverShell>
                           )
                         })}
                       </div>
@@ -2662,23 +2431,6 @@ const LAYOUT_CSS = `
   align-items: center;
 }
 
-/* 2x2 quarter-pipeline grid (col 2). Predictable height row-to-row;
- * top row is CQ + Q1, bottom is Q2 + Q3, left-to-right time. Each
- * slot holds at most one tag — wide values clip at slot width. */
-.acc-quarter-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: var(--ds-spacing-02);
-  min-width: 0;
-}
-.acc-quarter-grid__slot {
-  min-width: 0;
-  display: flex;
-  align-items: center;
-}
-.acc-quarter-grid__slot .panw--tag {
-  max-width: 100%;
-}
 /* Column 3 stacks sub-cells vertically (each row in the cell is a
  * distinct concept — activity / health / risks / EBC). */
 .acc-tag-cluster--stack {
@@ -2729,34 +2481,6 @@ const LAYOUT_CSS = `
 .acc-pop--ebc { min-width: 280px; }
 .acc-health-bars { display: block; }
 
-/* Product cluster — measure-and-truncate + hidden measurement layer.
- * Both layers are flex-wrap:nowrap so the cluster never spills onto
- * a second row; overflow:hidden clips any tag we decided to show
- * but ran out of room for (a render-only safety; the measurement is
- * what actually drives visibleCount). */
-.acc-product-cluster {
-  position: relative;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--ds-spacing-02);
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-}
-.acc-product-cluster__measure {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--ds-spacing-02);
-  white-space: nowrap;
-  visibility: hidden;
-  pointer-events: none;
-}
-
 /* Product popover (ARR contribution, not share-of-deal).
  * Single-product hovers carry one line of identity and one line of
  * value — width sized to the natural content, no over-reservation. */
@@ -2802,88 +2526,8 @@ const LAYOUT_CSS = `
   color: var(--ds-text-tertiary-rest);
 }
 
-/* Sales Play cluster — mirrors product cluster: flex-wrap:nowrap so the
- * row never spills onto a second line; overflow clipped. */
-.acc-play-cluster {
-  position: relative;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--ds-spacing-02);
-  min-width: 0;
-  max-width: 100%;
-  overflow: hidden;
-}
-.acc-play-cluster__measure {
-  position: absolute;
-  top: 0;
-  left: 0;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--ds-spacing-02);
-  white-space: nowrap;
-  visibility: hidden;
-  pointer-events: none;
-}
-
-/* Sales Play overflow popover — buckets are bigger than products
- * (multiple plays per bucket), so we give the popover more height. */
-.acc-pop--play-overflow {
-  min-width: 320px;
-  max-width: 400px;
-  max-height: 420px;
-  overflow-y: auto;
-}
-.acc-pop__overflow-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-04);
-}
-.acc-pop__overflow-item {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-02);
-}
-.acc-pop__overflow-head {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-spacing-04);
-  font-size: 13px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
-  padding-bottom: var(--ds-spacing-01);
-  border-bottom: 1px solid var(--ds-lines-neutral-rest);
-}
-
 .acc-pop--play-bucket { min-width: 240px; }
 
-/* Product overflow popover */
-.acc-pop--product-overflow { min-width: 280px; max-width: 360px; max-height: 320px; overflow-y: auto; }
-.acc-pop__product-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-02);
-}
-.acc-pop__product-list-item {
-  display: grid;
-  grid-template-columns: 20px 1fr auto;
-  align-items: center;
-  gap: var(--ds-spacing-02);
-}
-.acc-pop__product-amount {
-  font-size: 13px;
-  color: var(--ds-text-secondary-rest);
-  font-feature-settings: 'tnum' 1, 'lnum' 1;
-  font-variant-numeric: tabular-nums;
-}
 
 /* Static tag — non-interactive, doesn't pick up DS Tag :hover bg. */
 .panw--tag.acc-tag--static:hover {

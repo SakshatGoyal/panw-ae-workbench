@@ -1187,9 +1187,13 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
   // Chip reflects committed value, not draft.
+  // Bare numeric count (consistent with the other multi-select
+  // filters in this row — "close date 4", "products 15"). The "/9"
+  // fraction was a known-redundant pattern; the trigger label
+  // ("account health") already supplies the denominator's domain.
   const committedTotal =
     value.overall.length + value.technical.length + value.adoption.length
-  const chipLabel = `${committedTotal}/9`
+  const chipLabel = String(committedTotal)
   const apply = () => { onApply(valuesToSelection(draft)); setOpen(false) }
   const cancel = () => setOpen(false)
   return (
@@ -2125,13 +2129,13 @@ function AEAccountTable() {
             <table className="acc-table">
               <thead>
                 <tr>
-                  <th className="acc-c-account"><Header size="md" type="basic">Account</Header></th>
-                  <th className="acc-c-equal"><Header size="md" type="basic">Opportunities</Header></th>
-                  <th className="acc-c-equal"><Header size="md" type="basic">Activities &amp; Risks</Header></th>
-                  <th className="acc-c-equal"><Header size="md" type="basic">Products</Header></th>
-                  <th className="acc-c-equal"><Header size="md" type="basic">Sales Plays</Header></th>
-                  <th className="acc-c-value"><Header size="md" type="basic" alignment="right">Value</Header></th>
-                  <th className="acc-c-actions" />
+                  <th className="acc-c-account acc-no-sort"><Header size="md" type="basic">Account</Header></th>
+                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Opportunities</Header></th>
+                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Activities &amp; Risks</Header></th>
+                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Products</Header></th>
+                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Sales Plays</Header></th>
+                  <th className="acc-c-value acc-no-sort"><Header size="md" type="basic" alignment="right">Value</Header></th>
+                  <th className="acc-c-actions acc-no-sort" />
                 </tr>
               </thead>
               <tbody>
@@ -2160,23 +2164,35 @@ function AEAccountTable() {
                       </div>
                     </td>
                     <td className="acc-c-equal">
-                      {/* Column 2 — four per-quarter pipeline tags.
-                          Empty quarter (usd === 0) renders as a
-                          present, legible "$—" placeholder per spec
-                          §4.2 ("absence is data, not a missing
-                          tag"). All four tags are always rendered;
-                          tag-density toggles control visibility. */}
-                      <div className="acc-tag-cluster">
+                      {/* Column 2 — four per-quarter pipeline tags
+                          laid out as a 2x2 grid, left-to-right,
+                          top-row earliest. The grid gives every row
+                          a predictable column-2 height regardless of
+                          dollar-value widths, and reads as a
+                          timeline (CQ → Q1FY27 on row 1, Q2FY27 →
+                          Q3FY27 on row 2). Empty quarter renders as
+                          "$—" placeholder per spec §4.2 — absence
+                          is data, not a missing tag. Tag-density
+                          toggles control visibility per-quarter
+                          (hidden quarters leave their grid slot
+                          empty so the spatial timeline still
+                          reads). */}
+                      <div className="acc-quarter-grid">
                         {row.pipeline.map((q, i) => {
                           const key = QUARTER_DENSITY_KEYS[i]
-                          if (!density.includes(key)) return null
-                          const label = `${q.label}: ${formatUsdCompact(q.usd)}`
+                          if (!density.includes(key)) {
+                            return <div key={key} className="acc-quarter-grid__slot" />
+                          }
+                          // Drop the colon-space — at narrow column
+                          // widths the punctuation push made the
+                          // tags wrap inconsistently across rows.
+                          const label = `${q.label} ${formatUsdCompact(q.usd)}`
                           return (
-                            <HoverShell
-                              key={key}
-                              render={() => <QuarterPipelinePanel quarter={q} />}>
-                              <Tags {...TAG_BASE} className="acc-tag--static" label={label} />
-                            </HoverShell>
+                            <div key={key} className="acc-quarter-grid__slot">
+                              <HoverShell render={() => <QuarterPipelinePanel quarter={q} />}>
+                                <Tags {...TAG_BASE} className="acc-tag--static" label={label} />
+                              </HoverShell>
+                            </div>
                           )
                         })}
                       </div>
@@ -2540,19 +2556,32 @@ const LAYOUT_CSS = `
 .acc-table-shell { overflow-x: auto; }
 .acc-table {
   width: 100%;
-  border-collapse: separate;
-  border-spacing: 0;
+  border-collapse: collapse;
   table-layout: fixed;
 }
-.acc-table th,
+/* th owns no padding; the DS Header component renders its own
+ * internal padding so the row reads as a single horizontal band
+ * rather than a strip of chip-pills. Body cells carry their own
+ * padding via .acc-table td below. */
+.acc-table th {
+  text-align: left;
+  padding: 0;
+  vertical-align: middle;
+}
+.acc-table thead tr {
+  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+}
+/* Kill the resting "up-down" indicator on every header — only the
+ * active sort arrow on the currently-sorted column remains. Mirrors
+ * the opp-table override; without it every column reads as
+ * sortable when most aren't. */
+.acc-table .panw--header__sort-indicator:not(.panw--header__sort-indicator--active) {
+  display: none;
+}
 .acc-table td {
   padding: var(--ds-spacing-04);
-  vertical-align: top;
-  text-align: left;
-}
-.acc-table thead th {
-  background: transparent;
-  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+  vertical-align: middle;
+  color: var(--ds-text-secondary-rest);
 }
 
 /* Column widths.
@@ -2578,18 +2607,8 @@ const LAYOUT_CSS = `
 /* Body row treatment — no zebra, hairline dividers between rows. */
 .acc-table tbody tr { background-color: var(--ds-surface-rest); }
 .acc-table tbody tr + tr { border-top: 1px solid var(--ds-lines-neutral-rest); }
-.acc-table tbody tr:hover { background-color: var(--ds-ghost-hover); }
-.acc-table tbody tr td:first-child {
-  /* Restore the hairline by painting it on the cell, since border-collapse
-   * is separate. */
-  border-top: 1px solid transparent;
-}
-.acc-table tbody tr + tr td {
-  border-top: 1px solid var(--ds-lines-neutral-rest);
-}
-.acc-table tbody tr:first-child td {
-  border-top: 0;
-}
+.acc-table tbody tr:hover  { background-color: var(--ds-ghost-hover); }
+.acc-table tbody tr:active { background-color: var(--ds-ghost-pressed); }
 
 /* ── Column 1 — Account ─────────────────────────────────────────────────
  * Two-line stack. Name is body-compact-02 bold, secondary text.
@@ -2598,18 +2617,17 @@ const LAYOUT_CSS = `
 .acc-multiline {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-01);
+  gap: var(--ds-spacing-03); /* 8 — matches opp-table rhythm so the
+                                two lines read as a connected pair,
+                                not two collapsed-tight strings. */
+  align-items: flex-start;
   min-width: 0;
-  /* Reserve 2-line height even when Apex is absent, so the row rhythm
-   * doesn't jitter between standalone and parented accounts. */
-  min-height: 36px;
-  justify-content: center;
 }
 .acc-multiline__name {
   font-size: 14px;
-  line-height: 18px;
+  line-height: 20px;
   font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-secondary-rest);
+  color: var(--ds-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -2617,9 +2635,9 @@ const LAYOUT_CSS = `
   -webkit-box-orient: vertical;
 }
 .acc-multiline__sub {
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--ds-text-tertiary-rest);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ds-text-secondary-rest);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2642,6 +2660,24 @@ const LAYOUT_CSS = `
   flex-wrap: wrap;
   gap: var(--ds-spacing-02);
   align-items: center;
+}
+
+/* 2x2 quarter-pipeline grid (col 2). Predictable height row-to-row;
+ * top row is CQ + Q1, bottom is Q2 + Q3, left-to-right time. Each
+ * slot holds at most one tag — wide values clip at slot width. */
+.acc-quarter-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: var(--ds-spacing-02);
+  min-width: 0;
+}
+.acc-quarter-grid__slot {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+.acc-quarter-grid__slot .panw--tag {
+  max-width: 100%;
 }
 /* Column 3 stacks sub-cells vertically (each row in the cell is a
  * distinct concept — activity / health / risks / EBC). */
@@ -2721,17 +2757,26 @@ const LAYOUT_CSS = `
   pointer-events: none;
 }
 
-/* Product popover (ARR contribution, not share-of-deal). */
-.acc-pop--product { min-width: 200px; }
+/* Product popover (ARR contribution, not share-of-deal).
+ * Single-product hovers carry one line of identity and one line of
+ * value — width sized to the natural content, no over-reservation. */
+.acc-pop--product {
+  min-width: 0;
+  max-width: 320px;
+  padding: var(--ds-spacing-03) var(--ds-spacing-04);
+  gap: var(--ds-spacing-02);
+}
 .acc-pop__product-head {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-02);
+  white-space: nowrap;
 }
 .acc-pop__product-icon {
   display: inline-flex;
   width: 16px;
   height: 16px;
+  flex-shrink: 0;
 }
 .acc-pop__product-icon--missing {
   display: inline-block;
@@ -2739,15 +2784,16 @@ const LAYOUT_CSS = `
   height: 16px;
 }
 .acc-pop__product-name {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
 .acc-pop__product-arr {
-  font-size: 13px;
+  font-size: 12px;
   color: var(--ds-text-secondary-rest);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
+  padding-left: 24px; /* 16px icon + 8px gap = aligns with name */
 }
 .acc-pop__unit {
   font-size: 11px;

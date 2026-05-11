@@ -77,8 +77,29 @@
  *     `persist` (Renewal — opens on hover, stays open until outside
  *     click, immune to scroll-close).
  *
+ * ── Pass 5 scope (this file): density + grouped health ────────────────────
+ *   • Tag-density filter (spec §3.4) — multi-select control that turns
+ *     individual row tags on/off (Quote Number, Opportunity Type, Stage,
+ *     Forecast, Close Date, Last Activity, Account Health, Risk Factors,
+ *     Sales Play, Products). All on by default. Visually distinct from
+ *     the data-filter row: sits on its own micro-row above the data
+ *     filters, prefixed with a "display" label + Sliders icon, separated
+ *     from the data filters by a hairline divider. Commits immediately
+ *     on each toggle (no Apply step) — density is reversible and the AE
+ *     wants instant feedback.
+ *   • Grouped Account Health filter (spec §3.10) — three sections inside
+ *     a single Flyout: Overall Health, Technical Health, Adoption &
+ *     Deployment Health. Each section carries three checkboxes (Healthy
+ *     / At Risk / Critical). Defaults match spec: Overall = At Risk +
+ *     Critical (Healthy off); Technical and Adoption = all on. Apply /
+ *     Cancel actions follow the DS Filter convention (the multi-select
+ *     pattern the other data filters already use).
+ *
  * ── Deferred to later passes ─────────────────────────────────────────────
- *   • Tag filter as density control + Account Health grouped filter (Pass 5)
+ *   • Real filtering wiring for tag-density to ARR/deal totals copy
+ *     ("47 deals · $12.4M ARR") — currently a static label. The density
+ *     filter changes the row display, but the data-filter wiring still
+ *     renders the full row set (deferred from Pass 1).
  *
  * ── Conventions ─────────────────────────────────────────────────────────
  * Tag presets: shape="rounded", size="large" (= 4px chip-tier radius),
@@ -112,7 +133,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { createPortal } from 'react-dom'
 import {
   Calendar, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
-  ExclamationTriangle, ExclamationCircle,
+  ExclamationTriangle, ExclamationCircle, Sliders,
   BrandStrata, BrandPrisma, BrandCortex,
 } from '@ds/icons'
 import { Search } from '@ds/search'
@@ -498,14 +519,58 @@ const CLOSE_DATE_OPTIONS: FilterOption[] = [
   { value: 'q4fy27', label: 'Q4FY27' },
 ]
 
-// Flat 3-option health filter. The grouped (Overall / Technical / Adoption)
-// shape per spec §3.10 lands in Pass 5 — keep the v1 widget here so the
-// default (At Risk + Critical on Overall) still expresses the spec intent.
-const HEALTH_OPTIONS: FilterOption[] = [
-  { value: 'healthy',  label: 'healthy' },
-  { value: 'at-risk',  label: 'at risk' },
-  { value: 'critical', label: 'critical' },
+// Spec §3.10 — three sections × three options. State shape lives as
+// { overall, technical, adoption } each carrying a Health[] selection;
+// the GroupedHealthFilter component below renders all three in one
+// Flyout and commits on Apply.
+type HealthAxis = 'overall' | 'technical' | 'adoption'
+interface GroupedHealthSelection {
+  overall: Health[]
+  technical: Health[]
+  adoption: Health[]
+}
+const HEALTH_AXES: { key: HealthAxis; label: string }[] = [
+  { key: 'overall',   label: 'Overall Health' },
+  { key: 'technical', label: 'Technical Health' },
+  { key: 'adoption',  label: 'Adoption & Deployment Health' },
 ]
+const HEALTH_LEVELS: { value: Health; label: string }[] = [
+  { value: 'healthy',  label: 'Healthy' },
+  { value: 'at-risk',  label: 'At Risk' },
+  { value: 'critical', label: 'Critical' },
+]
+// Defaults per spec §3.10: Overall = At Risk + Critical (Healthy off);
+// Technical and Adoption = all three on. The "skewed-toward-attention"
+// default only applies to the Overall axis.
+const INITIAL_GROUPED_HEALTH: GroupedHealthSelection = {
+  overall:   ['at-risk', 'critical'],
+  technical: ['healthy', 'at-risk', 'critical'],
+  adoption:  ['healthy', 'at-risk', 'critical'],
+}
+
+// Spec §3.4 — tag-density filter. Each key maps to a renderable tag in
+// the row. Toggling a key OFF hides that tag from every row. All on by
+// default. Order in this array drives the order in the picker; row
+// rendering already has its own visual order, so the picker is just a
+// list.
+type DensityKey =
+  | 'quoteId' | 'oppType' | 'stage' | 'forecast' | 'closeDate'    // col 2
+  | 'lastActivity' | 'accountHealth' | 'riskCount' | 'salesPlay'  // col 3
+  | 'products'                                                     // col 4
+
+const DENSITY_OPTIONS: { value: DensityKey; label: string }[] = [
+  { value: 'quoteId',       label: 'quote number' },
+  { value: 'oppType',       label: 'opportunity type' },
+  { value: 'stage',         label: 'stage' },
+  { value: 'forecast',      label: 'forecast' },
+  { value: 'closeDate',     label: 'close date' },
+  { value: 'lastActivity',  label: 'last activity' },
+  { value: 'accountHealth', label: 'account health' },
+  { value: 'riskCount',     label: 'risk factors' },
+  { value: 'salesPlay',     label: 'sales play' },
+  { value: 'products',      label: 'products' },
+]
+const ALL_DENSITY_KEYS: DensityKey[] = DENSITY_OPTIONS.map(o => o.value)
 
 const RISK_FILTER_OPTIONS: FilterOption[] = (Object.keys(RISK_LIBRARY) as RiskId[]).map(id => ({
   value: id,
@@ -523,9 +588,11 @@ const INITIAL_SINGLE: Record<string, string | null> = {
 
 const INITIAL_MULTI: Record<string, string[]> = {
   closeDate: ['this-q', 'q4fy26'],
-  health:    ['at-risk', 'critical'],
   risk:      [],
 }
+// Account Health moved out of the flat-multi map into its own grouped
+// shape (INITIAL_GROUPED_HEALTH) since Pass 5 — the axes can't be
+// flattened into a single string[].
 
 // ─── Product taxonomy (tree filter) ──────────────────────────────────────────
 
@@ -875,6 +942,218 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
               </div>
             )
           })}
+        </div>
+        <FlyoutFooter>
+          <div className="panw--filter__footer-actions">
+            <Button kind="ghost" size="small" onClick={cancel}>Cancel</Button>
+            <Button kind="primary" size="small" onClick={apply}>Apply</Button>
+          </div>
+        </FlyoutFooter>
+      </Flyout>
+    </span>
+  )
+}
+
+// ─── Tag-density filter (spec §3.4) ──────────────────────────────────────────
+// Multi-select Flyout with checkboxes. Toggling a row commits
+// immediately (no Apply step). Trigger reuses panw--filter BEM so it
+// inherits the host shell, but the visual density-control treatment
+// (leading Sliders icon, "display:" prefix outside the trigger) sits in
+// the layout, not in this component.
+//
+// Spec callout: "Make it visually distinct from the row-filtering
+// controls below it. The two callouts ('controls how much information'
+// vs 'controls how many opportunities') are the mental model to
+// preserve." → handled by row separation + leading label, see render
+// site.
+
+interface TagDensityFilterProps {
+  selected: DensityKey[]
+  onChange: (next: DensityKey[]) => void
+}
+
+function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
+  const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  const allOn = selected.length === ALL_DENSITY_KEYS.length
+  const noneOn = selected.length === 0
+  const allStatus = allOn ? 'checked' : (noneOn ? 'unchecked' : 'indeterminate')
+
+  const toggleKey = (k: DensityKey) => {
+    onChange(
+      selected.includes(k)
+        ? selected.filter(v => v !== k)
+        : [...selected, k]
+    )
+  }
+  const toggleAll = () => onChange(allOn ? [] : [...ALL_DENSITY_KEYS])
+
+  return (
+    <span className="panw--filter__wrapper opp-density-filter">
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`panw--filter${open ? ' panw--filter--open' : ''}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span className="opp-density-filter__icon" aria-hidden="true"><Sliders size={16} /></span>
+        <span className="panw--filter__label">displayed tags</span>
+        <span className="panw--filter__values">
+          <span className="panw--filter__chip-target">
+            <Tags
+              label={`${selected.length} of ${ALL_DENSITY_KEYS.length}`}
+              color="neutral"
+              contrast="high"
+              size="default"
+            />
+          </span>
+        </span>
+        <span className="panw--filter__chevron" aria-hidden="true">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        placement="bottom-start">
+        <div className="opp-density-list" role="group" aria-label="Displayed tags">
+          <div
+            className="opp-density-row opp-density-row--all"
+            role="checkbox"
+            aria-checked={allStatus === 'checked'}
+            onClick={toggleAll}>
+            <Checkbox status={allStatus} label="" tabIndex={-1} />
+            <span className="opp-density-row__label opp-density-row__label--bold">All tags</span>
+          </div>
+          <div className="opp-density-divider" role="presentation" />
+          {DENSITY_OPTIONS.map(opt => {
+            const checked = selected.includes(opt.value)
+            return (
+              <div
+                key={opt.value}
+                className="opp-density-row"
+                role="checkbox"
+                aria-checked={checked}
+                onClick={() => toggleKey(opt.value)}>
+                <Checkbox
+                  status={checked ? 'checked' : 'unchecked'}
+                  label=""
+                  tabIndex={-1}
+                />
+                <span className="opp-density-row__label">{opt.label}</span>
+              </div>
+            )
+          })}
+        </div>
+      </Flyout>
+    </span>
+  )
+}
+
+// ─── Grouped Account Health filter (spec §3.10) ─────────────────────────────
+// Three axes × three levels, in one Flyout. Apply/Cancel pattern
+// mirrors the DS Filter component. Internal "draft" copy so a Cancel
+// doesn't leak partial edits.
+
+interface GroupedHealthFilterProps {
+  value: GroupedHealthSelection
+  onApply: (next: GroupedHealthSelection) => void
+}
+
+function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
+  const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState<GroupedHealthSelection>(value)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (open) setDraft(value)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  // The trigger chip reads the COMMITTED value, not the draft. If we
+  // showed draft live, a Cancel would jarringly snap the trigger from
+  // (say) "9/9" back to "8/9" after the picker closes. Reads as "how
+  // many cells are kept across the 3×3 grid".
+  const committedTotal =
+    value.overall.length + value.technical.length + value.adoption.length
+
+  const toggleLevel = (axis: HealthAxis, lvl: Health) => {
+    setDraft(d => {
+      const cur = d[axis]
+      const next = cur.includes(lvl) ? cur.filter(v => v !== lvl) : [...cur, lvl]
+      return { ...d, [axis]: next }
+    })
+  }
+
+  const apply = () => { onApply(draft); setOpen(false) }
+  const cancel = () => setOpen(false)
+
+  const chipLabel = `${committedTotal}/9`
+
+  return (
+    <span className="panw--filter__wrapper">
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`panw--filter${open ? ' panw--filter--open' : ''}`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span className="panw--filter__label">account health</span>
+        <span className="panw--filter__values">
+          <span className="panw--filter__chip-target">
+            <Tags label={chipLabel} color="neutral" contrast="high" size="default" />
+          </span>
+        </span>
+        <span className="panw--filter__chevron" aria-hidden="true">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        placement="bottom-start">
+        <div className="opp-grouped-health" role="group" aria-label="Account health filter">
+          {HEALTH_AXES.map((axis, i) => (
+            <React.Fragment key={axis.key}>
+              {i > 0 && <div className="opp-grouped-health__divider" role="presentation" />}
+              <div className="opp-grouped-health__section">
+                <div className="opp-grouped-health__heading">{axis.label}</div>
+                <div className="opp-grouped-health__levels">
+                  {HEALTH_LEVELS.map(lvl => {
+                    const checked = draft[axis.key].includes(lvl.value)
+                    return (
+                      <div
+                        key={lvl.value}
+                        className="opp-grouped-health__row"
+                        role="checkbox"
+                        aria-checked={checked}
+                        onClick={() => toggleLevel(axis.key, lvl.value)}>
+                        <Checkbox
+                          status={checked ? 'checked' : 'unchecked'}
+                          label=""
+                          tabIndex={-1}
+                        />
+                        <Tags
+                          shape="rounded"
+                          size="default"
+                          contrast="low"
+                          color={HEALTH_COLOR[lvl.value]}
+                          label={lvl.label}
+                        />
+                      </div>
+                    )
+                  })}
+                </div>
+              </div>
+            </React.Fragment>
+          ))}
         </div>
         <FlyoutFooter>
           <div className="panw--filter__footer-actions">
@@ -1681,11 +1960,14 @@ function OppRow({
   row,
   renewalOutcome,
   onOutcomeChange,
+  density,
 }: {
   row: OpportunityRow
   renewalOutcome: RenewalOutcome
   onOutcomeChange: (v: RenewalOutcome) => void
+  density: DensityKey[]
 }) {
+  const showTag = (k: DensityKey) => density.includes(k)
   const dayLabel =
     row.activity.daysAgo === 0 ? 'today'
     : row.activity.daysAgo === 1 ? '1 day ago'
@@ -1705,17 +1987,22 @@ function OppRow({
         </div>
       </td>
       <td>
-        {/* Column 2 — deal state. Last Activity is NOT here (moved to col 3). */}
+        {/* Column 2 — deal state. Last Activity is NOT here (moved to col 3).
+            Each tag is gated on the tag-density filter (spec §3.4). */}
         <div className="opp-tag-cluster">
-          <Tags {...TAG_BASE} label={row.quoteId} />
-          <TypeTagCell
-            row={row}
-            renewalOutcome={renewalOutcome}
-            onOutcomeChange={onOutcomeChange}
-          />
-          <Tags {...TAG_BASE} label={STAGE_LABEL[row.stage]} />
-          <Tags {...TAG_BASE} label={FORECAST_LABEL[row.forecast]} />
-          <Tags {...TAG_BASE} icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
+          {showTag('quoteId')  && <Tags {...TAG_BASE} label={row.quoteId} />}
+          {showTag('oppType')  && (
+            <TypeTagCell
+              row={row}
+              renewalOutcome={renewalOutcome}
+              onOutcomeChange={onOutcomeChange}
+            />
+          )}
+          {showTag('stage')    && <Tags {...TAG_BASE} label={STAGE_LABEL[row.stage]} />}
+          {showTag('forecast') && <Tags {...TAG_BASE} label={FORECAST_LABEL[row.forecast]} />}
+          {showTag('closeDate') && (
+            <Tags {...TAG_BASE} icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
+          )}
         </div>
       </td>
       <td>
@@ -1723,61 +2010,69 @@ function OppRow({
             surface (spec §4.3) — independent triggers, 700ms delay. */}
         <div className="opp-tag-cluster">
           {/* Last Activity — DS Tooltip (non-interactive label) */}
-          <HoverShell
-            render={() => (
-              <Tooltip
-                pointerDirection="top"
-                content={`${row.activity.description} — ${dayLabel}`}
-              />
-            )}
-            align="start">
-            {actStyle.icon ? (
+          {showTag('lastActivity') && (
+            <HoverShell
+              render={() => (
+                <Tooltip
+                  pointerDirection="top"
+                  content={`${row.activity.description} — ${dayLabel}`}
+                />
+              )}
+              align="start">
+              {actStyle.icon ? (
+                <Tags
+                  shape={TAG_BASE.shape}
+                  size={TAG_BASE.size}
+                  contrast={TAG_BASE.contrast}
+                  color={actStyle.color}
+                  icon
+                  renderIcon={actStyle.icon}
+                  label={dayLabel}
+                />
+              ) : (
+                <Tags {...TAG_BASE} label={dayLabel} />
+              )}
+            </HoverShell>
+          )}
+
+          {/* Account Health — interactive popover with sparkline + CTA */}
+          {showTag('accountHealth') && (
+            <HoverShell
+              interactive
+              align="start"
+              render={() => <AccountHealthPanel row={row} />}>
               <Tags
                 shape={TAG_BASE.shape}
                 size={TAG_BASE.size}
                 contrast={TAG_BASE.contrast}
-                color={actStyle.color}
-                icon
-                renderIcon={actStyle.icon}
-                label={dayLabel}
+                color={healthColor}
+                label={HEALTH_LABEL[row.health.overall]}
               />
-            ) : (
-              <Tags {...TAG_BASE} label={dayLabel} />
-            )}
-          </HoverShell>
-
-          {/* Account Health — interactive popover with sparkline + CTA */}
-          <HoverShell
-            interactive
-            align="start"
-            render={() => <AccountHealthPanel row={row} />}>
-            <Tags
-              shape={TAG_BASE.shape}
-              size={TAG_BASE.size}
-              contrast={TAG_BASE.contrast}
-              color={healthColor}
-              label={HEALTH_LABEL[row.health.overall]}
-            />
-          </HoverShell>
+            </HoverShell>
+          )}
 
           {/* Risk Factors — non-interactive popover listing applied risks */}
-          <HoverShell
-            align="start"
-            render={() => <RiskFactorsPanel risks={row.risks} />}>
-            <Tags {...TAG_BASE} label={riskLabel} />
-          </HoverShell>
+          {showTag('riskCount') && (
+            <HoverShell
+              align="start"
+              render={() => <RiskFactorsPanel risks={row.risks} />}>
+              <Tags {...TAG_BASE} label={riskLabel} />
+            </HoverShell>
+          )}
 
           {/* Sales Play — DS Tooltip with current status */}
-          <HoverShell
-            align="start"
-            render={() => (
-              <Tooltip
-                pointerDirection="top"
-                content={SALES_PLAY_STATUS_LABEL[row.salesPlay.status]}
-              />
-            )}>
-            <Tags {...TAG_BASE} label={row.salesPlay.name} />
-          </HoverShell>
+          {showTag('salesPlay') && (
+            <HoverShell
+              align="start"
+              render={() => (
+                <Tooltip
+                  pointerDirection="top"
+                  content={SALES_PLAY_STATUS_LABEL[row.salesPlay.status]}
+                />
+              )}>
+              <Tags {...TAG_BASE} label={row.salesPlay.name} />
+            </HoverShell>
+          )}
         </div>
       </td>
       <td>
@@ -1785,8 +2080,11 @@ function OppRow({
             from @ds/icons exports; unit-42 products render iconless until
             the index lands). Space-driven +N overflow via ProductCluster.
             Each visible product tag and the +N tag carry their own hover
-            popover (per-product value of total, or full overflow list). */}
-        <ProductCluster products={row.products} totalUsd={row.valueUsd} />
+            popover (per-product value of total, or full overflow list).
+            Density toggle hides the entire cluster, not individual items. */}
+        {showTag('products') && (
+          <ProductCluster products={row.products} totalUsd={row.valueUsd} />
+        )}
       </td>
       <td className="opp-c-value">
         <CellContents content="numbers" text={formatUsdCompact(row.valueUsd)} />
@@ -1812,6 +2110,14 @@ function AEOpportunityTable() {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [sortKey, setSortKey] = useState<SortKey>('closeDate') // spec §5 default
   const [sortDir, setSortDir] = useState<SortDir>('asc')        // spec §5 default
+
+  // Spec §3.4 — all tags on by default.
+  const [density, setDensity] = useState<DensityKey[]>([...ALL_DENSITY_KEYS])
+  // Spec §3.10 — grouped account-health filter, three axes × three
+  // levels. Defaults skew Overall toward attention; the other axes are
+  // wide-open. Apply commits; Cancel discards the draft.
+  const [groupedHealth, setGroupedHealth] =
+    useState<GroupedHealthSelection>(INITIAL_GROUPED_HEALTH)
 
   // Renewal outcomes are AE-mutable per row. Seeded from data; commits
   // happen when the AE clicks Confirm in the outcome editor (handled
@@ -1888,6 +2194,20 @@ function AEOpportunityTable() {
             />
           </div>
 
+          {/* ── Density row (spec §3.4) ────────────────────────────────────
+               Visually distinct from the data-filter row: separate row,
+               leading caption "display:", hairline divider below. The
+               control changes how much each row shows; it does not
+               narrow the row set. */}
+          <div className="opp-density-row-wrapper">
+            <span className="opp-density-row__caption">display:</span>
+            <TagDensityFilter selected={density} onChange={setDensity} />
+            <div className="opp-density-row__hint">
+              tag-density control — turn row tags off without filtering rows
+            </div>
+          </div>
+          <div className="opp-density-divider-row" role="presentation" />
+
           {/* ── Filter row ─────────────────────────────────────────────── */}
           <div className="opp-filter-row">
             <div className="opp-filter-group">
@@ -1921,11 +2241,9 @@ function AEOpportunityTable() {
                 selected={multi.closeDate ?? []}
                 onApply={values => setMultiFacet('closeDate', values)}
               />
-              <Filter
-                label="account health"
-                options={HEALTH_OPTIONS}
-                selected={multi.health ?? []}
-                onApply={values => setMultiFacet('health', values)}
+              <GroupedHealthFilter
+                value={groupedHealth}
+                onApply={setGroupedHealth}
               />
               <Filter
                 label="risk factors"
@@ -1958,6 +2276,7 @@ function AEOpportunityTable() {
                     row={row}
                     renewalOutcome={renewalOutcomes[row.id] ?? 'unknown'}
                     onOutcomeChange={(v) => setRenewalOutcome(row.id, v)}
+                    density={density}
                   />
                 ))}
               </tbody>
@@ -2549,6 +2868,122 @@ const LAYOUT_CSS = `
   display: flex;
   gap: var(--ds-spacing-02);
   justify-content: flex-end;
+}
+
+/* ── Tag-density row (spec §3.4) ─────────────────────────────────────────
+ * Sits on its own micro-row above the data-filter row. The "display:"
+ * caption + ghost hint copy + hairline divider together do the visual
+ * work of separating "controls how much each row shows" from "controls
+ * how many rows you see". The control itself is the standard panw--
+ * filter shell, so it doesn't fight the data filters' shape — the
+ * separation is structural, not stylistic. */
+.opp-density-row-wrapper {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-03); /* 8 */
+  margin-bottom: var(--ds-spacing-03);
+}
+.opp-density-row__caption {
+  font-size: 12px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ds-text-tertiary-rest);
+}
+.opp-density-row__hint {
+  font-size: 12px;
+  color: var(--ds-text-tertiary-rest);
+  font-style: italic;
+}
+.opp-density-divider-row {
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
+  margin: 0 0 var(--ds-spacing-04);
+}
+/* The density trigger carries a leading Sliders icon — Filter's BEM
+ * doesn't have a slot for it, so we inject it before the label. */
+.opp-density-filter .panw--filter {
+  /* Restore a leading-icon slot. The default trigger has only label /
+   * values / chevron, so we add inline-padding for our injected icon. */
+}
+.opp-density-filter__icon {
+  display: inline-flex;
+  align-items: center;
+  color: var(--ds-icons-secondary-rest);
+  margin-right: var(--ds-spacing-02);
+}
+
+/* ── Density filter list (inside the Flyout) ──────────────────────────── */
+.opp-density-list {
+  display: flex;
+  flex-direction: column;
+  padding: var(--ds-spacing-02) 0;
+  min-width: 240px;
+}
+.opp-density-divider {
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
+  margin: var(--ds-spacing-02) var(--ds-spacing-03);
+}
+.opp-density-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-03);
+  padding: var(--ds-spacing-02) var(--ds-spacing-03);
+  cursor: pointer;
+  border-radius: var(--ds-radius-tight);
+}
+.opp-density-row:hover { background-color: var(--ds-ghost-hover); }
+.opp-density-row__label {
+  font-size: 13px;
+  color: var(--ds-text-primary);
+}
+.opp-density-row__label--bold {
+  font-weight: var(--ds-type-font-weight-semibold);
+}
+
+/* ── Grouped Account Health filter (spec §3.10) ──────────────────────────
+ * Three sections × three rows. Section headings carry quiet weight; the
+ * level rows pair a checkbox with the same Tag pill used in the row, so
+ * the picker reads as a literal preview of what each option produces in
+ * the table. */
+.opp-grouped-health {
+  display: flex;
+  flex-direction: column;
+  min-width: 320px;
+  padding: var(--ds-spacing-04) var(--ds-spacing-04) 0;
+}
+.opp-grouped-health__section {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-03);
+  padding: var(--ds-spacing-03) 0;
+}
+.opp-grouped-health__heading {
+  font-size: 12px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--ds-text-tertiary-rest);
+}
+.opp-grouped-health__levels {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);
+}
+.opp-grouped-health__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-03);
+  padding: var(--ds-spacing-02) var(--ds-spacing-02);
+  cursor: pointer;
+  border-radius: var(--ds-radius-tight);
+}
+.opp-grouped-health__row:hover { background-color: var(--ds-ghost-hover); }
+.opp-grouped-health__divider {
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
+  margin: var(--ds-spacing-02) 0;
 }
 `
 

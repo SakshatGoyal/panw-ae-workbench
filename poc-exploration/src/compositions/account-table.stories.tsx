@@ -1415,6 +1415,41 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   )
 }
 
+// ─── Quarter pipeline popover (spec §4.2) ────────────────────────────────
+// Hover a quarter chip → small no-header table of {opp type, $value}.
+// No opp names — at the account level the AE is sizing the quarter,
+// not picking a deal.
+
+const OPP_TYPE_LABEL: Record<'net-new'|'upsell'|'renewal', string> = {
+  'net-new': 'Net New',
+  'upsell':  'Upsell',
+  'renewal': 'Renewal',
+}
+
+function QuarterPipelinePanel({ quarter }: { quarter: QuarterPipeline }) {
+  if (quarter.opps.length === 0) {
+    return (
+      <div className="acc-pop acc-pop--quarter">
+        <div className="acc-pop__heading">{quarter.label}</div>
+        <div className="acc-pop__sub">No pipeline in this quarter.</div>
+      </div>
+    )
+  }
+  return (
+    <div className="acc-pop acc-pop--quarter">
+      <div className="acc-pop__heading">{quarter.label} pipeline</div>
+      <ul className="acc-pop__kv-list">
+        {quarter.opps.map((o, i) => (
+          <li key={i} className="acc-pop__kv">
+            <span className="acc-pop__kv-label">{OPP_TYPE_LABEL[o.type]}</span>
+            <span className="acc-pop__kv-value">{formatUsdCompact(o.usd)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
 // ─── Apex roll-up popover (spec §4.1) ────────────────────────────────────
 // Derived at render time from the dataset so the numbers can't drift
 // from the visible siblings (cr-failure §8). Memoized via useMemo at
@@ -1654,7 +1689,28 @@ function AEAccountTable() {
                         )}
                       </div>
                     </td>
-                    <td className="acc-c-equal" />
+                    <td className="acc-c-equal">
+                      {/* Column 2 — four per-quarter pipeline tags.
+                          Empty quarter (usd === 0) renders as a
+                          present, legible "$—" placeholder per spec
+                          §4.2 ("absence is data, not a missing
+                          tag"). All four tags are always rendered;
+                          tag-density toggles control visibility. */}
+                      <div className="acc-tag-cluster">
+                        {row.pipeline.map((q, i) => {
+                          const key = QUARTER_DENSITY_KEYS[i]
+                          if (!density.includes(key)) return null
+                          const label = `${q.label}: ${formatUsdCompact(q.usd)}`
+                          return (
+                            <HoverShell
+                              key={key}
+                              render={() => <QuarterPipelinePanel quarter={q} />}>
+                              <Tags {...TAG_BASE} className="acc-tag--static" label={label} />
+                            </HoverShell>
+                          )
+                        })}
+                      </div>
+                    </td>
                     <td className="acc-c-equal" />
                     <td className="acc-c-equal" />
                     <td className="acc-c-equal" />
@@ -1985,11 +2041,32 @@ const LAYOUT_CSS = `
   color: var(--ds-text-primary);
 }
 
+/* Tag cluster inside a cell. Wraps; gap-04 between tags. */
+.acc-tag-cluster {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--ds-spacing-02);
+  align-items: center;
+}
+
+/* Static tag — non-interactive, doesn't pick up DS Tag :hover bg. */
+.panw--tag.acc-tag--static:hover {
+  background-color: var(--ds-field-alt-rest);
+}
+.panw--tag.acc-tag--static.panw--tag--low.panw--tag--neutral:hover {
+  background-color: var(--ds-field-alt-rest);
+}
+.panw--tag.acc-tag--static { cursor: default; }
+
 /* KV rows used inside hover popovers. */
-.acc-pop__rows {
+.acc-pop__rows,
+.acc-pop__kv-list {
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-02);
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 .acc-pop__kv {
   display: flex;

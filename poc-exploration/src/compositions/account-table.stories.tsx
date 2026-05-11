@@ -1548,6 +1548,200 @@ function EBCPanel({ ebc }: { ebc: EBC }) {
   )
 }
 
+// ─── Sales Play hover popover + cluster (spec §4.5) ─────────────────────
+// Per spec §4.5: render tags in LIFECYCLE order (Not Touched →
+// Pitched → Deferred → Declined → Pursuing → Closed Won → Closed
+// Lost), regardless of how many are present. Emphasis hierarchy pulls
+// the eye to Not Touched first — but using a brand-accent color, NOT
+// red (red would read as "error" instead of "action item" per
+// cr-intent-validator review).
+//
+// Overflow: cr-failure §2 / cr-scale §1 flagged that
+// lifecycle order + naive right-collapse hides the wrong buckets
+// (Closed Won is rightmost-but-still-important; deemphasized statuses
+// are middle). Instead, this cluster collapses by the
+// `SALES_PLAY_COLLAPSE_ORDER` priority (deemphasized first), then
+// renders the kept buckets in lifecycle order at the visible
+// positions. The +N popover lists collapsed buckets with their
+// individual play breakdowns.
+
+function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
+  return (
+    <div className="acc-pop acc-pop--play-bucket">
+      <div className="acc-pop__heading">
+        {SALES_PLAY_LABEL[bucket.status]} — {formatUsdCompact(bucket.usd)}
+      </div>
+      <ul className="acc-pop__kv-list">
+        {bucket.plays.map(p => (
+          <li key={p.name} className="acc-pop__kv">
+            <span className="acc-pop__kv-label">{p.name}</span>
+            <span className="acc-pop__kv-value">{formatUsdCompact(p.usd)}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function SalesPlayOverflowPanel({ buckets }: { buckets: SalesPlayBucket[] }) {
+  return (
+    <div className="acc-pop acc-pop--play-overflow">
+      <div className="acc-pop__heading">
+        {buckets.length} additional {buckets.length === 1 ? 'bucket' : 'buckets'}
+      </div>
+      <ul className="acc-pop__overflow-list">
+        {buckets.map(b => (
+          <li key={b.status} className="acc-pop__overflow-item">
+            <div className="acc-pop__overflow-head">
+              <span>{SALES_PLAY_LABEL[b.status]}</span>
+              <span className="acc-pop__kv-value">{formatUsdCompact(b.usd)}</span>
+            </div>
+            <ul className="acc-pop__kv-list">
+              {b.plays.map(p => (
+                <li key={p.name} className="acc-pop__kv">
+                  <span className="acc-pop__kv-label">{p.name}</span>
+                  <span className="acc-pop__kv-value">{formatUsdCompact(p.usd)}</span>
+                </li>
+              ))}
+            </ul>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
+  const palette = SALES_PLAY_PALETTE[bucket.status]
+  // Drop the colon-space to save ~6–8px per tag — at account-column
+  // widths the colon push makes single-bucket rows collapse to +N
+  // even when they have room for the bucket itself. Status label +
+  // dollar reads cleanly without it.
+  const label = `${SALES_PLAY_LABEL[bucket.status]} ${formatUsdCompact(bucket.usd)}`
+  return (
+    <HoverShell render={() => <SalesPlayBucketPanel bucket={bucket} />}>
+      <Tags
+        shape="rounded"
+        size="large"
+        contrast={palette.contrast}
+        color={palette.color}
+        className="acc-tag--static"
+        label={label}
+      />
+    </HoverShell>
+  )
+}
+
+interface SalesPlayClusterProps {
+  buckets: SalesPlayBucket[]   // may be in any order; cluster handles ordering
+  density: DensityKey[]
+}
+
+function SalesPlayCluster({ buckets, density }: SalesPlayClusterProps) {
+  // Filter by density first. Each status has its own tag-density key.
+  const visibleByDensity = buckets.filter(b =>
+    density.includes(`status-${b.status}` as DensityKey))
+  if (visibleByDensity.length === 0) return null
+
+  // Sort into lifecycle order for display.
+  const lifecycleOrdered = [...visibleByDensity].sort(
+    (a, b) => SALES_PLAY_LIFECYCLE.indexOf(a.status) - SALES_PLAY_LIFECYCLE.indexOf(b.status)
+  )
+  // Build a parallel "collapse-priority" list so we know which
+  // buckets to hide first when overflowing.
+  const collapsePriority = [...visibleByDensity].sort(
+    (a, b) => SALES_PLAY_COLLAPSE_ORDER.indexOf(a.status) - SALES_PLAY_COLLAPSE_ORDER.indexOf(b.status)
+  )
+
+  const containerRef = useRef<HTMLDivElement>(null)
+  const measureRef = useRef<HTMLDivElement>(null)
+  const [visibleStatuses, setVisibleStatuses] = useState<SalesPlayStatus[]>(
+    () => lifecycleOrdered.map(b => b.status)
+  )
+
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    const measure = measureRef.current
+    if (!container || !measure) return
+    const recompute = () => {
+      const parentWidth = container.clientWidth
+      if (parentWidth <= 0) { requestAnimationFrame(recompute); return }
+      const widthByStatus: Record<string, number> = {}
+      let badgeWidth = 0
+      for (const child of Array.from(measure.children) as HTMLElement[]) {
+        if (child.dataset.role === 'badge') badgeWidth = child.offsetWidth
+        else if (child.dataset.status) widthByStatus[child.dataset.status] = child.offsetWidth
+      }
+      const lifecycleWidth = (statuses: SalesPlayStatus[]) =>
+        statuses.reduce((s, st, i) => s + (widthByStatus[st] ?? 0) + (i > 0 ? ACC_PRODUCT_GAP : 0), 0)
+      // Small tolerance for sub-pixel rounding and tag padding —
+      // strict math collapses the 7-status row to +N when the only
+      // surviving bucket misses the limit by 2px. Tag overflow is
+      // clipped by .acc-play-cluster overflow:hidden either way.
+      const limit = parentWidth + 4
+      // Check if all fit without a badge.
+      const allStatuses = lifecycleOrdered.map(b => b.status)
+      if (lifecycleWidth(allStatuses) <= limit) {
+        setVisibleStatuses(prev =>
+          prev.length === allStatuses.length && prev.every((s, i) => s === allStatuses[i])
+            ? prev
+            : allStatuses
+        )
+        return
+      }
+      // Otherwise iteratively remove the next-deemphasized bucket until it fits.
+      // `keep` starts as the full lifecycle set; each iteration drops one
+      // entry by collapse priority. Reserve room for the +N badge once we
+      // know at least one collapse will happen.
+      const dropOrder = collapsePriority.map(b => b.status)
+      let keep = new Set(allStatuses)
+      for (const toDrop of dropOrder) {
+        keep.delete(toDrop)
+        const remaining = allStatuses.filter(s => keep.has(s))
+        const w = lifecycleWidth(remaining) + ACC_PRODUCT_GAP + badgeWidth
+        if (w <= limit) {
+          setVisibleStatuses(prev =>
+            prev.length === remaining.length && prev.every((s, i) => s === remaining[i])
+              ? prev
+              : remaining
+          )
+          return
+        }
+      }
+      // Worst case: nothing fits — show empty and badge with full count.
+      setVisibleStatuses([])
+    }
+    recompute()
+    const ro = new ResizeObserver(recompute)
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [lifecycleOrdered, collapsePriority])
+
+  const visibleBuckets = lifecycleOrdered.filter(b => visibleStatuses.includes(b.status))
+  const hiddenBuckets = lifecycleOrdered.filter(b => !visibleStatuses.includes(b.status))
+
+  return (
+    <div className="acc-play-cluster" ref={containerRef}>
+      {visibleBuckets.map(b => (
+        <SalesPlayTag key={b.status} bucket={b} />
+      ))}
+      {hiddenBuckets.length > 0 && (
+        <HoverShell render={() => <SalesPlayOverflowPanel buckets={hiddenBuckets} />}>
+          <Tags {...TAG_BASE} label={`+${hiddenBuckets.length}`} />
+        </HoverShell>
+      )}
+      <div ref={measureRef} className="acc-play-cluster__measure" aria-hidden="true">
+        {lifecycleOrdered.map(b => (
+          <span key={`m-${b.status}`} data-status={b.status}>
+            <SalesPlayTag bucket={b} />
+          </span>
+        ))}
+        <span data-role="badge"><Tags {...TAG_BASE} label={`+${Math.max(1, lifecycleOrdered.length - 1)}`} /></span>
+      </div>
+    </div>
+  )
+}
+
 // ─── Product hover panel (spec §4.4) ─────────────────────────────────────
 // IMPORTANT — distinct from opp-table's `ProductPanel`. The opp-table
 // version renders share-of-deal-value as a percentage:
@@ -2080,7 +2274,14 @@ function AEAccountTable() {
                         return <ProductCluster products={sorted} />
                       })()}
                     </td>
-                    <td className="acc-c-equal" />
+                    <td className="acc-c-equal">
+                      {/* Column 5 — Sales Play status buckets in
+                          lifecycle order (Not Touched → ... →
+                          Closed Lost). Overflow collapses by
+                          deemphasized priority, NOT rightmost
+                          (spec §4.5 + cr-failure §2). */}
+                      <SalesPlayCluster buckets={row.salesPlays} density={density} />
+                    </td>
                     <td className="acc-c-value">
                       <div className="acc-value">
                         <div><span className="acc-value__num">{formatUsdCompact(row.arrUsd)}</span> <span className="acc-value__unit">ARR</span></div>
@@ -2527,6 +2728,66 @@ const LAYOUT_CSS = `
   text-transform: uppercase;
   color: var(--ds-text-tertiary-rest);
 }
+
+/* Sales Play cluster — mirrors product cluster: flex-wrap:nowrap so the
+ * row never spills onto a second line; overflow clipped. */
+.acc-play-cluster {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.acc-play-cluster__measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Sales Play overflow popover — buckets are bigger than products
+ * (multiple plays per bucket), so we give the popover more height. */
+.acc-pop--play-overflow {
+  min-width: 320px;
+  max-width: 400px;
+  max-height: 420px;
+  overflow-y: auto;
+}
+.acc-pop__overflow-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-04);
+}
+.acc-pop__overflow-item {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);
+}
+.acc-pop__overflow-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-04);
+  font-size: 13px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  padding-bottom: var(--ds-spacing-01);
+  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+}
+
+.acc-pop--play-bucket { min-width: 240px; }
 
 /* Product overflow popover */
 .acc-pop--product-overflow { min-width: 280px; max-width: 360px; max-height: 320px; overflow-y: auto; }

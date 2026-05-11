@@ -132,7 +132,7 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  Calendar, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
+  Calendar, Clock, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
   ExclamationTriangle, ExclamationCircle, Sliders,
   BrandStrata, BrandPrisma, BrandCortex,
 } from '@ds/icons'
@@ -152,6 +152,8 @@ import {
   FlyoutFilter,
   FlyoutList,
   FlyoutItem,
+  FlyoutGroup,
+  FlyoutSelectAll,
   FlyoutFooter,
 } from '@ds/flyout'
 
@@ -236,6 +238,15 @@ const FORECAST_LABEL: Record<Forecast, string> = {
   'pipeline':  'pipeline',
   'best-case': 'best case',
   'commit':    'commit',
+}
+// Designer call: distinguish forecast confidence at a glance via
+// categorical tag color. Earliest stage = bronze (warm, low-saturation,
+// "raw"); best case = teal (cool, hopeful); commit = olive (earthy,
+// settled). All on the low-contrast variant so the row stays calm.
+const FORECAST_COLOR: Record<Forecast, TagColor> = {
+  'pipeline':  'bronze',
+  'best-case': 'teal',
+  'commit':    'olive',
 }
 const TYPE_LABEL: Record<OppType, string> = {
   'net-new': 'net new',
@@ -648,6 +659,13 @@ function formatUsdCompact(n: number): string {
     notation: 'compact', style: 'currency', currency: 'USD', maximumFractionDigits: 1,
   }).format(n)
 }
+// Full-precision USD for the value column. Tabular nums + thousand
+// separators; no decimals — opportunity values are whole-dollar.
+function formatUsdFull(n: number): string {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency', currency: 'USD', maximumFractionDigits: 0,
+  }).format(n)
+}
 
 // Parse "mar 7" → ordinal for sort. Sufficient for fixed demo data;
 // real data would carry a Date and this helper goes away.
@@ -976,19 +994,6 @@ function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
-  const allOn = selected.length === ALL_DENSITY_KEYS.length
-  const noneOn = selected.length === 0
-  const allStatus = allOn ? 'checked' : (noneOn ? 'unchecked' : 'indeterminate')
-
-  const toggleKey = (k: DensityKey) => {
-    onChange(
-      selected.includes(k)
-        ? selected.filter(v => v !== k)
-        : [...selected, k]
-    )
-  }
-  const toggleAll = () => onChange(allOn ? [] : [...ALL_DENSITY_KEYS])
-
   return (
     <span className="panw--filter__wrapper opp-density-filter">
       <button
@@ -999,11 +1004,11 @@ function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}>
         <span className="opp-density-filter__icon" aria-hidden="true"><Sliders size={16} /></span>
-        <span className="panw--filter__label">displayed tags</span>
+        <span className="panw--filter__label">tags</span>
         <span className="panw--filter__values">
           <span className="panw--filter__chip-target">
             <Tags
-              label={`${selected.length} of ${ALL_DENSITY_KEYS.length}`}
+              label={`${selected.length}/${ALL_DENSITY_KEYS.length}`}
               color="neutral"
               contrast="high"
               size="default"
@@ -1015,40 +1020,25 @@ function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
         </span>
       </button>
 
+      {/* Multi-select Flyout — instant commit (no Apply step). The DS
+         FlyoutSelectAll header carries the tri-state "select all"
+         control per system convention (icon-only checkbox above the
+         list, with implicit hairline below — both rendered by the
+         component itself). */}
       <Flyout
         open={open}
         onOpenChange={setOpen}
         anchorRef={triggerRef}
+        mode="multiple"
+        selected={selected}
+        onSelectionChange={(vals) => onChange(vals as DensityKey[])}
         placement="bottom-start">
-        <div className="opp-density-list" role="group" aria-label="Displayed tags">
-          <div
-            className="opp-density-row opp-density-row--all"
-            role="checkbox"
-            aria-checked={allStatus === 'checked'}
-            onClick={toggleAll}>
-            <Checkbox status={allStatus} label="" tabIndex={-1} />
-            <span className="opp-density-row__label opp-density-row__label--bold">All tags</span>
-          </div>
-          <div className="opp-density-divider" role="presentation" />
-          {DENSITY_OPTIONS.map(opt => {
-            const checked = selected.includes(opt.value)
-            return (
-              <div
-                key={opt.value}
-                className="opp-density-row"
-                role="checkbox"
-                aria-checked={checked}
-                onClick={() => toggleKey(opt.value)}>
-                <Checkbox
-                  status={checked ? 'checked' : 'unchecked'}
-                  label=""
-                  tabIndex={-1}
-                />
-                <span className="opp-density-row__label">{opt.label}</span>
-              </div>
-            )
-          })}
-        </div>
+        <FlyoutSelectAll />
+        <FlyoutList>
+          {DENSITY_OPTIONS.map(opt => (
+            <FlyoutItem key={opt.value} value={opt.value}>{opt.label}</FlyoutItem>
+          ))}
+        </FlyoutList>
       </Flyout>
     </span>
   )
@@ -1064,35 +1054,47 @@ interface GroupedHealthFilterProps {
   onApply: (next: GroupedHealthSelection) => void
 }
 
+// Encode (axis, level) as a single FlyoutItem value so we can ride the
+// DS Flyout's multi-select machinery: "overall:healthy",
+// "technical:at-risk", etc. The custom Health-token tag preview rides
+// alongside each FlyoutItem's label.
+function encodeAxisLevel(axis: HealthAxis, lvl: Health): string {
+  return `${axis}:${lvl}`
+}
+function selectionToValues(sel: GroupedHealthSelection): string[] {
+  return [
+    ...sel.overall.map(l => encodeAxisLevel('overall', l)),
+    ...sel.technical.map(l => encodeAxisLevel('technical', l)),
+    ...sel.adoption.map(l => encodeAxisLevel('adoption', l)),
+  ]
+}
+function valuesToSelection(values: string[]): GroupedHealthSelection {
+  const out: GroupedHealthSelection = { overall: [], technical: [], adoption: [] }
+  for (const v of values) {
+    const [axis, lvl] = v.split(':') as [HealthAxis, Health]
+    if (out[axis]) out[axis].push(lvl)
+  }
+  return out
+}
+
 function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
   const [open, setOpen] = useState(false)
-  const [draft, setDraft] = useState<GroupedHealthSelection>(value)
+  const [draft, setDraft] = useState<string[]>(selectionToValues(value))
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    if (open) setDraft(value)
+    if (open) setDraft(selectionToValues(value))
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
 
-  // The trigger chip reads the COMMITTED value, not the draft. If we
-  // showed draft live, a Cancel would jarringly snap the trigger from
-  // (say) "9/9" back to "8/9" after the picker closes. Reads as "how
-  // many cells are kept across the 3×3 grid".
+  // Trigger chip reflects the COMMITTED value, not the draft — a
+  // Cancel mustn't visibly snap the trigger backwards.
   const committedTotal =
     value.overall.length + value.technical.length + value.adoption.length
-
-  const toggleLevel = (axis: HealthAxis, lvl: Health) => {
-    setDraft(d => {
-      const cur = d[axis]
-      const next = cur.includes(lvl) ? cur.filter(v => v !== lvl) : [...cur, lvl]
-      return { ...d, [axis]: next }
-    })
-  }
-
-  const apply = () => { onApply(draft); setOpen(false) }
-  const cancel = () => setOpen(false)
-
   const chipLabel = `${committedTotal}/9`
+
+  const apply = () => { onApply(valuesToSelection(draft)); setOpen(false) }
+  const cancel = () => setOpen(false)
 
   return (
     <span className="panw--filter__wrapper">
@@ -1114,47 +1116,39 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
         </span>
       </button>
 
+      {/* DS Flyout in multi-select mode with FlyoutGroup sections per
+          axis. Each axis groups three FlyoutItems whose labels carry
+          the colored Health tag pill as a visual preview of what the
+          option produces in the table. A top-level FlyoutSelectAll
+          provides the system's tri-state select-all affordance. */}
       <Flyout
         open={open}
         onOpenChange={setOpen}
         anchorRef={triggerRef}
+        mode="multiple"
+        selected={draft}
+        onSelectionChange={setDraft}
         placement="bottom-start">
-        <div className="opp-grouped-health" role="group" aria-label="Account health filter">
-          {HEALTH_AXES.map((axis, i) => (
-            <React.Fragment key={axis.key}>
-              {i > 0 && <div className="opp-grouped-health__divider" role="presentation" />}
-              <div className="opp-grouped-health__section">
-                <div className="opp-grouped-health__heading">{axis.label}</div>
-                <div className="opp-grouped-health__levels">
-                  {HEALTH_LEVELS.map(lvl => {
-                    const checked = draft[axis.key].includes(lvl.value)
-                    return (
-                      <div
-                        key={lvl.value}
-                        className="opp-grouped-health__row"
-                        role="checkbox"
-                        aria-checked={checked}
-                        onClick={() => toggleLevel(axis.key, lvl.value)}>
-                        <Checkbox
-                          status={checked ? 'checked' : 'unchecked'}
-                          label=""
-                          tabIndex={-1}
-                        />
-                        <Tags
-                          shape="rounded"
-                          size="default"
-                          contrast="low"
-                          color={HEALTH_COLOR[lvl.value]}
-                          label={lvl.label}
-                        />
-                      </div>
-                    )
-                  })}
-                </div>
-              </div>
-            </React.Fragment>
+        <FlyoutSelectAll />
+        <FlyoutList>
+          {HEALTH_AXES.map(axis => (
+            <FlyoutGroup key={axis.key} label={axis.label} defaultOpen>
+              {HEALTH_LEVELS.map(lvl => (
+                <FlyoutItem
+                  key={encodeAxisLevel(axis.key, lvl.value)}
+                  value={encodeAxisLevel(axis.key, lvl.value)}>
+                  <Tags
+                    shape="rounded"
+                    size="default"
+                    contrast="low"
+                    color={HEALTH_COLOR[lvl.value]}
+                    label={lvl.label}
+                  />
+                </FlyoutItem>
+              ))}
+            </FlyoutGroup>
           ))}
-        </div>
+        </FlyoutList>
         <FlyoutFooter>
           <div className="panw--filter__footer-actions">
             <Button kind="ghost" size="small" onClick={cancel}>Cancel</Button>
@@ -1216,7 +1210,7 @@ function HoverShell({
   render,
   interactive = false,
   side = 'bottom',
-  align = 'start',
+  align = 'center',
   panelClassName,
   openDelayMs = HOVER_OPEN_DELAY_MS,
   persist = false,
@@ -1368,67 +1362,45 @@ function HoverShell({
   )
 }
 
-// ─── Sparkline — 12-month health trend ───────────────────────────────────────
-// 12 values, 0=healthy → 2=critical. Plotted so HEALTHY sits at the TOP
-// and CRITICAL at the BOTTOM — a "falling line" reads as a deteriorating
-// account, which matches the AE's intuition.
+// ─── Bar-chart 12-month health trend ─────────────────────────────────────────
+// Vertical rounded-pill bars, one per monthly reading. Bar HEIGHT scales
+// inversely with severity (healthy = tallest, critical = shortest) so a
+// "falling skyline" reads as a deteriorating account — matches the AE's
+// intuition. Bar COLOR is keyed to severity: green / yellow / red,
+// using the status text tokens (matching family) so the chart shares
+// language with the row's health pill and the picker tags.
 //
-// Three dashed horizontal guides mark the healthy / at-risk / critical
-// rows. Line color matches the LATEST value's tag color so the chart's
-// terminal feeling agrees with the row's overall-health pill.
+// Pill geometry: bars are 6px wide with 4px gaps, rounded corners
+// (radius = half-width for pill ends). The whole strip is anchored to
+// a shared baseline so the eye reads "height = vitality".
 
-// `text.success-rest` / `text.warning-rest` are not defined in this DS build;
-// the status-text family ships only the static tokens (no `rest` variants).
-// Using `text.status.<x>` here mirrors the matching-family rule (status pills
-// on subtle grounds use status text tokens) and the colors read as the
-// same severity language as the Tag pills next to the chart.
-const HEALTH_LINE_STROKE: Record<Health, string> = {
+const HEALTH_BAR_FILL: Record<Health, string> = {
   'healthy':  'var(--ds-text-status-success)',
   'at-risk':  'var(--ds-text-status-warning)',
   'critical': 'var(--ds-text-status-danger)',
 }
+const HEALTH_FROM_LEVEL: Record<number, Health> = {
+  0: 'healthy', 1: 'at-risk', 2: 'critical',
+}
+// Severity → height fraction. Healthy is tallest (full height); at-risk
+// dips to 70%; critical falls to 38%. The drop-off is steeper between
+// at-risk and critical so a critical bar reads as visibly "smaller",
+// not just "shorter than at-risk".
+const HEALTH_HEIGHT_FRACTION: Record<Health, number> = {
+  'healthy':  1.0,
+  'at-risk':  0.72,
+  'critical': 0.38,
+}
 
-function Sparkline({ trend, latest }: { trend: number[]; latest: Health }) {
-  // 12 monthly readings, oldest → newest. 0=healthy, 1=at-risk, 2=critical.
-  // Plotted with HEALTHY at the TOP, CRITICAL at the BOTTOM — a "falling
-  // line" matches the AE's intuition for a deteriorating account.
-  //
-  // Visual: three quiet dashed guides mark healthy / at-risk / critical
-  // levels (no text labels — the popover sub-heading "12-month health
-  // trend" plus the colored end-dot carries the meaning). A faint area
-  // fill beneath the line adds visual weight without dominating.
-  const w = 264
-  const h = 68
+function HealthTrendBars({ trend }: { trend: number[]; latest: Health }) {
+  // Geometry: fixed bar width + gap; chart width derives from count.
+  const barW = 6
+  const gap = 4
   const padX = 6
-  const padY = 6
-  const usableW = w - padX * 2
-  const usableH = h - padY * 2
-  // Inner inset for the DATA plot — the dashed guides sit at the chart
-  // edges (healthy at top, critical at bottom), but the data line is
-  // plotted slightly inside those guides so a flat-healthy line is
-  // visibly distinct from the top guide (and a flat-critical line is
-  // distinct from the bottom guide). Without this inset a perfect-health
-  // trend renders invisibly on top of the guide and reads as "no data".
-  const innerInset = 5
-  const innerH = Math.max(1, usableH - innerInset * 2)
-  const maxV = 2
-
-  const pts = trend.map((v, i) => {
-    const x = padX + (i / Math.max(1, trend.length - 1)) * usableW
-    const y = padY + innerInset + (v / maxV) * innerH
-    return { x, y }
-  })
-
-  const lineD = pts.length
-    ? 'M ' + pts.map(p => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ')
-    : ''
-  // Area fill closes the line down to the critical guide (chart floor).
-  const floorY = padY + usableH
-  const areaD = pts.length
-    ? `${lineD} L ${(padX + usableW).toFixed(1)} ${floorY.toFixed(1)} L ${padX.toFixed(1)} ${floorY.toFixed(1)} Z`
-    : ''
-  const stroke = HEALTH_LINE_STROKE[latest]
-  const last = pts[pts.length - 1]
+  const padY = 4
+  const innerH = 48
+  const h = innerH + padY * 2
+  const w = padX * 2 + trend.length * barW + Math.max(0, trend.length - 1) * gap
 
   return (
     <svg
@@ -1437,38 +1409,25 @@ function Sparkline({ trend, latest }: { trend: number[]; latest: Health }) {
       viewBox={`0 0 ${w} ${h}`}
       role="img"
       aria-label="12-month account health trend"
-      className="opp-sparkline">
-      {/* Quiet level guides — healthy / at-risk / critical (no labels) */}
-      {[0, 1, 2].map(v => {
-        const y = padY + (v / maxV) * usableH
+      className="opp-health-bars">
+      {trend.map((v, i) => {
+        const sev = HEALTH_FROM_LEVEL[v] ?? 'critical'
+        const fraction = HEALTH_HEIGHT_FRACTION[sev]
+        const barH = Math.max(barW, innerH * fraction) // min height = barW so pill ends meet
+        const x = padX + i * (barW + gap)
+        const y = padY + (innerH - barH)
         return (
-          <line
-            key={v}
-            x1={padX} x2={padX + usableW}
-            y1={y} y2={y}
-            stroke="var(--ds-lines-neutral-tile-rest)"
-            strokeWidth="1"
-            strokeDasharray="2 3" />
+          <rect
+            key={i}
+            x={x}
+            y={y}
+            width={barW}
+            height={barH}
+            rx={barW / 2}
+            ry={barW / 2}
+            fill={HEALTH_BAR_FILL[sev]} />
         )
       })}
-      {areaD && (
-        <path d={areaD} fill={stroke} opacity="0.08" />
-      )}
-      {lineD && (
-        <path
-          d={lineD}
-          fill="none"
-          stroke={stroke}
-          strokeWidth="1.75"
-          strokeLinejoin="round"
-          strokeLinecap="round" />
-      )}
-      {last && (
-        <>
-          <circle cx={last.x} cy={last.y} r="3.5" fill="var(--ds-surface-rest)" />
-          <circle cx={last.x} cy={last.y} r="2.5" fill={stroke} />
-        </>
-      )}
     </svg>
   )
 }
@@ -1481,7 +1440,7 @@ function AccountHealthPanel({ row }: { row: OpportunityRow }) {
     <div className="opp-pop opp-pop--health">
       <div className="opp-pop__heading">{row.account}</div>
       <div className="opp-pop__sub">12-month health trend</div>
-      <div className="opp-pop__chart"><Sparkline trend={h.trend12mo} latest={h.overall} /></div>
+      <div className="opp-pop__chart"><HealthTrendBars trend={h.trend12mo} latest={h.overall} /></div>
       <div className="opp-pop__rows">
         <div className="opp-pop__kv">
           <span className="opp-pop__kv-label">Technical Health</span>
@@ -1590,29 +1549,22 @@ const CHURN_COMPETITORS = [
   { label: 'N/A',         value: 'na' },
 ]
 
-// ─── Upsell "tooltip-with-Modify" panel (spec §4.2) ──────────────────────────
-// Pattern: text + a single quiet action button. Visually closer to a
-// popover than the bare DS Tooltip — the inverse-ground tooltip can't
-// host an interactive control. Kept compact; the action lives on the
-// right rail so the heading line carries the story.
+// ─── Button-only action popover (spec §4.2 + design call) ────────────────────
+// Single-button surface that anchors to a tag. Used by the Upsell type
+// tag (Modify) and the Quote ID tag (View Quote). No copy — the trigger
+// already names the entity; this popover is purely the affordance to
+// act on it.
 
-function UpsellModifyPanel({ row, onClose }: { row: OpportunityRow; onClose: () => void }) {
+function ActionButtonPanel({ label, onClick }: { label: string; onClick: () => void }) {
   return (
-    <div className="opp-pop opp-pop--upsell">
-      <div className="opp-pop__upsell-row">
-        <div className="opp-pop__upsell-text">
-          <div className="opp-pop__heading">Upsell into existing customer</div>
-          <div className="opp-pop__sub">Adjust line items, quantities, or term.</div>
-        </div>
-        <Button
-          kind="ghost-brand"
-          size="small"
-          onClick={() => { /* hook — out of scope */ onClose() }}>
-          Modify
-        </Button>
-      </div>
+    <div className="opp-pop opp-pop--action">
+      <Button kind="ghost-brand" size="small" onClick={onClick}>{label}</Button>
     </div>
   )
+}
+
+function UpsellModifyPanel({ row, onClose }: { row: OpportunityRow; onClose: () => void }) {
+  return <ActionButtonPanel label="Modify" onClick={() => { /* hook */ onClose() }} />
 }
 
 // ─── Renewal Outcome editor (spec §4.2) ──────────────────────────────────────
@@ -1701,7 +1653,7 @@ function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalO
                 title="Churn / Dismissal Reason"
                 placeholder="Select"
                 showDescription={false}
-                background="grey00"
+                background="grey10"
                 selectedValue={reason}
                 onChange={(v) => setReason(v)}
                 options={CHURN_REASONS}
@@ -1710,7 +1662,7 @@ function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalO
                 title="Competitor Replacement"
                 placeholder="Select"
                 showDescription={false}
-                background="grey00"
+                background="grey10"
                 selectedValue={competitor}
                 onChange={(v) => setCompetitor(v)}
                 options={CHURN_COMPETITORS}
@@ -1722,7 +1674,7 @@ function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalO
             inputType="area"
             placeholder="Optional notes."
             showDescription={false}
-            background="grey-00"
+            background="grey-10"
             value={notes}
             onChange={(v) => setNotes(v)}
           />
@@ -1886,8 +1838,7 @@ function ProductCluster({ products, totalUsd }: ProductClusterProps) {
       ))}
       {overflow > 0 && (
         <HoverShell
-          render={() => <ProductOverflowPanel products={overflowedProducts} totalUsd={totalUsd} />}
-          align="end">
+          render={() => <ProductOverflowPanel products={overflowedProducts} totalUsd={totalUsd} />}>
           <Tags {...TAG_BASE} label={`+${overflow}`} />
         </HoverShell>
       )}
@@ -1928,7 +1879,6 @@ function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps)
       <HoverShell
         interactive
         openDelayMs={1000}
-        align="start"
         panelClassName="opp-hover-panel--upsell"
         render={({ close }) => <UpsellModifyPanel row={row} onClose={close} />}>
         {plain}
@@ -1941,7 +1891,6 @@ function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps)
     <HoverShell
       interactive
       persist
-      align="start"
       panelClassName="opp-hover-panel--renewal"
       render={({ close }) => (
         <RenewalPanel
@@ -1981,16 +1930,45 @@ function OppRow({
   return (
     <tr className="opp-row">
       <td>
+        {/* Column 1 — opportunity name + account name as neutral
+            (gray) links. Both are clickable. The opp-name link is the
+            primary affordance; the account link drops to the account
+            page. Hover underline is the affordance. */}
         <div className="opp-multiline">
-          <span className="opp-multiline__name">{row.oppName}</span>
-          <span className="opp-multiline__sub">{row.account}</span>
+          <a
+            href="#"
+            className="opp-multiline__name opp-multiline__link"
+            onClick={(e) => e.preventDefault()}>
+            {row.oppName}
+          </a>
+          <a
+            href="#"
+            className="opp-multiline__sub opp-multiline__link"
+            onClick={(e) => e.preventDefault()}>
+            {row.account}
+          </a>
         </div>
       </td>
       <td>
         {/* Column 2 — deal state. Last Activity is NOT here (moved to col 3).
-            Each tag is gated on the tag-density filter (spec §3.4). */}
+            Each tag is gated on the tag-density filter (spec §3.4).
+            Static tags (quote / stage / close date) carry the
+            opp-tag--static class so they don't pick up hover states
+            from the DS tag scss — they're labels, not affordances. */}
         <div className="opp-tag-cluster">
-          {showTag('quoteId')  && <Tags {...TAG_BASE} label={row.quoteId} />}
+          {showTag('quoteId')  && (
+            <HoverShell
+              interactive
+              openDelayMs={1000}
+              panelClassName="opp-hover-panel--button"
+              render={({ close }) => (
+                <ActionButtonPanel
+                  label="View Quote"
+                  onClick={() => { /* hook */ close() }} />
+              )}>
+              <Tags {...TAG_BASE} label={row.quoteId} />
+            </HoverShell>
+          )}
           {showTag('oppType')  && (
             <TypeTagCell
               row={row}
@@ -1998,10 +1976,19 @@ function OppRow({
               onOutcomeChange={onOutcomeChange}
             />
           )}
-          {showTag('stage')    && <Tags {...TAG_BASE} label={STAGE_LABEL[row.stage]} />}
-          {showTag('forecast') && <Tags {...TAG_BASE} label={FORECAST_LABEL[row.forecast]} />}
+          {showTag('stage')    && <Tags {...TAG_BASE} className="opp-tag--static" label={STAGE_LABEL[row.stage]} />}
+          {showTag('forecast') && (
+            <Tags
+              shape={TAG_BASE.shape}
+              size={TAG_BASE.size}
+              contrast={TAG_BASE.contrast}
+              color={FORECAST_COLOR[row.forecast]}
+              className="opp-tag--static"
+              label={FORECAST_LABEL[row.forecast]}
+            />
+          )}
           {showTag('closeDate') && (
-            <Tags {...TAG_BASE} icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
+            <Tags {...TAG_BASE} className="opp-tag--static" icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
           )}
         </div>
       </td>
@@ -2009,37 +1996,33 @@ function OppRow({
         {/* Column 3 — activity & blockers. Each sub-cell has its own hover
             surface (spec §4.3) — independent triggers, 700ms delay. */}
         <div className="opp-tag-cluster">
-          {/* Last Activity — DS Tooltip (non-interactive label) */}
+          {/* Last Activity — Clock icon (intuitive for "X days ago").
+              In the >7-day buckets the icon swaps to caution / danger
+              glyphs and the tag color follows. */}
           {showTag('lastActivity') && (
             <HoverShell
               render={() => (
                 <Tooltip
-                  pointerDirection="top"
+                  pointerDirection="bottom"
                   content={`${row.activity.description} — ${dayLabel}`}
                 />
-              )}
-              align="start">
-              {actStyle.icon ? (
-                <Tags
-                  shape={TAG_BASE.shape}
-                  size={TAG_BASE.size}
-                  contrast={TAG_BASE.contrast}
-                  color={actStyle.color}
-                  icon
-                  renderIcon={actStyle.icon}
-                  label={dayLabel}
-                />
-              ) : (
-                <Tags {...TAG_BASE} label={dayLabel} />
-              )}
+              )}>
+              <Tags
+                shape={TAG_BASE.shape}
+                size={TAG_BASE.size}
+                contrast={TAG_BASE.contrast}
+                color={actStyle.color}
+                icon
+                renderIcon={actStyle.icon ?? Clock}
+                label={dayLabel}
+              />
             </HoverShell>
           )}
 
-          {/* Account Health — interactive popover with sparkline + CTA */}
+          {/* Account Health — interactive popover with bar-chart trend + CTA */}
           {showTag('accountHealth') && (
             <HoverShell
               interactive
-              align="start"
               render={() => <AccountHealthPanel row={row} />}>
               <Tags
                 shape={TAG_BASE.shape}
@@ -2054,7 +2037,6 @@ function OppRow({
           {/* Risk Factors — non-interactive popover listing applied risks */}
           {showTag('riskCount') && (
             <HoverShell
-              align="start"
               render={() => <RiskFactorsPanel risks={row.risks} />}>
               <Tags {...TAG_BASE} label={riskLabel} />
             </HoverShell>
@@ -2063,10 +2045,9 @@ function OppRow({
           {/* Sales Play — DS Tooltip with current status */}
           {showTag('salesPlay') && (
             <HoverShell
-              align="start"
               render={() => (
                 <Tooltip
-                  pointerDirection="top"
+                  pointerDirection="bottom"
                   content={SALES_PLAY_STATUS_LABEL[row.salesPlay.status]}
                 />
               )}>
@@ -2087,12 +2068,16 @@ function OppRow({
         )}
       </td>
       <td className="opp-c-value">
-        <CellContents content="numbers" text={formatUsdCompact(row.valueUsd)} />
+        {/* Value matches the opportunity-name text properties — bold,
+            primary text, same scale — so the eye reads value + name as
+            a paired primary surface. Full digits with thousand
+            separators, tabular nums. */}
+        <span className="opp-value">{formatUsdFull(row.valueUsd)}</span>
       </td>
       <td className="opp-c-actions">
         <div className="opp-actions">
-          <IconButton kind="ghost-brand" size="sm" iconSize={16} renderIcon={Stars} aria-label="AI" />
-          <IconButton kind="ghost-brand" size="sm" iconSize={16} renderIcon={ChevronRight} aria-label="Expand" />
+          <IconButton kind="ghost-accent" size="sm" iconSize={16} renderIcon={Stars} aria-label="AI" />
+          <IconButton kind="ghost-accent" size="sm" iconSize={16} renderIcon={ChevronRight} aria-label="Expand" />
         </div>
       </td>
     </tr>
@@ -2173,8 +2158,13 @@ function AEOpportunityTable() {
       <style>{LAYOUT_CSS}</style>
       <div className="opp-page">
         <div className="opp-page__shell">
-          {/* ── Search row: search grows full width, sort right-aligned ── */}
+          {/* ── Search row: counts left, search centered, sort right ────
+               Counts moved out of the filter row; they belong to the
+               search context (the slice the AE is looking at), not the
+               filter affordances. Search expands to fill the middle so
+               the bar reads as a single line of search context. */}
           <div className="opp-search-row">
+            <span className="opp-counts" aria-live="polite">47 deals · $12.4M</span>
             <div className="opp-search-row__search">
               <Search
                 size="md"
@@ -2194,23 +2184,16 @@ function AEOpportunityTable() {
             />
           </div>
 
-          {/* ── Density row (spec §3.4) ────────────────────────────────────
-               Visually distinct from the data-filter row: separate row,
-               leading caption "display:", hairline divider below. The
-               control changes how much each row shows; it does not
-               narrow the row set. */}
-          <div className="opp-density-row-wrapper">
-            <span className="opp-density-row__caption">display:</span>
-            <TagDensityFilter selected={density} onChange={setDensity} />
-            <div className="opp-density-row__hint">
-              tag-density control — turn row tags off without filtering rows
-            </div>
-          </div>
-          <div className="opp-density-divider-row" role="presentation" />
-
-          {/* ── Filter row ─────────────────────────────────────────────── */}
+          {/* ── Filter row ─────────────────────────────────────────────
+               Tag-density now sits inline with the data filters as
+               "tags", set off by a vertical divider. The visual
+               distinction between "density" and "row filter" is
+               carried by the divider + the label "tags" rather than a
+               separate row. */}
           <div className="opp-filter-row">
             <div className="opp-filter-group">
+              <TagDensityFilter selected={density} onChange={setDensity} />
+              <div className="opp-filter-divider" role="presentation" />
               <SingleSelectFilter
                 label="forecast"
                 options={FORECAST_OPTIONS}
@@ -2253,19 +2236,23 @@ function AEOpportunityTable() {
               />
               <ProductFilter selected={products} onApply={setProducts} />
             </div>
-            <span className="opp-counts">47 deals · $12.4M ARR</span>
           </div>
 
-          {/* ── Table ─────────────────────────────────────────────────── */}
+          {/* ── Table ───────────────────────────────────────────────────
+               Headers are Title Case. The four content columns
+               (Opportunity, Deal State, Activity & Blockers, Products)
+               share equal width; Value and Actions take only what they
+               need. Header icons removed — the sort arrow on the two
+               sortable headers is sufficient affordance. */}
           <div className="opp-table-shell">
             <table className="opp-table">
               <thead>
                 <tr>
-                  <th><Header size="md" type={headerType('oppName')} onHeaderClick={() => toggleSort('oppName')}>opportunity</Header></th>
-                  <th className="opp-no-sort"><Header size="md" type="basic">deal state</Header></th>
-                  <th className="opp-no-sort"><Header size="md" type="basic">activity &amp; blockers</Header></th>
-                  <th className="opp-no-sort"><Header size="md" type="basic">products</Header></th>
-                  <th className="opp-c-value"><Header size="md" type={headerType('value')} alignment="right" onHeaderClick={() => toggleSort('value')}>value</Header></th>
+                  <th className="opp-c-equal"><Header size="md" type={headerType('oppName')} onHeaderClick={() => toggleSort('oppName')}>Opportunity</Header></th>
+                  <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Deal State</Header></th>
+                  <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Activity &amp; Blockers</Header></th>
+                  <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Products</Header></th>
+                  <th className="opp-c-value"><Header size="md" type={headerType('value')} alignment="right" onHeaderClick={() => toggleSort('value')}>Value</Header></th>
                   <th className="opp-c-actions opp-no-sort" />
                 </tr>
               </thead>
@@ -2335,13 +2322,21 @@ const LAYOUT_CSS = `
 }
 
 /* ── Search row ─────────────────────────────────────────────────────────── *
- * Search grows to fill 100% of available space; sort sits to the right.
- * Override @ds/search's hardcoded width: 240px so it actually fills. */
+ * Counts left, search center (flex:1), sort right. The whole row is a
+ * single line; the bar reads as the AE's search-context surface. */
 .opp-search-row {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-03); /* 8 — proximity between distinct controls */
-  padding: var(--ds-spacing-04) var(--ds-spacing-04) var(--ds-spacing-02); /* 12 12 4 — tighter bottom to reduce gap to filter row */
+  gap: var(--ds-spacing-04); /* 12 — proximity between distinct regions */
+  padding: var(--ds-spacing-04) var(--ds-spacing-04) var(--ds-spacing-02);
+}
+.opp-counts {
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 13px;
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
 }
 .opp-search-row__search {
   flex: 1;
@@ -2353,20 +2348,18 @@ const LAYOUT_CSS = `
 
 /* Sort trigger — ghost-button shape, opens a single-select Flyout.
  *
- * Height tracking: align-self: stretch makes the trigger fill the search
- * row's cross-axis (vertical) height. The row's height is set by its
- * tallest child — the Search input — so the sort button always matches
- * the current search-bar height, no matter what size/padding the DS
- * Search component evolves to. Robust by construction; no magic number,
- * no fixed height to drift. Vertical padding is removed because the
- * stretch handles outer height, and content stays centered via the
- * inline-flex align-items: center on the button itself. */
+ * Padding follows the DS Button default (0.75rem 1rem = 12 16) for
+ * horizontal padding so the trigger reads as a peer of the system's
+ * default-size buttons. Vertical padding is removed because the
+ * trigger stretches to fill the search row's height (the search bar
+ * is the tallest child), keeping the button vertically aligned with
+ * the search input regardless of which size DS Search renders at. */
 .opp-sort-trigger {
   display: inline-flex;
   align-items: center;
   align-self: stretch;
   gap: var(--ds-spacing-02); /* 4 */
-  padding: 0 var(--ds-spacing-03); /* 0 8 — horizontal only; vertical comes from stretch */
+  padding: 0 var(--ds-spacing-05); /* 0 16 — matches DS Button default horizontal padding */
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -2385,14 +2378,16 @@ const LAYOUT_CSS = `
   color: var(--ds-text-primary);
 }
 
-/* ── Filter row ─────────────────────────────────────────────────────────── *
- * Counts top-aligned with 8px from row top per design call.
- * Filters wrap (no horizontal scroll — that pushed triggers off-screen). */
+/* ── Filter row ───────────────────────────────────────────────────────────
+ * Tag-density filter sits at the leading edge, set off by a vertical
+ * divider, followed by the data-row filters. The two control families
+ * share a row but the divider keeps the mental model — density
+ * controls how much each row shows; the others narrow the row set. */
 .opp-filter-row {
   display: flex;
   align-items: flex-start;
   gap: var(--ds-spacing-03);
-  padding: var(--ds-spacing-02) var(--ds-spacing-04) var(--ds-spacing-03); /* 4 12 8 — tight to search row */
+  padding: var(--ds-spacing-02) var(--ds-spacing-04) var(--ds-spacing-03);
   flex-wrap: wrap;
 }
 .opp-filter-group {
@@ -2404,49 +2399,69 @@ const LAYOUT_CSS = `
   flex: 1;
   min-width: 0;
 }
-.opp-counts {
-  margin-left: auto;
-  padding-top: var(--ds-spacing-03); /* 8 — top-aligned with first row of filter chips */
-  color: var(--ds-text-secondary-rest);
-  white-space: nowrap;
-  flex-shrink: 0;
+.opp-filter-divider {
+  width: 1px;
+  align-self: stretch;
+  background-color: var(--ds-lines-neutral-rest);
+  margin: 0 var(--ds-spacing-02);
+  min-height: 24px;
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
 .opp-table-shell { overflow-x: auto; }
-.opp-table { width: 100%; border-collapse: collapse; }
+.opp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
 .opp-table thead tr {
   border-bottom: 1px solid var(--ds-lines-neutral-rest);
 }
 .opp-table th {
   text-align: left;
   padding: 0; /* Header owns its own padding */
+  vertical-align: middle;
 }
-.opp-table th.opp-no-sort .panw--header__sort-indicator { display: none; }
+/* Header icon removal — kill the resting up-down indicator on every
+ * header. The active up/down arrow on the currently-sorted column
+ * remains (it's the only sort affordance the user has). */
+.opp-table .panw--header__sort-indicator:not(.panw--header__sort-indicator--active) {
+  display: none;
+}
 
-/* Numeric column right-alignment */
+/* Equal-width columns for the four content columns; Value reserves
+ * 140px for full-precision USD, Actions 80px for two icon buttons.
+ * The four equal columns split the remainder. table-layout: fixed
+ * honors these widths literally — without it the value column
+ * collapses to first-digit width. */
+.opp-table th.opp-c-equal,
+.opp-table td.opp-c-equal { width: calc((100% - 220px) / 4); }
 .opp-table th.opp-c-value,
-.opp-table td.opp-c-value { text-align: right; }
-
-/* Pass 1 — value cell is quiet per spec §4.5 (body-02, text.secondary).
-   Inherits Tags/CellContents defaults; no special weight or size override. */
-.opp-table td.opp-c-value .panw--cell-contents__text {
-  color: var(--ds-text-secondary-rest);
-  font-variant-numeric: tabular-nums;
+.opp-table td.opp-c-value {
+  text-align: right;
+  width: 140px;
+  white-space: nowrap;
 }
-
 .opp-table th.opp-c-actions,
 .opp-table td.opp-c-actions {
   text-align: right;
-  width: 1%;
+  width: 80px;
   white-space: nowrap;
 }
 
-/* Row interaction (matches @ds/cells-standard) */
-.opp-table tbody tr:nth-child(odd)  { background-color: var(--ds-surface-rest); }
-.opp-table tbody tr:nth-child(even) { background-color: var(--ds-surface-alt-rest); }
-.opp-table tbody tr:hover           { background-color: var(--ds-ghost-hover); }
-.opp-table tbody tr:active          { background-color: var(--ds-ghost-pressed); }
+/* Value column — matches opp-name text properties (semibold primary
+ * text), full-precision USD with tabular nums. */
+.opp-value {
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+/* Row dividers, no zebra. Rows are now uniform surface.rest with a
+ * hairline divider; hover is the only ground that lights up. */
+.opp-table tbody tr { background-color: var(--ds-surface-rest); }
+.opp-table tbody tr + tr { border-top: 1px solid var(--ds-lines-neutral-rest); }
+.opp-table tbody tr:hover  { background-color: var(--ds-ghost-hover); }
+.opp-table tbody tr:active { background-color: var(--ds-ghost-pressed); }
 
 .opp-table td {
   padding: var(--ds-spacing-04); /* 12 */
@@ -2454,23 +2469,41 @@ const LAYOUT_CSS = `
   color: var(--ds-text-secondary-rest);
 }
 
-/* Column 1 — quieted per spec §4.1: opp name = secondary bold,
-   account = tertiary label-02. */
+/* Column 1 — opportunity name + account name as gray (text-secondary)
+ * clickable links. The opp name carries primary weight; account is
+ * lighter. Underline on hover signals interactivity without the
+ * "always underlined" link aesthetic that fights the table density. */
 .opp-multiline {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-01); /* 2 */
+  gap: var(--ds-spacing-03); /* 8 — more breathing room between name and account */
   align-items: flex-start;
 }
 .opp-multiline__name {
   font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-secondary-rest);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ds-text-primary);
 }
 .opp-multiline__sub {
   font-weight: var(--ds-type-font-weight-regular);
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--ds-text-tertiary-rest);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ds-text-secondary-rest);
+}
+/* Link affordance — gray (not brand), hover-underline, focus ring. */
+.opp-multiline__link {
+  text-decoration: none;
+  cursor: pointer;
+  border-radius: var(--ds-radius-tight);
+  transition: color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.opp-multiline__link:hover { text-decoration: underline; }
+.opp-multiline__name.opp-multiline__link:hover { color: var(--ds-text-primary); }
+.opp-multiline__sub.opp-multiline__link:hover  { color: var(--ds-text-primary); }
+.opp-multiline__link:focus-visible {
+  outline: 2px solid var(--ds-lines-brand-rest);
+  outline-offset: 2px;
 }
 
 .opp-tag-cluster {
@@ -2523,11 +2556,13 @@ const LAYOUT_CSS = `
   /* Reset against whatever the host page might inject. */
   font-family: var(--ds-type-font-family-sans);
   color: var(--ds-text-primary);
-  /* Entrance: matches the DS Flyout 8px directional slide + opacity fade. */
+  /* Entrance: opacity fade + 4px slide from above DOWN into place. The
+   * direction reads as "the popover descends out of the trigger" for
+   * panels positioned below the trigger (the default placement). */
   animation: opp-hover-in 110ms cubic-bezier(0, 0, 0.38, 0.9);
 }
 @keyframes opp-hover-in {
-  from { opacity: 0; transform: translateY(4px); }
+  from { opacity: 0; transform: translateY(-4px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -2694,11 +2729,6 @@ const LAYOUT_CSS = `
   color: var(--ds-text-primary);
 }
 
-/* Sparkline — sits in opp-pop__chart wrapper */
-.opp-sparkline {
-  display: block;
-}
-
 /* Hover-only row actions */
 .opp-actions {
   display: inline-flex;
@@ -2767,27 +2797,17 @@ const LAYOUT_CSS = `
 .opp-tree__label { color: var(--ds-text-primary); }
 .opp-tree__label--bold { font-weight: var(--ds-type-font-weight-semibold); }
 
-/* ── Upsell tooltip-with-Modify (spec §4.2) ───────────────────────────────
- * Compact two-region popover: heading + sub on the left, single Modify
- * action on the right. Width is intrinsic — the row never wraps.
- */
-.opp-pop--upsell {
-  min-width: 320px;
-  max-width: 380px;
+/* ── Button-only action popover (spec §4.2 + design call) ─────────────────
+ * Single ghost-brand button on a surface.rest ground. No copy, no
+ * heading. Used for Upsell type tag (Modify) and Quote ID tag
+ * (View Quote). Intrinsic width — sized to the button. */
+.opp-pop--action {
+  min-width: 0;
+  max-width: none;
+  padding: var(--ds-spacing-02); /* 4 — tight halo around the button */
   gap: 0;
 }
-.opp-pop__upsell-row {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-05);
-}
-.opp-pop__upsell-text {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-02); /* 4 — heading + sub need a beat of separation */
-}
+.opp-pop--action .panw--btn { width: 100%; }
 
 /* ── Renewal popover (spec §4.2) ──────────────────────────────────────────
  * No heading. Tight two-column key/value rows. The final row (Outcome)
@@ -2870,42 +2890,11 @@ const LAYOUT_CSS = `
   justify-content: flex-end;
 }
 
-/* ── Tag-density row (spec §3.4) ─────────────────────────────────────────
- * Sits on its own micro-row above the data-filter row. The "display:"
- * caption + ghost hint copy + hairline divider together do the visual
- * work of separating "controls how much each row shows" from "controls
- * how many rows you see". The control itself is the standard panw--
- * filter shell, so it doesn't fight the data filters' shape — the
- * separation is structural, not stylistic. */
-.opp-density-row-wrapper {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-03); /* 8 */
-  margin-bottom: var(--ds-spacing-03);
-}
-.opp-density-row__caption {
-  font-size: 12px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ds-text-tertiary-rest);
-}
-.opp-density-row__hint {
-  font-size: 12px;
-  color: var(--ds-text-tertiary-rest);
-  font-style: italic;
-}
-.opp-density-divider-row {
-  height: 1px;
-  background-color: var(--ds-lines-neutral-rest);
-  margin: 0 0 var(--ds-spacing-04);
-}
-/* The density trigger carries a leading Sliders icon — Filter's BEM
- * doesn't have a slot for it, so we inject it before the label. */
-.opp-density-filter .panw--filter {
-  /* Restore a leading-icon slot. The default trigger has only label /
-   * values / chevron, so we add inline-padding for our injected icon. */
-}
+/* ── Tag-density filter trigger ──────────────────────────────────────────
+ * Sits inline with the data filters; the leading Sliders icon + the
+ * label "tags" reads as a peer control with a different verb. The
+ * trigger uses the standard panw--filter shell so it doesn't fight
+ * the row's rhythm; the verbal/visual distinction does the work. */
 .opp-density-filter__icon {
   display: inline-flex;
   align-items: center;
@@ -2913,78 +2902,36 @@ const LAYOUT_CSS = `
   margin-right: var(--ds-spacing-02);
 }
 
-/* ── Density filter list (inside the Flyout) ──────────────────────────── */
-.opp-density-list {
-  display: flex;
-  flex-direction: column;
-  padding: var(--ds-spacing-02) 0;
-  min-width: 240px;
+/* ── Static-tag override ─────────────────────────────────────────────────
+ * Tags rendered without a hover surface should not pick up the DS
+ * Tag's default :hover bg shift — they're labels, not affordances.
+ * Apply the .opp-tag--static class to lock the rest tokens across
+ * states. */
+.panw--tag.opp-tag--static:hover  {
+  background-color: var(--ds-field-alt-rest);
 }
-.opp-density-divider {
-  height: 1px;
-  background-color: var(--ds-lines-neutral-rest);
-  margin: var(--ds-spacing-02) var(--ds-spacing-03);
+.panw--tag.opp-tag--static.panw--tag--low.panw--tag--neutral:hover {
+  background-color: var(--ds-field-alt-rest);
 }
-.opp-density-row {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-03);
-  padding: var(--ds-spacing-02) var(--ds-spacing-03);
-  cursor: pointer;
-  border-radius: var(--ds-radius-tight);
+/* Re-apply the rest icon color on hover to prevent the DS Tag scss
+ * from rolling the icon to hover when we've locked the bg to rest. */
+.panw--tag.opp-tag--static .panw--tag__icon,
+.panw--tag.opp-tag--static:hover .panw--tag__icon {
+  color: var(--ds-icons-primary);
 }
-.opp-density-row:hover { background-color: var(--ds-ghost-hover); }
-.opp-density-row__label {
-  font-size: 13px;
-  color: var(--ds-text-primary);
-}
-.opp-density-row__label--bold {
-  font-weight: var(--ds-type-font-weight-semibold);
-}
+/* Categorical-color statics (forecast bronze/teal/olive) need the
+ * same lock against the hover bg darkening from the matrix mixin. */
+.panw--tag.opp-tag--static.panw--tag--low.panw--tag--bronze:hover  { background-color: var(--ds-tag-bronze-low-bg); }
+.panw--tag.opp-tag--static.panw--tag--low.panw--tag--teal:hover    { background-color: var(--ds-tag-teal-low-bg); }
+.panw--tag.opp-tag--static.panw--tag--low.panw--tag--olive:hover   { background-color: var(--ds-tag-olive-low-bg); }
 
-/* ── Grouped Account Health filter (spec §3.10) ──────────────────────────
- * Three sections × three rows. Section headings carry quiet weight; the
- * level rows pair a checkbox with the same Tag pill used in the row, so
- * the picker reads as a literal preview of what each option produces in
- * the table. */
-.opp-grouped-health {
-  display: flex;
-  flex-direction: column;
-  min-width: 320px;
-  padding: var(--ds-spacing-04) var(--ds-spacing-04) 0;
-}
-.opp-grouped-health__section {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-03);
-  padding: var(--ds-spacing-03) 0;
-}
-.opp-grouped-health__heading {
-  font-size: 12px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--ds-text-tertiary-rest);
-}
-.opp-grouped-health__levels {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-02);
-}
-.opp-grouped-health__row {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-03);
-  padding: var(--ds-spacing-02) var(--ds-spacing-02);
-  cursor: pointer;
-  border-radius: var(--ds-radius-tight);
-}
-.opp-grouped-health__row:hover { background-color: var(--ds-ghost-hover); }
-.opp-grouped-health__divider {
-  height: 1px;
-  background-color: var(--ds-lines-neutral-rest);
-  margin: var(--ds-spacing-02) 0;
-}
+/* Cursor stays default on static tags — they're not interactive. */
+.panw--tag.opp-tag--static { cursor: default; }
+
+/* ── Health-trend bar chart (account-health popover) ─────────────────────
+ * No special styles — the SVG carries its own geometry. Reserved for
+ * the wrapper so the chart anchors cleanly under the sub-heading. */
+.opp-health-bars { display: block; }
 `
 
 // ─── Storybook meta ──────────────────────────────────────────────────────────

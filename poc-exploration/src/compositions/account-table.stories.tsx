@@ -1633,16 +1633,14 @@ function SalesPlayCluster({ buckets, density }: SalesPlayClusterProps) {
 function ProductARRPanel({ product }: { product: Product }) {
   const Icon = BRAND_ICON[product.brand]
   return (
-    <div className="acc-pop acc-pop--product">
-      <div className="acc-pop__product-head">
-        <span className="acc-pop__product-icon" aria-hidden="true">
-          {Icon ? <Icon /> : <span className="acc-pop__product-icon--missing" />}
-        </span>
-        <span className="acc-pop__product-name">{product.name}</span>
-      </div>
-      <div className="acc-pop__product-arr">
-        {formatUsdCompact(product.arrUsd)}{' '}<span className="acc-pop__unit">ARR</span>
-      </div>
+    <div className="acc-pop-row">
+      <span className="acc-pop-row__icon" aria-hidden="true">
+        {Icon ? <Icon size={20} /> : null}
+      </span>
+      <span className="acc-pop-row__name">{product.name}</span>
+      <span className="acc-pop-row__value">
+        {formatUsdCompact(product.arrUsd)} ARR
+      </span>
     </div>
   )
 }
@@ -2299,7 +2297,8 @@ const LAYOUT_CSS = `
   color: var(--ds-text-primary);
 }
 .acc-pop__sub {
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-secondary-rest);
 }
 .acc-pop--applied .acc-pop__applied-list {
@@ -2484,50 +2483,42 @@ const LAYOUT_CSS = `
 .acc-pop--ebc { min-width: 280px; }
 .acc-health-bars { display: block; }
 
-/* Product popover (ARR contribution, not share-of-deal).
- * Single-product hovers carry one line of identity and one line of
- * value — width sized to the natural content, no over-reservation. */
-.acc-pop--product {
-  min-width: 0;
-  max-width: 320px;
-  padding: var(--ds-spacing-03) var(--ds-spacing-04);
-  gap: var(--ds-spacing-02);
-}
-.acc-pop__product-head {
+/* Product popover — single horizontal row at large CellStandard
+ * height (48px). Three cells: [20px logo] [bold name] [value], the
+ * value pushed to the trailing edge with margin-left:auto so longer
+ * names breathe naturally and the dollar reads as a row-end summary.
+ * Cell padding (16px) and content sizes (16px / 24px) match the
+ * scan rhythm of a CellStandard row, not the squint-y label scale. */
+.acc-pop-row {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-02);
+  height: 48px;
+  padding: 0 var(--ds-spacing-05); /* 16 — CellStandard horizontal padding */
+  gap: var(--ds-spacing-03);       /* 8  — gap between logo and name */
+  min-width: 0;
   white-space: nowrap;
 }
-.acc-pop__product-icon {
+.acc-pop-row__icon {
   display: inline-flex;
-  width: 16px;
-  height: 16px;
+  width: 20px;
+  height: 20px;
   flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
 }
-.acc-pop__product-icon--missing {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-}
-.acc-pop__product-name {
-  font-size: 14px;
-  line-height: 20px;
+.acc-pop-row__name {
+  font-size: 16px;
+  line-height: 24px;
   font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
-.acc-pop__product-arr {
-  font-size: 12px;
+.acc-pop-row__value {
+  font-size: 16px;
+  line-height: 24px;
   color: var(--ds-text-secondary-rest);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
-  padding-left: 24px; /* 16px icon + 8px gap = aligns with name */
-}
-.acc-pop__unit {
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ds-text-tertiary-rest);
+  margin-left: var(--ds-spacing-06); /* 24 — clear separation from name */
 }
 
 .acc-pop--play-bucket { min-width: 240px; }
@@ -2560,7 +2551,8 @@ const LAYOUT_CSS = `
   gap: var(--ds-spacing-04);
 }
 .acc-pop__kv-label {
-  font-size: 12px;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-secondary-rest);
 }
 .acc-pop__kv-value {

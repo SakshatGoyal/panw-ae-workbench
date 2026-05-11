@@ -1070,7 +1070,7 @@ function SingleSelectFilter({ label, options, value, onChange, allLabel = 'All' 
         {selectedOption && (
           <span className="panw--filter__values">
             <span className="panw--filter__chip-target">
-              <Tags label={selectedOption.label} color="neutral" contrast="high" size="default" />
+              <Tags label={selectedOption.label} color="neutral" contrast="high" size="default" className="acc-tag--static" />
             </span>
           </span>
         )}
@@ -1200,7 +1200,7 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
         <span className="panw--filter__label">account health</span>
         <span className="panw--filter__values">
           <span className="panw--filter__chip-target">
-            <Tags label={chipLabel} color="neutral" contrast="high" size="default" />
+            <Tags label={chipLabel} color="neutral" contrast="high" size="default" className="acc-tag--static" />
           </span>
         </span>
         <span className="panw--filter__chevron" aria-hidden="true">
@@ -1229,6 +1229,7 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
                     contrast="low"
                     color={HEALTH_COLOR[lvl.value]}
                     label={lvl.label}
+                    className="acc-tag--static"
                   />
                 </FlyoutItem>
               ))}
@@ -1361,7 +1362,7 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
             render={() => <AppliedListPanel heading="products" items={selectedLabels} />}>
             <span className="panw--filter__values">
               <span className="panw--filter__chip-target">
-                <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" />
+                <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" className="acc-tag--static" />
               </span>
             </span>
           </HoverShell>
@@ -1413,10 +1414,13 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
 
 // ─── Health-trend bar chart (forked from opp-table) ──────────────────────
 
+// Bars are glyphs (SVG rect fills), not text — use the icons-status
+// family. text-status-* is one stop darker per the aesthetic guide
+// and reads as label text, which these aren't.
 const HEALTH_BAR_FILL: Record<Health, string> = {
-  'healthy':  'var(--ds-text-status-success)',
-  'at-risk':  'var(--ds-text-status-warning)',
-  'critical': 'var(--ds-text-status-danger)',
+  'healthy':  'var(--ds-icons-status-success)',
+  'at-risk':  'var(--ds-icons-status-warning)',
+  'critical': 'var(--ds-icons-status-danger)',
 }
 const HEALTH_FROM_LEVEL: Record<number, Health> = {
   0: 'healthy', 1: 'at-risk', 2: 'critical',
@@ -1586,7 +1590,6 @@ function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
         size="large"
         contrast={palette.contrast}
         color={palette.color}
-        className="acc-tag--static"
         label={label}
       />
     </HoverShell>
@@ -1661,8 +1664,8 @@ function ProductCluster({ products }: { products: Product[] }) {
             key={`${p.name}-${i}`}
             render={() => <ProductARRPanel product={p} />}>
             {Icon
-              ? <Tags {...TAG_BASE} className="acc-tag--static" icon renderIcon={Icon} label={p.name} />
-              : <Tags {...TAG_BASE} className="acc-tag--static" label={p.name} />}
+              ? <Tags {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
+              : <Tags {...TAG_BASE} label={p.name} />}
           </HoverShell>
         )
       })}
@@ -1960,7 +1963,7 @@ function AEAccountTable() {
                             <HoverShell
                               key={key}
                               render={() => <QuarterPipelinePanel quarter={q} />}>
-                              <Tags {...TAG_BASE} className="acc-tag--static" label={label} />
+                              <Tags {...TAG_BASE} label={label} />
                             </HoverShell>
                           )
                         })}
@@ -2001,7 +2004,7 @@ function AEAccountTable() {
                                   size={TAG_BASE.size}
                                   contrast={TAG_BASE.contrast}
                                   color={actStyle.color}
-                                  className="acc-tag--static acc-tag--icon-quiet"
+                                  className="acc-tag--icon-quiet"
                                   icon
                                   renderIcon={actStyle.icon ?? Clock}
                                   label={dayLabel}
@@ -2017,7 +2020,6 @@ function AEAccountTable() {
                                   size={TAG_BASE.size}
                                   contrast={TAG_BASE.contrast}
                                   color={healthColor}
-                                  className="acc-tag--static"
                                   label={HEALTH_LABEL[row.health.overall]}
                                 />
                               </HoverShell>
@@ -2026,7 +2028,7 @@ function AEAccountTable() {
                               <HoverShell
                                 interactive
                                 render={() => <AccountRiskFactorsPanel risks={row.risks} density={density} />}>
-                                <Tags {...TAG_BASE} className="acc-tag--static" label={riskLabel} />
+                                <Tags {...TAG_BASE} label={riskLabel} />
                               </HoverShell>
                             )}
                             {density.includes('ebc') && (
@@ -2038,7 +2040,7 @@ function AEAccountTable() {
                                   size={TAG_BASE.size}
                                   contrast={TAG_BASE.contrast}
                                   color={EBC_SEVERITY_COLOR[ebcSev]}
-                                  className="acc-tag--static acc-tag--icon-quiet"
+                                  className="acc-tag--icon-quiet"
                                   icon
                                   renderIcon={Calendar}
                                   label={ebcLabel}
@@ -2274,12 +2276,12 @@ const LAYOUT_CSS = `
 .acc-hover-panel {
   background: var(--ds-surface-rest);
   border: 1px solid var(--ds-lines-neutral-rest);
-  border-radius: var(--ds-radius-tight);
-  box-shadow: var(--ds-elevation-medium, 0 4px 12px rgba(0,0,0,0.08));
+  border-radius: var(--ds-radius-generous);
+  box-shadow: var(--ds-shadow-flyout);
   animation: acc-hover-pop 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
 @keyframes acc-hover-pop {
-  from { opacity: 0; transform: translateY(-4px); }
+  from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
@@ -2309,7 +2311,8 @@ const LAYOUT_CSS = `
   gap: var(--ds-spacing-02);
 }
 .acc-pop--applied .acc-pop__applied-item {
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-secondary-rest);
 }
 
@@ -2370,7 +2373,7 @@ const LAYOUT_CSS = `
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: var(--ds-spacing-01);
+  gap: var(--ds-spacing-02); /* 4 — button-group spacing per Stage guide */
 }
 
 /* Body row treatment — no zebra, hairline dividers between rows. */
@@ -2404,8 +2407,8 @@ const LAYOUT_CSS = `
   -webkit-box-orient: vertical;
 }
 .acc-multiline__sub {
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 12px;
+  line-height: 16px;
   color: var(--ds-text-secondary-rest);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2462,10 +2465,10 @@ const LAYOUT_CSS = `
   gap: var(--ds-spacing-02);
   align-items: start;
 }
-.acc-pop__risk-emoji { font-size: 14px; line-height: 18px; }
+.acc-pop__risk-emoji { font-size: 14px; line-height: 20px; }
 .acc-pop__risk-label {
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-secondary-rest);
 }
 
@@ -2508,7 +2511,8 @@ const LAYOUT_CSS = `
   height: 16px;
 }
 .acc-pop__product-name {
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 20px;
   font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
@@ -2529,14 +2533,15 @@ const LAYOUT_CSS = `
 .acc-pop--play-bucket { min-width: 240px; }
 
 
-/* Static tag — non-interactive, doesn't pick up DS Tag :hover bg. */
-.panw--tag.acc-tag--static:hover {
-  background-color: var(--ds-field-alt-rest);
+/* Static tag — display-only label inside an interactive wrapper
+ * (e.g. a filter trigger button, or a FlyoutItem row). The wrapper
+ * element owns the hover; the tag should never pick up its own
+ * :hover state. pointer-events:none routes hover through to the
+ * wrapper without overriding bg per categorical color. */
+.panw--tag.acc-tag--static {
+  pointer-events: none;
+  cursor: default;
 }
-.panw--tag.acc-tag--static.panw--tag--low.panw--tag--neutral:hover {
-  background-color: var(--ds-field-alt-rest);
-}
-.panw--tag.acc-tag--static { cursor: default; }
 
 /* KV rows used inside hover popovers. */
 .acc-pop__rows,
@@ -2559,7 +2564,8 @@ const LAYOUT_CSS = `
   color: var(--ds-text-secondary-rest);
 }
 .acc-pop__kv-value {
-  font-size: 13px;
+  font-size: 14px;
+  line-height: 20px;
   font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
   font-feature-settings: 'tnum' 1, 'lnum' 1;

@@ -69,7 +69,7 @@
  *     - `ProductFilter` + tree     (opp-table ~L805)
  *     - `TagDensityFilter`         (opp-table ~L1031)
  *     - `GroupedHealthFilter`      (opp-table ~L1109)
- *     - `AppliedListPanel`         (opp-table ~L1000)
+ *     - DS chip-popover pattern    (@ds/filter Filter.tsx, used directly)
  *     - `HealthTrendBars` + panel  (opp-table ~L1424 / L1466)
  *
  * ── System gaps surfaced (same list as opp-table) ──────────────────────
@@ -79,11 +79,11 @@
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
   Calendar, Clock, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
-  ExclamationTriangle, ExclamationCircle,
+  ExclamationTriangle, ExclamationCircle, Close,
   BrandStrata, BrandPrisma, BrandCortex,
   // Sales Play status icons. Chips are neutral; per-status color is
   // applied to the icon only via CSS (see SALES_PLAY_ICON_COLOR_VAR map
@@ -159,6 +159,11 @@ type EBC =
 interface QuarterPipeline {
   label: string       // "CQ" | "Q1FY27" | ...
   usd: number         // 0 = empty quarter (placeholder tag rendered as $—)
+  /** Multiple opps of the same type within one quarter are
+   *  intentionally allowed and render as multiple rows in the
+   *  quarter popover (e.g. two Renewals at different dollar
+   *  amounts). We deliberately do NOT carry an opp name here —
+   *  the popover surface only commits to type + value. */
   opps: { type: 'net-new' | 'upsell' | 'renewal'; usd: number }[]
 }
 
@@ -390,8 +395,10 @@ const ROWS: AccountRow[] = (() => {
       pipeline: mkPipeline(1_200_000, 800_000, 0, 450_000, [
         { q: 0, type: 'renewal', usd: 900_000 },
         { q: 0, type: 'upsell',  usd: 300_000 },
-        { q: 1, type: 'net-new', usd: 800_000 },
-        { q: 3, type: 'upsell',  usd: 450_000 },
+        { q: 1, type: 'net-new', usd: 500_000 },
+        { q: 1, type: 'net-new', usd: 300_000 },
+        { q: 3, type: 'upsell',  usd: 250_000 },
+        { q: 3, type: 'upsell',  usd: 200_000 },
       ]),
       activity: { daysAgo: 2, description: 'EBC follow-up with CIO' },
       health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
@@ -423,7 +430,9 @@ const ROWS: AccountRow[] = (() => {
       apex: 'Meridian Financial Partners',
       pipeline: mkPipeline(450_000, 1_200_000, 700_000, 0, [
         { q: 0, type: 'upsell',  usd: 450_000 },
-        { q: 1, type: 'net-new', usd: 1_200_000 },
+        // Q1 — same-type pair (two Net News) per designer ask
+        { q: 1, type: 'net-new', usd: 700_000 },
+        { q: 1, type: 'net-new', usd: 500_000 },
         { q: 2, type: 'renewal', usd: 700_000 },
       ]),
       activity: { daysAgo: 18, description: 'Pricing thread with procurement' },
@@ -482,7 +491,9 @@ const ROWS: AccountRow[] = (() => {
       pipeline: mkPipeline(3_100_000, 1_400_000, 900_000, 600_000, [
         { q: 0, type: 'renewal', usd: 2_500_000 },
         { q: 0, type: 'upsell',  usd: 600_000 },
-        { q: 1, type: 'upsell',  usd: 1_400_000 },
+        // Q1 — mixed-type pair (Upsell + Renewal) per designer ask
+        { q: 1, type: 'upsell',  usd: 200_000 },
+        { q: 1, type: 'renewal', usd: 1_200_000 },
         { q: 2, type: 'net-new', usd: 900_000 },
         { q: 3, type: 'net-new', usd: 600_000 },
       ]),
@@ -571,6 +582,7 @@ const ROWS: AccountRow[] = (() => {
       name: 'Summit Healthcare Systems',
       apex: 'Summit Health Holdings',
       pipeline: mkPipeline(445_000, 280_000, 0, 165_000, [
+        // CQ — mixed-type pair (Upsell + Renewal in the same Q).
         { q: 0, type: 'upsell',  usd: 280_000 },
         { q: 0, type: 'renewal', usd: 165_000 },
         { q: 1, type: 'net-new', usd: 280_000 },
@@ -737,13 +749,6 @@ function formatEbcDate(iso: string): string {
 
 // ─── Filter option sets ──────────────────────────────────────────────────
 
-const CLOSE_DATE_OPTIONS: FilterOption[] = [
-  { value: 'this-q', label: 'This Quarter' },
-  { value: 'q1fy27', label: 'Q1FY27' },
-  { value: 'q2fy27', label: 'Q2FY27' },
-  { value: 'q3fy27', label: 'Q3FY27' },
-  { value: 'q4fy27', label: 'Q4FY27' },
-]
 
 const LAST_ACTIVITY_OPTIONS: { value: string; label: string }[] = [
   { value: 'lt-7',  label: 'Last 7 days' },
@@ -1036,15 +1041,69 @@ function HoverShell({
 
 // ─── Applied-list popover (chip hover on filter triggers) ────────────────
 
-function AppliedListPanel({ heading, items }: { heading: string; items: string[] }) {
+// ─── Filter-chip hover popover (DS-aligned) ──────────────────────────────
+// The DS Filter component (design-system/packages/filter/src/Filter/Filter.tsx)
+// ships a built-in chip-hover popover with:
+//   • .panw--filter__chip-popover         — panel chrome (surface, shadow, radius, position:absolute)
+//   • .panw--filter__chip-popover-row     — flex row with text + remove IconButton
+//   • .panw--filter__chip-popover-label   — flex-1 label with ellipsis truncation
+// All styling lives in @ds/styles/scss/components/filter/_filter.scss.
+//
+// The custom filters in this composition (GroupedHealth / Product) follow
+// the SAME JSX shape and class names so they pick up the DS styling
+// without any local CSS. The state machine and 180ms close grace are
+// extracted into useChipPopoverHover() to avoid duplication; both
+// filters' chip targets and popover panels wire its handlers.
+
+function useChipPopoverHover() {
+  const [chipPopoverOpen, setChipPopoverOpen] = useState(false)
+  const closeTimerRef = useRef<number | null>(null)
+  const cancelClose = useCallback(() => {
+    if (closeTimerRef.current !== null) {
+      window.clearTimeout(closeTimerRef.current)
+      closeTimerRef.current = null
+    }
+  }, [])
+  const scheduleClose = useCallback(() => {
+    cancelClose()
+    closeTimerRef.current = window.setTimeout(() => setChipPopoverOpen(false), 180)
+  }, [cancelClose])
+  useEffect(() => () => cancelClose(), [cancelClose])
+  const openOnEnter = useCallback(() => { cancelClose(); setChipPopoverOpen(true) }, [cancelClose])
+  return { chipPopoverOpen, setChipPopoverOpen, cancelClose, scheduleClose, openOnEnter }
+}
+
+interface FilterChipPopoverProps {
+  items: { value: string; label: string }[]
+  onRemove: (value: string) => void
+  onMouseEnter: () => void
+  onMouseLeave: () => void
+}
+
+function FilterChipPopover({ items, onRemove, onMouseEnter, onMouseLeave }: FilterChipPopoverProps) {
   return (
-    <div className="acc-pop acc-pop--applied">
-      <div className="acc-pop__heading">{heading} ({items.length})</div>
-      <ul className="acc-pop__applied-list">
-        {items.map(name => (
-          <li key={name} className="acc-pop__applied-item">{name}</li>
-        ))}
-      </ul>
+    <div
+      className="panw--filter__chip-popover"
+      role="dialog"
+      aria-label="Applied filters"
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}>
+      {items.map(({ value, label }) => (
+        <div key={value} className="panw--filter__chip-popover-row">
+          <span className="panw--filter__chip-popover-label">{label}</span>
+          <IconButton
+            kind="ghost"
+            size="sm"
+            iconSize={16}
+            renderIcon={Close}
+            aria-label={`Remove ${label}`}
+            onClick={(e) => {
+              e.stopPropagation()
+              onRemove(value)
+            }}
+          />
+        </div>
+      ))}
     </div>
   )
 }
@@ -1188,14 +1247,39 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
   }, [open])
   // Chip reflects committed value, not draft.
   // Bare numeric count (consistent with the other multi-select
-  // filters in this row — "close date 4", "products 15"). The "/9"
+  // filters in this row — "products 15"). The "/9"
   // fraction was a known-redundant pattern; the trigger label
   // ("account health") already supplies the denominator's domain.
   const committedTotal =
     value.overall.length + value.technical.length + value.adoption.length
   const chipLabel = String(committedTotal)
+  // Applied items for the DS chip-popover. Each is encoded as
+  // `${axis}:${level}` so onRemove can decode and clear it from the
+  // right group.
+  const appliedItems = ([
+    ['overall',   value.overall],
+    ['technical', value.technical],
+    ['adoption',  value.adoption],
+  ] as const).flatMap(([axis, levels]) =>
+    levels.map(lvl => ({
+      value: encodeAxisLevel(axis, lvl),
+      label: `${axis}: ${HEALTH_LABEL[lvl]}`,
+    }))
+  )
   const apply = () => { onApply(valuesToSelection(draft)); setOpen(false) }
   const cancel = () => setOpen(false)
+
+  // Chip-popover hover state (DS pattern from @ds/filter).
+  const chipHover = useChipPopoverHover()
+  const removeApplied = (encoded: string) => {
+    const [axis, lvl] = encoded.split(':') as [HealthAxis, Health]
+    onApply({
+      ...value,
+      [axis]: value[axis].filter(v => v !== lvl),
+    })
+    if (committedTotal - 1 === 0) chipHover.setChipPopoverOpen(false)
+  }
+
   return (
     <span className="panw--filter__wrapper">
       <button
@@ -1206,15 +1290,32 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}>
         <span className="panw--filter__label">account health</span>
-        <span className="panw--filter__values">
-          <span className="panw--filter__chip-target">
-            <Tags label={chipLabel} color="neutral" contrast="high" size="default" className="acc-tag--static" />
+        {committedTotal > 0 && (
+          <span className="panw--filter__values">
+            <span
+              className="panw--filter__chip-target"
+              onMouseEnter={chipHover.openOnEnter}
+              onMouseLeave={chipHover.scheduleClose}>
+              <Tags label={chipLabel} color="neutral" contrast="high" size="default" className="acc-tag--static" />
+            </span>
           </span>
-        </span>
+        )}
         <span className="panw--filter__chevron" aria-hidden="true">
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </span>
       </button>
+      {/* Chip-popover lives as a sibling of the trigger inside the
+       *  .panw--filter__wrapper so the DS CSS positions it correctly
+       *  (position:absolute, top:100%). Suppressed when the main
+       *  flyout is open to avoid two stacked panels. */}
+      {committedTotal > 0 && chipHover.chipPopoverOpen && !open && (
+        <FilterChipPopover
+          items={appliedItems}
+          onRemove={removeApplied}
+          onMouseEnter={chipHover.cancelClose}
+          onMouseLeave={chipHover.scheduleClose}
+        />
+      )}
       <Flyout
         open={open}
         onOpenChange={setOpen}
@@ -1348,10 +1449,20 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   const masterStatus: 'checked' | 'unchecked' | 'indeterminate' =
     allOn ? 'checked' : noneOn ? 'unchecked' : 'indeterminate'
   const toggleMaster = () => setDraft(allOn ? [] : [...allLeaves])
-  const selectedLabels = selected
-    .map(v => PRODUCT_TREE.flatMap(g => g.children ?? [])
-      .find(c => c.value === v)?.label)
-    .filter((s): s is string => !!s)
+  // Applied items for the DS chip-popover: each leaf value + its label.
+  const appliedItems = selected
+    .map(v => {
+      const leaf = PRODUCT_TREE.flatMap(g => g.children ?? []).find(c => c.value === v)
+      return leaf ? { value: leaf.value, label: leaf.label } : null
+    })
+    .filter((x): x is { value: string; label: string } => !!x)
+
+  const chipHover = useChipPopoverHover()
+  const removeApplied = (val: string) => {
+    const next = selected.filter(v => v !== val)
+    onApply(next)
+    if (next.length === 0) chipHover.setChipPopoverOpen(false)
+  }
 
   return (
     <span className="panw--filter__wrapper">
@@ -1364,21 +1475,27 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
         onClick={() => setOpen(v => !v)}>
         <span className="panw--filter__label">products</span>
         {selected.length > 0 && (
-          <HoverShell
-            interactive
-            openDelayMs={300}
-            render={() => <AppliedListPanel heading="products" items={selectedLabels} />}>
-            <span className="panw--filter__values">
-              <span className="panw--filter__chip-target">
-                <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" className="acc-tag--static" />
-              </span>
+          <span className="panw--filter__values">
+            <span
+              className="panw--filter__chip-target"
+              onMouseEnter={chipHover.openOnEnter}
+              onMouseLeave={chipHover.scheduleClose}>
+              <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" className="acc-tag--static" />
             </span>
-          </HoverShell>
+          </span>
         )}
         <span className="panw--filter__chevron" aria-hidden="true">
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </span>
       </button>
+      {selected.length > 0 && chipHover.chipPopoverOpen && !open && (
+        <FilterChipPopover
+          items={appliedItems}
+          onRemove={removeApplied}
+          onMouseEnter={chipHover.cancelClose}
+          onMouseLeave={chipHover.scheduleClose}
+        />
+      )}
       <Flyout
         open={open}
         onOpenChange={setOpen}
@@ -1422,13 +1539,19 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
 
 // ─── Health-trend bar chart (forked from opp-table) ──────────────────────
 
-// Bars are glyphs (SVG rect fills), not text — use the icons-status
-// family. text-status-* is one stop darker per the aesthetic guide
-// and reads as label text, which these aren't.
+// Health-trend bars use the primitive 30–50 scale per explicit
+// designer direction (lighter than the icons.status family, which
+// renders too dark at small bar widths). Values lifted verbatim from
+// design-system/packages/colors/src/colors.ts:
+//   green-40  → #3cc29a  (healthy)
+//   yellow-30 → #ffbe4f  (at risk)
+//   red-50    → #f55868  (critical)
+// Inlined as raw hex because these primitives are not exposed as CSS
+// custom properties at the theme layer; only semantic tokens are.
 const HEALTH_BAR_FILL: Record<Health, string> = {
-  'healthy':  'var(--ds-icons-status-success)',
-  'at-risk':  'var(--ds-icons-status-warning)',
-  'critical': 'var(--ds-icons-status-danger)',
+  'healthy':  '#3cc29a', // green-40
+  'at-risk':  '#ffbe4f', // yellow-30
+  'critical': '#f55868', // red-50
 }
 const HEALTH_FROM_LEVEL: Record<number, Health> = {
   0: 'healthy', 1: 'at-risk', 2: 'critical',
@@ -1541,16 +1664,22 @@ function EBCPanel({ ebc }: { ebc: EBC }) {
     <div className="acc-pop acc-pop--ebc">
       <div className="acc-pop__heading">EBC — {formatEbcDate(ebc.date)}</div>
       <div className="acc-pop__sub">{ebc.topic}</div>
-      <div className="acc-pop__rows">
-        <div className="acc-pop__kv">
+      {/* Attendees as rows with hairline dividers — same pattern as
+       *  every other multi-row block in the popovers. The leading
+       *  cell "PANW attendees" is a label-only row that anchors the
+       *  list and gives it identity (analogous to Figma's "Active
+       *  Quote:" row). */}
+      <ul className="acc-pop__kv-list">
+        <li key="__label" className="acc-pop__kv">
           <span className="acc-pop__kv-label">PANW attendees</span>
-        </div>
-        <ul className="acc-pop__applied-list">
-          {ebc.attendees.map(a => (
-            <li key={a} className="acc-pop__applied-item">{a}</li>
-          ))}
-        </ul>
-      </div>
+          <span className="acc-pop__kv-value">{ebc.attendees.length}</span>
+        </li>
+        {ebc.attendees.map(a => (
+          <li key={a} className="acc-pop__kv">
+            <span className="acc-pop__kv-label">{a}</span>
+          </li>
+        ))}
+      </ul>
       <div className="acc-pop__cta">
         <Button kind="ghost-brand" size="small">View EBC details</Button>
       </div>
@@ -1594,7 +1723,7 @@ function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
   // dollar reads cleanly without it.
   const label = `${SALES_PLAY_LABEL[bucket.status]} ${formatUsdCompact(bucket.usd)}`
   return (
-    <HoverShell render={() => <SalesPlayBucketPanel bucket={bucket} />}>
+    <HoverShell interactive render={() => <SalesPlayBucketPanel bucket={bucket} />}>
       <Tags
         shape="rounded"
         size="large"
@@ -1674,6 +1803,7 @@ function ProductCluster({ products }: { products: Product[] }) {
         return (
           <HoverShell
             key={`${p.name}-${i}`}
+            interactive
             render={() => <ProductARRPanel product={p} />}>
             {Icon
               ? <Tags {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
@@ -1705,6 +1835,12 @@ function QuarterPipelinePanel({ quarter }: { quarter: QuarterPipeline }) {
       </div>
     )
   }
+  // Each opp renders on its own row as "{Type}" / "{usd}". Multiple
+  // opps of the same type render as multiple identical-label rows
+  // distinguished only by their value — that's the entire signal the
+  // popover is meant to carry. No opp name is shown (we don't have a
+  // canonical opp-name field on the data, and synthesizing product
+  // descriptors here would just add noise).
   return (
     <div className="acc-pop acc-pop--quarter">
       <div className="acc-pop__heading">{quarter.label} pipeline</div>
@@ -1807,8 +1943,6 @@ function AEAccountTable() {
   const [density, setDensity] = useState<DensityKey[]>([...ALL_DENSITY_KEYS])
   const [groupedHealth, setGroupedHealth] =
     useState<GroupedHealthSelection>(INITIAL_GROUPED_HEALTH)
-  const [closeDateMulti, setCloseDateMulti] =
-    useState<string[]>(['this-q', 'q1fy27', 'q2fy27', 'q3fy27'])
   const [lastActivitySingle, setLastActivitySingle] = useState<string | null>(null)
   const [ebcSingle, setEbcSingle] = useState<string | null>(null)
   const [upsellSingle, setUpsellSingle] = useState<string | null>(null)
@@ -1883,12 +2017,6 @@ function AEAccountTable() {
             <div className="acc-filter-group">
               <TagDensityFilter selected={density} onChange={setDensity} />
               <div className="acc-filter-divider" role="presentation" />
-              <Filter
-                label="close date"
-                options={CLOSE_DATE_OPTIONS}
-                selected={closeDateMulti}
-                onApply={setCloseDateMulti}
-              />
               <GroupedHealthFilter
                 value={groupedHealth}
                 onApply={setGroupedHealth}
@@ -1974,6 +2102,7 @@ function AEAccountTable() {
                           return (
                             <HoverShell
                               key={key}
+                              interactive
                               render={() => <QuarterPipelinePanel quarter={q} />}>
                               <Tags {...TAG_BASE} label={label} />
                             </HoverShell>
@@ -2284,7 +2413,15 @@ const LAYOUT_CSS = `
 .acc-tree__label--bold { font-weight: var(--ds-type-font-weight-semibold); }
 
 /* ── Hover-panel surface (portaled) ─────────────────────────────────── */
-.acc-hover-trigger { display: inline-flex; }
+.acc-hover-trigger {
+  display: inline-flex;
+  /* When wrapped inside a width-constrained cluster (e.g. a narrow
+   * cell), the trigger must allow its child tag to shrink. Without
+   * these two declarations the inline-flex sizes to content and
+   * defeats the ellipsis truncation on the tag's label. */
+  max-width: 100%;
+  min-width: 0;
+}
 .acc-hover-panel {
   background: var(--ds-surface-rest);
   border: 1px solid var(--ds-lines-neutral-rest);
@@ -2297,22 +2434,31 @@ const LAYOUT_CSS = `
   to   { opacity: 1; transform: translateY(0); }
 }
 
-/* Popover container — mirrors .opp-pop. 16px padding, 12px gap
- * between blocks; 14/20 body type. Per the project rule "no popover
- * text below 14px," every text class inside .acc-pop floors at 14.
- * The chrome (surface / border / shadow / radius) is supplied by the
- * HoverShell wrapper above; this block owns the inside layout only. */
+/* Popover container — 12px padding all sides per designer direction
+ * (Figma "Active Quote" reference). The container owns vertical
+ * rhythm via 8px gap between blocks (heading / sub / rows / cta).
+ * Row lists span edge-to-edge via negative horizontal margin so
+ * hairline dividers and click-row hover grounds reach the popover
+ * frame — labels still respect 12px horizontal inset internally.
+ * Per the project rule "no popover text below 14px," every text
+ * class inside .acc-pop floors at 14. */
 .acc-pop {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-04); /* 12 */
+  gap: var(--ds-spacing-03); /* 8 between blocks */
   min-width: 220px;
   max-width: 320px;
-  padding: var(--ds-spacing-05); /* 16 */
+  padding: var(--ds-spacing-05); /* 16 all sides */
   font-size: 14px;
   line-height: 20px;
   color: var(--ds-text-primary);
 }
+/* Heading + sub sit at the popover's content edge — no extra
+ * horizontal margin. With the popover's 16px padding, they land
+ * 16px from the popover frame, on the same rail as the row text
+ * (the row extends 8px past the popover content edge via negative
+ * margin, then re-imposes 8px text-inset internally, so its text
+ * also lands at 16 from the frame). */
 .acc-pop__heading {
   font-size: 14px;
   line-height: 20px;
@@ -2323,26 +2469,152 @@ const LAYOUT_CSS = `
   /* Tertiary text-color + negative top margin = the "tight under
    * heading" treatment used by .opp-pop__sub. Held at 14/20 per
    * popover-text floor. */
+  margin-top: calc(-1 * var(--ds-spacing-03));
   font-size: 14px;
   line-height: 20px;
   color: var(--ds-text-tertiary-rest);
-  margin-top: calc(-1 * var(--ds-spacing-03));
 }
-.acc-pop--applied .acc-pop__applied-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+
+/* ── Row pattern ─────────────────────────────────────────────────────
+ *  Architecture note: dividers are NOT borders on the row. Borders
+ *  on a border-radius:4px box curve at the corners and produce the
+ *  little "notch" hairlines you'd see meeting a rounded hover pill.
+ *  Instead, every divider is a 1px absolute-positioned pseudo
+ *  element — straight rectangles that don't inherit the row's
+ *  radius. The list's own top and bottom hairlines are also
+ *  pseudos (::before / ::after on the list element) for the same
+ *  reason and so the hover-hide rules below can reach them.
+ *
+ *  Layout: rows sit 8px inset from the list's left/right so the
+ *  hover pill never kisses the popover frame. Dividers also stop
+ *  at the same 8px inset, so labels and dividers share one column.
+ *
+ *  Hover/press: row ground lifts via ghost.field tokens; on hover
+ *  the row's own top + bottom adjacent dividers fade so the pill
+ *  reads as a single uninterrupted shape. Including the list's
+ *  top/bottom hairlines when the first / last row is hovered (via
+ *  :has()). The click target is the row itself; behavior is a
+ *  no-op until the next click destination is defined. */
+.acc-pop__rows,
+.acc-pop__kv-list,
+.acc-pop__risk-list,
+.acc-pop__applied-list {
+  position: relative;
   display: flex;
   flex-direction: column;
-  /* 8px between rows — half-step above the dense 4px to give text rows
-   * room to breathe at 14/20 without inflating the popover footprint. */
-  gap: var(--ds-spacing-03);
+  gap: 0;
+  list-style: none;
+  /* Negative horizontal margin pulls the list 8px out of the
+   * popover's 16px padding on each side, so the row extends to 8px
+   * from the popover frame. The row's 8px internal padding then
+   * re-imposes the text rail at 16px from the frame — the same
+   * column the heading sits on (which inherits its 16px inset from
+   * the popover padding alone). */
+  margin: 0 calc(-1 * var(--ds-spacing-03));
+  padding: 0;
 }
-.acc-pop--applied .acc-pop__applied-item {
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--ds-text-secondary-rest);
+/* List top hairline. Inset 8px on each side so the line stops at
+ * the text rail (16px from frame = list_edge_8 + 8). */
+.acc-pop__rows::before,
+.acc-pop__kv-list::before,
+.acc-pop__risk-list::before,
+.acc-pop__applied-list::before {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 0 var(--ds-spacing-03);
+  background-color: var(--ds-lines-neutral-rest);
 }
+/* List bottom hairline. */
+.acc-pop__rows::after,
+.acc-pop__kv-list::after,
+.acc-pop__risk-list::after,
+.acc-pop__applied-list::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 0 var(--ds-spacing-03);
+  background-color: var(--ds-lines-neutral-rest);
+}
+/* Each row. The row extends to the popover-content edge so its
+ * hover background reads as a generous band; text sits inside the
+ * row with 4px horizontal padding so it never touches the row's
+ * own edge. Heading / sub / chart / CTA carry a matching 4px
+ * horizontal margin so every text line in the popover sits on one
+ * rail. position:relative anchors the inter-row line pseudo
+ * (::before below). */
+.acc-pop__rows > *,
+.acc-pop__kv-list > *,
+.acc-pop__risk-list > *,
+.acc-pop__applied-list > * {
+  position: relative;
+  min-height: 32px;
+  margin: 0;
+  padding: 0 var(--ds-spacing-03); /* 8px text inset from row edge */
+  cursor: pointer;
+  background-color: var(--ds-ghost-field-rest);
+  border-radius: var(--ds-radius-tight);
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+/* Line between rows — inset 8px on each side to align with the
+ * text rail rather than the row's outer edge. */
+.acc-pop__rows > * + *::before,
+.acc-pop__kv-list > * + *::before,
+.acc-pop__risk-list > * + *::before,
+.acc-pop__applied-list > * + *::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: var(--ds-spacing-03);
+  right: var(--ds-spacing-03);
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
+}
+.acc-pop__rows > *:hover,
+.acc-pop__kv-list > *:hover,
+.acc-pop__risk-list > *:hover,
+.acc-pop__applied-list > *:hover {
+  background-color: var(--ds-ghost-field-hover);
+}
+.acc-pop__rows > *:active,
+.acc-pop__kv-list > *:active,
+.acc-pop__risk-list > *:active,
+.acc-pop__applied-list > *:active {
+  background-color: var(--ds-ghost-field-pressed);
+}
+/* When a row is hovered, hide:
+ *   (a) its own ::before (top inter-row divider)
+ *   (b) the next sibling's ::before (which is THIS row's bottom
+ *       inter-row divider when there's a row below)
+ * so the pill reads as one clean rounded shape. */
+.acc-pop__rows > *:hover::before,
+.acc-pop__kv-list > *:hover::before,
+.acc-pop__risk-list > *:hover::before,
+.acc-pop__applied-list > *:hover::before,
+.acc-pop__rows > *:hover + *::before,
+.acc-pop__kv-list > *:hover + *::before,
+.acc-pop__risk-list > *:hover + *::before,
+.acc-pop__applied-list > *:hover + *::before {
+  background-color: transparent;
+}
+/* And when the first / last row is hovered, hide the list's own
+ * top / bottom hairline respectively. :has() is required because
+ * we need to reach the list pseudo from the hovered row. */
+.acc-pop__rows:has(> *:first-child:hover)::before,
+.acc-pop__kv-list:has(> *:first-child:hover)::before,
+.acc-pop__risk-list:has(> *:first-child:hover)::before,
+.acc-pop__applied-list:has(> *:first-child:hover)::before {
+  background-color: transparent;
+}
+.acc-pop__rows:has(> *:last-child:hover)::after,
+.acc-pop__kv-list:has(> *:last-child:hover)::after,
+.acc-pop__risk-list:has(> *:last-child:hover)::after,
+.acc-pop__applied-list:has(> *:last-child:hover)::after {
+  background-color: transparent;
+}
+/* Filter-chip hover popover lives entirely in the DS — see
+ * @ds/styles/scss/components/filter/_filter.scss for the
+ * .panw--filter__chip-popover ruleset. No local override needed. */
 
 /* Filter footer actions */
 .panw--filter__footer-actions {
@@ -2463,6 +2735,11 @@ const LAYOUT_CSS = `
   flex-wrap: wrap;
   gap: var(--ds-spacing-02);
   align-items: center;
+  /* min-width:0 unlocks flex-children to shrink below their content
+   * width — required for tag ellipsis truncation below to engage when
+   * the column gets narrower than the chip's natural width. Without
+   * this the chip would force the cell to overflow horizontally. */
+  min-width: 0;
 }
 
 /* Column 3 stacks sub-cells vertically (each row in the cell is a
@@ -2470,6 +2747,29 @@ const LAYOUT_CSS = `
 .acc-tag-cluster--stack {
   flex-direction: column;
   align-items: flex-start;
+}
+
+/* ── Tag ellipsis truncation ─────────────────────────────────────────
+ *  When a column becomes narrower than a tag's natural content width,
+ *  the tag clips its LABEL with an ellipsis instead of pushing the
+ *  cell into horizontal overflow. Icons stay visible — they carry
+ *  state signal on their own. The wrapping cluster still tries to
+ *  re-flow to multiple lines first (flex-wrap); truncation only
+ *  engages when a single tag is wider than its allotted cell width.
+ *
+ *  This applies broadly to in-cell tags via a scoped selector chain
+ *  so DS Tags elsewhere (filter chips, popover tags) are untouched. */
+.acc-tag-cluster .panw--tag {
+  max-width: 100%;
+  min-width: 0;
+}
+.acc-tag-cluster .panw--tag .panw--tag__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  max-width: 100%;
 }
 
 /* Icon-quiet tag — see opp-table convention. The DS tag-neutral-low
@@ -2482,23 +2782,13 @@ const LAYOUT_CSS = `
 
 /* Risk-list inside RiskFactorsPanel popover */
 .acc-pop--risks { max-width: 360px; }
-.acc-pop__risk-list {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-03); /* 8 — matches .opp-pop__risk-list */
-}
+/* Risk rows: 20px emoji column + 1fr label. Height + dividers +
+ * click states come from the shared .acc-pop__risk-list > * rule. */
 .acc-pop__risk-row {
   display: grid;
   grid-template-columns: 20px 1fr;
-  gap: var(--ds-spacing-03); /* 8 — column gap matches row gap */
+  column-gap: var(--ds-spacing-03);
   align-items: center;
-  /* 28px min-height keeps single-line risks anchored to a 4px-grid
-   * row even when the emoji glyph renders shorter than the label
-   * x-height. */
-  min-height: 28px;
 }
 .acc-pop__risk-emoji { font-size: 14px; line-height: 20px; }
 .acc-pop__risk-label {
@@ -2509,12 +2799,18 @@ const LAYOUT_CSS = `
 
 /* Account-health popover layout */
 .acc-pop--health { min-width: 280px; }
-.acc-pop__chart { display: block; }
+/* Chart sits at popover content edge (16px from frame), same rail
+ * as heading + row text. */
+.acc-pop__chart {
+  display: block;
+}
 .acc-pop__cta {
   display: flex;
   justify-content: flex-end;
-  padding-top: var(--ds-spacing-02);
-  border-top: 1px solid var(--ds-lines-neutral-rest);
+  /* CTA sits on the same rail as heading + row text (16px from
+   * frame via popover padding alone). The list above already draws
+   * its own bottom hairline, so the CTA adds no second line. */
+  padding-top: var(--ds-spacing-03);
 }
 .acc-pop--ebc { min-width: 280px; }
 .acc-health-bars { display: block; }
@@ -2600,25 +2896,14 @@ const LAYOUT_CSS = `
 .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--declined    .panw--tag__icon,
 .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--closed-lost .panw--tag__icon { color: var(--ds-icons-secondary-rest); }
 
-/* KV rows used inside hover popovers. 8px between rows, 28px min
- * height per row — both mirror .opp-pop__rows / .opp-pop__kv.
- * The min-height locks rows to a 4px grid even when one side of a
- * row is a tag (taller than text-only KV pairs). */
-.acc-pop__rows,
-.acc-pop__kv-list {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-03); /* 8 */
-  list-style: none;
-  padding: 0;
-  margin: 0;
-}
+/* KV rows: label left, value/tag right. Height + dividers + click
+ * states come from the shared .acc-pop__kv-list > * and
+ * .acc-pop__rows > * rules. */
 .acc-pop__kv {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--ds-spacing-04);
-  min-height: 28px;
 }
 .acc-pop__kv-label {
   font-size: 14px;

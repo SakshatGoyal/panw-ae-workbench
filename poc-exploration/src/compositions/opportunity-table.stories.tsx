@@ -60,11 +60,25 @@
  *   • Column 5 value emphasis dropped (no longer 18px semibold).
  *   • Column 6 buttons promoted to ghost-brand; Eye → ChevronRight (expand).
  *
+ * ── Pass 4 scope (this file): Type-tag interactivity ───────────────────────
+ *   • Upsell type tag → 1-second hover delay → tooltip-with-Modify
+ *     (heading + sub + single ghost-brand action button). Interactive
+ *     panel; closes on mouseleave with 160ms grace.
+ *   • Renewal type tag → 700ms hover delay → popover with subscription
+ *     end / Renewable TCV / ARR rows and the Renewal Outcome editor.
+ *     Persistent panel — closes only on outside click or Confirm/Cancel.
+ *   • Renewal Outcome editor: tag-as-button trigger opens a DS Flyout
+ *     listing the 6 outcomes. Picking a non-Unknown value expands a
+ *     Notes form below; Churn additionally surfaces structured Reason
+ *     and Competitor dropdowns. Cancel reverts, Confirm commits to the
+ *     row's outcome state (lifted into AEOpportunityTable so changes
+ *     persist across hovers).
+ *   • HoverShell extended: optional `openDelayMs` (Upsell uses 1000) and
+ *     `persist` (Renewal — opens on hover, stays open until outside
+ *     click, immune to scroll-close).
+ *
  * ── Deferred to later passes ─────────────────────────────────────────────
  *   • Tag filter as density control + Account Health grouped filter (Pass 5)
- *   • Per-cell and per-tag hover popovers (Pass 3)
- *   • Renewal Outcome editor + Upsell Modify tooltip (Pass 4)
- *   • Account Health 12-month trend chart (Pass 3)
  *
  * ── Conventions ─────────────────────────────────────────────────────────
  * Tag presets: shape="rounded", size="large" (= 4px chip-tier radius),
@@ -107,9 +121,11 @@ import { Header } from '@ds/header'
 import { CellContents } from '@ds/cell-contents'
 import { Pagination } from '@ds/pagination'
 import { Button, IconButton } from '@ds/button'
-import { Tags } from '@ds/tags'
+import { Tags, type TagColor } from '@ds/tags'
 import { Tooltip } from '@ds/tooltip'
 import { Checkbox } from '@ds/checkbox'
+import { Dropdown } from '@ds/dropdown'
+import { TextEntry } from '@ds/text-entry'
 import {
   Flyout,
   FlyoutFilter,
@@ -899,12 +915,21 @@ type HoverShellSide = 'bottom' | 'top'
 
 interface HoverShellProps {
   children: React.ReactNode
-  render: () => React.ReactNode
+  render: (api: { close: () => void }) => React.ReactNode
   interactive?: boolean
   side?: HoverShellSide
   align?: HoverShellAlign
   /** Optional class on the portaled wrapper. */
   panelClassName?: string
+  /** Open delay in ms (default 700). Upsell uses 1000 per spec §4.2. */
+  openDelayMs?: number
+  /**
+   * When true, the panel does NOT auto-close on mouseleave. It only
+   * closes when (a) the panel calls the `close` API, (b) the user clicks
+   * outside, or (c) the viewport scrolls/resizes. Used by the Renewal
+   * popover, which contains a multi-step inline form the AE drives.
+   */
+  persist?: boolean
 }
 
 function HoverShell({
@@ -914,6 +939,8 @@ function HoverShell({
   side = 'bottom',
   align = 'start',
   panelClassName,
+  openDelayMs = HOVER_OPEN_DELAY_MS,
+  persist = false,
 }: HoverShellProps) {
   const triggerRef = useRef<HTMLSpanElement>(null)
   const panelRef = useRef<HTMLDivElement>(null)
@@ -958,16 +985,18 @@ function HoverShell({
   }, [open, side, align])
 
   // Close on scroll/resize — position would otherwise drift away from anchor.
+  // Persist-mode popovers (Renewal editor) hold an unsaved form, so we
+  // suppress this behavior; the user must explicitly Cancel or Confirm.
   useEffect(() => {
-    if (!open) return
-    const close = () => setOpen(false)
-    window.addEventListener('scroll', close, true)
-    window.addEventListener('resize', close)
+    if (!open || persist) return
+    const fn = () => setOpen(false)
+    window.addEventListener('scroll', fn, true)
+    window.addEventListener('resize', fn)
     return () => {
-      window.removeEventListener('scroll', close, true)
-      window.removeEventListener('resize', close)
+      window.removeEventListener('scroll', fn, true)
+      window.removeEventListener('resize', fn)
     }
-  }, [open])
+  }, [open, persist])
 
   // Cleanup pending timers on unmount.
   useEffect(() => () => {
@@ -986,11 +1015,13 @@ function HoverShell({
     clearCloseTimer()
     if (open) return
     clearOpenTimer()
-    openTimerRef.current = setTimeout(() => setOpen(true), HOVER_OPEN_DELAY_MS)
+    openTimerRef.current = setTimeout(() => setOpen(true), openDelayMs)
   }
   const handleTriggerLeave = () => {
     clearOpenTimer()
     if (!open) return
+    // Persist mode: panel stays open until outside click / close API call.
+    if (persist) return
     if (interactive) {
       clearCloseTimer()
       closeTimerRef.current = setTimeout(() => setOpen(false), HOVER_CLOSE_GRACE_MS)
@@ -999,13 +1030,33 @@ function HoverShell({
     }
   }
   const handlePanelEnter = () => {
-    if (!interactive) return
+    if (!interactive && !persist) return
     clearCloseTimer()
   }
   const handlePanelLeave = () => {
+    if (persist) return
     if (!interactive) return
     setOpen(false)
   }
+
+  // Outside-click close (persist mode only). Hovers and tooltips don't
+  // need this because they close on mouseleave already.
+  useEffect(() => {
+    if (!open || !persist) return
+    const onDown = (ev: MouseEvent) => {
+      const t = ev.target as Node
+      if (panelRef.current?.contains(t)) return
+      if (triggerRef.current?.contains(t)) return
+      setOpen(false)
+    }
+    // mousedown not click — so the click that started inside a child
+    // Flyout's portal doesn't bubble up and close us before the Flyout
+    // can handle it.
+    document.addEventListener('mousedown', onDown, true)
+    return () => document.removeEventListener('mousedown', onDown, true)
+  }, [open, persist])
+
+  const close = () => setOpen(false)
 
   return (
     <>
@@ -1025,12 +1076,12 @@ function HoverShell({
             top: pos?.top ?? -9999,
             left: pos?.left ?? -9999,
             visibility: pos ? 'visible' : 'hidden',
-            pointerEvents: interactive ? 'auto' : 'none',
+            pointerEvents: interactive || persist ? 'auto' : 'none',
             zIndex: 9999,
           }}
           onMouseEnter={handlePanelEnter}
           onMouseLeave={handlePanelLeave}>
-          {render()}
+          {render({ close })}
         </div>,
         document.body
       )}
@@ -1229,6 +1280,222 @@ function ProductPanel({ product, totalUsd }: { product: Product; totalUsd: numbe
   )
 }
 
+// ─── Renewal Outcome (spec §4.2) ─────────────────────────────────────────────
+// Six outcomes; each carries a Tag color. Spec calls "purple" for
+// Displacement and "slate" for Duplicate, both of which exist in TagColors.
+
+const RENEWAL_OUTCOMES: { value: RenewalOutcome; label: string; color: TagColor }[] = [
+  { value: 'unknown',      label: 'Unknown',                  color: 'neutral' },
+  { value: 'full',         label: 'Full Renewal / Upsell',    color: 'green' },
+  { value: 'downsell',     label: 'Downsell',                 color: 'orange' },
+  { value: 'churn',        label: 'Churn',                    color: 'red' },
+  { value: 'displacement', label: 'Displacement (HW Refresh)', color: 'purple' },
+  { value: 'duplicate',    label: 'Duplicate',                color: 'slate' },
+]
+const outcomeMeta = (v: RenewalOutcome) =>
+  RENEWAL_OUTCOMES.find(o => o.value === v) ?? RENEWAL_OUTCOMES[0]
+
+const CHURN_REASONS = [
+  { label: 'Customer dissatisfied',    value: 'dissatisfied' },
+  { label: 'Budget cut',               value: 'budget' },
+  { label: 'Competitive displacement', value: 'competitive' },
+  { label: 'End of life',              value: 'eol' },
+  { label: 'Other',                    value: 'other' },
+]
+const CHURN_COMPETITORS = [
+  { label: 'CrowdStrike', value: 'crowdstrike' },
+  { label: 'Fortinet',    value: 'fortinet' },
+  { label: 'SentinelOne', value: 'sentinelone' },
+  { label: 'Cisco',       value: 'cisco' },
+  { label: 'Other',       value: 'other' },
+  { label: 'N/A',         value: 'na' },
+]
+
+// ─── Upsell "tooltip-with-Modify" panel (spec §4.2) ──────────────────────────
+// Pattern: text + a single quiet action button. Visually closer to a
+// popover than the bare DS Tooltip — the inverse-ground tooltip can't
+// host an interactive control. Kept compact; the action lives on the
+// right rail so the heading line carries the story.
+
+function UpsellModifyPanel({ row, onClose }: { row: OpportunityRow; onClose: () => void }) {
+  return (
+    <div className="opp-pop opp-pop--upsell">
+      <div className="opp-pop__upsell-row">
+        <div className="opp-pop__upsell-text">
+          <div className="opp-pop__heading">Upsell into existing customer</div>
+          <div className="opp-pop__sub">Adjust line items, quantities, or term.</div>
+        </div>
+        <Button
+          kind="ghost-brand"
+          size="small"
+          onClick={() => { /* hook — out of scope */ onClose() }}>
+          Modify
+        </Button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Renewal Outcome editor (spec §4.2) ──────────────────────────────────────
+// Renders inside the renewal popover. Tag-as-button trigger with a
+// trailing chevron opens a DS Flyout listing the 6 outcomes. Picking a
+// non-Unknown value expands a form below the row; Churn additionally
+// reveals the two structured dropdowns.
+
+interface RenewalOutcomeEditorProps {
+  value: RenewalOutcome
+  onChange: (v: RenewalOutcome) => void
+  /** Confirm/Cancel close the popover. */
+  onConfirm: () => void
+  onCancel: () => void
+}
+
+function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalOutcomeEditorProps) {
+  // Working copy — edits don't commit until Confirm. Cancel reverts.
+  const [draft, setDraft] = useState<RenewalOutcome>(value)
+  const [reason, setReason] = useState<string | undefined>(undefined)
+  const [competitor, setCompetitor] = useState<string | undefined>(undefined)
+  const [notes, setNotes] = useState<string>('')
+
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+
+  const current = outcomeMeta(draft)
+  const formVisible = draft !== 'unknown' && draft !== value
+  // The form is also revealed when draft === value but value !== unknown,
+  // so the AE can keep editing notes / churn fields on a previously-set
+  // outcome. Re-evaluate:
+  const showForm = draft !== value || (draft !== 'unknown' && (notes.length > 0 || reason || competitor))
+  const churnVisible = draft === 'churn'
+  const dirty = draft !== value || notes.length > 0 || !!reason || !!competitor
+
+  const handleConfirm = () => {
+    if (draft !== value) onChange(draft)
+    onConfirm()
+  }
+  const handleCancel = () => {
+    setDraft(value); setReason(undefined); setCompetitor(undefined); setNotes('')
+    onCancel()
+  }
+
+  return (
+    <>
+      <div className="opp-renewal-row opp-renewal-row--outcome">
+        <span className="opp-renewal-row__label">Renewal Outcome</span>
+        <div className="opp-outcome-wrapper">
+          <button
+            ref={triggerRef}
+            type="button"
+            className="opp-outcome-trigger"
+            aria-haspopup="listbox"
+            aria-expanded={pickerOpen}
+            onClick={() => setPickerOpen(v => !v)}>
+            <span
+              className={`panw--tag panw--tag--size-large panw--tag--shape-rounded panw--tag--low panw--tag--${current.color}`}
+              role="presentation">
+              <span className="panw--tag__label">{current.label}</span>
+              <span className="panw--tag__icon" aria-hidden="true"><ChevronDown size={14} /></span>
+            </span>
+          </button>
+          <Flyout
+            open={pickerOpen}
+            onOpenChange={setPickerOpen}
+            anchorRef={triggerRef}
+            mode="single"
+            selected={[draft]}
+            onSelectionChange={(vals) => { if (vals[0]) setDraft(vals[0] as RenewalOutcome) }}
+            placement="bottom-end">
+            <FlyoutList>
+              {RENEWAL_OUTCOMES.map(o => (
+                <FlyoutItem key={o.value} value={o.value}>{o.label}</FlyoutItem>
+              ))}
+            </FlyoutList>
+          </Flyout>
+        </div>
+      </div>
+
+      {showForm && (
+        <div className="opp-renewal-form" role="group" aria-label="Renewal details">
+          {churnVisible && (
+            <>
+              <Dropdown
+                title="Churn / Dismissal Reason"
+                placeholder="Select"
+                showDescription={false}
+                background="grey00"
+                selectedValue={reason}
+                onChange={(v) => setReason(v)}
+                options={CHURN_REASONS}
+              />
+              <Dropdown
+                title="Competitor Replacement"
+                placeholder="Select"
+                showDescription={false}
+                background="grey00"
+                selectedValue={competitor}
+                onChange={(v) => setCompetitor(v)}
+                options={CHURN_COMPETITORS}
+              />
+            </>
+          )}
+          <TextEntry
+            title="Notes"
+            inputType="area"
+            placeholder="Optional notes."
+            showDescription={false}
+            background="grey-00"
+            value={notes}
+            onChange={(v) => setNotes(v)}
+          />
+          <div className="opp-renewal-form__actions">
+            <Button kind="secondary" size="small" onClick={handleCancel}>Cancel</Button>
+            <Button kind="primary"   size="small" onClick={handleConfirm} disabled={!dirty}>Confirm</Button>
+          </div>
+        </div>
+      )}
+    </>
+  )
+}
+
+// ─── Renewal popover (spec §4.2) ─────────────────────────────────────────────
+// No header. Two-column key/value table; last row is the Outcome editor.
+
+interface RenewalPanelProps {
+  row: OpportunityRow
+  outcome: RenewalOutcome
+  onOutcomeChange: (v: RenewalOutcome) => void
+  onClose: () => void
+}
+
+function RenewalPanel({ row, outcome, onOutcomeChange, onClose }: RenewalPanelProps) {
+  if (!row.renewal) return null
+  const r = row.renewal
+  return (
+    <div className="opp-pop opp-pop--renewal">
+      <div className="opp-renewal-rows">
+        <div className="opp-renewal-row">
+          <span className="opp-renewal-row__label">Subscription end</span>
+          <span className="opp-renewal-row__value">{r.subEnd}</span>
+        </div>
+        <div className="opp-renewal-row">
+          <span className="opp-renewal-row__label">Renewable TCV</span>
+          <span className="opp-renewal-row__value">{formatUsdCompact(r.renewableTcvUsd)}</span>
+        </div>
+        <div className="opp-renewal-row">
+          <span className="opp-renewal-row__label">ARR</span>
+          <span className="opp-renewal-row__value">{formatUsdCompact(r.arrUsd)}</span>
+        </div>
+        <RenewalOutcomeEditor
+          value={outcome}
+          onChange={onOutcomeChange}
+          onConfirm={onClose}
+          onCancel={onClose}
+        />
+      </div>
+    </div>
+  )
+}
+
 function ProductOverflowPanel({ products, totalUsd }: { products: Product[]; totalUsd: number }) {
   return (
     <div className="opp-pop opp-pop--product-overflow">
@@ -1359,7 +1626,66 @@ function ProductCluster({ products, totalUsd }: ProductClusterProps) {
 
 // ─── Row sub-component ───────────────────────────────────────────────────────
 
-function OppRow({ row }: { row: OpportunityRow }) {
+// ─── Type tag cell (spec §4.2) ──────────────────────────────────────────────
+// Net New → plain tag.
+// Upsell → 1-second hover → tooltip-with-Modify (interactive).
+// Renewal → 700ms hover → key/value popover with the Outcome editor
+//           (interactive + persist; closes on outside click / Confirm /
+//           Cancel).
+
+interface TypeTagCellProps {
+  row: OpportunityRow
+  renewalOutcome: RenewalOutcome
+  onOutcomeChange: (v: RenewalOutcome) => void
+}
+
+function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps) {
+  const plain = <Tags {...TAG_BASE} label={TYPE_LABEL[row.type]} />
+
+  if (row.type === 'net-new') return plain
+
+  if (row.type === 'upsell') {
+    return (
+      <HoverShell
+        interactive
+        openDelayMs={1000}
+        align="start"
+        panelClassName="opp-hover-panel--upsell"
+        render={({ close }) => <UpsellModifyPanel row={row} onClose={close} />}>
+        {plain}
+      </HoverShell>
+    )
+  }
+
+  // renewal
+  return (
+    <HoverShell
+      interactive
+      persist
+      align="start"
+      panelClassName="opp-hover-panel--renewal"
+      render={({ close }) => (
+        <RenewalPanel
+          row={row}
+          outcome={renewalOutcome}
+          onOutcomeChange={onOutcomeChange}
+          onClose={close}
+        />
+      )}>
+      {plain}
+    </HoverShell>
+  )
+}
+
+function OppRow({
+  row,
+  renewalOutcome,
+  onOutcomeChange,
+}: {
+  row: OpportunityRow
+  renewalOutcome: RenewalOutcome
+  onOutcomeChange: (v: RenewalOutcome) => void
+}) {
   const dayLabel =
     row.activity.daysAgo === 0 ? 'today'
     : row.activity.daysAgo === 1 ? '1 day ago'
@@ -1382,7 +1708,11 @@ function OppRow({ row }: { row: OpportunityRow }) {
         {/* Column 2 — deal state. Last Activity is NOT here (moved to col 3). */}
         <div className="opp-tag-cluster">
           <Tags {...TAG_BASE} label={row.quoteId} />
-          <Tags {...TAG_BASE} label={TYPE_LABEL[row.type]} />
+          <TypeTagCell
+            row={row}
+            renewalOutcome={renewalOutcome}
+            onOutcomeChange={onOutcomeChange}
+          />
           <Tags {...TAG_BASE} label={STAGE_LABEL[row.stage]} />
           <Tags {...TAG_BASE} label={FORECAST_LABEL[row.forecast]} />
           <Tags {...TAG_BASE} icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
@@ -1482,6 +1812,18 @@ function AEOpportunityTable() {
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [sortKey, setSortKey] = useState<SortKey>('closeDate') // spec §5 default
   const [sortDir, setSortDir] = useState<SortDir>('asc')        // spec §5 default
+
+  // Renewal outcomes are AE-mutable per row. Seeded from data; commits
+  // happen when the AE clicks Confirm in the outcome editor (handled
+  // inside RenewalOutcomeEditor; this map is the only source of truth
+  // outside it).
+  const [renewalOutcomes, setRenewalOutcomes] = useState<Record<string, RenewalOutcome>>(() => {
+    const seed: Record<string, RenewalOutcome> = {}
+    for (const r of ROWS) if (r.renewal) seed[r.id] = r.renewal.outcome
+    return seed
+  })
+  const setRenewalOutcome = (id: string, v: RenewalOutcome) =>
+    setRenewalOutcomes(prev => ({ ...prev, [id]: v }))
 
   const setSingleFacet = (id: string, v: string | null) =>
     setSingle(prev => ({ ...prev, [id]: v }))
@@ -1610,7 +1952,14 @@ function AEOpportunityTable() {
                 </tr>
               </thead>
               <tbody>
-                {sortedRows.map(row => <OppRow key={row.id} row={row} />)}
+                {sortedRows.map(row => (
+                  <OppRow
+                    key={row.id}
+                    row={row}
+                    renewalOutcome={renewalOutcomes[row.id] ?? 'unknown'}
+                    onOutcomeChange={(v) => setRenewalOutcome(row.id, v)}
+                  />
+                ))}
               </tbody>
             </table>
           </div>
@@ -2098,6 +2447,109 @@ const LAYOUT_CSS = `
 .opp-tree__icon { color: var(--ds-icons-secondary-rest); display: inline-flex; }
 .opp-tree__label { color: var(--ds-text-primary); }
 .opp-tree__label--bold { font-weight: var(--ds-type-font-weight-semibold); }
+
+/* ── Upsell tooltip-with-Modify (spec §4.2) ───────────────────────────────
+ * Compact two-region popover: heading + sub on the left, single Modify
+ * action on the right. Width is intrinsic — the row never wraps.
+ */
+.opp-pop--upsell {
+  min-width: 320px;
+  max-width: 380px;
+  gap: 0;
+}
+.opp-pop__upsell-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-05);
+}
+.opp-pop__upsell-text {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02); /* 4 — heading + sub need a beat of separation */
+}
+
+/* ── Renewal popover (spec §4.2) ──────────────────────────────────────────
+ * No heading. Tight two-column key/value rows. The final row (Outcome)
+ * is the interactive control; subsequent rows below are the expanded
+ * edit form.
+ */
+.opp-pop--renewal {
+  min-width: 360px;
+  max-width: 420px;
+  padding: var(--ds-spacing-05);
+  gap: 0;
+}
+.opp-renewal-rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-03); /* 8 */
+}
+.opp-renewal-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-04);
+  min-height: 24px;
+}
+.opp-renewal-row__label {
+  font-size: 13px;
+  color: var(--ds-text-secondary-rest);
+}
+.opp-renewal-row__value {
+  font-size: 13px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+}
+.opp-renewal-row--outcome {
+  margin-top: var(--ds-spacing-02);
+  padding-top: var(--ds-spacing-04);
+  border-top: 1px solid var(--ds-lines-neutral-rest);
+}
+
+/* Outcome trigger — tag with trailing chevron. The DS Tags component
+ * only renders icons in the leading slot, so we hand-author the BEM
+ * markup to put the chevron at the end. Mirrors the pattern from
+ * AE Opportunities Panel.
+ */
+.opp-outcome-wrapper { position: relative; }
+.opp-outcome-trigger {
+  all: unset;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  border-radius: var(--ds-radius-tight);
+}
+.opp-outcome-trigger:focus-visible {
+  outline: 2px solid var(--ds-lines-brand-rest);
+  outline-offset: 2px;
+}
+.opp-outcome-trigger .panw--tag { cursor: pointer; }
+.opp-outcome-trigger .panw--tag__icon {
+  margin-left: var(--ds-spacing-02);
+}
+
+/* Renewal edit form — revealed once the AE picks a non-Unknown outcome
+ * (or starts editing notes on an already-set outcome). Fields stack at
+ * full width; actions right-aligned. */
+.opp-renewal-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-04);
+  margin-top: var(--ds-spacing-04);
+  padding-top: var(--ds-spacing-04);
+  border-top: 1px solid var(--ds-lines-neutral-rest);
+}
+.opp-renewal-form .panw--dropdown,
+.opp-renewal-form .panw--text-entry { width: 100%; }
+.opp-renewal-form__actions {
+  display: flex;
+  gap: var(--ds-spacing-02);
+  justify-content: flex-end;
+}
 `
 
 // ─── Storybook meta ──────────────────────────────────────────────────────────

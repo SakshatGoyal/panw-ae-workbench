@@ -133,7 +133,7 @@ import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 're
 import { createPortal } from 'react-dom'
 import {
   Calendar, Clock, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
-  ExclamationTriangle, ExclamationCircle, Sliders,
+  ExclamationTriangle, ExclamationCircle,
   BrandStrata, BrandPrisma, BrandCortex,
 } from '@ds/icons'
 import { Search } from '@ds/search'
@@ -805,26 +805,12 @@ interface ProductFilterProps {
 function ProductFilter({ selected, onApply }: ProductFilterProps) {
   const [open, setOpen] = useState(false)
   const [draft, setDraft] = useState<string[]>(selected)
-  const [search, setSearch] = useState('')
-  const [expanded, setExpanded] = useState<Set<string>>(
-    new Set(PRODUCT_TREE.map(g => g.value))
-  )
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   useEffect(() => {
-    if (open) {
-      setDraft(selected)
-      setSearch('')
-    }
+    if (open) setDraft(selected)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [open])
-
-  const allSelected = ALL_PRODUCT_LEAVES.every(v => draft.includes(v))
-  const someSelected = draft.length > 0 && !allSelected
-  const allStatus =
-    allSelected ? 'checked' : someSelected ? 'indeterminate' : 'unchecked'
-
-  const toggleAll = () => setDraft(allSelected ? [] : [...ALL_PRODUCT_LEAVES])
 
   const groupLeaves = (g: ProductNode) => g.children?.map(c => c.value) ?? []
 
@@ -848,20 +834,21 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   const toggleLeaf = (val: string) =>
     setDraft(d => d.includes(val) ? d.filter(v => v !== val) : [...d, val])
 
-  const toggleExpand = (val: string) =>
-    setExpanded(s => {
-      const n = new Set(s)
-      if (n.has(val)) n.delete(val); else n.add(val)
-      return n
-    })
-
-  const matches = (label: string) =>
-    !search.trim() || label.toLowerCase().includes(search.trim().toLowerCase())
-
   const apply = () => { onApply(draft); setOpen(false) }
   const cancel = () => setOpen(false)
 
-  const triggerLabel = 'products'
+  const allLeaves = ALL_PRODUCT_LEAVES
+  const allOn = allLeaves.every(v => draft.includes(v))
+  const noneOn = !draft.some(v => allLeaves.includes(v))
+  const masterStatus: 'checked' | 'unchecked' | 'indeterminate' =
+    allOn ? 'checked' : noneOn ? 'unchecked' : 'indeterminate'
+  const toggleMaster = () => setDraft(allOn ? [] : [...allLeaves])
+
+  // Labels for the selected leaves — used in the chip-hover popover.
+  const selectedLabels = selected
+    .map(v => PRODUCT_TREE.flatMap(g => g.children ?? [])
+      .find(c => c.value === v)?.label)
+    .filter((s): s is string => !!s)
 
   return (
     <span className="panw--filter__wrapper">
@@ -872,94 +859,70 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}>
-        <span className="panw--filter__label">{triggerLabel}</span>
+        <span className="panw--filter__label">products</span>
         {selected.length > 0 && (
-          <span className="panw--filter__values">
-            <span className="panw--filter__chip-target">
-              <Tags
-                label={
-                  selected.length === 1
-                    ? PRODUCT_TREE.flatMap(g => g.children ?? []).find(c => c.value === selected[0])?.label ?? '1'
-                    : String(selected.length)
-                }
-                color="neutral"
-                contrast="high"
-                size="default"
-              />
+          <HoverShell
+            interactive
+            openDelayMs={300}
+            render={() => <AppliedListPanel heading="products" items={selectedLabels} />}>
+            <span className="panw--filter__values">
+              <span className="panw--filter__chip-target">
+                <Tags
+                  label={String(selected.length)}
+                  color="neutral"
+                  contrast="high"
+                  size="default"
+                />
+              </span>
             </span>
-          </span>
+          </HoverShell>
         )}
         <span className="panw--filter__chevron" aria-hidden="true">
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </span>
       </button>
 
+      {/* Tree filter: each leaf is a FlyoutItem (DS default sizing).
+          Group rows are custom (collapsible tree node with status
+          checkbox + folder icon). Master select-all sits at the top as
+          an icon-only FlyoutSelectAll-style row. The Flyout's
+          multi-select machinery drives leaf state; group + master
+          rows are local UI on top. */}
       <Flyout
         open={open}
         onOpenChange={setOpen}
         anchorRef={triggerRef}
+        mode="multiple"
+        selected={draft}
+        onSelectionChange={setDraft}
         placement="bottom-start">
-        <FlyoutFilter
-          placeholder="Filter"
-          value={search}
-          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
-        />
+        {/* Icon-only select-all header per DS pattern (mirrors the
+            built-in FlyoutSelectAll: tri-state checkbox, no label,
+            hairline beneath). We render it locally because we want a
+            tree below — FlyoutSelectAll counts only registered
+            FlyoutItems, not the group rows. */}
+        <div
+          className="opp-tree__select-all"
+          role="checkbox"
+          aria-checked={masterStatus === 'checked' ? 'true' : masterStatus === 'indeterminate' ? 'mixed' : 'false'}
+          tabIndex={0}
+          onClick={toggleMaster}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMaster() } }}>
+          <Checkbox status={masterStatus} label="" tabIndex={-1} />
+        </div>
+        <div className="opp-tree__select-all-divider" role="separator" aria-hidden="true" />
+
         <div className="opp-tree" role="tree">
-          <div className="opp-tree__row opp-tree__row--root" onClick={toggleAll} role="treeitem" aria-checked={allStatus === 'checked'}>
-            <span className="opp-tree__chev-spacer" />
-            <Checkbox status={allStatus} label="" tabIndex={-1} />
-            <span className="opp-tree__label opp-tree__label--bold">All Products</span>
-          </div>
-          {PRODUCT_TREE.map(group => {
-            const visibleChildren = (group.children ?? []).filter(c => matches(c.label))
-            const groupVisible = matches(group.label) || visibleChildren.length > 0
-            if (!groupVisible) return null
-            const isOpen = expanded.has(group.value)
-            return (
-              <div key={group.value} className="opp-tree__group" role="group">
-                <div className="opp-tree__row opp-tree__row--group" role="treeitem" aria-expanded={isOpen}>
-                  <button
-                    type="button"
-                    className="opp-tree__chev"
-                    aria-label={isOpen ? `Collapse ${group.label}` : `Expand ${group.label}`}
-                    onClick={(e) => { e.stopPropagation(); toggleExpand(group.value) }}>
-                    {isOpen ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-                  </button>
-                  <span
-                    className="opp-tree__row-action"
-                    onClick={() => toggleGroup(group)}>
-                    <Checkbox
-                      status={groupStatus(group)}
-                      label=""
-                      tabIndex={-1}
-                    />
-                    <span className="opp-tree__icon" aria-hidden="true"><Folder size={16} /></span>
-                    <span className="opp-tree__label opp-tree__label--bold">{group.label}</span>
-                  </span>
-                </div>
-                {isOpen && (
-                  <div className="opp-tree__children">
-                    {visibleChildren.map(leaf => (
-                      <div
-                        key={leaf.value}
-                        className="opp-tree__row opp-tree__row--leaf"
-                        role="treeitem"
-                        aria-checked={draft.includes(leaf.value)}
-                        onClick={() => toggleLeaf(leaf.value)}>
-                        <span className="opp-tree__chev-spacer" />
-                        <Checkbox
-                          status={draft.includes(leaf.value) ? 'checked' : 'unchecked'}
-                          label=""
-                          tabIndex={-1}
-                        />
-                        <span className="opp-tree__label">{leaf.label}</span>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+          {PRODUCT_TREE.map(group => (
+            <ProductTreeGroup
+              key={group.value}
+              group={group}
+              draft={draft}
+              status={groupStatus(group)}
+              onToggleGroup={() => toggleGroup(group)}
+              onToggleLeaf={toggleLeaf}
+            />
+          ))}
         </div>
         <FlyoutFooter>
           <div className="panw--filter__footer-actions">
@@ -969,6 +932,81 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
         </FlyoutFooter>
       </Flyout>
     </span>
+  )
+}
+
+// ─── Product tree group — collapsible parent + leaves ───────────────────────
+
+function ProductTreeGroup({
+  group,
+  draft,
+  status,
+  onToggleGroup,
+  onToggleLeaf,
+}: {
+  group: ProductNode
+  draft: string[]
+  status: 'checked' | 'unchecked' | 'indeterminate'
+  onToggleGroup: () => void
+  onToggleLeaf: (val: string) => void
+}) {
+  const [isOpen, setOpen] = useState(true)
+  const Chev = isOpen ? ChevronDown : ChevronRight
+  return (
+    <div className="opp-tree__group" role="group">
+      <div className="opp-tree__row opp-tree__row--group" role="treeitem" aria-expanded={isOpen}>
+        <button
+          type="button"
+          className="opp-tree__chev"
+          aria-label={isOpen ? `Collapse ${group.label}` : `Expand ${group.label}`}
+          onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }}>
+          <Chev size={16} />
+        </button>
+        <span className="opp-tree__row-action" onClick={onToggleGroup}>
+          <Checkbox status={status} label="" tabIndex={-1} />
+          <span className="opp-tree__icon" aria-hidden="true"><Folder size={16} /></span>
+          <span className="opp-tree__label opp-tree__label--bold">{group.label}</span>
+        </span>
+      </div>
+      {isOpen && (
+        <div className="opp-tree__children">
+          {(group.children ?? []).map(leaf => (
+            <div
+              key={leaf.value}
+              className="opp-tree__row opp-tree__row--leaf"
+              role="treeitem"
+              aria-checked={draft.includes(leaf.value)}
+              onClick={() => onToggleLeaf(leaf.value)}>
+              <span className="opp-tree__chev-spacer" />
+              <Checkbox
+                status={draft.includes(leaf.value) ? 'checked' : 'unchecked'}
+                label=""
+                tabIndex={-1}
+              />
+              <span className="opp-tree__label">{leaf.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Applied-list popover (chip hover) ──────────────────────────────────────
+// Shown on hover of a count chip. Lists every applied value so the AE
+// can see what's selected without opening the picker. Read-only —
+// removal happens inside the picker.
+
+function AppliedListPanel({ heading, items }: { heading: string; items: string[] }) {
+  return (
+    <div className="opp-pop opp-pop--applied">
+      <div className="opp-pop__heading">{heading} ({items.length})</div>
+      <ul className="opp-pop__applied-list">
+        {items.map(name => (
+          <li key={name} className="opp-pop__applied-item">{name}</li>
+        ))}
+      </ul>
+    </div>
   )
 }
 
@@ -994,8 +1032,10 @@ function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
+  // Trigger is just label + chevron — density is a quiet control; the
+  // explicit count chip and leading icon were over-stating its weight.
   return (
-    <span className="panw--filter__wrapper opp-density-filter">
+    <span className="panw--filter__wrapper">
       <button
         ref={triggerRef}
         type="button"
@@ -1003,18 +1043,7 @@ function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
         aria-haspopup="listbox"
         aria-expanded={open}
         onClick={() => setOpen(v => !v)}>
-        <span className="opp-density-filter__icon" aria-hidden="true"><Sliders size={16} /></span>
         <span className="panw--filter__label">tags</span>
-        <span className="panw--filter__values">
-          <span className="panw--filter__chip-target">
-            <Tags
-              label={`${selected.length}/${ALL_DENSITY_KEYS.length}`}
-              color="neutral"
-              contrast="high"
-              size="default"
-            />
-          </span>
-        </span>
         <span className="panw--filter__chevron" aria-hidden="true">
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </span>
@@ -1988,7 +2017,7 @@ function OppRow({
             />
           )}
           {showTag('closeDate') && (
-            <Tags {...TAG_BASE} className="opp-tag--static" icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
+            <Tags {...TAG_BASE} className="opp-tag--static opp-tag--icon-quiet" icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
           )}
         </div>
       </td>
@@ -2012,6 +2041,7 @@ function OppRow({
                 size={TAG_BASE.size}
                 contrast={TAG_BASE.contrast}
                 color={actStyle.color}
+                className="opp-tag--icon-quiet"
                 icon
                 renderIcon={actStyle.icon ?? Clock}
                 label={dayLabel}
@@ -2090,7 +2120,10 @@ function AEOpportunityTable() {
   const [search, setSearch] = useState('')
   const [single, setSingle] = useState<Record<string, string | null>>(INITIAL_SINGLE)
   const [multi, setMulti] = useState<Record<string, string[]>>(INITIAL_MULTI)
-  const [products, setProducts] = useState<string[]>([]) // empty = All
+  // Default: every leaf selected (all 15). Spec §3.12 says "All
+  // (default)"; we encode that as the explicit full list so the trigger
+  // chip reports the count and the SelectAll header shows checked.
+  const [products, setProducts] = useState<string[]>([...ALL_PRODUCT_LEAVES])
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [sortKey, setSortKey] = useState<SortKey>('closeDate') // spec §5 default
@@ -2331,10 +2364,14 @@ const LAYOUT_CSS = `
   padding: var(--ds-spacing-04) var(--ds-spacing-04) var(--ds-spacing-02);
 }
 .opp-counts {
-  color: var(--ds-text-secondary-rest);
+  /* body-02 bold (DS type scale: 16px / 24px / semibold). Tabular
+   * nums so the figures align cleanly. */
+  color: var(--ds-text-primary);
   white-space: nowrap;
   flex-shrink: 0;
-  font-size: 13px;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: var(--ds-type-font-weight-semibold);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
 }
@@ -2754,7 +2791,9 @@ const LAYOUT_CSS = `
   margin-bottom: var(--ds-spacing-02);
 }
 
-/* ── Product tree (custom — every node has a checkbox) ──────────────────── */
+/* ── Product tree (custom — every node has a checkbox) ────────────────────
+ * Row sizing matches DS Flyout default (32px min-height, 8/12 padding)
+ * so the tree reads as a peer of every other flyout list. */
 .opp-tree {
   display: flex;
   flex-direction: column;
@@ -2763,15 +2802,32 @@ const LAYOUT_CSS = `
 .opp-tree__row {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-02); /* 4 */
-  padding: var(--ds-spacing-02) var(--ds-spacing-03); /* 4 8 — flyout item rhythm */
+  gap: var(--ds-spacing-03); /* 8 — DS flyout item gap */
+  min-height: 32px;
+  padding: var(--ds-spacing-03) var(--ds-spacing-04); /* 8 12 — DS flyout item rhythm */
   cursor: pointer;
   border-radius: var(--ds-radius-tight);
 }
 .opp-tree__row:hover { background-color: var(--ds-ghost-hover); }
 .opp-tree__row--root { font-weight: var(--ds-type-font-weight-semibold); }
-.opp-tree__row--group { padding-left: var(--ds-spacing-03); }
-.opp-tree__row--leaf { padding-left: var(--ds-spacing-06); /* 24 — indent level */ }
+.opp-tree__row--group { padding-left: var(--ds-spacing-04); }
+.opp-tree__row--leaf { padding-left: var(--ds-spacing-08); /* 32 — child indent */ }
+
+/* Icon-only SelectAll header — mirrors @ds/flyout's FlyoutSelectAll
+ * markup: a single tri-state checkbox row above the list, with an
+ * implicit hairline below. */
+.opp-tree__select-all {
+  display: flex;
+  align-items: center;
+  min-height: 32px;
+  padding: var(--ds-spacing-03) var(--ds-spacing-04);
+  cursor: pointer;
+}
+.opp-tree__select-all:hover { background-color: var(--ds-ghost-hover); }
+.opp-tree__select-all-divider {
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
+}
 .opp-tree__row-action {
   display: inline-flex;
   align-items: center;
@@ -2900,6 +2956,39 @@ const LAYOUT_CSS = `
   align-items: center;
   color: var(--ds-icons-secondary-rest);
   margin-right: var(--ds-spacing-02);
+}
+
+/* ── Lighter-icon override for label tags ────────────────────────────────
+ * The DS tag-neutral-low icon defaults to icons.primary (neutral90)
+ * per the matching-family rule, but for label-style tags like close
+ * date and last activity the icon should sit one stop lighter so it
+ * reads as supporting, not equal-weight to the label text. Override
+ * to icons.secondary.rest (≈ neutral70). State variants preserved. */
+.panw--tag.opp-tag--icon-quiet.panw--tag--low.panw--tag--neutral .panw--tag__icon,
+.panw--tag.opp-tag--icon-quiet.panw--tag--low.panw--tag--neutral .panw--tag__close-btn {
+  color: var(--ds-icons-secondary-rest);
+}
+
+/* ── Applied-list popover (chip hover on filter triggers) ────────────────
+ * Read-only list of currently-applied items. Same surface lineage as
+ * other popovers; tightened padding for what's effectively a label. */
+.opp-pop--applied {
+  min-width: 220px;
+  max-width: 320px;
+  padding: var(--ds-spacing-04);
+  gap: var(--ds-spacing-03);
+}
+.opp-pop__applied-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);
+}
+.opp-pop__applied-item {
+  font-size: 13px;
+  color: var(--ds-text-secondary-rest);
 }
 
 /* ── Static-tag override ─────────────────────────────────────────────────

@@ -725,12 +725,694 @@ function formatEbcDate(iso: string): string {
   return d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric', timeZone: 'UTC' })
 }
 
+// ─── Filter option sets ──────────────────────────────────────────────────
+
+const CLOSE_DATE_OPTIONS: FilterOption[] = [
+  { value: 'this-q', label: 'This Quarter' },
+  { value: 'q1fy27', label: 'Q1FY27' },
+  { value: 'q2fy27', label: 'Q2FY27' },
+  { value: 'q3fy27', label: 'Q3FY27' },
+  { value: 'q4fy27', label: 'Q4FY27' },
+]
+
+const LAST_ACTIVITY_OPTIONS: { value: string; label: string }[] = [
+  { value: 'lt-7',  label: 'Last 7 days' },
+  { value: '7-21',  label: '7–21 days' },
+  { value: 'gt-21', label: 'Over 21 days' },
+]
+
+const EBC_OPTIONS: { value: string; label: string }[] = [
+  { value: 'lt-180',  label: 'Within 180 days' },
+  { value: '180-365', label: '180–365 days' },
+  { value: 'gt-365',  label: 'Over 365 days' },
+]
+// Spec §3.8: no "Never" option — accounts with no EBC fall into the
+// Over 365 days bucket for filtering. (Tag copy stays "No EBC on
+// record" in the row — see Phase 5 EBC sub-cell.)
+
+const UPSELL_OPTIONS: { value: string; label: string }[] = [
+  { value: 'with',    label: 'With upsell pipeline' },
+  { value: 'without', label: 'No upsell pipeline' },
+]
+
+const ACCOUNT_RISK_FILTER_OPTIONS: FilterOption[] =
+  (Object.keys(ACCOUNT_RISK_LIBRARY) as AccountRiskId[]).map(id => ({
+    value: id,
+    label: `${ACCOUNT_RISK_LIBRARY[id].emoji} ${ACCOUNT_RISK_LIBRARY[id].label}`,
+  }))
+
+// Grouped Account Health (spec §3.10). Same shape as opp-table's
+// implementation — three axes × three levels. Defaults differ from
+// opp-table per spec §5: sub-axes default OFF on this table.
+type HealthAxis = 'overall' | 'technical' | 'adoption'
+interface GroupedHealthSelection {
+  overall: Health[]
+  technical: Health[]
+  adoption: Health[]
+}
+const HEALTH_AXES: { key: HealthAxis; label: string }[] = [
+  { key: 'overall',   label: 'Overall Health' },
+  { key: 'technical', label: 'Technical Health' },
+  { key: 'adoption',  label: 'Adoption & Deployment Health' },
+]
+const HEALTH_LEVELS: { value: Health; label: string }[] = [
+  { value: 'healthy',  label: 'Healthy' },
+  { value: 'at-risk',  label: 'At Risk' },
+  { value: 'critical', label: 'Critical' },
+]
+// Per spec §5: Overall = At Risk + Critical (Healthy off);
+// Technical and Adoption = ALL OFF. This is the major spec divergence
+// from opp-table, which defaults sub-axes ON. See cr-intent-validator
+// §"silently dropped spec items".
+const INITIAL_GROUPED_HEALTH: GroupedHealthSelection = {
+  overall:   ['at-risk', 'critical'],
+  technical: [],
+  adoption:  [],
+}
+
+// ─── Tag-density key SoT (spec §3.4) ─────────────────────────────────────
+// Per cr-failure §9: single source of truth for tag-density keys, used
+// by the filter option list, the default selection, AND the row
+// renderer. Per-quarter pipeline keys and per-status sales-play keys
+// are enumerated explicitly so a typo can't silently hide a tag.
+
+const QUARTER_DENSITY_KEYS = ['q0', 'q1', 'q2', 'q3'] as const
+type QuarterDensityKey = typeof QUARTER_DENSITY_KEYS[number]
+
+const STATUS_DENSITY_KEYS: readonly `status-${SalesPlayStatus}`[] =
+  SALES_PLAY_LIFECYCLE.map(s => `status-${s}` as const)
+type StatusDensityKey = typeof STATUS_DENSITY_KEYS[number]
+
+const ACCOUNT_RISK_DENSITY_KEYS: readonly `risk-${AccountRiskId}`[] =
+  (Object.keys(ACCOUNT_RISK_LIBRARY) as AccountRiskId[])
+    .map(id => `risk-${id}` as const)
+type AccountRiskDensityKey = typeof ACCOUNT_RISK_DENSITY_KEYS[number]
+
+type DensityKey =
+  | QuarterDensityKey                                        // col 2
+  | 'lastActivity' | 'accountHealth' | 'riskCount' | 'ebc'   // col 3 cells
+  | AccountRiskDensityKey                                    // col 3 risk-popover items
+  | 'products'                                               // col 4
+  | StatusDensityKey                                         // col 5
+
+const DENSITY_OPTIONS: { value: DensityKey; label: string }[] = [
+  // Pipeline (per-quarter)
+  { value: 'q0', label: 'CQ pipeline' },
+  { value: 'q1', label: `${QUARTER_LABELS[1]} pipeline` },
+  { value: 'q2', label: `${QUARTER_LABELS[2]} pipeline` },
+  { value: 'q3', label: `${QUARTER_LABELS[3]} pipeline` },
+  // Activities & risks (col 3)
+  { value: 'lastActivity',  label: 'last activity' },
+  { value: 'accountHealth', label: 'account health' },
+  { value: 'riskCount',     label: 'risk factor count' },
+  { value: 'ebc',           label: 'EBC' },
+  // Account-level risk per-item toggles
+  ...(Object.entries(ACCOUNT_RISK_LIBRARY) as [AccountRiskId, { emoji: string; label: string }][])
+    .map(([id, def]) => ({
+      value: `risk-${id}` as DensityKey,
+      label: `risk: ${def.emoji} ${def.label}`,
+    })),
+  // Products (col 4)
+  { value: 'products', label: 'products' },
+  // Sales Play status per-status toggles
+  ...SALES_PLAY_LIFECYCLE.map(s => ({
+    value: `status-${s}` as DensityKey,
+    label: `sales play: ${SALES_PLAY_LABEL[s]}`,
+  })),
+]
+const ALL_DENSITY_KEYS: DensityKey[] = DENSITY_OPTIONS.map(o => o.value)
+
+// ─── Product taxonomy (forked from opp-table) ────────────────────────────
+
+interface ProductNode {
+  label: string
+  value: string
+  children?: ProductNode[]
+}
+
+const PRODUCT_TREE: ProductNode[] = [
+  { label: 'Firewall', value: 'firewall', children: [
+    { label: 'PA Series', value: 'pa-series' },
+    { label: 'VM Series', value: 'vm-series' },
+  ]},
+  { label: 'CDSS', value: 'cdss', children: [
+    { label: 'PA Series Attached', value: 'pa-series-attached' },
+    { label: 'PA Series Support', value: 'pa-series-support' },
+    { label: 'FW Data Lake', value: 'fw-data-lake' },
+  ]},
+  { label: 'SASE', value: 'sase', children: [
+    { label: 'Prisma Access', value: 'prisma-access' },
+    { label: 'Prisma SD-WAN', value: 'prisma-sd-wan' },
+  ]},
+  { label: 'Cortex & Cloud', value: 'cortex-cloud', children: [
+    { label: 'Cortex XDR+', value: 'cortex-xdr' },
+    { label: 'Cortex XSOAR', value: 'cortex-xsoar' },
+    { label: 'Xpanse', value: 'xpanse' },
+    { label: 'XSIAM', value: 'xsiam' },
+    { label: 'QRadar', value: 'qradar' },
+    { label: 'Cortex & Cloud', value: 'cortex-cloud-leaf' },
+  ]},
+  { label: 'Unit 42', value: 'unit-42', children: [
+    { label: 'Reactive', value: 'unit-42-reactive' },
+    { label: 'Proactive', value: 'unit-42-proactive' },
+  ]},
+]
+const ALL_PRODUCT_LEAVES = PRODUCT_TREE.flatMap(g => g.children?.map(c => c.value) ?? [])
+
 // ─── Tag presets ─────────────────────────────────────────────────────────
 const TAG_BASE = {
   color: 'neutral' as const,
   contrast: 'low' as const,
   shape: 'rounded' as const,
   size: 'large' as const,
+}
+
+// ─── HoverShell (forked from opp-table) ──────────────────────────────────
+// 700ms-delayed portaled hover surface, anchored to a trigger. Used for
+// chip-hover popovers in the filter row (Phase 2) and per-cell hovers
+// in Phases 4–7. See opp-table ~L1237 for the canonical impl + the
+// "interactive" / "persist" mode contract.
+
+const HOVER_OPEN_DELAY_MS = 700
+const HOVER_CLOSE_GRACE_MS = 160
+const POPOVER_GAP_PX = 6
+
+type HoverShellAlign = 'start' | 'center' | 'end'
+type HoverShellSide = 'bottom' | 'top'
+
+interface HoverShellProps {
+  children: React.ReactNode
+  render: (api: { close: () => void }) => React.ReactNode
+  interactive?: boolean
+  side?: HoverShellSide
+  align?: HoverShellAlign
+  panelClassName?: string
+  openDelayMs?: number
+  persist?: boolean
+}
+
+function HoverShell({
+  children, render, interactive = false, side = 'bottom', align = 'center',
+  panelClassName, openDelayMs = HOVER_OPEN_DELAY_MS, persist = false,
+}: HoverShellProps) {
+  const triggerRef = useRef<HTMLSpanElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [open, setOpen] = useState(false)
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
+
+  useLayoutEffect(() => {
+    if (!open) { setPos(null); return }
+    const trigger = triggerRef.current
+    const panel = panelRef.current
+    if (!trigger || !panel) return
+    const a = trigger.getBoundingClientRect()
+    const panelW = panel.offsetWidth
+    const panelH = panel.offsetHeight
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const spaceBelow = vh - a.bottom
+    const spaceAbove = a.top
+    const preferTop = side === 'top'
+    const fitsBelow = spaceBelow >= panelH + POPOVER_GAP_PX + 8
+    const fitsAbove = spaceAbove >= panelH + POPOVER_GAP_PX + 8
+    const placeAbove = (preferTop && fitsAbove) || (!preferTop && !fitsBelow && fitsAbove)
+    const top = placeAbove
+      ? a.top - panelH - POPOVER_GAP_PX
+      : a.bottom + POPOVER_GAP_PX
+    let left = a.left
+    if (align === 'center') left = a.left + (a.width / 2) - (panelW / 2)
+    else if (align === 'end') left = a.right - panelW
+    left = Math.max(8, Math.min(vw - panelW - 8, left))
+    setPos({ top, left })
+  }, [open, side, align])
+
+  useEffect(() => {
+    if (!open || persist) return
+    const fn = () => setOpen(false)
+    window.addEventListener('scroll', fn, true)
+    window.addEventListener('resize', fn)
+    return () => {
+      window.removeEventListener('scroll', fn, true)
+      window.removeEventListener('resize', fn)
+    }
+  }, [open, persist])
+
+  useEffect(() => () => {
+    if (openTimerRef.current) clearTimeout(openTimerRef.current)
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+  }, [])
+
+  const clearOpenTimer = () => { if (openTimerRef.current) { clearTimeout(openTimerRef.current); openTimerRef.current = null } }
+  const clearCloseTimer = () => { if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null } }
+
+  const handleTriggerEnter = () => {
+    clearCloseTimer()
+    if (open) return
+    clearOpenTimer()
+    openTimerRef.current = setTimeout(() => setOpen(true), openDelayMs)
+  }
+  const handleTriggerLeave = () => {
+    clearOpenTimer()
+    if (!open) return
+    if (persist) return
+    if (interactive) {
+      clearCloseTimer()
+      closeTimerRef.current = setTimeout(() => setOpen(false), HOVER_CLOSE_GRACE_MS)
+    } else setOpen(false)
+  }
+  const handlePanelEnter = () => { if (!interactive && !persist) return; clearCloseTimer() }
+  const handlePanelLeave = () => {
+    if (persist) return
+    if (!interactive) return
+    setOpen(false)
+  }
+
+  useEffect(() => {
+    if (!open || !persist) return
+    const onDown = (ev: MouseEvent) => {
+      const t = ev.target as Node
+      if (panelRef.current?.contains(t)) return
+      if (triggerRef.current?.contains(t)) return
+      setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown, true)
+    return () => document.removeEventListener('mousedown', onDown, true)
+  }, [open, persist])
+
+  const close = () => setOpen(false)
+
+  return (
+    <>
+      <span
+        ref={triggerRef}
+        className="acc-hover-trigger"
+        onMouseEnter={handleTriggerEnter}
+        onMouseLeave={handleTriggerLeave}>
+        {children}
+      </span>
+      {open && createPortal(
+        <div
+          ref={panelRef}
+          className={`acc-hover-panel${panelClassName ? ` ${panelClassName}` : ''}`}
+          style={{
+            position: 'fixed',
+            top: pos?.top ?? -9999,
+            left: pos?.left ?? -9999,
+            visibility: pos ? 'visible' : 'hidden',
+            pointerEvents: interactive || persist ? 'auto' : 'none',
+            zIndex: 9999,
+          }}
+          onMouseEnter={handlePanelEnter}
+          onMouseLeave={handlePanelLeave}>
+          {render({ close })}
+        </div>,
+        document.body
+      )}
+    </>
+  )
+}
+
+// ─── Applied-list popover (chip hover on filter triggers) ────────────────
+
+function AppliedListPanel({ heading, items }: { heading: string; items: string[] }) {
+  return (
+    <div className="acc-pop acc-pop--applied">
+      <div className="acc-pop__heading">{heading} ({items.length})</div>
+      <ul className="acc-pop__applied-list">
+        {items.map(name => (
+          <li key={name} className="acc-pop__applied-item">{name}</li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// ─── Single-select filter (forked from opp-table) ────────────────────────
+
+const ALL_SENTINEL = '__all__'
+
+interface SingleSelectFilterProps {
+  label: string
+  options: { value: string; label: string }[]
+  value: string | null
+  onChange: (v: string | null) => void
+  allLabel?: string
+}
+
+function SingleSelectFilter({ label, options, value, onChange, allLabel = 'All' }: SingleSelectFilterProps) {
+  const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const selectedOption = value === null ? null : options.find(o => o.value === value) ?? null
+  return (
+    <span className="panw--filter__wrapper">
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`panw--filter${open ? ' panw--filter--open' : ''}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span className="panw--filter__label">{label}</span>
+        {selectedOption && (
+          <span className="panw--filter__values">
+            <span className="panw--filter__chip-target">
+              <Tags label={selectedOption.label} color="neutral" contrast="high" size="default" />
+            </span>
+          </span>
+        )}
+        <span className="panw--filter__chevron" aria-hidden="true">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        mode="single"
+        selected={[value ?? ALL_SENTINEL]}
+        onSelectionChange={(values) => {
+          const v = values[0]
+          onChange(!v || v === ALL_SENTINEL ? null : v)
+          setOpen(false)
+        }}
+        placement="bottom-start">
+        <FlyoutList>
+          <FlyoutItem value={ALL_SENTINEL}>{allLabel}</FlyoutItem>
+          {options.map(o => (
+            <FlyoutItem key={o.value} value={o.value}>{o.label}</FlyoutItem>
+          ))}
+        </FlyoutList>
+      </Flyout>
+    </span>
+  )
+}
+
+// ─── Tag-density filter (forked from opp-table) ──────────────────────────
+
+interface TagDensityFilterProps {
+  selected: DensityKey[]
+  onChange: (next: DensityKey[]) => void
+}
+
+function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
+  const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  return (
+    <span className="panw--filter__wrapper">
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`panw--filter${open ? ' panw--filter--open' : ''}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span className="panw--filter__label">tags</span>
+        <span className="panw--filter__chevron" aria-hidden="true">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        mode="multiple"
+        selected={selected}
+        onSelectionChange={(vals) => onChange(vals as DensityKey[])}
+        placement="bottom-start">
+        <FlyoutSelectAll />
+        <FlyoutList>
+          {DENSITY_OPTIONS.map(opt => (
+            <FlyoutItem key={opt.value} value={opt.value}>{opt.label}</FlyoutItem>
+          ))}
+        </FlyoutList>
+      </Flyout>
+    </span>
+  )
+}
+
+// ─── Grouped Account Health filter (forked from opp-table) ───────────────
+
+function encodeAxisLevel(axis: HealthAxis, lvl: Health): string {
+  return `${axis}:${lvl}`
+}
+function selectionToValues(sel: GroupedHealthSelection): string[] {
+  return [
+    ...sel.overall.map(l => encodeAxisLevel('overall', l)),
+    ...sel.technical.map(l => encodeAxisLevel('technical', l)),
+    ...sel.adoption.map(l => encodeAxisLevel('adoption', l)),
+  ]
+}
+function valuesToSelection(values: string[]): GroupedHealthSelection {
+  const out: GroupedHealthSelection = { overall: [], technical: [], adoption: [] }
+  for (const v of values) {
+    const [axis, lvl] = v.split(':') as [HealthAxis, Health]
+    if (out[axis]) out[axis].push(lvl)
+  }
+  return out
+}
+
+interface GroupedHealthFilterProps {
+  value: GroupedHealthSelection
+  onApply: (next: GroupedHealthSelection) => void
+}
+
+function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
+  const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState<string[]>(selectionToValues(value))
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (open) setDraft(selectionToValues(value))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+  // Chip reflects committed value, not draft.
+  const committedTotal =
+    value.overall.length + value.technical.length + value.adoption.length
+  const chipLabel = `${committedTotal}/9`
+  const apply = () => { onApply(valuesToSelection(draft)); setOpen(false) }
+  const cancel = () => setOpen(false)
+  return (
+    <span className="panw--filter__wrapper">
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`panw--filter${open ? ' panw--filter--open' : ''}`}
+        aria-haspopup="dialog"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span className="panw--filter__label">account health</span>
+        <span className="panw--filter__values">
+          <span className="panw--filter__chip-target">
+            <Tags label={chipLabel} color="neutral" contrast="high" size="default" />
+          </span>
+        </span>
+        <span className="panw--filter__chevron" aria-hidden="true">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        mode="multiple"
+        selected={draft}
+        onSelectionChange={setDraft}
+        placement="bottom-start">
+        <FlyoutSelectAll />
+        <FlyoutList>
+          {HEALTH_AXES.map(axis => (
+            <FlyoutGroup key={axis.key} label={axis.label} defaultOpen>
+              {HEALTH_LEVELS.map(lvl => (
+                <FlyoutItem
+                  key={encodeAxisLevel(axis.key, lvl.value)}
+                  value={encodeAxisLevel(axis.key, lvl.value)}>
+                  <Tags
+                    shape="rounded"
+                    size="default"
+                    contrast="low"
+                    color={HEALTH_COLOR[lvl.value]}
+                    label={lvl.label}
+                  />
+                </FlyoutItem>
+              ))}
+            </FlyoutGroup>
+          ))}
+        </FlyoutList>
+        <FlyoutFooter>
+          <div className="panw--filter__footer-actions">
+            <Button kind="ghost" size="small" onClick={cancel}>Cancel</Button>
+            <Button kind="primary" size="small" onClick={apply}>Apply</Button>
+          </div>
+        </FlyoutFooter>
+      </Flyout>
+    </span>
+  )
+}
+
+// ─── Product tree group (forked from opp-table) ──────────────────────────
+
+function ProductTreeGroup({
+  group, draft, status, onToggleGroup, onToggleLeaf,
+}: {
+  group: ProductNode
+  draft: string[]
+  status: 'checked' | 'unchecked' | 'indeterminate'
+  onToggleGroup: () => void
+  onToggleLeaf: (val: string) => void
+}) {
+  const [isOpen, setOpen] = useState(true)
+  const Chev = isOpen ? ChevronDown : ChevronRight
+  return (
+    <div className="acc-tree__group" role="group">
+      <div className="acc-tree__row acc-tree__row--group" role="treeitem" aria-expanded={isOpen}>
+        <button
+          type="button"
+          className="acc-tree__chev"
+          aria-label={isOpen ? `Collapse ${group.label}` : `Expand ${group.label}`}
+          onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }}>
+          <Chev size={16} />
+        </button>
+        <span className="acc-tree__row-action" onClick={onToggleGroup}>
+          <Checkbox status={status} label="" tabIndex={-1} />
+          <span className="acc-tree__icon" aria-hidden="true"><Folder size={16} /></span>
+          <span className="acc-tree__label acc-tree__label--bold">{group.label}</span>
+        </span>
+      </div>
+      {isOpen && (
+        <div className="acc-tree__children">
+          {(group.children ?? []).map(leaf => (
+            <div
+              key={leaf.value}
+              className="acc-tree__row acc-tree__row--leaf"
+              role="treeitem"
+              aria-checked={draft.includes(leaf.value)}
+              onClick={() => onToggleLeaf(leaf.value)}>
+              <span className="acc-tree__chev-spacer" />
+              <Checkbox
+                status={draft.includes(leaf.value) ? 'checked' : 'unchecked'}
+                label=""
+                tabIndex={-1}
+              />
+              <span className="acc-tree__label">{leaf.label}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Product filter (tree with chip-hover popover) ───────────────────────
+
+interface ProductFilterProps {
+  selected: string[]
+  onApply: (selected: string[]) => void
+}
+
+function ProductFilter({ selected, onApply }: ProductFilterProps) {
+  const [open, setOpen] = useState(false)
+  const [draft, setDraft] = useState<string[]>(selected)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  useEffect(() => {
+    if (open) setDraft(selected)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open])
+
+  const groupLeaves = (g: ProductNode) => g.children?.map(c => c.value) ?? []
+  const groupStatus = (g: ProductNode) => {
+    const leaves = groupLeaves(g)
+    const sel = leaves.filter(v => draft.includes(v)).length
+    if (sel === 0) return 'unchecked'
+    if (sel === leaves.length) return 'checked'
+    return 'indeterminate'
+  }
+  const toggleGroup = (g: ProductNode) => {
+    const leaves = groupLeaves(g)
+    const allOn = leaves.every(v => draft.includes(v))
+    setDraft(d => allOn ? d.filter(v => !leaves.includes(v))
+                        : Array.from(new Set([...d, ...leaves])))
+  }
+  const toggleLeaf = (val: string) =>
+    setDraft(d => d.includes(val) ? d.filter(v => v !== val) : [...d, val])
+  const apply = () => { onApply(draft); setOpen(false) }
+  const cancel = () => setOpen(false)
+  const allLeaves = ALL_PRODUCT_LEAVES
+  const allOn = allLeaves.every(v => draft.includes(v))
+  const noneOn = !draft.some(v => allLeaves.includes(v))
+  const masterStatus: 'checked' | 'unchecked' | 'indeterminate' =
+    allOn ? 'checked' : noneOn ? 'unchecked' : 'indeterminate'
+  const toggleMaster = () => setDraft(allOn ? [] : [...allLeaves])
+  const selectedLabels = selected
+    .map(v => PRODUCT_TREE.flatMap(g => g.children ?? [])
+      .find(c => c.value === v)?.label)
+    .filter((s): s is string => !!s)
+
+  return (
+    <span className="panw--filter__wrapper">
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`panw--filter${open ? ' panw--filter--open' : ''}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span className="panw--filter__label">products</span>
+        {selected.length > 0 && (
+          <HoverShell
+            interactive
+            openDelayMs={300}
+            render={() => <AppliedListPanel heading="products" items={selectedLabels} />}>
+            <span className="panw--filter__values">
+              <span className="panw--filter__chip-target">
+                <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" />
+              </span>
+            </span>
+          </HoverShell>
+        )}
+        <span className="panw--filter__chevron" aria-hidden="true">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        mode="multiple"
+        selected={draft}
+        onSelectionChange={setDraft}
+        placement="bottom-start">
+        <div
+          className="acc-tree__select-all"
+          role="checkbox"
+          aria-checked={masterStatus === 'checked' ? 'true' : masterStatus === 'indeterminate' ? 'mixed' : 'false'}
+          tabIndex={0}
+          onClick={toggleMaster}
+          onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleMaster() } }}>
+          <Checkbox status={masterStatus} label="" tabIndex={-1} />
+        </div>
+        <div className="acc-tree__select-all-divider" role="separator" aria-hidden="true" />
+        <div className="acc-tree" role="tree">
+          {PRODUCT_TREE.map(group => (
+            <ProductTreeGroup
+              key={group.value}
+              group={group}
+              draft={draft}
+              status={groupStatus(group)}
+              onToggleGroup={() => toggleGroup(group)}
+              onToggleLeaf={toggleLeaf}
+            />
+          ))}
+        </div>
+        <FlyoutFooter>
+          <div className="panw--filter__footer-actions">
+            <Button kind="ghost" size="small" onClick={cancel}>Cancel</Button>
+            <Button kind="primary" size="small" onClick={apply}>Apply</Button>
+          </div>
+        </FlyoutFooter>
+      </Flyout>
+    </span>
+  )
 }
 
 // ─── Sort flyout (forked from opp-table) ─────────────────────────────────
@@ -789,6 +1471,18 @@ function AEAccountTable() {
   // Default sort per spec §5: most-broken accounts at top of triage queue.
   const [sortKey, setSortKey] = useState<SortKey>('riskCount')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+
+  // Filter row state. Defaults pinned to spec §5.
+  const [density, setDensity] = useState<DensityKey[]>([...ALL_DENSITY_KEYS])
+  const [groupedHealth, setGroupedHealth] =
+    useState<GroupedHealthSelection>(INITIAL_GROUPED_HEALTH)
+  const [closeDateMulti, setCloseDateMulti] =
+    useState<string[]>(['this-q', 'q1fy27', 'q2fy27', 'q3fy27'])
+  const [lastActivitySingle, setLastActivitySingle] = useState<string | null>(null)
+  const [ebcSingle, setEbcSingle] = useState<string | null>(null)
+  const [upsellSingle, setUpsellSingle] = useState<string | null>(null)
+  const [accountRiskMulti, setAccountRiskMulti] = useState<string[]>([])
+  const [products, setProducts] = useState<string[]>([...ALL_PRODUCT_LEAVES])
 
   // Filtering wiring lands later. For now, sort renders against the full
   // fixture so the default-sort behavior is visibly verifiable.
@@ -852,7 +1546,49 @@ function AEAccountTable() {
             />
           </div>
 
-          {/* Filter row lands in Phase 2. */}
+          {/* Filter row — tag-density at the leading edge, divider,
+              then the seven data filters per spec §3.5–§3.11. */}
+          <div className="acc-filter-row">
+            <div className="acc-filter-group">
+              <TagDensityFilter selected={density} onChange={setDensity} />
+              <div className="acc-filter-divider" role="presentation" />
+              <Filter
+                label="close date"
+                options={CLOSE_DATE_OPTIONS}
+                selected={closeDateMulti}
+                onApply={setCloseDateMulti}
+              />
+              <GroupedHealthFilter
+                value={groupedHealth}
+                onApply={setGroupedHealth}
+              />
+              <SingleSelectFilter
+                label="last activity"
+                options={LAST_ACTIVITY_OPTIONS}
+                value={lastActivitySingle}
+                onChange={setLastActivitySingle}
+              />
+              <SingleSelectFilter
+                label="EBC"
+                options={EBC_OPTIONS}
+                value={ebcSingle}
+                onChange={setEbcSingle}
+              />
+              <SingleSelectFilter
+                label="upsell"
+                options={UPSELL_OPTIONS}
+                value={upsellSingle}
+                onChange={setUpsellSingle}
+              />
+              <Filter
+                label="account risk factors"
+                options={ACCOUNT_RISK_FILTER_OPTIONS}
+                selected={accountRiskMulti}
+                onApply={setAccountRiskMulti}
+              />
+              <ProductFilter selected={products} onApply={setProducts} />
+            </div>
+          </div>
 
           <div className="acc-table-shell">
             <table className="acc-table">
@@ -984,6 +1720,135 @@ const LAYOUT_CSS = `
 .acc-sort-trigger[aria-expanded="true"] {
   background-color: var(--ds-ghost-pressed);
   color: var(--ds-text-primary);
+}
+
+/* ── Filter row ─────────────────────────────────────────────────────────
+ * Tag-density filter at the leading edge, vertical divider, then the
+ * data-row filters. Mirrors opp-table mental model: density controls
+ * how much each row shows; the others narrow the row set. */
+.acc-filter-row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-spacing-03);
+  padding: var(--ds-spacing-02) var(--ds-spacing-04) var(--ds-spacing-03);
+  flex-wrap: wrap;
+}
+.acc-filter-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  row-gap: var(--ds-spacing-02);
+  flex: 1;
+  min-width: 0;
+}
+.acc-filter-divider {
+  display: inline-block;
+  width: 1px;
+  align-self: stretch;
+  background-color: var(--ds-lines-neutral-rest);
+  margin: 0 var(--ds-spacing-02);
+}
+
+/* ── Tree (product filter) ──────────────────────────────────────────── */
+.acc-tree { padding: var(--ds-spacing-02) 0; }
+.acc-tree__select-all {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  padding: var(--ds-spacing-02) var(--ds-spacing-04);
+  cursor: pointer;
+}
+.acc-tree__select-all-divider {
+  height: 1px;
+  background: var(--ds-lines-neutral-rest);
+  margin: 0;
+}
+.acc-tree__group { padding: 0; }
+.acc-tree__row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  padding: var(--ds-spacing-02) var(--ds-spacing-04);
+  min-height: 32px;
+  cursor: pointer;
+}
+.acc-tree__row:hover { background-color: var(--ds-ghost-hover); }
+.acc-tree__row--leaf { padding-left: var(--ds-spacing-08); }
+.acc-tree__chev {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  color: var(--ds-icons-secondary-rest);
+  border-radius: var(--ds-radius-tight);
+}
+.acc-tree__chev:hover { background-color: var(--ds-ghost-hover); color: var(--ds-text-primary); }
+.acc-tree__chev-spacer { display: inline-block; width: 20px; height: 1px; }
+.acc-tree__row-action {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  flex: 1;
+}
+.acc-tree__icon { color: var(--ds-icons-secondary-rest); display: inline-flex; }
+.acc-tree__label { font-size: 14px; color: var(--ds-text-primary); }
+.acc-tree__label--bold { font-weight: var(--ds-type-font-weight-semibold); }
+
+/* ── Hover-panel surface (portaled) ─────────────────────────────────── */
+.acc-hover-trigger { display: inline-flex; }
+.acc-hover-panel {
+  background: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-rest);
+  border-radius: var(--ds-radius-tight);
+  box-shadow: var(--ds-elevation-medium, 0 4px 12px rgba(0,0,0,0.08));
+  animation: acc-hover-pop 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+@keyframes acc-hover-pop {
+  from { opacity: 0; transform: translateY(-4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.acc-pop {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-03);
+  min-width: 220px;
+  max-width: 320px;
+  padding: var(--ds-spacing-04);
+}
+.acc-pop__heading {
+  font-size: 14px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+.acc-pop__sub {
+  font-size: 12px;
+  color: var(--ds-text-secondary-rest);
+}
+.acc-pop--applied .acc-pop__applied-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);
+}
+.acc-pop--applied .acc-pop__applied-item {
+  font-size: 13px;
+  color: var(--ds-text-secondary-rest);
+}
+
+/* Filter footer actions */
+.panw--filter__footer-actions {
+  display: flex;
+  gap: var(--ds-spacing-02);
+  justify-content: flex-end;
+  padding: var(--ds-spacing-02) var(--ds-spacing-04);
 }
 
 /* Table shell — no own border. */

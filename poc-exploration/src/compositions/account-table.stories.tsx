@@ -1548,6 +1548,149 @@ function EBCPanel({ ebc }: { ebc: EBC }) {
   )
 }
 
+// ─── Product hover panel (spec §4.4) ─────────────────────────────────────
+// IMPORTANT — distinct from opp-table's `ProductPanel`. The opp-table
+// version renders share-of-deal-value as a percentage:
+//     (product.usd / totalUsd * 100).toFixed(1) + '%'
+// This panel renders ABSOLUTE per-product ARR contribution. Do NOT
+// merge the two implementations — cr-failure §7 specifically calls out
+// the trap of porting the % formula with a relabeled JSX field.
+
+function ProductARRPanel({ product }: { product: Product }) {
+  const Icon = BRAND_ICON[product.brand]
+  return (
+    <div className="acc-pop acc-pop--product">
+      <div className="acc-pop__product-head">
+        <span className="acc-pop__product-icon" aria-hidden="true">
+          {Icon ? <Icon /> : <span className="acc-pop__product-icon--missing" />}
+        </span>
+        <span className="acc-pop__product-name">{product.name}</span>
+      </div>
+      <div className="acc-pop__product-arr">
+        {formatUsdCompact(product.arrUsd)}{' '}<span className="acc-pop__unit">ARR</span>
+      </div>
+    </div>
+  )
+}
+
+function ProductARROverflowPanel({ products }: { products: Product[] }) {
+  return (
+    <div className="acc-pop acc-pop--product-overflow">
+      <div className="acc-pop__heading">
+        {products.length} additional {products.length === 1 ? 'product' : 'products'}
+      </div>
+      <ul className="acc-pop__product-list">
+        {products.map(p => {
+          const Icon = BRAND_ICON[p.brand]
+          return (
+            <li key={p.name} className="acc-pop__product-list-item">
+              <span className="acc-pop__product-icon" aria-hidden="true">
+                {Icon ? <Icon /> : <span className="acc-pop__product-icon--missing" />}
+              </span>
+              <span className="acc-pop__product-name">{p.name}</span>
+              <span className="acc-pop__product-amount">{formatUsdCompact(p.arrUsd)}</span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
+// ─── Product cluster — measure-and-truncate with +N overflow ─────────────
+// Forked from opp-table ProductCluster. Hover popover differs (ARR not
+// share-of-deal). Products are passed in already sorted descending by
+// ARR — the cell collapses the lowest-ARR products into +N first by
+// virtue of slice order.
+
+const ACC_PRODUCT_GAP = 4
+
+interface ProductClusterProps { products: Product[] }
+
+function ProductCluster({ products }: ProductClusterProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const measureRef = useRef<HTMLDivElement>(null)
+  const [visibleCount, setVisibleCount] = useState(products.length)
+
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    const measure = measureRef.current
+    if (!container || !measure) return
+    const recompute = () => {
+      const parentWidth = container.clientWidth
+      if (parentWidth <= 0) {
+        // Container not laid out yet — retry next frame so we don't
+        // ship the initial all-visible state when it doesn't fit.
+        requestAnimationFrame(recompute)
+        return
+      }
+      const tagWidths: number[] = []
+      let badgeWidth = 0
+      for (const child of Array.from(measure.children) as HTMLElement[]) {
+        if (child.dataset.role === 'badge') badgeWidth = child.offsetWidth
+        else tagWidths.push(child.offsetWidth)
+      }
+      const allWidth = tagWidths.reduce(
+        (s, w, i) => s + w + (i > 0 ? ACC_PRODUCT_GAP : 0), 0)
+      if (allWidth <= parentWidth) {
+        setVisibleCount(prev => (prev === products.length ? prev : products.length))
+        return
+      }
+      const limit = parentWidth - badgeWidth - ACC_PRODUCT_GAP
+      let used = 0
+      let fit = 0
+      for (let i = 0; i < tagWidths.length; i++) {
+        const candidate = used + (i > 0 ? ACC_PRODUCT_GAP : 0) + tagWidths[i]
+        if (candidate <= limit) { used = candidate; fit++ } else break
+      }
+      setVisibleCount(prev => (prev === fit ? prev : fit))
+    }
+    recompute()
+    const ro = new ResizeObserver(recompute)
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [products])
+
+  const overflow = products.length - visibleCount
+  const overflowedProducts = products.slice(visibleCount)
+  const renderTagPlain = (p: Product, keyHint: string) => {
+    const Icon = BRAND_ICON[p.brand]
+    return Icon
+      ? <Tags key={keyHint} {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
+      : <Tags key={keyHint} {...TAG_BASE} label={p.name} />
+  }
+  return (
+    <div className="acc-product-cluster" ref={containerRef}>
+      {products.slice(0, visibleCount).map((p, i) => (
+        <HoverShell
+          key={`v-${p.name}-${i}`}
+          render={() => <ProductARRPanel product={p} />}>
+          {renderTagPlain(p, `v-tag-${p.name}-${i}`)}
+        </HoverShell>
+      ))}
+      {overflow > 0 && (
+        <HoverShell
+          render={() => <ProductARROverflowPanel products={overflowedProducts} />}>
+          <Tags {...TAG_BASE} label={`+${overflow}`} />
+        </HoverShell>
+      )}
+      <div ref={measureRef} className="acc-product-cluster__measure" aria-hidden="true">
+        {products.map((p, i) => (
+          <span key={`m-${p.name}-${i}`}>
+            {renderTagPlain(p, `m-inner-${p.name}-${i}`)}
+          </span>
+        ))}
+        {/* Badge sample uses a single-digit "+N" rather than "+99" —
+            account-level fixtures cap at <=15 products, so the real
+            badge is always 1–2 digits wide. The "+99" sample
+            over-reserves enough to push the first tag off-screen at
+            account-column widths (~187px). */}
+        <span data-role="badge"><Tags {...TAG_BASE} label={`+${Math.max(1, products.length - 1)}`} /></span>
+      </div>
+    </div>
+  )
+}
+
 // ─── Quarter pipeline popover (spec §4.2) ────────────────────────────────
 // Hover a quarter chip → small no-header table of {opp type, $value}.
 // No opp names — at the account level the AE is sizing the quarter,
@@ -1927,7 +2070,16 @@ function AEAccountTable() {
                         )
                       })()}
                     </td>
-                    <td className="acc-c-equal" />
+                    <td className="acc-c-equal">
+                      {/* Column 4 — Products owned, sorted descending by
+                          ARR. Hover shows ABSOLUTE ARR contribution
+                          (not share-of-deal — distinct from opp-table
+                          on purpose per spec §4.4). */}
+                      {density.includes('products') && (() => {
+                        const sorted = [...row.products].sort((a, b) => b.arrUsd - a.arrUsd)
+                        return <ProductCluster products={sorted} />
+                      })()}
+                    </td>
                     <td className="acc-c-equal" />
                     <td className="acc-c-value">
                       <div className="acc-value">
@@ -2187,13 +2339,13 @@ const LAYOUT_CSS = `
  * pair); Actions is 80. The remaining width splits evenly across the
  * four equal columns. */
 .acc-table th.acc-c-account,
-.acc-table td.acc-c-account { width: 240px; }
+.acc-table td.acc-c-account { width: 200px; }
 .acc-table th.acc-c-equal,
-.acc-table td.acc-c-equal { width: calc((100% - 240px - 140px - 80px) / 4); }
+.acc-table td.acc-c-equal { width: calc((100% - 200px - 130px - 72px) / 4); }
 .acc-table th.acc-c-value,
-.acc-table td.acc-c-value { width: 140px; text-align: right; }
+.acc-table td.acc-c-value { width: 130px; text-align: right; }
 .acc-table th.acc-c-actions,
-.acc-table td.acc-c-actions { width: 80px; }
+.acc-table td.acc-c-actions { width: 72px; }
 
 /* Body row treatment — no zebra, hairline dividers between rows. */
 .acc-table tbody tr { background-color: var(--ds-surface-rest); }
@@ -2312,6 +2464,92 @@ const LAYOUT_CSS = `
 }
 .acc-pop--ebc { min-width: 280px; }
 .acc-health-bars { display: block; }
+
+/* Product cluster — measure-and-truncate + hidden measurement layer.
+ * Both layers are flex-wrap:nowrap so the cluster never spills onto
+ * a second row; overflow:hidden clips any tag we decided to show
+ * but ran out of room for (a render-only safety; the measurement is
+ * what actually drives visibleCount). */
+.acc-product-cluster {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.acc-product-cluster__measure {
+  position: absolute;
+  top: 0;
+  left: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+/* Product popover (ARR contribution, not share-of-deal). */
+.acc-pop--product { min-width: 200px; }
+.acc-pop__product-head {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+}
+.acc-pop__product-icon {
+  display: inline-flex;
+  width: 16px;
+  height: 16px;
+}
+.acc-pop__product-icon--missing {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+}
+.acc-pop__product-name {
+  font-size: 14px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+.acc-pop__product-arr {
+  font-size: 13px;
+  color: var(--ds-text-secondary-rest);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+}
+.acc-pop__unit {
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* Product overflow popover */
+.acc-pop--product-overflow { min-width: 280px; max-width: 360px; max-height: 320px; overflow-y: auto; }
+.acc-pop__product-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);
+}
+.acc-pop__product-list-item {
+  display: grid;
+  grid-template-columns: 20px 1fr auto;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+}
+.acc-pop__product-amount {
+  font-size: 13px;
+  color: var(--ds-text-secondary-rest);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+}
 
 /* Static tag — non-interactive, doesn't pick up DS Tag :hover bg. */
 .panw--tag.acc-tag--static:hover {

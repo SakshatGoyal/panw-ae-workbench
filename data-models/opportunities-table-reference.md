@@ -249,6 +249,17 @@ The default behavior (At Risk + Critical only, on Overall) is important
 for the table's first-impression: when an AE opens the page, the rows
 they see should already be skewed toward the ones that need them.
 
+> **⚠️ Caution — Overall vs. sub-axis selections can contradict each
+> other.** Per section 2, Overall Health is *derived* from the other two
+> — it's `max(Technical, Adoption)` on the severity ladder. That means
+> filtering by Overall is equivalent to filtering by the worst of the
+> two sub-axes. As a result, a combination like *Overall: Critical +
+> Technical: Healthy* is legal but weird: it returns rows where
+> Adoption is critical (forcing Overall to Critical) and Technical is
+> healthy. The filter doesn't prevent contradictory selections; trust
+> the AE not to build them, and consider surfacing a hint in the UI if
+> we see this becoming a real source of confusion.
+
 ### 3.11 Risk Factors Filter (multi-select)
 
 `All` (default), or any combination of these nine specific risks:

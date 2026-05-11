@@ -1,6 +1,20 @@
 /**
  * AE Opportunity Table — sales pipeline composition
  *
+ * ── Pass 2 scope (additive on top of Pass 1) ────────────────────────────────
+ *   • Last Activity severity bands: 0–7d neutral, 7–21d caution + caution
+ *     icon, >21d error + error icon. Glyphs: ExclamationTriangle (caution),
+ *     ExclamationCircle (error).
+ *   • Account Health gets categorical color: healthy → green, at-risk →
+ *     yellow, critical → red (low contrast pills).
+ *   • Column 4 product tags carry a brand icon (BrandStrata / BrandPrisma /
+ *     BrandCortex / BrandPanw). Brand icons carry authored fills and ignore
+ *     the tag's color.
+ *   • Column 4 has space-driven +N overflow — a hidden measurement layer
+ *     measures natural tag widths against the container, and only the tags
+ *     that fit are rendered visibly; the rest collapse into a +N tag.
+ *     Re-flows on container resize via ResizeObserver.
+ *
  * ── Pass 1 scope (this file): structure & data only ─────────────────────────
  *   • Data model regenerated to carry brand-per-product, sub-health axes,
  *     activity description, risk factors as discrete records, sales play,
@@ -24,8 +38,6 @@
  *
  * ── Deferred to later passes ─────────────────────────────────────────────
  *   • Tag filter as density control + Account Health grouped filter (Pass 5)
- *   • Brand icons on product tags + space-driven +N overflow (Pass 2)
- *   • Last Activity severity coloring (caution / error bands) (Pass 2)
  *   • Per-cell and per-tag hover popovers (Pass 3)
  *   • Renewal Outcome editor + Upsell Modify tooltip (Pass 4)
  *   • Account Health 12-month trend chart (Pass 3)
@@ -49,12 +61,20 @@
  *     primitives in this file.
  *   • Pagination/Dropdown has no placement="top" prop — CSS workaround.
  *   • No Toolbar primitive for the search/filter rows.
+ *   • No measure-and-truncate-with-+N primitive — built locally as
+ *     ProductCluster with a hidden measurement layer + ResizeObserver.
+ *   • BrandUnit42 is committed under design-system/packages/icons but is
+ *     not yet exported from @ds/icons (index.ts ownership lives in the
+ *     icons-package lane). Unit 42 products render without a brand icon
+ *     for now — fallback handled in BRAND_ICON map below.
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import React, { useEffect, useMemo, useRef, useState } from 'react'
+import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import {
   Calendar, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
+  ExclamationTriangle, ExclamationCircle,
+  BrandStrata, BrandPrisma, BrandCortex,
 } from '@ds/icons'
 import { Search } from '@ds/search'
 import { Filter, type FilterOption } from '@ds/filter'
@@ -163,6 +183,44 @@ const HEALTH_LABEL: Record<Health, string> = {
   'healthy':  'healthy',
   'at-risk':  'at risk',
   'critical': 'critical',
+}
+
+// Spec §4.3: healthy → green, at-risk → yellow, critical → red. Low-contrast
+// pill (pastel ground + dark text) — readable inline without dominating the
+// row. `yellow` and `red` are Tag color tokens (see TagColors in tags pkg).
+type SeverityTagColor = 'green' | 'yellow' | 'orange' | 'red' | 'neutral'
+const HEALTH_COLOR: Record<Health, SeverityTagColor> = {
+  'healthy':  'green',
+  'at-risk':  'yellow',
+  'critical': 'red',
+}
+
+// Spec §4.3 Last Activity:
+//   0–7d  → neutral, no icon         (deal being worked)
+//   7–21d → caution color + caution icon (going quiet)
+//   >21d  → error color + error icon (gone cold)
+// Caution = orange in this DS (stage-text-and-icons.md status families).
+// Error = red.
+interface ActivityBucketStyle {
+  color: SeverityTagColor
+  icon?: React.ElementType
+}
+function activityStyleForDays(daysAgo: number): ActivityBucketStyle {
+  if (daysAgo < 7)   return { color: 'neutral' }
+  if (daysAgo <= 21) return { color: 'orange', icon: ExclamationTriangle }
+  return { color: 'red', icon: ExclamationCircle }
+}
+
+// Brand icons live in @ds/icons and carry authored fills — `color` on the
+// host tag does NOT recolor them (icon doc, "brand icons" paragraph).
+// BrandUnit42 component is present in the icons package but not yet
+// exported from the package index (lane ownership belongs to the icons
+// package); fall back to no icon for unit-42 products.
+const BRAND_ICON: Record<Brand, React.ElementType | undefined> = {
+  'strata':  BrandStrata,
+  'prisma':  BrandPrisma,
+  'cortex':  BrandCortex,
+  'unit-42': undefined,
 }
 
 // ─── Risk library (spec §3.11) ───────────────────────────────────────────────
@@ -787,6 +845,101 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   )
 }
 
+// ─── Product cluster (space-driven +N overflow) ──────────────────────────────
+// Spec §4.4: "The cell shows as many tags as fit, then collapses the
+// remainder into a +N tag at the end. The decision about how many tags
+// fit is space-driven, not a fixed limit. Re-flow on resize."
+//
+// Implementation: a hidden measurement layer renders every tag (and a
+// sample +N badge) at natural width. On mount and on container resize we
+// walk those widths against the container's clientWidth, deciding how
+// many fit. The visible layer then renders only that count + a +N tag if
+// anything was hidden. The measurement layer sits absolutely-positioned
+// inside the cluster and is clipped by the cluster's overflow:hidden so
+// it never paints anywhere.
+
+const PRODUCT_GAP = 4 // px — matches --ds-spacing-02
+
+interface ProductClusterProps { products: Product[] }
+
+function ProductCluster({ products }: ProductClusterProps) {
+  const containerRef = useRef<HTMLDivElement>(null)
+  const measureRef = useRef<HTMLDivElement>(null)
+  const [visibleCount, setVisibleCount] = useState(products.length)
+
+  useLayoutEffect(() => {
+    const container = containerRef.current
+    const measure = measureRef.current
+    if (!container || !measure) return
+
+    const recompute = () => {
+      const parentWidth = container.clientWidth
+      if (parentWidth <= 0) return
+
+      const tagWidths: number[] = []
+      let badgeWidth = 0
+      for (const child of Array.from(measure.children) as HTMLElement[]) {
+        if (child.dataset.role === 'badge') badgeWidth = child.offsetWidth
+        else tagWidths.push(child.offsetWidth)
+      }
+
+      // First test: do all tags fit with no badge?
+      const allWidth = tagWidths.reduce(
+        (s, w, i) => s + w + (i > 0 ? PRODUCT_GAP : 0), 0)
+      if (allWidth <= parentWidth) {
+        setVisibleCount(prev => (prev === products.length ? prev : products.length))
+        return
+      }
+
+      // Otherwise reserve room for the badge and count how many fit.
+      const limit = parentWidth - badgeWidth - PRODUCT_GAP
+      let used = 0
+      let fit = 0
+      for (let i = 0; i < tagWidths.length; i++) {
+        const candidate = used + (i > 0 ? PRODUCT_GAP : 0) + tagWidths[i]
+        if (candidate <= limit) {
+          used = candidate
+          fit++
+        } else break
+      }
+      setVisibleCount(prev => (prev === fit ? prev : fit))
+    }
+
+    recompute()
+    const ro = new ResizeObserver(recompute)
+    ro.observe(container)
+    return () => ro.disconnect()
+  }, [products])
+
+  const overflow = products.length - visibleCount
+
+  const renderTag = (p: Product, keyHint: string) => {
+    const Icon = BRAND_ICON[p.brand]
+    return Icon
+      ? <Tags key={keyHint} {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
+      : <Tags key={keyHint} {...TAG_BASE} label={p.name} />
+  }
+
+  return (
+    <div className="opp-product-cluster" ref={containerRef}>
+      {products.slice(0, visibleCount).map((p, i) =>
+        renderTag(p, `v-${p.name}-${i}`)
+      )}
+      {overflow > 0 && (
+        <Tags {...TAG_BASE} label={`+${overflow}`} />
+      )}
+      <div ref={measureRef} className="opp-product-cluster__measure" aria-hidden="true">
+        {products.map((p, i) => (
+          <span key={`m-${p.name}-${i}`}>
+            {renderTag(p, `m-inner-${p.name}-${i}`)}
+          </span>
+        ))}
+        <span data-role="badge"><Tags {...TAG_BASE} label="+99" /></span>
+      </div>
+    </div>
+  )
+}
+
 // ─── Row sub-component ───────────────────────────────────────────────────────
 
 function OppRow({ row }: { row: OpportunityRow }) {
@@ -796,6 +949,9 @@ function OppRow({ row }: { row: OpportunityRow }) {
     : `${row.activity.daysAgo} days ago`
   const riskLabel =
     row.risks.length === 1 ? '1 risk' : `${row.risks.length} risks`
+
+  const actStyle = activityStyleForDays(row.activity.daysAgo)
+  const healthColor = HEALTH_COLOR[row.health.overall]
 
   return (
     <tr className="opp-row">
@@ -816,20 +972,40 @@ function OppRow({ row }: { row: OpportunityRow }) {
         </div>
       </td>
       <td>
-        {/* Column 3 — activity & blockers. Last Activity + Health + Risk count + Sales Play. */}
+        {/* Column 3 — activity & blockers. Last Activity (severity-banded) +
+            Health (categorical color) + Risk count (neutral) + Sales Play
+            (neutral). Per spec §4.3: count is the signal for risks, no
+            severity grade by count; sales play is informational. */}
         <div className="opp-tag-cluster">
-          <Tags {...TAG_BASE} label={dayLabel} />
-          <Tags {...TAG_BASE} label={HEALTH_LABEL[row.health.overall]} />
+          {actStyle.icon ? (
+            <Tags
+              shape={TAG_BASE.shape}
+              size={TAG_BASE.size}
+              contrast={TAG_BASE.contrast}
+              color={actStyle.color}
+              icon
+              renderIcon={actStyle.icon}
+              label={dayLabel}
+            />
+          ) : (
+            <Tags {...TAG_BASE} label={dayLabel} />
+          )}
+          <Tags
+            shape={TAG_BASE.shape}
+            size={TAG_BASE.size}
+            contrast={TAG_BASE.contrast}
+            color={healthColor}
+            label={HEALTH_LABEL[row.health.overall]}
+          />
           <Tags {...TAG_BASE} label={riskLabel} />
           <Tags {...TAG_BASE} label={row.salesPlay.name} />
         </div>
       </td>
       <td>
-        <div className="opp-tag-cluster">
-          {row.products.map(p => (
-            <Tags key={p.name} {...TAG_BASE} label={p.name} />
-          ))}
-        </div>
+        {/* Column 4 — products. Brand icon per product (BrandUnit42 absent
+            from @ds/icons exports; unit-42 products render iconless until
+            the index lands). Space-driven +N overflow via ProductCluster. */}
+        <ProductCluster products={row.products} />
       </td>
       <td className="opp-c-value">
         <CellContents content="numbers" text={formatUsdCompact(row.valueUsd)} />
@@ -1183,6 +1359,35 @@ const LAYOUT_CSS = `
   flex-wrap: wrap;
   gap: var(--ds-spacing-02);
   align-items: center;
+}
+
+/* ── Product cluster — single-row, space-driven +N overflow ──────────────
+ * Visible layer = flex row, NO wrap, clipped horizontally.
+ * Measurement layer = absolutely positioned (zero layout footprint),
+ *   visually hidden, used only to read natural offsetWidths.
+ * The visible-vs-measure layers share Tag styles, so widths match.
+ */
+.opp-product-cluster {
+  position: relative;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  min-width: 0;
+  max-width: 100%;
+  overflow: hidden;
+}
+.opp-product-cluster__measure {
+  position: absolute;
+  left: 0;
+  top: 0;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  gap: var(--ds-spacing-02);
+  white-space: nowrap;
+  visibility: hidden;
+  pointer-events: none;
 }
 
 /* Hover-only row actions */

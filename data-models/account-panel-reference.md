@@ -37,32 +37,7 @@ It is the closest thing the workbench has to a one-page customer brief.
 
 ---
 
-## 2. Two Open Modes — Account vs Opportunity
-
-The panel is **the same component** in both cases. Only the initial state
-differs.
-
-**Account mode** *(opened from a row in the Accounts table)*
-- All sections render in their **default collapsed/summary state**.
-- The Opportunities section shows the list of opportunities in the next 4
-  quarters, all collapsed.
-- This is the "read the customer" view.
-
-**Opportunity mode** *(opened from a row in the Opportunities table)*
-- Same panel, same account context, but the panel scrolls/opens with the
-  **selected opportunity expanded** inside the Opportunities section.
-- Sibling opportunities on the same account remain visible but collapsed,
-  so the AE can still see the bigger picture around the deal they
-  clicked.
-- This is the "read a specific deal in the context of its account" view.
-
-> **Designer takeaway:** treat opportunity mode as a *deep link into a
-> section*, not a different layout. There is no separate "opportunity
-> panel."
-
----
-
-## 3. Panel Anatomy
+## 2. Panel Anatomy
 
 Top to bottom, the panel has six blocks. The first is the header; the
 rest are independently collapsible accordions.
@@ -79,14 +54,13 @@ sections scroll inside the panel, not the page.
 
 ---
 
-## 4. Header
+## 3. Header
 
 The non-accordion top block. Always visible.
 
 Fields, in order:
 
-- **Account Preview** — the panel title. The same string regardless of
-  which mode opened it.
+- **Account Preview** — the panel title.
 - **Account** — the account name (e.g., *Ironic Arts and Crafts*) with
   an open-in-new-tab affordance that links to the full account detail
   surface.
@@ -98,15 +72,12 @@ Fields, in order:
   contracted revenue across the lifetime of the relationship). It lives
   in the header because it's the single number AEs use to *size* a
   customer at a glance.
-- **Regional Manager** / **Account Owner** — the two people responsible
-  for the account. Stacked, with a small connecting indicator showing
-  the reporting relationship (manager above owner).
 
 The header has no actions beyond close and the two link-outs.
 
 ---
 
-## 5. Install Base
+## 4. Install Base
 
 > What the customer *already owns* and what that's worth to PANW today.
 
@@ -127,76 +98,86 @@ Customer Estate surface, where the install base can be inspected by
 product, by contract, and by site. The estate surface is the source of
 truth; this section is its *executive summary inside the panel*.
 
-> **Note for data architects:** none of these four numbers are derived
-> inside the workbench. They roll up from finance / contracts systems.
-> The panel reads them; it does not compute them.
-
 ---
 
-## 6. Sales Play
+## 5. Sales Play
 
-> Which Palo Alto sales motions are currently live on this account, what
-> they're worth, and what state each is in.
+> Where the AE *hasn't acted yet*. The section is a Not-Touched-first
+> view of the account's qualified plays.
 
-Defaults to **expanded**. The section is a small two-level accordion.
+Defaults to **expanded**. The section is a two-level accordion: section
+→ family → individual play.
 
-**Section header**
+The core idea is inverted from "what's live." Live work is already on the
+AE's calendar; what they *miss* is the qualified play they haven't
+opened yet. So at every level of this accordion, the surfaced dollar
+value is the **sum of Not Touched plays** — not the sum of all plays.
+
+**Section level (collapsed)**
 - Title: *Sales Play*.
-- A single **total value** chip with a status icon (e.g., a red urgency
-  badge + *$55,900*). This is the sum of all play values on the account,
-  not just the urgent ones. The icon reflects the *most urgent* status
-  across the plays — typically Not Touched.
+- A single **Not Touched total** tag (e.g., a red Not-Touched indicator
+  + *$55,900*). This is the dollar value of plays the AE has not yet
+  acted on across all families. If the number is high, the AE is
+  leaving qualified motion on the table.
+- If there are no Not Touched plays on the account, the tag is omitted
+  rather than shown as $0.
 
-**Per-family rows** (one row per sales play family present)
+**Family level (one accordion row per family present on the account)**
 - *FW & CDSS*, *SASE*, *Cortex Cloud*, *Unit 42* — the four families
   defined in `sales-play-reference.md`.
-- Each row shows the family name, a **status icon** representing the
-  most urgent play in that family, and the **family-level total dollar
-  value** (sum of all plays in that family for this account).
-- A row is expandable; expanding it reveals each individual play in
-  that family with its own status icon and dollar value.
+- Only families with at least one qualified play on this account
+  appear. Not every account qualifies for every family.
+- Each row shows the family name and the **family-level Not Touched
+  total** (e.g., *Cortex Cloud — $24,900*). Same rule as the section
+  total: this is *only* the Not Touched portion of the family, not all
+  plays in the family.
+- Expanding the row reveals every individual play in that family that
+  applies to this account.
 
-**Per-play sub-rows** (inside an expanded family)
+**Per-play sub-rows (inside an expanded family)**
 - Examples: *XSIAM Splunk Takeout — $24,900*, *Hardware Refresh —
   $2,500*, *GP to Prisma Access — $38,500*.
-- The icon column carries the play's **status**, drawn from the 7-status
-  enum in `sales-play-reference.md`. The intended visual mapping (to
-  confirm with the design system):
-  - 🔴 Not Touched — red urgency badge (highest visual emphasis)
-  - 📅 Pitched — calendar/in-flight glyph
-  - 🎧 Deferred — listening/parked glyph
-  - 👍 Pursuing — affirmative glyph
-  - ✅ Closed Won — green check
-  - ⊗ Closed Lost / Declined — gray or black X
-  - *(empty cell on the table = play does not apply; here, plays that
-    don't apply are simply not listed)*
-- The dollar value follows the play-value rule from
-  `sales-play-reference.md`: estimate pre-pursuit, opportunity-derived
-  post-pursuit.
+- Each sub-row shows the play name, a **status indicator** for that
+  play's individual status (drawn from the 7-status enum in
+  `sales-play-reference.md` — Not Touched, Pitched, Deferred, Declined,
+  Pursuing, Closed Won, Closed Lost), and the play's dollar value.
+- The dollar value here is the **play's own value**, regardless of
+  status. The rollup at the family and section levels filters to Not
+  Touched; the leaf row shows the underlying number for every play.
+- The dollar-value rule from `sales-play-reference.md` still applies:
+  estimate pre-pursuit, opportunity-derived post-pursuit.
 
 **Deep link** — *Open in Sales Play Console*. Same pattern as Install
 Base: the panel is a summary; the console is the manage surface.
 
-> **Designer note:** the section deliberately keeps families *and* plays
-> on the same panel. Collapsed-family rollup gives the territory-level
-> read; expanded plays give the actionable read. This mirrors the
-> collapse/expand behavior of family columns in the sales-play matrix.
+> **Why Not Touched, not "live":** an AE doesn't need the panel to
+> remind them about deals already in flight — those are on their
+> calendar. The panel's job is to surface motion they've forgotten or
+> never opened. The visual hierarchy follows that intent: collapsed
+> rollups answer *"how much haven't I touched?"*, expanded leaves
+> answer *"what's the state of each one?"*.
 
 ---
 
-## 7. Opportunities in Next 4Q
+## 6. Opportunities in Next 4Q
 
 > Every open opportunity on this account whose close date falls inside
 > the current quarter or the next three.
 
-Defaults to **expanded**. This is the section that is most affected by
-which mode opened the panel (see Section 2).
+Defaults to **expanded**. This section is the panel's tightest parity
+surface with the opportunities table — the same tag tokens, popover
+patterns, and interaction grammar are reused here.
+
+> **Terminology note:** throughout this section, "**tag**" means the
+> DS `<Tags />` component (the same one used in
+> `opportunity-table.stories.tsx`). On hover, certain tags open a
+> **popover** — a small surface with a single ghost-brand action
+> button. This is the same pattern the table uses (e.g., the Quote ID
+> tag opens a *View Quote* popover).
 
 **Section header**
-- A status dot (color reflects the worst forecast/risk signal among the
-  opportunities — to confirm).
 - Title: *Opportunities in Next 4Q*.
-- A **total value chip** (e.g., *$3.8M*) — the sum of all opportunity
+- A **total value tag** (e.g., *$3.8M*) — the sum of all opportunity
   amounts in the window. This is *pipeline*, not booked revenue.
 
 **Opportunity rows** (one per open opportunity)
@@ -210,40 +191,72 @@ which mode opened the panel (see Section 2).
   the named quarter (*Q4FY26*, *Q2FY27*, etc.) for future quarters,
   matching the convention from `accounts-table-reference.md`.
 
-**Expanded opportunity** (the snapshot)
-A 9-row label/value block — the *Opportunity Snapshot* component in
-Figma. Rows, in order:
+**Expanded opportunity (the snapshot)**
 
-1. **Active Quote** — a link-out to the live quote document (e.g.,
-   *Q-100874*). Empty when no quote exists yet.
-2. **Closing in** — days to close (e.g., *38 days*).
-3. **Stage** — the stage tag (one of the 5 named stages) plus
-   **days-in-stage** (e.g., *Stage 4 · 35 days*). Days-in-stage is the
-   aging signal the opportunities table also surfaces.
-4. **ARR** — the ARR figure plus the **forecast category** tag (e.g.,
-   *Best Case-In*) and the days the opp has spent in that forecast
-   category.
-5. **Opportunity Type** — *Expand Business*, *Renewal*, *Net-New*, etc.
-6. **Opportunity Risks** — a red count badge (e.g., *4*) with a chevron
-   that expands the full risk list. Uses the 9-risk taxonomy from
-   `opportunities-table-reference.md` — opportunity-level risks, not
-   account-level.
-7. **Products** — comma-separated list with an *and N more* affordance
-   when the list exceeds the inline budget. Info-icon hover reveals
-   the full list.
-8. **Last Activity** — the typed activity category (e.g., *Customer
-   Engagement*).
-9. **Last Activity Date** — formatted date (e.g., *12 Mar 2026*).
-10. **Renewal Outcome** — the renewal disposition control (see below).
-    Present on every opportunity row; *Unknown* by default.
+A label/value block where the right-hand value is, in most rows, a tag
+that opens a popover on hover. Every interactive value uses the same
+*tag-as-trigger → popover-with-single-button* pattern as the table —
+no inline link-outs, no raw text URLs.
+
+Rows, in order:
+
+1. **Active Quote** — a tag showing the quote ID (e.g., *Q-100874*).
+   On hover, a popover with a single *View Quote* ghost-brand button.
+   Omitted when no quote exists.
+2. **Closing in** — a tag showing days to close (e.g., *38 days*). On
+   hover, a popover with a single *View in SFDC* ghost-brand button.
+3. **Stage** — a tag using the canonical stage name (*Discovery*,
+   *Solutioning*, *Tech Validation*, *Active POV*, *Negotiation*) plus
+   days-in-stage. On hover, a popover with *View in SFDC*.
+4. **ARR** — the ARR figure, displayed as a value. (Not interactive on
+   its own.)
+5. **Forecast** — a tag with the forecast category (*Pipeline*, *Best
+   Case*, *Commit*, *Closed*) and days-in-forecast. On hover, a
+   popover with *View in SFDC*. Added for parity with the table; the
+   earlier draft did not include this row.
+6. **Opportunity Type** — a tag with the type (*Net-New*, *Upsell*,
+   *Renewal*). On hover, a popover with *View in SFDC*. (The table's
+   Upsell-specific *Modify* tooltip and Renewal-specific subscription
+   popover live on the table only; the panel keeps a single pattern
+   for simplicity.)
+7. **Opportunity Risks** — a danger-toned count tag (e.g., *4*) using
+   the same red-tag treatment as the table. On hover, a popover
+   listing every applied risk, identical to the table's risk popover.
+   Risk taxonomy is the 9-value opportunity-level set in
+   `opportunities-table-reference.md`.
+8. **Products** — a single tag carrying the **unique brand icons** for
+   the products on the opportunity (e.g., one Strata + one Prisma +
+   one Cortex icon, even if there are multiple Prisma products).
+   Brand icons are not recolored by the tag. On hover, a popover
+   listing each product on the opportunity and its **contribution to
+   the opportunity's total value** (same per-product-contribution
+   pattern as the table's product popover).
+9. **Last Activity** — a tag showing the activity *type* (e.g.,
+   *Customer Engagement*). On hover, a popover with *View in SFDC*.
+10. **Last Activity Date** — a tag showing the formatted date (e.g.,
+    *12 Mar 2026*). On hover, a popover showing the **actual activity
+    record** (subject + short description) — not just a link.
+11. **Renewal Outcome** — present **only when Opportunity Type is
+    Renewal**. See below.
+
+Every account should have at least one Renewal-type opportunity inside
+the 4-quarter window — this is a mock-data invariant, not a UI rule,
+so the Renewal Outcome control always has a place to demonstrate
+itself.
+
+**Footer (per expanded opportunity)**
+A single ghost-accent **Open in SFDC** button, sitting at the bottom
+of the expanded snapshot. This is the one *explicit* deep link inside
+the opportunity; the per-row popovers all point at the same SFDC
+record, but the footer button is what the AE reaches for when they
+want to leave the panel entirely.
 
 **Renewal Outcome — the editable disposition control**
 
-Same six-value enum as in the opportunities table, but inside the panel
-it shows up *inline on the snapshot* rather than as a popover anchored
-to a table cell.
+Renders **only when Opportunity Type = Renewal**. For all other types
+the row is omitted.
 
-Disposition values (with the chip color convention):
+Same six-value enum as in the opportunities table:
 - **Unknown** — gray
 - **Full Renewal / Upsell** — green
 - **Downsell** — orange
@@ -251,23 +264,21 @@ Disposition values (with the chip color convention):
 - **Displacement (HW Refresh)** — purple
 - **Duplicate** — slate
 
-The control opens an inline mini-form. Two flows:
+The trigger is a tag-as-button. Clicking opens a DS Flyout
+(equivalent to the table's Renewal Outcome editor) with two flows:
 
 - **Non-Churn flow** *(Unknown, Full Renewal/Upsell, Downsell,
   Displacement, Duplicate)* — a single optional *Notes* field. *Save*
-  is enabled the moment the disposition is chosen; notes are optional
-  but typed-as-required visually so reps know they're encouraged.
+  is enabled the moment the disposition is chosen.
 - **Churn flow** — adds two required dropdowns *before* notes:
   - **Churn / Dismissal Reason** *(required)*
   - **Competitor Replacement** *(required)*
-  - **Notes** *(required, in the Churn flow)*
+  - **Notes** *(required in the Churn flow)*
 
 The Figma "Renewal Snapshot" component models this as a stepper
-(*Step=00 → Confirmed* across Full Renewal and Churn flows). The
-**meaning** of that stepper is: the rep is committing to a disposition
-and providing enough structured context for forecasting / churn-cause
-analytics to use. The panel renders one step at a time inline; *Save*
-commits the chosen step and collapses the form back to the chip.
+(*Step=00 → Confirmed*, across Full Renewal and Churn flows). The
+panel renders one step at a time; *Save* commits the chosen
+disposition and collapses the form back to a tag.
 
 > **Architect note:** Churn requires structured reason + competitor
 > because Churn is the only disposition with downstream reporting
@@ -275,12 +286,13 @@ commits the chosen step and collapses the form back to the chip.
 
 ---
 
-## 8. Account Health
+## 7. Account Health
 
-> A health summary derived from two sub-axes and a per-product
-> breakdown.
+> A health summary derived from two sub-axes, with a per-product
+> breakdown listed underneath.
 
-Defaults to **expanded**.
+Defaults to **expanded**. **Single-level accordion** — there are no
+nested accordions inside this section.
 
 **Section header**
 - Title: *Account Health*.
@@ -296,8 +308,8 @@ to the same Healthy / At-Risk / Critical scheme used everywhere else.
 This is the *only* time-series visualization in the panel; everywhere
 else, signals are point-in-time.
 
-**Sub-axis rows**
-Two rows, one per sub-axis, each with its own status tag:
+**Account-level sub-axis rows**
+Two rows, one per sub-axis, each with its own health tag:
 
 - **Technical Health** — *Healthy / At-Risk / Critical*. Signals: POV
   outcomes, integration completeness, support escalation pattern.
@@ -308,14 +320,27 @@ The two sub-axis tags together are the **source** of the overall tag
 in the header. One of them will always match the overall tag; the
 other may be healthier.
 
-**Per-product matrix**
-A small table with three columns: *Product / Technical / Deployment*.
-One row per product the account owns. Each cell is a tag in the same
-three-step severity scheme.
+**Per-product breakdown**
+A flat list — one block per product the account owns, no nested
+expansion, no table. Each product block has three lines:
 
-This matrix is what an AE uses to answer *"is the account critical
+- **Heading row** — the product's **brand icon** on the left, the
+  product name next to it, and the **product's ARR** on the right
+  (e.g., *Cortex XSOAR · $480K*). This anchors the per-product health
+  to a dollar size, so the AE can tell whether a Critical product is a
+  large or small slice of the account.
+- **Technical Health row** — label on the left, a health tag
+  (*Healthy / At-Risk / Critical*) on the right.
+- **Deployment and Adoption Health row** — label on the left, a
+  health tag on the right.
+
+The Figma's two-column matrix was tighter on horizontal space but
+felt crammed at panel width; this per-product stacked layout trades
+vertical space for legibility.
+
+This breakdown is what an AE uses to answer *"is the account critical
 because of one bad product, or because of the whole portfolio?"* —
-the most common follow-up question once they've seen the overall tag.
+the most common follow-up once they've seen the overall tag.
 
 > **Caution, repeated from the table docs:** the overall tag is
 > derived. If a UI affordance ever lets a user filter or edit Overall
@@ -324,60 +349,58 @@ the most common follow-up question once they've seen the overall tag.
 
 ---
 
-## 9. Behaviors That Repeat Across Sections
+## 8. Behaviors That Repeat Across Sections
 
 - **Accordion** — every block from Install Base downward is an
   independent accordion. Collapsing one does not collapse the others.
   Open/closed state is *per-session*, not persisted to the account.
+- **Tag + popover grammar** — interactive values inside the
+  Opportunities section follow the same *tag-as-trigger →
+  single-button popover* pattern as the opportunities table. Reusing
+  the same primitive across the two surfaces is intentional; an AE
+  who learned the table already knows the panel.
 - **Deep links** — each section that has a fuller surface elsewhere
   (Install Base → Customer Estate, Sales Play → Sales Play Console,
-  Opportunities → Opportunity detail page, Account Health → Account
-  Health detail) exposes a single deep link. The panel never tries to
-  *replace* the deep surface; it summarizes and hands off.
-- **Mode-aware initial state** — Opportunity mode pre-expands the
-  matching opportunity row. No other section's default state changes
-  between modes.
+  Opportunities → SFDC) exposes a single deep link. The panel never
+  tries to *replace* the deep surface; it summarizes and hands off.
 - **No editing in the panel except Renewal Outcome.** Everything else
-  is read-only. This is intentional: the panel is for *reading the
-  customer*, not for managing it. The one exception is Renewal Outcome
-  because it's a disposition the AE is uniquely qualified to set, and
-  forcing a context switch to do that would kill the workflow.
+  is read-only. The one exception is Renewal Outcome because it's a
+  disposition the AE is uniquely qualified to set, and forcing a
+  context switch to do that would kill the workflow.
 
 ---
 
-## 10. How an AE Talks About the Panel
+## 9. How an AE Talks About the Panel
 
-> "Open Ironic Arts and Crafts — they're a $7.35M customer, owned by
-> Victor, under Daniel in the region."
+> "Open Ironic Arts and Crafts — they're a $7.35M customer."
 
-Maps to: header — LTV, owner, regional manager.
+Maps to: header — account name + LTV.
 
-> "Pull up the panel; their SASE play is $38.5K untouched and their
-> XSIAM Splunk Takeout is $24.9K untouched. That's where I should
-> spend the morning."
+> "Their Sales Play tag says $55.9K untouched. SASE alone is $38.5K I
+> haven't opened. That's where I should spend the morning."
 
-Maps to: Sales Play section, expanded per-family rows, status icons.
+Maps to: Sales Play section header tag (Not Touched total), family
+row Not Touched total, individual play status.
 
-> "Click into the SentinelOne renewal. $750K closing this quarter,
-> Best Case-In, 67 days in forecast, 4 risks — three guesses what's
-> wrong."
+> "Pull up the SentinelOne renewal. $750K closing this quarter, Best
+> Case-In, 67 days in forecast, 4 risks — three guesses what's wrong."
 
-Maps to: Opportunity mode, snapshot expanded, ARR + forecast tag +
-days-in-stage + opportunity risks count.
+Maps to: opportunity expanded snapshot — ARR, Forecast tag,
+days-in-forecast, Opportunity Risks tag.
 
 > "They're Critical overall because Cortex XSOAR is Critical on the
 > Technical axis. Everything else is Healthy. That's a one-product
 > problem."
 
 Maps to: Account Health overall tag, sub-axis tags, per-product
-matrix.
+breakdown.
 
 These four sentences are the acceptance test. If the panel can't
 answer one of them in a single glance, the layout has a gap.
 
 ---
 
-## 11. What This Document Deliberately Doesn't Cover
+## 10. What This Document Deliberately Doesn't Cover
 
 - **The full sales-play data model.** See `sales-play-reference.md`.
 - **The opportunity column semantics.** See
@@ -397,13 +420,13 @@ answer one of them in a single glance, the layout has a gap.
 
 ---
 
-## 12. Cross-references
+## 11. Cross-references
 
-- `accounts-table-reference.md` — the table whose rows open this panel
-  in *Account mode*.
-- `opportunities-table-reference.md` — the table whose rows open this
-  panel in *Opportunity mode*, and the source of truth for the
-  Opportunity Snapshot's fields.
+- `accounts-table-reference.md` — the table whose rows open this
+  panel.
+- `opportunities-table-reference.md` — the table whose rows also open
+  this panel, and the source of truth for the Opportunity Snapshot's
+  fields, tag tokens, and popover patterns.
 - `sales-play-reference.md` — families, statuses, value rules, and the
   matrix view that mirrors the Sales Play section.
 - `sales-play-domain-model.md` — the technical/shape companion to the

@@ -85,13 +85,18 @@ import {
   Calendar, Clock, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
   ExclamationTriangle, ExclamationCircle,
   BrandStrata, BrandPrisma, BrandCortex,
+  // Sales Play status icons. Chips are neutral; per-status color is
+  // applied to the icon only via CSS (see SALES_PLAY_ICON_COLOR_VAR map
+  // and the .acc-sp-tag--* rules below).
+  NotTouched, Pitched, HourglassEnd, MinusCircleStroke,
+  ChessKnight, ClosedWon, DoNotEnter,
 } from '@ds/icons'
 import { Search } from '@ds/search'
 import { Filter, type FilterOption } from '@ds/filter'
 import { Header } from '@ds/header'
 import { Pagination } from '@ds/pagination'
 import { Button, IconButton } from '@ds/button'
-import { Tags, type TagColor } from '@ds/tags'
+import { Tags } from '@ds/tags'
 import { Tooltip } from '@ds/tooltip'
 import { Checkbox } from '@ds/checkbox'
 import {
@@ -261,22 +266,35 @@ const EBC_SEVERITY_COLOR: Record<EBCSeverity, SeverityTagColor> = {
   'danger':  'red',
 }
 
-// Sales Play emphasis hierarchy (spec §4.5).
-//   Not Touched → strongest emphasis (action items). Not red — red reads
-//     as "error". Use brand-accent purple (low-contrast) so the eye is
-//     pulled without misreading the chip as a danger signal.
-//   Pursuing    → softer brand-positive (green low).
-//   Pitched, Deferred → neutral.
-//   Declined, Closed Won, Closed Lost → deemphasized (slate/olive low).
-type SalesPlayTagPalette = { color: TagColor; contrast: 'low' | 'high' }
-const SALES_PLAY_PALETTE: Record<SalesPlayStatus, SalesPlayTagPalette> = {
-  'not-touched': { color: 'purple', contrast: 'high' },
-  'pursuing':    { color: 'green',  contrast: 'low'  },
-  'pitched':     { color: 'neutral', contrast: 'low' },
-  'deferred':    { color: 'neutral', contrast: 'low' },
-  'declined':    { color: 'slate',   contrast: 'low' },
-  'closed-won':  { color: 'olive',   contrast: 'low' },
-  'closed-lost': { color: 'slate',   contrast: 'low' },
+// Sales Play visual model (revised).
+//
+// All sales-play tags share the same neutral chip — color is reserved
+// for the leading status icon, not the chip ground. This keeps the
+// column visually quiet at scan-distance and lets the icon carry the
+// state signal (a chip is a label; an icon is a glyph). Emphasis
+// hierarchy now lives in the icon-color map below.
+//
+//   Not Touched → red-60 (action item; the only urgent state)
+//   Pursuing    → success-green (in-flight)
+//   Closed Won  → DS-authored teal (the icon ships with a baked
+//                 success-teal fill that we deliberately do NOT
+//                 override — it's the canonical positive-completion
+//                 color)
+//   Pitched, Deferred, Declined, Closed Lost → default icon color
+//                 (--ds-icons-secondary-rest)
+//
+// The mapping from status → icon component lives below and the
+// per-status icon-color overrides live in CSS (`.acc-sp-tag--*`) so
+// the path-level `fill` attributes on the named DS icons can be
+// recolored (CSS `fill` overrides the SVG presentation attribute).
+const SALES_PLAY_ICON: Record<SalesPlayStatus, React.ElementType> = {
+  'not-touched': NotTouched,
+  'pitched':     Pitched,
+  'deferred':    HourglassEnd,
+  'declined':    MinusCircleStroke,
+  'pursuing':    ChessKnight,
+  'closed-won':  ClosedWon,
+  'closed-lost': DoNotEnter,
 }
 const SALES_PLAY_LABEL: Record<SalesPlayStatus, string> = {
   'not-touched': 'Not Touched',
@@ -783,29 +801,30 @@ const INITIAL_GROUPED_HEALTH: GroupedHealthSelection = {
 }
 
 // ─── Tag-density key SoT (spec §3.4) ─────────────────────────────────────
-// Per cr-failure §9: single source of truth for tag-density keys, used
-// by the filter option list, the default selection, AND the row
-// renderer. Per-quarter pipeline keys and per-status sales-play keys
-// are enumerated explicitly so a typo can't silently hide a tag.
+// The "tags" filter answers a single question: which CATEGORIES of
+// visible chip should appear in a row. It is NOT a value-level filter.
+// That means:
+//   • Per-quarter pipeline tags (q0…q3) are listed — each is a distinct
+//     chip rendered in column 2; users may legitimately want to hide CQ
+//     while keeping the next-three.
+//   • Activity / Account Health / Risk Count / EBC are listed — each
+//     is a separate sub-cell tag in column 3.
+//   • Products is listed — the brand pills in column 4.
+//   • Sales-play per-status entries are DELIBERATELY NOT listed.
+//     Sales plays are an entire column; hiding the column is a
+//     column-visibility concern, not a tag-density one.
+//   • Per-risk entries are DELIBERATELY NOT listed. Individual risk
+//     factors live INSIDE the risk-count popover — they are popover
+//     content, not row-level tags. The row-level tag is the risk-count
+//     chip itself, and that is already covered by `riskCount`.
 
 const QUARTER_DENSITY_KEYS = ['q0', 'q1', 'q2', 'q3'] as const
 type QuarterDensityKey = typeof QUARTER_DENSITY_KEYS[number]
 
-const STATUS_DENSITY_KEYS: readonly `status-${SalesPlayStatus}`[] =
-  SALES_PLAY_LIFECYCLE.map(s => `status-${s}` as const)
-type StatusDensityKey = typeof STATUS_DENSITY_KEYS[number]
-
-const ACCOUNT_RISK_DENSITY_KEYS: readonly `risk-${AccountRiskId}`[] =
-  (Object.keys(ACCOUNT_RISK_LIBRARY) as AccountRiskId[])
-    .map(id => `risk-${id}` as const)
-type AccountRiskDensityKey = typeof ACCOUNT_RISK_DENSITY_KEYS[number]
-
 type DensityKey =
   | QuarterDensityKey                                        // col 2
   | 'lastActivity' | 'accountHealth' | 'riskCount' | 'ebc'   // col 3 cells
-  | AccountRiskDensityKey                                    // col 3 risk-popover items
   | 'products'                                               // col 4
-  | StatusDensityKey                                         // col 5
 
 const DENSITY_OPTIONS: { value: DensityKey; label: string }[] = [
   // Pipeline (per-quarter)
@@ -818,19 +837,8 @@ const DENSITY_OPTIONS: { value: DensityKey; label: string }[] = [
   { value: 'accountHealth', label: 'account health' },
   { value: 'riskCount',     label: 'risk factor count' },
   { value: 'ebc',           label: 'EBC' },
-  // Account-level risk per-item toggles
-  ...(Object.entries(ACCOUNT_RISK_LIBRARY) as [AccountRiskId, { emoji: string; label: string }][])
-    .map(([id, def]) => ({
-      value: `risk-${id}` as DensityKey,
-      label: `risk: ${def.emoji} ${def.label}`,
-    })),
   // Products (col 4)
   { value: 'products', label: 'products' },
-  // Sales Play status per-status toggles
-  ...SALES_PLAY_LIFECYCLE.map(s => ({
-    value: `status-${s}` as DensityKey,
-    label: `sales play: ${SALES_PLAY_LABEL[s]}`,
-  })),
 ]
 const ALL_DENSITY_KEYS: DensityKey[] = DENSITY_OPTIONS.map(o => o.value)
 
@@ -1492,9 +1500,11 @@ function AccountHealthPanel({ row }: { row: AccountRow }) {
 // factors" so it's unambiguous to a reader (cr-intent §"Risk Factors
 // sub-cell mirror filter format" + cr-failure §14).
 
-function AccountRiskFactorsPanel({ risks, density }: { risks: AccountRiskFactor[]; density: DensityKey[] }) {
-  const visible = risks.filter(r => density.includes(`risk-${r.id}` as DensityKey))
-  if (visible.length === 0) {
+function AccountRiskFactorsPanel({ risks }: { risks: AccountRiskFactor[] }) {
+  // Per-risk entries are not part of the tags filter (popover content,
+  // not row-level chips). The popover always shows every risk on the
+  // account; empty rows fall back to a "no risks" line.
+  if (risks.length === 0) {
     return (
       <div className="acc-pop acc-pop--risks">
         <div className="acc-pop__heading">Account-level risk factors</div>
@@ -1506,7 +1516,7 @@ function AccountRiskFactorsPanel({ risks, density }: { risks: AccountRiskFactor[
     <div className="acc-pop acc-pop--risks">
       <div className="acc-pop__heading">Account-level risk factors</div>
       <ul className="acc-pop__risk-list">
-        {visible.map(r => (
+        {risks.map(r => (
           <li key={r.id} className="acc-pop__risk-row">
             <span className="acc-pop__risk-emoji" aria-hidden="true">{r.emoji}</span>
             <span className="acc-pop__risk-label">{r.label}</span>
@@ -1577,7 +1587,7 @@ function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
 }
 
 function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
-  const palette = SALES_PLAY_PALETTE[bucket.status]
+  const IconCmp = SALES_PLAY_ICON[bucket.status]
   // Drop the colon-space to save ~6–8px per tag — at account-column
   // widths the colon push makes single-bucket rows collapse to +N
   // even when they have room for the bucket itself. Status label +
@@ -1588,9 +1598,12 @@ function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
       <Tags
         shape="rounded"
         size="large"
-        contrast={palette.contrast}
-        color={palette.color}
+        color="neutral"
+        contrast="low"
+        icon
+        renderIcon={IconCmp}
         label={label}
+        className={`acc-sp-tag acc-sp-tag--${bucket.status}`}
       />
     </HoverShell>
   )
@@ -1598,19 +1611,20 @@ function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
 
 interface SalesPlayClusterProps {
   buckets: SalesPlayBucket[]   // may be in any order; cluster handles ordering
-  density: DensityKey[]
 }
 
 // Account-table sales plays wrap vertically rather than collapsing to
 // +N. With column-3's 4-sub-cell stack the row already carries 4 lines
 // of height; column 5 simply uses that same vertical budget. Lifecycle
 // order is preserved across the wrap (Not Touched → ... → Closed Lost).
+//
+// Sales plays are not part of the tags-density filter (an entire-column
+// concern, not a per-tag concern), so the cluster always renders every
+// bucket present on the row.
 
-function SalesPlayCluster({ buckets, density }: SalesPlayClusterProps) {
-  const visible = buckets.filter(b =>
-    density.includes(`status-${b.status}` as DensityKey))
-  if (visible.length === 0) return null
-  const lifecycleOrdered = [...visible].sort(
+function SalesPlayCluster({ buckets }: SalesPlayClusterProps) {
+  if (buckets.length === 0) return null
+  const lifecycleOrdered = [...buckets].sort(
     (a, b) => SALES_PLAY_LIFECYCLE.indexOf(a.status) - SALES_PLAY_LIFECYCLE.indexOf(b.status)
   )
   return (
@@ -2025,7 +2039,7 @@ function AEAccountTable() {
                             {density.includes('riskCount') && riskCount > 0 && (
                               <HoverShell
                                 interactive
-                                render={() => <AccountRiskFactorsPanel risks={row.risks} density={density} />}>
+                                render={() => <AccountRiskFactorsPanel risks={row.risks} />}>
                                 <Tags {...TAG_BASE} label={riskLabel} />
                               </HoverShell>
                             )}
@@ -2065,7 +2079,7 @@ function AEAccountTable() {
                           Closed Lost). Overflow collapses by
                           deemphasized priority, NOT rightmost
                           (spec §4.5 + cr-failure §2). */}
-                      <SalesPlayCluster buckets={row.salesPlays} density={density} />
+                      <SalesPlayCluster buckets={row.salesPlays} />
                     </td>
                     <td className="acc-c-value">
                       <div className="acc-value">
@@ -2283,23 +2297,36 @@ const LAYOUT_CSS = `
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Popover container — mirrors .opp-pop. 16px padding, 12px gap
+ * between blocks; 14/20 body type. Per the project rule "no popover
+ * text below 14px," every text class inside .acc-pop floors at 14.
+ * The chrome (surface / border / shadow / radius) is supplied by the
+ * HoverShell wrapper above; this block owns the inside layout only. */
 .acc-pop {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-03);
+  gap: var(--ds-spacing-04); /* 12 */
   min-width: 220px;
   max-width: 320px;
-  padding: var(--ds-spacing-04);
+  padding: var(--ds-spacing-05); /* 16 */
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ds-text-primary);
 }
 .acc-pop__heading {
   font-size: 14px;
+  line-height: 20px;
   font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
 .acc-pop__sub {
+  /* Tertiary text-color + negative top margin = the "tight under
+   * heading" treatment used by .opp-pop__sub. Held at 14/20 per
+   * popover-text floor. */
   font-size: 14px;
   line-height: 20px;
-  color: var(--ds-text-secondary-rest);
+  color: var(--ds-text-tertiary-rest);
+  margin-top: calc(-1 * var(--ds-spacing-03));
 }
 .acc-pop--applied .acc-pop__applied-list {
   list-style: none;
@@ -2307,7 +2334,9 @@ const LAYOUT_CSS = `
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-02);
+  /* 8px between rows — half-step above the dense 4px to give text rows
+   * room to breathe at 14/20 without inflating the popover footprint. */
+  gap: var(--ds-spacing-03);
 }
 .acc-pop--applied .acc-pop__applied-item {
   font-size: 14px;
@@ -2406,8 +2435,11 @@ const LAYOUT_CSS = `
   -webkit-box-orient: vertical;
 }
 .acc-multiline__sub {
-  font-size: 12px;
-  line-height: 16px;
+  /* 13/18 secondary — mirrors .opp-multiline__sub so the account
+   * name + apex stack reads at the same scale as the opp-name +
+   * account stack in the opp-table. */
+  font-size: 13px;
+  line-height: 18px;
   color: var(--ds-text-secondary-rest);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2456,19 +2488,23 @@ const LAYOUT_CSS = `
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-02);
+  gap: var(--ds-spacing-03); /* 8 — matches .opp-pop__risk-list */
 }
 .acc-pop__risk-row {
   display: grid;
   grid-template-columns: 20px 1fr;
-  gap: var(--ds-spacing-02);
-  align-items: start;
+  gap: var(--ds-spacing-03); /* 8 — column gap matches row gap */
+  align-items: center;
+  /* 28px min-height keeps single-line risks anchored to a 4px-grid
+   * row even when the emoji glyph renders shorter than the label
+   * x-height. */
+  min-height: 28px;
 }
 .acc-pop__risk-emoji { font-size: 14px; line-height: 20px; }
 .acc-pop__risk-label {
   font-size: 14px;
   line-height: 20px;
-  color: var(--ds-text-secondary-rest);
+  color: var(--ds-text-primary);
 }
 
 /* Account-health popover layout */
@@ -2483,18 +2519,20 @@ const LAYOUT_CSS = `
 .acc-pop--ebc { min-width: 280px; }
 .acc-health-bars { display: block; }
 
-/* Product popover — single horizontal row at large CellStandard
- * height (48px). Three cells: [20px logo] [bold name] [value], the
- * value pushed to the trailing edge with margin-left:auto so longer
- * names breathe naturally and the dollar reads as a row-end summary.
- * Cell padding (16px) and content sizes (16px / 24px) match the
- * scan rhythm of a CellStandard row, not the squint-y label scale. */
+/* Product popover — single horizontal row at CellStandard default
+ * height (40px). Three cells: [20px logo] [bold name] [value], the
+ * value anchored to the trailing edge via margin-left:auto so longer
+ * names breathe and the dollar reads as a row-end summary.
+ * Text is 14/20 — matches the floor used everywhere else in
+ * .acc-pop, and lines up with .opp-pop__product-name semantics
+ * (semibold primary, regular trailing meta). 16px horizontal padding
+ * is the CellStandard convention. */
 .acc-pop-row {
   display: flex;
   align-items: center;
-  height: 48px;
-  padding: 0 var(--ds-spacing-05); /* 16 — CellStandard horizontal padding */
-  gap: var(--ds-spacing-03);       /* 8  — gap between logo and name */
+  height: 40px;
+  padding: 0 var(--ds-spacing-05); /* 16 */
+  gap: var(--ds-spacing-03);       /* 8  */
   min-width: 0;
   white-space: nowrap;
 }
@@ -2507,14 +2545,14 @@ const LAYOUT_CSS = `
   justify-content: center;
 }
 .acc-pop-row__name {
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 20px;
   font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
 .acc-pop-row__value {
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-secondary-rest);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
@@ -2534,12 +2572,43 @@ const LAYOUT_CSS = `
   cursor: default;
 }
 
-/* KV rows used inside hover popovers. */
+/* Sales Play chip — chips are neutral, state lives in the icon.
+ * Several named DS status icons (not-touched, pitched, closed-won)
+ * ship with a baked-in fill attribute. CSS fill is a presentation
+ * property that overrides the SVG attribute, so the rules below
+ * recolor them cleanly without touching @ds/icons.
+ * Scope is .acc-sp-tag only — do not generalize. Other tags in the
+ * table (health, risks, EBC, brand) keep their own icon-color
+ * semantics. */
+/* Specificity note: DS ships
+ *   .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon
+ *   { color: var(--ds-icons-primary); }
+ * at (0,4,0). Our overrides must beat that, so every rule below
+ * carries the full .panw--tag.panw--tag--low.panw--tag--neutral
+ * chain (0,5,0). Do not simplify these selectors without re-checking
+ * the DS rule. */
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag .panw--tag__icon svg,
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag .panw--tag__icon svg path {
+  fill: currentColor;
+}
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--not-touched .panw--tag__icon { color: var(--ds-icons-status-danger); }
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--pursuing    .panw--tag__icon { color: var(--ds-icons-success); }
+/* closed-won keeps its DS-authored success-teal. */
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--closed-won  .panw--tag__icon { color: #29a393; }
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--pitched     .panw--tag__icon,
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--deferred    .panw--tag__icon,
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--declined    .panw--tag__icon,
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--closed-lost .panw--tag__icon { color: var(--ds-icons-secondary-rest); }
+
+/* KV rows used inside hover popovers. 8px between rows, 28px min
+ * height per row — both mirror .opp-pop__rows / .opp-pop__kv.
+ * The min-height locks rows to a 4px grid even when one side of a
+ * row is a tag (taller than text-only KV pairs). */
 .acc-pop__rows,
 .acc-pop__kv-list {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-02);
+  gap: var(--ds-spacing-03); /* 8 */
   list-style: none;
   padding: 0;
   margin: 0;
@@ -2549,6 +2618,7 @@ const LAYOUT_CSS = `
   align-items: center;
   justify-content: space-between;
   gap: var(--ds-spacing-04);
+  min-height: 28px;
 }
 .acc-pop__kv-label {
   font-size: 14px;
@@ -2566,12 +2636,16 @@ const LAYOUT_CSS = `
 
 /* ── Column 6 — Value (ARR / LTV stack) ─────────────────────────────── */
 .acc-value {
+  /* 14/20 matches .opp-value — the canonical body-compact size for
+   * tabular money in a row. Earlier this was 16/24 to "shout" the
+   * number, but consistency with opp-table wins; users read both
+   * tables back-to-back. */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: var(--ds-spacing-01);
-  font-size: 16px;
-  line-height: 24px;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-secondary-rest);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;

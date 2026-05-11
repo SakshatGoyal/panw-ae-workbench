@@ -1415,6 +1415,32 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   )
 }
 
+// ─── Apex roll-up popover (spec §4.1) ────────────────────────────────────
+// Derived at render time from the dataset so the numbers can't drift
+// from the visible siblings (cr-failure §8). Memoized via useMemo at
+// the call site.
+
+function ApexHoverPanel({ apex, rows }: { apex: string; rows: AccountRow[] }) {
+  const siblings = rows.filter(r => r.apex === apex)
+  const combinedArr = siblings.reduce((s, r) => s + r.arrUsd, 0)
+  const count = siblings.length
+  return (
+    <div className="acc-pop acc-pop--apex">
+      <div className="acc-pop__heading">{apex}</div>
+      <div className="acc-pop__rows">
+        <div className="acc-pop__kv">
+          <span className="acc-pop__kv-label">Sub-accounts</span>
+          <span className="acc-pop__kv-value">{count}</span>
+        </div>
+        <div className="acc-pop__kv">
+          <span className="acc-pop__kv-label">Combined ARR</span>
+          <span className="acc-pop__kv-value">{formatUsdCompact(combinedArr)}</span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // ─── Sort flyout (forked from opp-table) ─────────────────────────────────
 
 interface SortFlyoutProps {
@@ -1607,10 +1633,24 @@ function AEAccountTable() {
                 {sortedRows.map(row => (
                   <tr key={row.id} className="acc-row">
                     <td className="acc-c-account">
+                      {/* Column 1 — Account Name (link, body-compact-02
+                          bold) + Apex Account (smaller, tertiary,
+                          hover → roll-up popover). Apex line omitted
+                          when account is standalone (spec §2 / §4.1). */}
                       <div className="acc-multiline">
-                        <span className="acc-multiline__name">{row.name}</span>
+                        <a
+                          href="#"
+                          className="acc-multiline__name acc-multiline__link"
+                          onClick={(e) => e.preventDefault()}>
+                          {row.name}
+                        </a>
                         {row.apex && (
-                          <span className="acc-multiline__sub">{row.apex}</span>
+                          <HoverShell
+                            interactive
+                            openDelayMs={400}
+                            render={() => <ApexHoverPanel apex={row.apex!} rows={ROWS} />}>
+                            <span className="acc-multiline__sub">{row.apex}</span>
+                          </HoverShell>
                         )}
                       </div>
                     </td>
@@ -1932,6 +1972,41 @@ const LAYOUT_CSS = `
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  cursor: default;
+}
+.acc-multiline__link {
+  color: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+.acc-multiline__link:hover {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  color: var(--ds-text-primary);
+}
+
+/* KV rows used inside hover popovers. */
+.acc-pop__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);
+}
+.acc-pop__kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-04);
+}
+.acc-pop__kv-label {
+  font-size: 12px;
+  color: var(--ds-text-secondary-rest);
+}
+.acc-pop__kv-value {
+  font-size: 13px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
 }
 
 /* ── Column 6 — Value (ARR / LTV stack) ─────────────────────────────── */

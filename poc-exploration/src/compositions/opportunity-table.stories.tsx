@@ -1,55 +1,63 @@
 /**
  * AE Opportunity Table — sales pipeline composition
  *
- * Column structure (left → right):
- *   opportunity (name + account)
- *   products (neutral tags, one per product)
- *   logistics (quote id + type + stage + forecast + closes-date + last-activity)
- *   challenges (risks + health)
- *   value (rightmost, 18px semibold — no Stage token at 18px; documented gap)
- *   actions (icon buttons, reveal on hover)
+ * ── Pass 1 scope (this file): structure & data only ─────────────────────────
+ *   • Data model regenerated to carry brand-per-product, sub-health axes,
+ *     activity description, risk factors as discrete records, sales play,
+ *     and renewal payload.
+ *   • Defaults aligned with spec §5: Close Date asc sort; Close Date filter =
+ *     This Quarter + Q4FY26; Account Health = At Risk + Critical.
+ *   • Sort vocabulary reduced to the 5 spec axes (account name, opp name,
+ *     close date, value, risk factor count).
+ *   • Forecast, Stage, Opp Type, Last Activity are now single-select.
+ *   • Stage uses canonical names (Discovery / Solutioning / Tech Validation /
+ *     Active POV / Negotiation) — not "stage 1" etc.
+ *   • Last Activity moved from Column 2 ("deal state") into Column 3
+ *     ("activity & blockers"). Sales Play added to Column 3.
+ *   • Risk Factors filter rebuilt around the 9 named risks (emoji-labeled).
+ *   • Deal Size filter removed (not in spec).
+ *   • v1 "tags" filter removed — its eventual job is density control,
+ *     which is a different shape (Pass 5).
+ *   • Column 1 quieted (opp name → secondary bold; account → tertiary).
+ *   • Column 5 value emphasis dropped (no longer 18px semibold).
+ *   • Column 6 buttons promoted to ghost-brand; Eye → ChevronRight (expand).
  *
- * Sort: opportunity + value sortable on column header click. Sort button in
- * the search row opens a single-select Flyout with a wider sort vocabulary
- * (value, opportunity name, close date, last active, deal stage, opportunity
- * type, stage, account health, risk factor count).
+ * ── Deferred to later passes ─────────────────────────────────────────────
+ *   • Tag filter as density control + Account Health grouped filter (Pass 5)
+ *   • Brand icons on product tags + space-driven +N overflow (Pass 2)
+ *   • Last Activity severity coloring (caution / error bands) (Pass 2)
+ *   • Per-cell and per-tag hover popovers (Pass 3)
+ *   • Renewal Outcome editor + Upsell Modify tooltip (Pass 4)
+ *   • Account Health 12-month trend chart (Pass 3)
  *
- * Tags filter: parent categories of every tag rendered in the table.
- * Product filter: tree-with-checkboxes — every node has a checkbox, parent
- *   state is derived from children (checked / unchecked / indeterminate),
- *   toggling a parent cascades to its leaves. Hand-rolled because @ds/filter
- *   is flat-only.
- *
- * Tag conventions:
- *   shape="rounded", size="large" (= 4px chip-tier radius)
- *   color="neutral", contrast="low"
+ * ── Conventions ─────────────────────────────────────────────────────────
+ * Tag presets: shape="rounded", size="large" (= 4px chip-tier radius),
+ *              color="neutral", contrast="low".
  *
  * Row interaction matches @ds/cells-standard:
  *   rest      — alternate surface.rest / surface.alt.rest (zebra)
  *   hover     — ghost.hover (alpha-tint, composites over rest fill)
  *   pressed   — ghost.pressed
  *
- * Icons: imported from @ds/icons per stage-components.md ("reach for this
- * any time you'd import from lucide-react").
- *
  * Shell: no border, no background — composition lives inside a parent card.
  *
  * IACVT workaround for flyout tokens at the bottom of LAYOUT_CSS.
  *
- * System gaps surfaced (not patched in composition):
- *   • No 18px body/heading token — value cell uses inline 18px.
+ * ── System gaps surfaced (not patched in composition) ──────────────────
  *   • No tree variant of Filter — product filter built from primitives.
+ *   • No single-select variant of Filter — SingleSelectFilter built from
+ *     primitives in this file.
  *   • Pagination/Dropdown has no placement="top" prop — CSS workaround.
  *   • No Toolbar primitive for the search/filter rows.
  */
 
 import type { Meta, StoryObj } from '@storybook/react'
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import {
-  Calendar, Stars, Eye, ChevronDown, ChevronUp, ChevronRight, Folder,
+  Calendar, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
 } from '@ds/icons'
 import { Search } from '@ds/search'
-import { Filter, Sort, TreeFilter, type FilterOption, type TreeNode } from '@ds/filter'
+import { Filter, type FilterOption } from '@ds/filter'
 import { Header } from '@ds/header'
 import { CellContents } from '@ds/cell-contents'
 import { Pagination } from '@ds/pagination'
@@ -66,158 +74,357 @@ import {
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
+type DealStage =
+  | 'discovery' | 'solutioning' | 'tech-validation' | 'active-pov' | 'negotiation'
+type Forecast = 'pipeline' | 'best-case' | 'commit'
+type OppType = 'net-new' | 'upsell' | 'renewal'
+type Health = 'healthy' | 'at-risk' | 'critical'
+type Brand = 'strata' | 'prisma' | 'cortex' | 'unit-42'
+type LastActivityBucket = 'lt-7' | '7-21' | 'gt-21'
+
+type RiskId =
+  | 'exec' | 'design' | 'tech-win' | 'partner' | 'mandatory-ps'
+  | 'quote-approval' | 'budget' | 'term-length' | 'no-activity'
+
+type SalesPlayStatus =
+  | 'not-touched' | 'pitched' | 'deferred' | 'declined'
+  | 'pursuing' | 'closed-won' | 'closed-lost'
+
+type RenewalOutcome =
+  | 'unknown' | 'full' | 'downsell' | 'churn' | 'displacement' | 'duplicate'
+
+interface Product { name: string; brand: Brand; valueUsd: number }
+interface RiskFactor { id: RiskId; emoji: string; label: string }
+interface AccountHealth {
+  overall: Health
+  technical: Health
+  adoption: Health
+  // 12 monthly readings, oldest → newest. 0=healthy, 1=at-risk, 2=critical.
+  trend12mo: number[]
+}
+interface Activity { daysAgo: number; description: string }
+interface SalesPlay { name: string; status: SalesPlayStatus }
+interface RenewalData {
+  subEnd: string
+  renewableTcvUsd: number
+  arrUsd: number
+  outcome: RenewalOutcome
+}
+
 interface OpportunityRow {
   id: string
-  type: 'renewal' | 'net new' | 'upsell'
-  quoteId: string
   oppName: string
   account: string
-  products: string[]
-  value: string
-  forecast: string
-  stage: string
-  risks: string
-  health: string
-  closeDate: string
-  lastActivity: string
+  type: OppType
+  forecast: Forecast
+  stage: DealStage
+  closeDate: string // "mar 7" — short display form
+  quoteId: string
+  products: Product[]
+  valueUsd: number
+  activity: Activity
+  health: AccountHealth
+  risks: RiskFactor[]
+  salesPlay: SalesPlay
+  renewal?: RenewalData
 }
 
-interface FacetDef {
-  id: string
-  label: string
-  options: FilterOption[]
-}
-
-type SortKey =
-  | 'value' | 'oppName' | 'closeDate' | 'lastActive' | 'dealStage'
-  | 'oppType' | 'stage' | 'health' | 'riskCount'
+type SortKey = 'accountName' | 'oppName' | 'closeDate' | 'value' | 'riskCount'
 type SortDir = 'asc' | 'desc'
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: 'value', label: 'value' },
-  { key: 'oppName', label: 'opportunity name' },
-  { key: 'closeDate', label: 'close date' },
-  { key: 'lastActive', label: 'last active' },
-  { key: 'dealStage', label: 'deal stage' },
-  { key: 'oppType', label: 'opportunity type' },
-  { key: 'stage', label: 'stage' },
-  { key: 'health', label: 'account health' },
-  { key: 'riskCount', label: 'risk factor count' },
+  { key: 'accountName', label: 'account name' },
+  { key: 'oppName',     label: 'opportunity name' },
+  { key: 'closeDate',   label: 'close date' },
+  { key: 'value',       label: 'value' },
+  { key: 'riskCount',   label: 'risk factor count' },
 ]
+
+// ─── Display label maps ──────────────────────────────────────────────────────
+
+const STAGE_LABEL: Record<DealStage, string> = {
+  'discovery':       'discovery',
+  'solutioning':     'solutioning',
+  'tech-validation': 'tech validation',
+  'active-pov':      'active POV',
+  'negotiation':     'negotiation',
+}
+const FORECAST_LABEL: Record<Forecast, string> = {
+  'pipeline':  'pipeline',
+  'best-case': 'best case',
+  'commit':    'commit',
+}
+const TYPE_LABEL: Record<OppType, string> = {
+  'net-new': 'net new',
+  'upsell':  'upsell',
+  'renewal': 'renewal',
+}
+const HEALTH_LABEL: Record<Health, string> = {
+  'healthy':  'healthy',
+  'at-risk':  'at risk',
+  'critical': 'critical',
+}
+
+// ─── Risk library (spec §3.11) ───────────────────────────────────────────────
+
+const RISK_LIBRARY: Record<RiskId, { emoji: string; label: string }> = {
+  'exec':           { emoji: '🧍', label: 'Lacking exec engagement or support' },
+  'design':         { emoji: '📜', label: 'No design-of-record' },
+  'tech-win':       { emoji: '🏅', label: 'No Secured technical win' },
+  'partner':        { emoji: '🤝', label: 'No Partner selected or finalized' },
+  'mandatory-ps':   { emoji: '🧑‍💻', label: 'Mandatory PS was removed' },
+  'quote-approval': { emoji: '⌛', label: 'Quotes pending approval' },
+  'budget':         { emoji: '💲', label: 'Budget conversation not scheduled or complete' },
+  'term-length':    { emoji: '🔁', label: 'Term length greater than 3 years or without financing/billing plans' },
+  'no-activity':    { emoji: '💤', label: 'No activity for last 30 days' },
+}
+const mkRisk = (id: RiskId): RiskFactor => ({ id, ...RISK_LIBRARY[id] })
+
+// ─── Product brand map (spec §4.4) ───────────────────────────────────────────
+// PA Series shows up as both Strata (Firewall) and Prisma (CDSS attachment) —
+// disambiguated by name. "PA Series" = Firewall/Strata; the CDSS attachment is
+// named "PA Series Attached" already.
+
+const PRODUCT_BRAND: Record<string, Brand> = {
+  'PA Series':           'strata',
+  'VM Series':           'strata',
+  'PA Series Attached':  'prisma',
+  'PA Series Support':   'prisma',
+  'FW Data Lake':        'strata',
+  'Prisma Access':       'prisma',
+  'Prisma SD-WAN':       'prisma',
+  'Cortex XDR+':         'cortex',
+  'Cortex XSOAR':        'cortex',
+  'Xpanse':              'cortex',
+  'XSIAM':               'cortex',
+  'QRadar':              'cortex',
+  'Cortex & Cloud':      'cortex',
+  'Reactive':            'unit-42',
+  'Proactive':           'unit-42',
+}
+const mkProduct = (name: string, valueUsd: number): Product => ({
+  name,
+  brand: PRODUCT_BRAND[name] ?? 'strata',
+  valueUsd,
+})
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
 const ROWS: OpportunityRow[] = [
-  { id: '1', type: 'renewal', quoteId: 'Q-0307',
+  {
+    id: '1',
     oppName: 'Prisma Access annual renewal with global bandwidth upgrade',
     account: 'Titan Energy Solutions',
-    products: ['Prisma Access', 'GlobalProtect'],
-    value: '$1.2M', forecast: 'commit', stage: 'stage 5',
-    risks: '0 risks', health: 'healthy',
-    closeDate: 'mar 7', lastActivity: '2 days ago' },
-  { id: '2', type: 'net new', quoteId: 'Q-0891',
+    type: 'renewal', forecast: 'commit', stage: 'negotiation',
+    closeDate: 'mar 7', quoteId: 'Q-00307',
+    products: [
+      mkProduct('Prisma Access', 900_000),
+      mkProduct('Prisma SD-WAN', 300_000),
+    ],
+    valueUsd: 1_200_000,
+    activity: { daysAgo: 2, description: 'Pricing review with procurement' },
+    health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
+      trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+    risks: [],
+    salesPlay: { name: 'SASE Acceleration', status: 'pursuing' },
+    renewal: { subEnd: 'Sept 1, 2025', renewableTcvUsd: 1_200_000, arrUsd: 600_000, outcome: 'full' },
+  },
+  {
+    id: '2',
     oppName: 'Cortex XDR enterprise deployment for distributed workforce',
     account: 'Meridian Capital Group',
-    products: ['Cortex XDR', 'Cortex XSOAR', '+1'],
-    value: '$2.4M', forecast: 'commit', stage: 'stage 4',
-    risks: '2 risks', health: 'healthy',
-    closeDate: 'mar 14', lastActivity: '1 day ago' },
-  { id: '3', type: 'upsell', quoteId: 'Q-0734',
+    type: 'net-new', forecast: 'commit', stage: 'active-pov',
+    closeDate: 'mar 14', quoteId: 'Q-00891',
+    products: [
+      mkProduct('Cortex XDR+', 1_400_000),
+      mkProduct('Cortex XSOAR', 700_000),
+      mkProduct('XSIAM', 300_000),
+    ],
+    valueUsd: 2_400_000,
+    activity: { daysAgo: 1, description: 'Technical deep-dive with SecOps lead' },
+    health: { overall: 'at-risk', technical: 'healthy', adoption: 'at-risk',
+      trend12mo: [0,0,0,0,0,1,0,0,0,0,0,1] },
+    risks: [mkRisk('budget'), mkRisk('partner')],
+    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pursuing' },
+  },
+  {
+    id: '3',
     oppName: 'Strata Cloud Manager upgrade with advanced threat prevention',
     account: 'Nexus Financial Holdings',
-    products: ['Strata Cloud Manager', 'AIOps for NGFW'],
-    value: '$890K', forecast: 'best case', stage: 'stage 3',
-    risks: '1 risk', health: 'healthy',
-    closeDate: 'mar 18', lastActivity: '3 days ago' },
-  { id: '4', type: 'renewal', quoteId: 'Q-0622',
+    type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
+    closeDate: 'mar 18', quoteId: 'Q-00734',
+    products: [
+      mkProduct('PA Series', 540_000),
+      mkProduct('FW Data Lake', 350_000),
+    ],
+    valueUsd: 890_000,
+    activity: { daysAgo: 3, description: 'Architecture review session' },
+    health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
+      trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+    risks: [mkRisk('design')],
+    salesPlay: { name: 'Hardware Refresh', status: 'pursuing' },
+  },
+  {
+    id: '4',
     oppName: 'Annual Prisma Access license renewal — full global employee base',
     account: 'Vertex Manufacturing Co.',
-    products: ['Prisma Access', 'Prisma SD-WAN', '+2'],
-    value: '$3.1M', forecast: 'commit', stage: 'stage 5',
-    risks: '4 risks', health: 'critical',
-    closeDate: 'mar 21', lastActivity: '9 days ago' },
-  { id: '5', type: 'upsell', quoteId: 'Q-0855',
+    type: 'renewal', forecast: 'commit', stage: 'negotiation',
+    closeDate: 'mar 21', quoteId: 'Q-00622',
+    products: [
+      mkProduct('Prisma Access', 1_700_000),
+      mkProduct('Prisma SD-WAN', 800_000),
+      mkProduct('PA Series', 400_000),
+      mkProduct('FW Data Lake', 200_000),
+    ],
+    valueUsd: 3_100_000,
+    activity: { daysAgo: 9, description: 'Executive escalation call' },
+    health: { overall: 'critical', technical: 'critical', adoption: 'at-risk',
+      trend12mo: [0,0,1,1,1,1,2,2,2,2,2,2] },
+    risks: [mkRisk('exec'), mkRisk('partner'), mkRisk('budget'), mkRisk('quote-approval')],
+    salesPlay: { name: 'SASE Acceleration', status: 'pursuing' },
+    renewal: { subEnd: 'Apr 30, 2025', renewableTcvUsd: 3_100_000, arrUsd: 1_550_000, outcome: 'unknown' },
+  },
+  {
+    id: '5',
     oppName: 'Cortex XDR additional endpoint coverage expansion',
     account: 'Pacific Commerce Bank',
-    products: ['Cortex XDR', 'WildFire'],
-    value: '$670K', forecast: 'best case', stage: 'stage 2',
-    risks: '6 risks', health: 'critical',
-    closeDate: 'mar 28', lastActivity: '12 days ago' },
-  { id: '6', type: 'net new', quoteId: 'Q-0956',
+    type: 'upsell', forecast: 'best-case', stage: 'solutioning',
+    closeDate: 'mar 28', quoteId: 'Q-00855',
+    products: [
+      mkProduct('Cortex XDR+', 470_000),
+      mkProduct('Xpanse', 200_000),
+    ],
+    valueUsd: 670_000,
+    activity: { daysAgo: 12, description: 'Pricing options shared via email' },
+    health: { overall: 'critical', technical: 'at-risk', adoption: 'critical',
+      trend12mo: [0,0,0,1,1,1,1,2,2,2,2,2] },
+    risks: [
+      mkRisk('exec'), mkRisk('design'), mkRisk('tech-win'),
+      mkRisk('mandatory-ps'), mkRisk('term-length'), mkRisk('no-activity'),
+    ],
+    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pursuing' },
+  },
+  {
+    id: '6',
     oppName: 'Cortex XSOAR automation platform initial deployment',
     account: 'Axiom Technology Partners',
-    products: ['Cortex XSOAR', 'XPANSE'],
-    value: '$1.7M', forecast: 'pipeline', stage: 'stage 2',
-    risks: '0 risks', health: 'healthy',
-    closeDate: 'apr 2', lastActivity: 'today' },
-  { id: '7', type: 'upsell', quoteId: 'Q-0481',
+    type: 'net-new', forecast: 'pipeline', stage: 'solutioning',
+    closeDate: 'apr 2', quoteId: 'Q-00956',
+    products: [
+      mkProduct('Cortex XSOAR', 1_200_000),
+      mkProduct('Xpanse', 500_000),
+    ],
+    valueUsd: 1_700_000,
+    activity: { daysAgo: 0, description: 'Discovery call with security team' },
+    health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
+      trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+    risks: [],
+    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pitched' },
+  },
+  {
+    id: '7',
     oppName: 'WildFire advanced malware protection add-on for all endpoints',
     account: 'Summit Healthcare Systems',
-    products: ['WildFire', 'Cortex XDR'],
-    value: '$445K', forecast: 'best case', stage: 'stage 3',
-    risks: '5 risks', health: 'at risk',
-    closeDate: 'apr 8', lastActivity: '5 days ago' },
-  { id: '8', type: 'net new', quoteId: 'Q-1012',
+    type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
+    closeDate: 'apr 8', quoteId: 'Q-00481',
+    products: [
+      mkProduct('Cortex XDR+', 280_000),
+      mkProduct('PA Series Attached', 165_000),
+    ],
+    valueUsd: 445_000,
+    activity: { daysAgo: 5, description: 'POC kickoff meeting' },
+    health: { overall: 'at-risk', technical: 'healthy', adoption: 'at-risk',
+      trend12mo: [0,0,0,0,0,0,0,1,1,1,1,1] },
+    risks: [mkRisk('design'), mkRisk('partner'), mkRisk('quote-approval'),
+            mkRisk('term-length'), mkRisk('budget')],
+    salesPlay: { name: 'Hardware Refresh', status: 'pursuing' },
+  },
+  {
+    id: '8',
     oppName: 'Prisma Cloud enterprise security platform for cloud migration program',
     account: 'Harbor Logistics Group',
-    products: ['Prisma Cloud', 'Prisma Access', '+3'],
-    value: '$5.2M', forecast: 'pipeline', stage: 'stage 1',
-    risks: '3 risks', health: 'at risk',
-    closeDate: 'apr 15', lastActivity: '7 days ago' },
+    type: 'net-new', forecast: 'pipeline', stage: 'discovery',
+    closeDate: 'apr 15', quoteId: 'Q-01012',
+    products: [
+      mkProduct('Prisma Access', 2_400_000),
+      mkProduct('Prisma SD-WAN', 1_500_000),
+      mkProduct('Cortex XDR+', 700_000),
+      mkProduct('XSIAM', 400_000),
+      mkProduct('Reactive', 200_000),
+    ],
+    valueUsd: 5_200_000,
+    activity: { daysAgo: 7, description: 'Solution overview workshop' },
+    health: { overall: 'at-risk', technical: 'at-risk', adoption: 'healthy',
+      trend12mo: [0,0,0,0,0,0,1,1,1,1,1,1] },
+    risks: [mkRisk('exec'), mkRisk('design'), mkRisk('tech-win')],
+    salesPlay: { name: 'SASE Acceleration', status: 'pitched' },
+  },
 ]
 
-// ─── Facet definitions ───────────────────────────────────────────────────────
+// ─── Filter option sets ──────────────────────────────────────────────────────
 
-const FACETS: FacetDef[] = [
-  { id: 'tags', label: 'tags', options: [
-    { value: 'opp-type', label: 'opportunity type' },
-    { value: 'opp-stage', label: 'opportunity stage' },
-    { value: 'forecast', label: 'forecast' },
-    { value: 'last-activity', label: 'last activity' },
-    { value: 'close-date', label: 'close date' },
-    { value: 'risk-factors', label: 'risk factors' },
-    { value: 'account-health', label: 'account health' },
-  ]},
-  { id: 'quarter', label: 'quarter', options: [
-    { value: 'q1', label: 'Q1 FY26' }, { value: 'q2', label: 'Q2 FY26' },
-    { value: 'q3', label: 'Q3 FY26' }, { value: 'q4', label: 'Q4 FY26' },
-  ]},
-  { id: 'type', label: 'type', options: [
-    { value: 'net-new', label: 'net new' }, { value: 'upsell', label: 'upsell' },
-    { value: 'renewal', label: 'renewal' },
-  ]},
-  { id: 'forecast', label: 'forecast', options: [
-    { value: 'commit', label: 'commit' }, { value: 'best-case', label: 'best case' },
-    { value: 'pipeline', label: 'pipeline' }, { value: 'closed', label: 'closed' },
-    { value: 'closed-lost', label: 'closed lost' },
-  ]},
-  { id: 'stage', label: 'stage', options: [
-    { value: '1', label: 'stage 1' }, { value: '2', label: 'stage 2' },
-    { value: '3', label: 'stage 3' }, { value: '4', label: 'stage 4' },
-    { value: '5', label: 'stage 5' },
-  ]},
-  { id: 'deal-size', label: 'deal size', options: [
-    { value: 'lt-100', label: 'under $100K' },
-    { value: '100-500', label: '$100K – $500K' },
-    { value: '500-1m', label: '$500K – $1M' },
-    { value: 'gt-1m', label: 'over $1M' },
-  ]},
-  { id: 'risk', label: 'risk factors', options: [
-    { value: 'none', label: 'none' },
-    { value: '1-3', label: '1–3 risks' },
-    { value: '4-plus', label: '4 or more' },
-  ]},
-  { id: 'health', label: 'health', options: [
-    { value: 'healthy', label: 'healthy' },
-    { value: 'at-risk', label: 'at risk' },
-    { value: 'critical', label: 'critical' },
-  ]},
+const FORECAST_OPTIONS: { value: string; label: string }[] = [
+  { value: 'pipeline',  label: 'pipeline' },
+  { value: 'best-case', label: 'best case' },
+  { value: 'commit',    label: 'commit' },
 ]
 
-const INITIAL_APPLIED: Record<string, string[]> = {
-  quarter: ['q2'],
-  forecast: ['commit'],
-  health: ['at-risk', 'critical'],
+const STAGE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'discovery',       label: 'discovery' },
+  { value: 'solutioning',     label: 'solutioning' },
+  { value: 'tech-validation', label: 'tech validation' },
+  { value: 'active-pov',      label: 'active POV' },
+  { value: 'negotiation',     label: 'negotiation' },
+]
+
+const TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'net-new', label: 'net new' },
+  { value: 'upsell',  label: 'upsell' },
+  { value: 'renewal', label: 'renewal' },
+]
+
+const LAST_ACTIVITY_OPTIONS: { value: string; label: string }[] = [
+  { value: 'lt-7',  label: 'last 7 days' },
+  { value: '7-21',  label: '7–21 days' },
+  { value: 'gt-21', label: 'over 21 days' },
+]
+
+const CLOSE_DATE_OPTIONS: FilterOption[] = [
+  { value: 'this-q', label: 'This Quarter' },
+  { value: 'q4fy26', label: 'Q4FY26' },
+  { value: 'q1fy27', label: 'Q1FY27' },
+  { value: 'q2fy27', label: 'Q2FY27' },
+  { value: 'q3fy27', label: 'Q3FY27' },
+  { value: 'q4fy27', label: 'Q4FY27' },
+]
+
+// Flat 3-option health filter. The grouped (Overall / Technical / Adoption)
+// shape per spec §3.10 lands in Pass 5 — keep the v1 widget here so the
+// default (At Risk + Critical on Overall) still expresses the spec intent.
+const HEALTH_OPTIONS: FilterOption[] = [
+  { value: 'healthy',  label: 'healthy' },
+  { value: 'at-risk',  label: 'at risk' },
+  { value: 'critical', label: 'critical' },
+]
+
+const RISK_FILTER_OPTIONS: FilterOption[] = (Object.keys(RISK_LIBRARY) as RiskId[]).map(id => ({
+  value: id,
+  label: `${RISK_LIBRARY[id].emoji} ${RISK_LIBRARY[id].label}`,
+}))
+
+// ─── Defaults (spec §5) ──────────────────────────────────────────────────────
+
+const INITIAL_SINGLE: Record<string, string | null> = {
+  forecast: null,
+  stage: null,
+  oppType: null,
+  lastActivity: null,
+}
+
+const INITIAL_MULTI: Record<string, string[]> = {
+  closeDate: ['this-q', 'q4fy26'],
+  health:    ['at-risk', 'critical'],
+  risk:      [],
 }
 
 // ─── Product taxonomy (tree filter) ──────────────────────────────────────────
@@ -247,7 +454,7 @@ const PRODUCT_TREE: ProductNode[] = [
     { label: 'Cortex XSOAR', value: 'cortex-xsoar' },
     { label: 'Xpanse', value: 'xpanse' },
     { label: 'XSIAM', value: 'xsiam' },
-    { label: 'Qradar', value: 'qradar' },
+    { label: 'QRadar', value: 'qradar' },
     { label: 'Cortex & Cloud', value: 'cortex-cloud-leaf' },
   ]},
   { label: 'Unit 42', value: 'unit-42', children: [
@@ -267,6 +474,22 @@ const TAG_BASE = {
   size: 'large' as const, // large = 4px radius (per design call)
 }
 
+// ─── Helpers ─────────────────────────────────────────────────────────────────
+
+function formatUsdCompact(n: number): string {
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact', style: 'currency', currency: 'USD', maximumFractionDigits: 1,
+  }).format(n)
+}
+
+// Parse "mar 7" → ordinal for sort. Sufficient for fixed demo data;
+// real data would carry a Date and this helper goes away.
+const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov','dec']
+function closeDateOrdinal(s: string): number {
+  const [m, d] = s.toLowerCase().split(/\s+/)
+  return (MONTHS.indexOf(m ?? '') * 31) + (parseInt(d ?? '1', 10) || 1)
+}
+
 // ─── Sort flyout (single-select) ─────────────────────────────────────────────
 
 interface SortFlyoutProps {
@@ -279,7 +502,7 @@ function SortFlyout({ sortKey, sortDir, onChange }: SortFlyoutProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
-  const currentLabel = SORT_OPTIONS.find(o => o.key === sortKey)?.label ?? 'value'
+  const currentLabel = SORT_OPTIONS.find(o => o.key === sortKey)?.label ?? 'close date'
 
   return (
     <>
@@ -312,6 +535,78 @@ function SortFlyout({ sortKey, sortDir, onChange }: SortFlyoutProps) {
         </FlyoutList>
       </Flyout>
     </>
+  )
+}
+
+// ─── Single-select filter (built from primitives) ────────────────────────────
+// DS Filter is multi-select with Apply/Cancel. Spec §3.5/3.6/3.8/3.9 want
+// single-select with an "All" reset option. This trigger mirrors Filter's
+// visual shape (label + selected chip + chevron) but commits immediately on
+// item click, like SortFlyout. Built locally; flagged in file header as a
+// system gap.
+
+const ALL_SENTINEL = '__all__'
+
+interface SingleSelectFilterProps {
+  label: string
+  options: { value: string; label: string }[]
+  value: string | null
+  onChange: (v: string | null) => void
+  allLabel?: string
+}
+
+function SingleSelectFilter({ label, options, value, onChange, allLabel = 'All' }: SingleSelectFilterProps) {
+  const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const selectedOption = value === null ? null : options.find(o => o.value === value) ?? null
+
+  return (
+    <span className="panw--filter__wrapper">
+      <button
+        ref={triggerRef}
+        type="button"
+        className={`panw--filter${open ? ' panw--filter--open' : ''}`}
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span className="panw--filter__label">{label}</span>
+        {selectedOption && (
+          <span className="panw--filter__values">
+            <span className="panw--filter__chip-target">
+              <Tags
+                label={selectedOption.label}
+                color="neutral"
+                contrast="high"
+                size="default"
+              />
+            </span>
+          </span>
+        )}
+        <span className="panw--filter__chevron" aria-hidden="true">
+          {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+        </span>
+      </button>
+
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        mode="single"
+        selected={[value ?? ALL_SENTINEL]}
+        onSelectionChange={(values) => {
+          const v = values[0]
+          onChange(!v || v === ALL_SENTINEL ? null : v)
+          setOpen(false)
+        }}
+        placement="bottom-start">
+        <FlyoutList>
+          <FlyoutItem value={ALL_SENTINEL}>{allLabel}</FlyoutItem>
+          {options.map(o => (
+            <FlyoutItem key={o.value} value={o.value}>{o.label}</FlyoutItem>
+          ))}
+        </FlyoutList>
+      </Flyout>
+    </span>
   )
 }
 
@@ -381,8 +676,7 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   const apply = () => { onApply(draft); setOpen(false) }
   const cancel = () => setOpen(false)
 
-  // Trigger displays a chip-tag with count when any applied (matches Filter component pattern).
-  const triggerLabel = 'product'
+  const triggerLabel = 'products'
 
   return (
     <span className="panw--filter__wrapper">
@@ -419,15 +713,13 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
         open={open}
         onOpenChange={setOpen}
         anchorRef={triggerRef}
-        placement="bottom-end">
+        placement="bottom-start">
         <FlyoutFilter
           placeholder="Filter"
           value={search}
           onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearch(e.target.value)}
         />
         <div className="opp-tree" role="tree">
-          {/* All Products (select-all). Diverges from FlyoutSelectAll's
-              icon-only convention per user reference showing a labeled row. */}
           <div className="opp-tree__row opp-tree__row--root" onClick={toggleAll} role="treeitem" aria-checked={allStatus === 'checked'}>
             <span className="opp-tree__chev-spacer" />
             <Checkbox status={allStatus} label="" tabIndex={-1} />
@@ -498,6 +790,13 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
 // ─── Row sub-component ───────────────────────────────────────────────────────
 
 function OppRow({ row }: { row: OpportunityRow }) {
+  const dayLabel =
+    row.activity.daysAgo === 0 ? 'today'
+    : row.activity.daysAgo === 1 ? '1 day ago'
+    : `${row.activity.daysAgo} days ago`
+  const riskLabel =
+    row.risks.length === 1 ? '1 risk' : `${row.risks.length} risks`
+
   return (
     <tr className="opp-row">
       <td>
@@ -507,35 +806,38 @@ function OppRow({ row }: { row: OpportunityRow }) {
         </div>
       </td>
       <td>
+        {/* Column 2 — deal state. Last Activity is NOT here (moved to col 3). */}
+        <div className="opp-tag-cluster">
+          <Tags {...TAG_BASE} label={row.quoteId} />
+          <Tags {...TAG_BASE} label={TYPE_LABEL[row.type]} />
+          <Tags {...TAG_BASE} label={STAGE_LABEL[row.stage]} />
+          <Tags {...TAG_BASE} label={FORECAST_LABEL[row.forecast]} />
+          <Tags {...TAG_BASE} icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
+        </div>
+      </td>
+      <td>
+        {/* Column 3 — activity & blockers. Last Activity + Health + Risk count + Sales Play. */}
+        <div className="opp-tag-cluster">
+          <Tags {...TAG_BASE} label={dayLabel} />
+          <Tags {...TAG_BASE} label={HEALTH_LABEL[row.health.overall]} />
+          <Tags {...TAG_BASE} label={riskLabel} />
+          <Tags {...TAG_BASE} label={row.salesPlay.name} />
+        </div>
+      </td>
+      <td>
         <div className="opp-tag-cluster">
           {row.products.map(p => (
-            <Tags key={p} {...TAG_BASE} label={p} />
+            <Tags key={p.name} {...TAG_BASE} label={p.name} />
           ))}
         </div>
       </td>
-      <td>
-        <div className="opp-tag-cluster">
-          <Tags {...TAG_BASE} label={row.quoteId} />
-          <Tags {...TAG_BASE} label={row.type} />
-          <Tags {...TAG_BASE} label={row.stage} />
-          <Tags {...TAG_BASE} label={row.forecast} />
-          <Tags {...TAG_BASE} icon renderIcon={Calendar} label={`closes ${row.closeDate}`} />
-          <Tags {...TAG_BASE} label={row.lastActivity} />
-        </div>
-      </td>
-      <td>
-        <div className="opp-tag-cluster">
-          <Tags {...TAG_BASE} label={row.risks} />
-          <Tags {...TAG_BASE} label={row.health} />
-        </div>
-      </td>
       <td className="opp-c-value">
-        <CellContents content="numbers" text={row.value} />
+        <CellContents content="numbers" text={formatUsdCompact(row.valueUsd)} />
       </td>
       <td className="opp-c-actions">
         <div className="opp-actions">
-          <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Stars} aria-label="AI" />
-          <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Eye} aria-label="View" />
+          <IconButton kind="ghost-brand" size="sm" iconSize={16} renderIcon={Stars} aria-label="AI" />
+          <IconButton kind="ghost-brand" size="sm" iconSize={16} renderIcon={ChevronRight} aria-label="Expand" />
         </div>
       </td>
     </tr>
@@ -546,32 +848,47 @@ function OppRow({ row }: { row: OpportunityRow }) {
 
 function AEOpportunityTable() {
   const [search, setSearch] = useState('')
-  const [applied, setApplied] = useState<Record<string, string[]>>(INITIAL_APPLIED)
-  const [products, setProducts] = useState<string[]>([])
+  const [single, setSingle] = useState<Record<string, string | null>>(INITIAL_SINGLE)
+  const [multi, setMulti] = useState<Record<string, string[]>>(INITIAL_MULTI)
+  const [products, setProducts] = useState<string[]>([]) // empty = All
   const [page, setPage] = useState(1)
   const [rowsPerPage, setRowsPerPage] = useState(10)
-  const [sortKey, setSortKey] = useState<SortKey>('value')
-  const [sortDir, setSortDir] = useState<SortDir>('desc')
+  const [sortKey, setSortKey] = useState<SortKey>('closeDate') // spec §5 default
+  const [sortDir, setSortDir] = useState<SortDir>('asc')        // spec §5 default
 
-  const setFacet = (id: string, values: string[]) => {
-    setApplied(prev => {
-      const next = { ...prev }
-      if (values.length === 0) delete next[id]
-      else next[id] = values
-      return next
-    })
-  }
+  const setSingleFacet = (id: string, v: string | null) =>
+    setSingle(prev => ({ ...prev, [id]: v }))
+  const setMultiFacet = (id: string, values: string[]) =>
+    setMulti(prev => ({ ...prev, [id]: values }))
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
       setSortDir(d => d === 'asc' ? 'desc' : 'asc')
     } else {
       setSortKey(key)
-      setSortDir('desc')
+      setSortDir(key === 'closeDate' ? 'asc' : 'desc')
     }
   }
 
-  // Header columns are restricted to the two we expose for sort via the column UI.
+  // Sort only — filtering wiring lands in a later pass alongside the
+  // density / grouped-health filters. Pass 1 is structural; the controls
+  // exist and hold state, but the table renders the full row set.
+  const sortedRows = useMemo(() => {
+    const arr = [...ROWS]
+    arr.sort((a, b) => {
+      let cmp = 0
+      switch (sortKey) {
+        case 'accountName': cmp = a.account.localeCompare(b.account); break
+        case 'oppName':     cmp = a.oppName.localeCompare(b.oppName); break
+        case 'closeDate':   cmp = closeDateOrdinal(a.closeDate) - closeDateOrdinal(b.closeDate); break
+        case 'value':       cmp = a.valueUsd - b.valueUsd; break
+        case 'riskCount':   cmp = a.risks.length - b.risks.length; break
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    return arr
+  }, [sortKey, sortDir])
+
   type HeaderSortKey = Extract<SortKey, 'oppName' | 'value'>
   const headerType = (key: HeaderSortKey) =>
     sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'basic'
@@ -586,46 +903,68 @@ function AEOpportunityTable() {
             <div className="opp-search-row__search">
               <Search
                 size="md"
-                placeholder="account, quote id, contact, product…"
+                placeholder="account, quote id, opportunity name, product…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 onClear={() => setSearch('')}
               />
             </div>
-            {/* Sort lives in @ds/filter as the single-select sibling of
-                Filter — same trigger chrome (32px tall, neutral border,
-                content-sized) so it reads as part of the filter family. */}
-            <Sort
-              options={SORT_OPTIONS.map(o => ({ value: o.key, label: o.label }))}
-              value={sortKey}
-              direction={sortDir}
-              onChange={(v) => setSortKey(v as SortKey)}
-              onDirectionChange={setSortDir}
+            <SortFlyout
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onChange={(k) => {
+                setSortKey(k)
+                setSortDir(k === 'closeDate' ? 'asc' : 'desc')
+              }}
             />
           </div>
 
-          {/* ── Filter row: filters left, counts right (top-aligned) ───── */}
+          {/* ── Filter row ─────────────────────────────────────────────── */}
           <div className="opp-filter-row">
             <div className="opp-filter-group">
-              {FACETS.map(facet => (
-                <Filter
-                  key={facet.id}
-                  label={facet.label}
-                  options={facet.options}
-                  selected={applied[facet.id] ?? []}
-                  onApply={(values: string[]) => setFacet(facet.id, values)}
-                />
-              ))}
-              {/* TreeFilter is the @ds/filter tree variant — Apply/Cancel
-                  commit semantics like Filter, but with parent groups and
-                  cascading checkbox state. */}
-              <TreeFilter
-                label="product"
-                options={PRODUCT_TREE as TreeNode[]}
-                selected={products}
-                selectAllLabel="All Products"
-                onApply={setProducts}
+              <SingleSelectFilter
+                label="forecast"
+                options={FORECAST_OPTIONS}
+                value={single.forecast}
+                onChange={(v) => setSingleFacet('forecast', v)}
               />
+              <SingleSelectFilter
+                label="stage"
+                options={STAGE_OPTIONS}
+                value={single.stage}
+                onChange={(v) => setSingleFacet('stage', v)}
+              />
+              <SingleSelectFilter
+                label="opportunity type"
+                options={TYPE_OPTIONS}
+                value={single.oppType}
+                onChange={(v) => setSingleFacet('oppType', v)}
+              />
+              <SingleSelectFilter
+                label="last activity"
+                options={LAST_ACTIVITY_OPTIONS}
+                value={single.lastActivity}
+                onChange={(v) => setSingleFacet('lastActivity', v)}
+              />
+              <Filter
+                label="close date"
+                options={CLOSE_DATE_OPTIONS}
+                selected={multi.closeDate ?? []}
+                onApply={values => setMultiFacet('closeDate', values)}
+              />
+              <Filter
+                label="account health"
+                options={HEALTH_OPTIONS}
+                selected={multi.health ?? []}
+                onApply={values => setMultiFacet('health', values)}
+              />
+              <Filter
+                label="risk factors"
+                options={RISK_FILTER_OPTIONS}
+                selected={multi.risk ?? []}
+                onApply={values => setMultiFacet('risk', values)}
+              />
+              <ProductFilter selected={products} onApply={setProducts} />
             </div>
             <span className="opp-counts">47 deals · $12.4M ARR</span>
           </div>
@@ -636,15 +975,15 @@ function AEOpportunityTable() {
               <thead>
                 <tr>
                   <th><Header size="md" type={headerType('oppName')} onHeaderClick={() => toggleSort('oppName')}>opportunity</Header></th>
+                  <th className="opp-no-sort"><Header size="md" type="basic">deal state</Header></th>
+                  <th className="opp-no-sort"><Header size="md" type="basic">activity &amp; blockers</Header></th>
                   <th className="opp-no-sort"><Header size="md" type="basic">products</Header></th>
-                  <th className="opp-no-sort"><Header size="md" type="basic">logistics</Header></th>
-                  <th className="opp-no-sort"><Header size="md" type="basic">challenges</Header></th>
                   <th className="opp-c-value"><Header size="md" type={headerType('value')} alignment="right" onHeaderClick={() => toggleSort('value')}>value</Header></th>
                   <th className="opp-c-actions opp-no-sort" />
                 </tr>
               </thead>
               <tbody>
-                {ROWS.map(row => <OppRow key={row.id} row={row} />)}
+                {sortedRows.map(row => <OppRow key={row.id} row={row} />)}
               </tbody>
             </table>
           </div>
@@ -760,14 +1099,6 @@ const LAYOUT_CSS = `
   flex: 1;
   min-width: 0;
 }
-/* Filter trigger height — pinned at the component level (32px on all sides
-   regardless of whether a count chip is rendered). No override needed here. */
-
-/* Flyout containing-block — no longer needs a workaround.
-   @ds/flyout now uses position: fixed for the dropdown panel, anchoring
-   it to the viewport regardless of any positioned ancestor (e.g. the
-   .panw--filter__wrapper that's position: relative for the chip-hover
-   popover). Wrapper positioning stays at its component default. */
 .opp-counts {
   margin-left: auto;
   padding-top: var(--ds-spacing-03); /* 8 — top-aligned with first row of filter chips */
@@ -792,18 +1123,11 @@ const LAYOUT_CSS = `
 .opp-table th.opp-c-value,
 .opp-table td.opp-c-value { text-align: right; }
 
-/* Value cell — 18px semibold. Stage has no body/heading token at 18px
-   (sizes jump from 16 / heading-02 to 20 / heading-03), so this stays
-   inline. Flagged in file header as a system gap. */
+/* Pass 1 — value cell is quiet per spec §4.5 (body-02, text.secondary).
+   Inherits Tags/CellContents defaults; no special weight or size override. */
 .opp-table td.opp-c-value .panw--cell-contents__text {
-  font-size: 18px;
-  /* Pair the inline 18px font-size with a 24px line-height so descenders
-     don't clip. Stage has no body/heading token at 18px (sizes jump from
-     heading-02 / 16 to heading-03 / 20), so the line-height is also
-     hand-set to match the missing token's natural rhythm. */
-  line-height: 24px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
+  color: var(--ds-text-secondary-rest);
+  font-variant-numeric: tabular-nums;
 }
 
 .opp-table th.opp-c-actions,
@@ -825,7 +1149,8 @@ const LAYOUT_CSS = `
   color: var(--ds-text-secondary-rest);
 }
 
-/* Multi-line opp cell (system gap — no primitive) */
+/* Column 1 — quieted per spec §4.1: opp name = secondary bold,
+   account = tertiary label-02. */
 .opp-multiline {
   display: flex;
   flex-direction: column;
@@ -834,11 +1159,13 @@ const LAYOUT_CSS = `
 }
 .opp-multiline__name {
   font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
+  color: var(--ds-text-secondary-rest);
 }
 .opp-multiline__sub {
   font-weight: var(--ds-type-font-weight-regular);
-  color: var(--ds-text-secondary-rest);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
 }
 
 .opp-tag-cluster {

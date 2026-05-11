@@ -18,6 +18,11 @@ $brand-70: #004C9D !default;
 $brand-80: #003474 !default;
 $brand-90: #00265B !default;
 $brand-95: #112131 !default;
+$brand-cortex: #00CC66 !default;
+$brand-panw: #FA582D !default;
+$brand-prisma: #00C0E8 !default;
+$brand-strata: #FFCB06 !default;
+$brand-unit42: #C84727 !default;
 $cobalt-10: #e5f8ff !default;
 $cobalt-100: #0f1a26 !default;
 $cobalt-20: #c7eeff !default;
@@ -223,7 +228,12 @@ $primitive-colors: (
         "80": #003474,
         "90": #00265B,
         "95": #112131,
-        "100": #001533
+        "100": #001533,
+        "panw": #FA582D,
+        "prisma": #00C0E8,
+        "strata": #FFCB06,
+        "cortex": #00CC66,
+        "unit42": #C84727
       ),
       "neutral": (
         "0": #ffffff,
@@ -461,6 +471,11 @@ $primitive-color-scalars: (
   "brand-80": $brand-80,
   "brand-90": $brand-90,
   "brand-95": $brand-95,
+  "brand-cortex": $brand-cortex,
+  "brand-panw": $brand-panw,
+  "brand-prisma": $brand-prisma,
+  "brand-strata": $brand-strata,
+  "brand-unit42": $brand-unit42,
   "cobalt-10": $cobalt-10,
   "cobalt-100": $cobalt-100,
   "cobalt-20": $cobalt-20,

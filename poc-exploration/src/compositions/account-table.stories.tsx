@@ -2288,7 +2288,28 @@ function AEAccountTable() {
                         <div><span className="acc-value__num">{formatUsdCompact(row.ltvUsd)}</span> <span className="acc-value__unit">LTV</span></div>
                       </div>
                     </td>
-                    <td className="acc-c-actions" />
+                    <td className="acc-c-actions">
+                      {/* Column 7 — Actions. Two ghost-accent
+                          IconButtons: AI (Stars) and Expand
+                          (ChevronRight). Behavior placeholder, mirrors
+                          opp-table. */}
+                      <div className="acc-actions">
+                        <IconButton
+                          kind="ghost-accent"
+                          size="sm"
+                          iconSize={16}
+                          renderIcon={Stars}
+                          aria-label="AI actions for this account"
+                        />
+                        <IconButton
+                          kind="ghost-accent"
+                          size="sm"
+                          iconSize={16}
+                          renderIcon={ChevronRight}
+                          aria-label="Open account detail"
+                        />
+                      </div>
+                    </td>
                   </tr>
                 ))}
               </tbody>
@@ -2547,6 +2568,12 @@ const LAYOUT_CSS = `
 .acc-table td.acc-c-value { width: 130px; text-align: right; }
 .acc-table th.acc-c-actions,
 .acc-table td.acc-c-actions { width: 72px; }
+.acc-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--ds-spacing-01);
+}
 
 /* Body row treatment — no zebra, hairline dividers between rows. */
 .acc-table tbody tr { background-color: var(--ds-surface-rest); }

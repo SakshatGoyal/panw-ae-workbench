@@ -1415,6 +1415,139 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   )
 }
 
+// ─── Health-trend bar chart (forked from opp-table) ──────────────────────
+
+const HEALTH_BAR_FILL: Record<Health, string> = {
+  'healthy':  'var(--ds-text-status-success)',
+  'at-risk':  'var(--ds-text-status-warning)',
+  'critical': 'var(--ds-text-status-danger)',
+}
+const HEALTH_FROM_LEVEL: Record<number, Health> = {
+  0: 'healthy', 1: 'at-risk', 2: 'critical',
+}
+const HEALTH_HEIGHT_FRACTION: Record<Health, number> = {
+  'healthy': 1.0, 'at-risk': 0.72, 'critical': 0.38,
+}
+
+function HealthTrendBars({ trend }: { trend: number[] }) {
+  const barW = 6, gap = 4, padX = 6, padY = 4, innerH = 48
+  const h = innerH + padY * 2
+  const w = padX * 2 + trend.length * barW + Math.max(0, trend.length - 1) * gap
+  return (
+    <svg
+      width={w} height={h} viewBox={`0 0 ${w} ${h}`}
+      role="img" aria-label="12-month account health trend"
+      className="acc-health-bars">
+      {trend.map((v, i) => {
+        const sev = HEALTH_FROM_LEVEL[v] ?? 'critical'
+        const fraction = HEALTH_HEIGHT_FRACTION[sev]
+        const barH = Math.max(barW, innerH * fraction)
+        const x = padX + i * (barW + gap)
+        const y = padY + (innerH - barH)
+        return (
+          <rect key={i} x={x} y={y} width={barW} height={barH}
+            rx={barW / 2} ry={barW / 2} fill={HEALTH_BAR_FILL[sev]} />
+        )
+      })}
+    </svg>
+  )
+}
+
+// ─── Account Health hover popover ────────────────────────────────────────
+
+function AccountHealthPanel({ row }: { row: AccountRow }) {
+  const h = row.health
+  return (
+    <div className="acc-pop acc-pop--health">
+      <div className="acc-pop__heading">{row.name}</div>
+      <div className="acc-pop__sub">12-month health trend</div>
+      <div className="acc-pop__chart"><HealthTrendBars trend={h.trend12mo} /></div>
+      <div className="acc-pop__rows">
+        <div className="acc-pop__kv">
+          <span className="acc-pop__kv-label">Technical Health</span>
+          <Tags
+            shape="rounded" size="default" contrast="low"
+            color={HEALTH_COLOR[h.technical]}
+            label={HEALTH_LABEL[h.technical]} />
+        </div>
+        <div className="acc-pop__kv">
+          <span className="acc-pop__kv-label">Adoption &amp; Deployment</span>
+          <Tags
+            shape="rounded" size="default" contrast="low"
+            color={HEALTH_COLOR[h.adoption]}
+            label={HEALTH_LABEL[h.adoption]} />
+        </div>
+      </div>
+      <div className="acc-pop__cta">
+        <Button kind="ghost-brand" size="small">View Account Health</Button>
+      </div>
+    </div>
+  )
+}
+
+// ─── Account-level Risk Factors hover popover (spec §4.3) ────────────────
+// IMPORTANT: these are ACCOUNT-LEVEL risks (six-value taxonomy from
+// `ACCOUNT_RISK_LIBRARY`), DELIBERATELY DISTINCT from opp-table's
+// deal-level risks. The popover heading reads "Account-level risk
+// factors" so it's unambiguous to a reader (cr-intent §"Risk Factors
+// sub-cell mirror filter format" + cr-failure §14).
+
+function AccountRiskFactorsPanel({ risks, density }: { risks: AccountRiskFactor[]; density: DensityKey[] }) {
+  const visible = risks.filter(r => density.includes(`risk-${r.id}` as DensityKey))
+  if (visible.length === 0) {
+    return (
+      <div className="acc-pop acc-pop--risks">
+        <div className="acc-pop__heading">Account-level risk factors</div>
+        <div className="acc-pop__sub">No risk factors flagged on this account.</div>
+      </div>
+    )
+  }
+  return (
+    <div className="acc-pop acc-pop--risks">
+      <div className="acc-pop__heading">Account-level risk factors</div>
+      <ul className="acc-pop__risk-list">
+        {visible.map(r => (
+          <li key={r.id} className="acc-pop__risk-row">
+            <span className="acc-pop__risk-emoji" aria-hidden="true">{r.emoji}</span>
+            <span className="acc-pop__risk-label">{r.label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// ─── EBC hover popover (spec §4.3) ───────────────────────────────────────
+function EBCPanel({ ebc }: { ebc: EBC }) {
+  if (ebc.absent) {
+    return (
+      <div className="acc-pop acc-pop--ebc">
+        <div className="acc-pop__heading">EBC history</div>
+        <div className="acc-pop__sub">This account has not had an EBC on file.</div>
+      </div>
+    )
+  }
+  return (
+    <div className="acc-pop acc-pop--ebc">
+      <div className="acc-pop__heading">EBC — {formatEbcDate(ebc.date)}</div>
+      <div className="acc-pop__sub">{ebc.topic}</div>
+      <div className="acc-pop__rows">
+        <div className="acc-pop__kv">
+          <span className="acc-pop__kv-label">PANW attendees</span>
+        </div>
+        <ul className="acc-pop__applied-list">
+          {ebc.attendees.map(a => (
+            <li key={a} className="acc-pop__applied-item">{a}</li>
+          ))}
+        </ul>
+      </div>
+      <div className="acc-pop__cta">
+        <Button kind="ghost-brand" size="small">View EBC details</Button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Quarter pipeline popover (spec §4.2) ────────────────────────────────
 // Hover a quarter chip → small no-header table of {opp type, $value}.
 // No opp names — at the account level the AE is sizing the quarter,
@@ -1711,7 +1844,89 @@ function AEAccountTable() {
                         })}
                       </div>
                     </td>
-                    <td className="acc-c-equal" />
+                    <td className="acc-c-equal">
+                      {/* Column 3 — Activities & Risks (4 sub-cells).
+                          Last Activity / Account Health / Risk count /
+                          EBC. Each is independently gated by tag-
+                          density. Hover surfaces are per-sub-cell (spec
+                          §4.3). */}
+                      {(() => {
+                        const dayLabel =
+                          row.activity.daysAgo === 0 ? 'today'
+                          : row.activity.daysAgo === 1 ? '1 day ago'
+                          : `${row.activity.daysAgo} days ago`
+                        const actStyle = activityStyleForDays(row.activity.daysAgo)
+                        const healthColor = HEALTH_COLOR[row.health.overall]
+                        const riskCount = row.risks.length
+                        const riskLabel =
+                          riskCount === 1 ? '1 risk' : `${riskCount} risks`
+                        const ebcSev = ebcSeverity(row.ebc)
+                        const ebcLabel = row.ebc.absent
+                          ? 'No EBC on record'
+                          : `EBC on ${formatEbcDate(row.ebc.date)}`
+                        return (
+                          <div className="acc-tag-cluster acc-tag-cluster--stack">
+                            {density.includes('lastActivity') && (
+                              <HoverShell
+                                render={() => (
+                                  <Tooltip
+                                    pointerDirection="bottom"
+                                    content={`${row.activity.description} — ${dayLabel}`}
+                                  />
+                                )}>
+                                <Tags
+                                  shape={TAG_BASE.shape}
+                                  size={TAG_BASE.size}
+                                  contrast={TAG_BASE.contrast}
+                                  color={actStyle.color}
+                                  className="acc-tag--static acc-tag--icon-quiet"
+                                  icon
+                                  renderIcon={actStyle.icon ?? Clock}
+                                  label={dayLabel}
+                                />
+                              </HoverShell>
+                            )}
+                            {density.includes('accountHealth') && (
+                              <HoverShell
+                                interactive
+                                render={() => <AccountHealthPanel row={row} />}>
+                                <Tags
+                                  shape={TAG_BASE.shape}
+                                  size={TAG_BASE.size}
+                                  contrast={TAG_BASE.contrast}
+                                  color={healthColor}
+                                  className="acc-tag--static"
+                                  label={HEALTH_LABEL[row.health.overall]}
+                                />
+                              </HoverShell>
+                            )}
+                            {density.includes('riskCount') && riskCount > 0 && (
+                              <HoverShell
+                                interactive
+                                render={() => <AccountRiskFactorsPanel risks={row.risks} density={density} />}>
+                                <Tags {...TAG_BASE} className="acc-tag--static" label={riskLabel} />
+                              </HoverShell>
+                            )}
+                            {density.includes('ebc') && (
+                              <HoverShell
+                                interactive
+                                render={() => <EBCPanel ebc={row.ebc} />}>
+                                <Tags
+                                  shape={TAG_BASE.shape}
+                                  size={TAG_BASE.size}
+                                  contrast={TAG_BASE.contrast}
+                                  color={EBC_SEVERITY_COLOR[ebcSev]}
+                                  className="acc-tag--static acc-tag--icon-quiet"
+                                  icon
+                                  renderIcon={Calendar}
+                                  label={ebcLabel}
+                                />
+                              </HoverShell>
+                            )}
+                          </div>
+                        )
+                      })()}
+                    </td>
                     <td className="acc-c-equal" />
                     <td className="acc-c-equal" />
                     <td className="acc-c-value">
@@ -2048,6 +2263,55 @@ const LAYOUT_CSS = `
   gap: var(--ds-spacing-02);
   align-items: center;
 }
+/* Column 3 stacks sub-cells vertically (each row in the cell is a
+ * distinct concept — activity / health / risks / EBC). */
+.acc-tag-cluster--stack {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Icon-quiet tag — see opp-table convention. The DS tag-neutral-low
+ * icon defaults to icons.primary; for label-style tags (close date,
+ * last activity, EBC) the icon sits one stop lighter. */
+.panw--tag.acc-tag--icon-quiet.panw--tag--low.panw--tag--neutral .panw--tag__icon,
+.panw--tag.acc-tag--icon-quiet.panw--tag--low.panw--tag--neutral .panw--tag__close-btn {
+  color: var(--ds-icons-secondary-rest);
+}
+
+/* Risk-list inside RiskFactorsPanel popover */
+.acc-pop--risks { max-width: 360px; }
+.acc-pop__risk-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);
+}
+.acc-pop__risk-row {
+  display: grid;
+  grid-template-columns: 20px 1fr;
+  gap: var(--ds-spacing-02);
+  align-items: start;
+}
+.acc-pop__risk-emoji { font-size: 14px; line-height: 18px; }
+.acc-pop__risk-label {
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ds-text-secondary-rest);
+}
+
+/* Account-health popover layout */
+.acc-pop--health { min-width: 280px; }
+.acc-pop__chart { display: block; }
+.acc-pop__cta {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: var(--ds-spacing-02);
+  border-top: 1px solid var(--ds-lines-neutral-rest);
+}
+.acc-pop--ebc { min-width: 280px; }
+.acc-health-bars { display: block; }
 
 /* Static tag — non-interactive, doesn't pick up DS Tag :hover bg. */
 .panw--tag.acc-tag--static:hover {

@@ -1,6 +1,30 @@
 /**
  * AE Opportunity Table — sales pipeline composition
  *
+ * ── Pass 3 scope (additive on top of Pass 2) ────────────────────────────────
+ *   • Per-cell hover surfaces (Column 3):
+ *       Last Activity → DS Tooltip (activity description + day label).
+ *       Account Health → custom popover with 12-month SVG sparkline, sub-
+ *         axis tags (Technical / Adoption & Deployment), and a ghost-brand
+ *         "View Account Health" CTA. Interactive (hover-into permitted).
+ *       Risk Factors → custom popover listing every applied risk with
+ *         emoji + label (per spec §3.11).
+ *       Sales Play → DS Tooltip with current status label.
+ *   • Per-tag hover surfaces (Column 4):
+ *       Product tag → custom popover with brand icon + name + per-product
+ *         value as a share of total.
+ *       +N tag → custom popover listing every overflowed product in the
+ *         same format.
+ *   • All hover surfaces share a 700ms open delay so a cursor moving
+ *     across the table doesn't bombard the AE with cascading popovers.
+ *     Interactive popovers (Account Health) carry a 160ms close grace
+ *     period so the user can move their cursor into the popover to click
+ *     the CTA. Non-interactive surfaces close immediately on mouseleave.
+ *   • All hover surfaces are portaled to document.body so they aren't
+ *     clipped by the table-shell's overflow-x:auto.
+ *   • Open surfaces auto-close on scroll/resize (positions are sticky
+ *     to the trigger and would drift otherwise).
+ *
  * ── Pass 2 scope (additive on top of Pass 1) ────────────────────────────────
  *   • Last Activity severity bands: 0–7d neutral, 7–21d caution + caution
  *     icon, >21d error + error icon. Glyphs: ExclamationTriangle (caution),
@@ -71,6 +95,7 @@
 
 import type { Meta, StoryObj } from '@storybook/react'
 import React, { useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
+import { createPortal } from 'react-dom'
 import {
   Calendar, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
   ExclamationTriangle, ExclamationCircle,
@@ -83,6 +108,7 @@ import { CellContents } from '@ds/cell-contents'
 import { Pagination } from '@ds/pagination'
 import { Button, IconButton } from '@ds/button'
 import { Tags } from '@ds/tags'
+import { Tooltip } from '@ds/tooltip'
 import { Checkbox } from '@ds/checkbox'
 import {
   Flyout,
@@ -845,6 +871,388 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
   )
 }
 
+// ─── Hover shell — 700ms delayed popover/tooltip with portal positioning ────
+//
+// Wraps any trigger in a span. On mouseenter, starts a 700ms timer; on
+// mouseleave (before fire) cancels it. When the timer fires, opens a
+// portaled panel anchored to the trigger's bounding rect.
+//
+// Two modes:
+//   `interactive: false` (default for tooltips) — closes IMMEDIATELY on
+//      mouseleave of the trigger. The panel ignores pointer events so it
+//      can't accidentally catch the cursor.
+//   `interactive: true` — gives a 160ms close grace period after the
+//      trigger leaves. Mouseenter on the panel inside that window cancels
+//      the close. Lets the user move the cursor into a popover containing
+//      a clickable action.
+//
+// Open surfaces auto-close on scroll/resize so a position-sticky-to-
+// anchor surface doesn't drift visibly. The delay also means a quick
+// cursor sweep across the table never opens any popover at all.
+
+const HOVER_OPEN_DELAY_MS = 700
+const HOVER_CLOSE_GRACE_MS = 160
+const POPOVER_GAP_PX = 6 // distance between trigger and popover
+
+type HoverShellAlign = 'start' | 'center' | 'end'
+type HoverShellSide = 'bottom' | 'top'
+
+interface HoverShellProps {
+  children: React.ReactNode
+  render: () => React.ReactNode
+  interactive?: boolean
+  side?: HoverShellSide
+  align?: HoverShellAlign
+  /** Optional class on the portaled wrapper. */
+  panelClassName?: string
+}
+
+function HoverShell({
+  children,
+  render,
+  interactive = false,
+  side = 'bottom',
+  align = 'start',
+  panelClassName,
+}: HoverShellProps) {
+  const triggerRef = useRef<HTMLSpanElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const openTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const closeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const [open, setOpen] = useState(false)
+  // Position is computed AFTER the portal mounts the panel so we can read
+  // its real height/width and avoid overflow off the viewport.
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
+
+  // Compute position whenever the panel becomes visible.
+  useLayoutEffect(() => {
+    if (!open) { setPos(null); return }
+    const trigger = triggerRef.current
+    const panel = panelRef.current
+    if (!trigger || !panel) return
+
+    const a = trigger.getBoundingClientRect()
+    const panelW = panel.offsetWidth
+    const panelH = panel.offsetHeight
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+
+    // Vertical placement — flip to top if not enough room below.
+    const spaceBelow = vh - a.bottom
+    const spaceAbove = a.top
+    const preferTop = side === 'top'
+    const fitsBelow = spaceBelow >= panelH + POPOVER_GAP_PX + 8
+    const fitsAbove = spaceAbove >= panelH + POPOVER_GAP_PX + 8
+    const placeAbove = (preferTop && fitsAbove) || (!preferTop && !fitsBelow && fitsAbove)
+    const top = placeAbove
+      ? a.top - panelH - POPOVER_GAP_PX
+      : a.bottom + POPOVER_GAP_PX
+
+    // Horizontal alignment.
+    let left = a.left
+    if (align === 'center') left = a.left + (a.width / 2) - (panelW / 2)
+    else if (align === 'end') left = a.right - panelW
+    left = Math.max(8, Math.min(vw - panelW - 8, left))
+
+    setPos({ top, left })
+  }, [open, side, align])
+
+  // Close on scroll/resize — position would otherwise drift away from anchor.
+  useEffect(() => {
+    if (!open) return
+    const close = () => setOpen(false)
+    window.addEventListener('scroll', close, true)
+    window.addEventListener('resize', close)
+    return () => {
+      window.removeEventListener('scroll', close, true)
+      window.removeEventListener('resize', close)
+    }
+  }, [open])
+
+  // Cleanup pending timers on unmount.
+  useEffect(() => () => {
+    if (openTimerRef.current) clearTimeout(openTimerRef.current)
+    if (closeTimerRef.current) clearTimeout(closeTimerRef.current)
+  }, [])
+
+  const clearOpenTimer = () => {
+    if (openTimerRef.current) { clearTimeout(openTimerRef.current); openTimerRef.current = null }
+  }
+  const clearCloseTimer = () => {
+    if (closeTimerRef.current) { clearTimeout(closeTimerRef.current); closeTimerRef.current = null }
+  }
+
+  const handleTriggerEnter = () => {
+    clearCloseTimer()
+    if (open) return
+    clearOpenTimer()
+    openTimerRef.current = setTimeout(() => setOpen(true), HOVER_OPEN_DELAY_MS)
+  }
+  const handleTriggerLeave = () => {
+    clearOpenTimer()
+    if (!open) return
+    if (interactive) {
+      clearCloseTimer()
+      closeTimerRef.current = setTimeout(() => setOpen(false), HOVER_CLOSE_GRACE_MS)
+    } else {
+      setOpen(false)
+    }
+  }
+  const handlePanelEnter = () => {
+    if (!interactive) return
+    clearCloseTimer()
+  }
+  const handlePanelLeave = () => {
+    if (!interactive) return
+    setOpen(false)
+  }
+
+  return (
+    <>
+      <span
+        ref={triggerRef}
+        className="opp-hover-trigger"
+        onMouseEnter={handleTriggerEnter}
+        onMouseLeave={handleTriggerLeave}>
+        {children}
+      </span>
+      {open && createPortal(
+        <div
+          ref={panelRef}
+          className={`opp-hover-panel${panelClassName ? ` ${panelClassName}` : ''}`}
+          style={{
+            position: 'fixed',
+            top: pos?.top ?? -9999,
+            left: pos?.left ?? -9999,
+            visibility: pos ? 'visible' : 'hidden',
+            pointerEvents: interactive ? 'auto' : 'none',
+            zIndex: 9999,
+          }}
+          onMouseEnter={handlePanelEnter}
+          onMouseLeave={handlePanelLeave}>
+          {render()}
+        </div>,
+        document.body
+      )}
+    </>
+  )
+}
+
+// ─── Sparkline — 12-month health trend ───────────────────────────────────────
+// 12 values, 0=healthy → 2=critical. Plotted so HEALTHY sits at the TOP
+// and CRITICAL at the BOTTOM — a "falling line" reads as a deteriorating
+// account, which matches the AE's intuition.
+//
+// Three dashed horizontal guides mark the healthy / at-risk / critical
+// rows. Line color matches the LATEST value's tag color so the chart's
+// terminal feeling agrees with the row's overall-health pill.
+
+// `text.success-rest` / `text.warning-rest` are not defined in this DS build;
+// the status-text family ships only the static tokens (no `rest` variants).
+// Using `text.status.<x>` here mirrors the matching-family rule (status pills
+// on subtle grounds use status text tokens) and the colors read as the
+// same severity language as the Tag pills next to the chart.
+const HEALTH_LINE_STROKE: Record<Health, string> = {
+  'healthy':  'var(--ds-text-status-success)',
+  'at-risk':  'var(--ds-text-status-warning)',
+  'critical': 'var(--ds-text-status-danger)',
+}
+
+function Sparkline({ trend, latest }: { trend: number[]; latest: Health }) {
+  // 12 monthly readings, oldest → newest. 0=healthy, 1=at-risk, 2=critical.
+  // Plotted with HEALTHY at the TOP, CRITICAL at the BOTTOM — a "falling
+  // line" matches the AE's intuition for a deteriorating account.
+  //
+  // Visual: three quiet dashed guides mark healthy / at-risk / critical
+  // levels (no text labels — the popover sub-heading "12-month health
+  // trend" plus the colored end-dot carries the meaning). A faint area
+  // fill beneath the line adds visual weight without dominating.
+  const w = 264
+  const h = 68
+  const padX = 6
+  const padY = 6
+  const usableW = w - padX * 2
+  const usableH = h - padY * 2
+  // Inner inset for the DATA plot — the dashed guides sit at the chart
+  // edges (healthy at top, critical at bottom), but the data line is
+  // plotted slightly inside those guides so a flat-healthy line is
+  // visibly distinct from the top guide (and a flat-critical line is
+  // distinct from the bottom guide). Without this inset a perfect-health
+  // trend renders invisibly on top of the guide and reads as "no data".
+  const innerInset = 5
+  const innerH = Math.max(1, usableH - innerInset * 2)
+  const maxV = 2
+
+  const pts = trend.map((v, i) => {
+    const x = padX + (i / Math.max(1, trend.length - 1)) * usableW
+    const y = padY + innerInset + (v / maxV) * innerH
+    return { x, y }
+  })
+
+  const lineD = pts.length
+    ? 'M ' + pts.map(p => `${p.x.toFixed(1)} ${p.y.toFixed(1)}`).join(' L ')
+    : ''
+  // Area fill closes the line down to the critical guide (chart floor).
+  const floorY = padY + usableH
+  const areaD = pts.length
+    ? `${lineD} L ${(padX + usableW).toFixed(1)} ${floorY.toFixed(1)} L ${padX.toFixed(1)} ${floorY.toFixed(1)} Z`
+    : ''
+  const stroke = HEALTH_LINE_STROKE[latest]
+  const last = pts[pts.length - 1]
+
+  return (
+    <svg
+      width={w}
+      height={h}
+      viewBox={`0 0 ${w} ${h}`}
+      role="img"
+      aria-label="12-month account health trend"
+      className="opp-sparkline">
+      {/* Quiet level guides — healthy / at-risk / critical (no labels) */}
+      {[0, 1, 2].map(v => {
+        const y = padY + (v / maxV) * usableH
+        return (
+          <line
+            key={v}
+            x1={padX} x2={padX + usableW}
+            y1={y} y2={y}
+            stroke="var(--ds-lines-neutral-tile-rest)"
+            strokeWidth="1"
+            strokeDasharray="2 3" />
+        )
+      })}
+      {areaD && (
+        <path d={areaD} fill={stroke} opacity="0.08" />
+      )}
+      {lineD && (
+        <path
+          d={lineD}
+          fill="none"
+          stroke={stroke}
+          strokeWidth="1.75"
+          strokeLinejoin="round"
+          strokeLinecap="round" />
+      )}
+      {last && (
+        <>
+          <circle cx={last.x} cy={last.y} r="3.5" fill="var(--ds-surface-rest)" />
+          <circle cx={last.x} cy={last.y} r="2.5" fill={stroke} />
+        </>
+      )}
+    </svg>
+  )
+}
+
+// ─── Panel content components ────────────────────────────────────────────────
+
+function AccountHealthPanel({ row }: { row: OpportunityRow }) {
+  const h = row.health
+  return (
+    <div className="opp-pop opp-pop--health">
+      <div className="opp-pop__heading">{row.account}</div>
+      <div className="opp-pop__sub">12-month health trend</div>
+      <div className="opp-pop__chart"><Sparkline trend={h.trend12mo} latest={h.overall} /></div>
+      <div className="opp-pop__rows">
+        <div className="opp-pop__kv">
+          <span className="opp-pop__kv-label">Technical Health</span>
+          <Tags
+            shape="rounded" size="default" contrast="low"
+            color={HEALTH_COLOR[h.technical]}
+            label={HEALTH_LABEL[h.technical]} />
+        </div>
+        <div className="opp-pop__kv">
+          <span className="opp-pop__kv-label">Adoption &amp; Deployment</span>
+          <Tags
+            shape="rounded" size="default" contrast="low"
+            color={HEALTH_COLOR[h.adoption]}
+            label={HEALTH_LABEL[h.adoption]} />
+        </div>
+      </div>
+      <div className="opp-pop__cta">
+        <Button kind="ghost-brand" size="small">View Account Health</Button>
+      </div>
+    </div>
+  )
+}
+
+function RiskFactorsPanel({ risks }: { risks: RiskFactor[] }) {
+  if (risks.length === 0) {
+    return (
+      <div className="opp-pop opp-pop--risks">
+        <div className="opp-pop__heading">No risk factors</div>
+        <div className="opp-pop__sub">This deal isn't flagged with any risks.</div>
+      </div>
+    )
+  }
+  return (
+    <div className="opp-pop opp-pop--risks">
+      <div className="opp-pop__heading">
+        {risks.length === 1 ? '1 risk factor' : `${risks.length} risk factors`}
+      </div>
+      <ul className="opp-pop__risk-list">
+        {risks.map(r => (
+          <li key={r.id} className="opp-pop__risk-item">
+            <span className="opp-pop__risk-emoji" aria-hidden="true">{r.emoji}</span>
+            <span className="opp-pop__risk-label">{r.label}</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  )
+}
+
+// Sales-play status display labels (spec §3.4 of sales-play-reference)
+const SALES_PLAY_STATUS_LABEL: Record<SalesPlayStatus, string> = {
+  'not-touched': 'Not Touched',
+  'pitched':     'Pitched',
+  'deferred':    'Deferred',
+  'declined':    'Declined',
+  'pursuing':    'Pursuing',
+  'closed-won':  'Closed Won',
+  'closed-lost': 'Closed Lost',
+}
+
+function ProductPanel({ product, totalUsd }: { product: Product; totalUsd: number }) {
+  const Icon = BRAND_ICON[product.brand]
+  const pct = Math.round((product.valueUsd / Math.max(1, totalUsd)) * 100)
+  return (
+    <div className="opp-pop opp-pop--product">
+      <div className="opp-pop__product-row">
+        {Icon && <span className="opp-pop__product-icon" aria-hidden="true"><Icon /></span>}
+        <span className="opp-pop__product-name">{product.name}</span>
+      </div>
+      <div className="opp-pop__product-meta">
+        <span className="opp-pop__product-amount">{formatUsdCompact(product.valueUsd)}</span>
+        <span className="opp-pop__product-share">of total opportunity value ({pct}%)</span>
+      </div>
+    </div>
+  )
+}
+
+function ProductOverflowPanel({ products, totalUsd }: { products: Product[]; totalUsd: number }) {
+  return (
+    <div className="opp-pop opp-pop--product-overflow">
+      <div className="opp-pop__heading">
+        {products.length} additional {products.length === 1 ? 'product' : 'products'}
+      </div>
+      <ul className="opp-pop__product-list">
+        {products.map(p => {
+          const Icon = BRAND_ICON[p.brand]
+          return (
+            <li key={p.name} className="opp-pop__product-list-item">
+              <span className="opp-pop__product-icon" aria-hidden="true">
+                {Icon ? <Icon /> : <span className="opp-pop__product-icon--missing" />}
+              </span>
+              <span className="opp-pop__product-name">{p.name}</span>
+              <span className="opp-pop__product-amount">{formatUsdCompact(p.valueUsd)}</span>
+            </li>
+          )
+        })}
+      </ul>
+    </div>
+  )
+}
+
 // ─── Product cluster (space-driven +N overflow) ──────────────────────────────
 // Spec §4.4: "The cell shows as many tags as fit, then collapses the
 // remainder into a +N tag at the end. The decision about how many tags
@@ -860,9 +1268,9 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
 
 const PRODUCT_GAP = 4 // px — matches --ds-spacing-02
 
-interface ProductClusterProps { products: Product[] }
+interface ProductClusterProps { products: Product[]; totalUsd: number }
 
-function ProductCluster({ products }: ProductClusterProps) {
+function ProductCluster({ products, totalUsd }: ProductClusterProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const measureRef = useRef<HTMLDivElement>(null)
   const [visibleCount, setVisibleCount] = useState(products.length)
@@ -912,8 +1320,9 @@ function ProductCluster({ products }: ProductClusterProps) {
   }, [products])
 
   const overflow = products.length - visibleCount
+  const overflowedProducts = products.slice(visibleCount)
 
-  const renderTag = (p: Product, keyHint: string) => {
+  const renderTagPlain = (p: Product, keyHint: string) => {
     const Icon = BRAND_ICON[p.brand]
     return Icon
       ? <Tags key={keyHint} {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
@@ -922,16 +1331,24 @@ function ProductCluster({ products }: ProductClusterProps) {
 
   return (
     <div className="opp-product-cluster" ref={containerRef}>
-      {products.slice(0, visibleCount).map((p, i) =>
-        renderTag(p, `v-${p.name}-${i}`)
-      )}
+      {products.slice(0, visibleCount).map((p, i) => (
+        <HoverShell
+          key={`v-${p.name}-${i}`}
+          render={() => <ProductPanel product={p} totalUsd={totalUsd} />}>
+          {renderTagPlain(p, `v-tag-${p.name}-${i}`)}
+        </HoverShell>
+      ))}
       {overflow > 0 && (
-        <Tags {...TAG_BASE} label={`+${overflow}`} />
+        <HoverShell
+          render={() => <ProductOverflowPanel products={overflowedProducts} totalUsd={totalUsd} />}
+          align="end">
+          <Tags {...TAG_BASE} label={`+${overflow}`} />
+        </HoverShell>
       )}
       <div ref={measureRef} className="opp-product-cluster__measure" aria-hidden="true">
         {products.map((p, i) => (
           <span key={`m-${p.name}-${i}`}>
-            {renderTag(p, `m-inner-${p.name}-${i}`)}
+            {renderTagPlain(p, `m-inner-${p.name}-${i}`)}
           </span>
         ))}
         <span data-role="badge"><Tags {...TAG_BASE} label="+99" /></span>
@@ -972,40 +1389,74 @@ function OppRow({ row }: { row: OpportunityRow }) {
         </div>
       </td>
       <td>
-        {/* Column 3 — activity & blockers. Last Activity (severity-banded) +
-            Health (categorical color) + Risk count (neutral) + Sales Play
-            (neutral). Per spec §4.3: count is the signal for risks, no
-            severity grade by count; sales play is informational. */}
+        {/* Column 3 — activity & blockers. Each sub-cell has its own hover
+            surface (spec §4.3) — independent triggers, 700ms delay. */}
         <div className="opp-tag-cluster">
-          {actStyle.icon ? (
+          {/* Last Activity — DS Tooltip (non-interactive label) */}
+          <HoverShell
+            render={() => (
+              <Tooltip
+                pointerDirection="top"
+                content={`${row.activity.description} — ${dayLabel}`}
+              />
+            )}
+            align="start">
+            {actStyle.icon ? (
+              <Tags
+                shape={TAG_BASE.shape}
+                size={TAG_BASE.size}
+                contrast={TAG_BASE.contrast}
+                color={actStyle.color}
+                icon
+                renderIcon={actStyle.icon}
+                label={dayLabel}
+              />
+            ) : (
+              <Tags {...TAG_BASE} label={dayLabel} />
+            )}
+          </HoverShell>
+
+          {/* Account Health — interactive popover with sparkline + CTA */}
+          <HoverShell
+            interactive
+            align="start"
+            render={() => <AccountHealthPanel row={row} />}>
             <Tags
               shape={TAG_BASE.shape}
               size={TAG_BASE.size}
               contrast={TAG_BASE.contrast}
-              color={actStyle.color}
-              icon
-              renderIcon={actStyle.icon}
-              label={dayLabel}
+              color={healthColor}
+              label={HEALTH_LABEL[row.health.overall]}
             />
-          ) : (
-            <Tags {...TAG_BASE} label={dayLabel} />
-          )}
-          <Tags
-            shape={TAG_BASE.shape}
-            size={TAG_BASE.size}
-            contrast={TAG_BASE.contrast}
-            color={healthColor}
-            label={HEALTH_LABEL[row.health.overall]}
-          />
-          <Tags {...TAG_BASE} label={riskLabel} />
-          <Tags {...TAG_BASE} label={row.salesPlay.name} />
+          </HoverShell>
+
+          {/* Risk Factors — non-interactive popover listing applied risks */}
+          <HoverShell
+            align="start"
+            render={() => <RiskFactorsPanel risks={row.risks} />}>
+            <Tags {...TAG_BASE} label={riskLabel} />
+          </HoverShell>
+
+          {/* Sales Play — DS Tooltip with current status */}
+          <HoverShell
+            align="start"
+            render={() => (
+              <Tooltip
+                pointerDirection="top"
+                content={SALES_PLAY_STATUS_LABEL[row.salesPlay.status]}
+              />
+            )}>
+            <Tags {...TAG_BASE} label={row.salesPlay.name} />
+          </HoverShell>
         </div>
       </td>
       <td>
         {/* Column 4 — products. Brand icon per product (BrandUnit42 absent
             from @ds/icons exports; unit-42 products render iconless until
-            the index lands). Space-driven +N overflow via ProductCluster. */}
-        <ProductCluster products={row.products} />
+            the index lands). Space-driven +N overflow via ProductCluster.
+            Each visible product tag and the +N tag carry their own hover
+            popover (per-product value of total, or full overflow list). */}
+        <ProductCluster products={row.products} totalUsd={row.valueUsd} />
       </td>
       <td className="opp-c-value">
         <CellContents content="numbers" text={formatUsdCompact(row.valueUsd)} />
@@ -1388,6 +1839,196 @@ const LAYOUT_CSS = `
   white-space: nowrap;
   visibility: hidden;
   pointer-events: none;
+}
+
+/* ── Hover trigger + portaled panel ─────────────────────────────────────── *
+ * The trigger is just an inline-flex span; its real job is to anchor the
+ * popover via getBoundingClientRect. The panel itself lives in
+ * document.body so it isn't clipped by the table-shell's overflow-x:auto.
+ */
+.opp-hover-trigger {
+  display: inline-flex;
+  align-items: center;
+}
+
+.opp-hover-panel {
+  /* Reset against whatever the host page might inject. */
+  font-family: var(--ds-type-font-family-sans);
+  color: var(--ds-text-primary);
+  /* Entrance: matches the DS Flyout 8px directional slide + opacity fade. */
+  animation: opp-hover-in 110ms cubic-bezier(0, 0, 0.38, 0.9);
+}
+@keyframes opp-hover-in {
+  from { opacity: 0; transform: translateY(4px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .opp-hover-panel { animation: none; }
+}
+
+/* ── Hand-rolled popover panel (used for Account Health, Risk Factors,
+ *    Product, +N overflow). DS Tooltip handles its own styling and
+ *    renders directly inside the portal; this panel is for the rich
+ *    surfaces. Visual lineage: surface.rest + shadow-flyout + radius-
+ *    standard, 16px padding (structured per stage-spacing.md flyout/
+ *    popover rules). */
+.opp-pop {
+  background-color: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-standard);
+  box-shadow: var(--ds-shadow-flyout);
+  padding: var(--ds-spacing-05); /* 16 */
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ds-text-primary);
+  min-width: 220px;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-04); /* 12 */
+}
+.opp-pop__heading {
+  font-weight: var(--ds-type-font-weight-semibold);
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ds-text-primary);
+}
+.opp-pop__sub {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  margin-top: calc(-1 * var(--ds-spacing-03)); /* tighten under heading */
+}
+.opp-pop__chart {
+  display: flex;
+  margin: var(--ds-spacing-01) 0;
+}
+.opp-pop__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-03); /* 8 */
+}
+.opp-pop__kv {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--ds-spacing-04);
+  min-height: 28px;
+}
+.opp-pop__kv-label {
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-secondary-rest);
+}
+.opp-pop__cta {
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* Risk factors list */
+.opp-pop__risk-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-03);
+}
+.opp-pop__risk-item {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--ds-spacing-03);
+  font-size: 13px;
+  line-height: 18px;
+}
+.opp-pop__risk-emoji {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  font-size: 14px;
+  line-height: 1;
+}
+.opp-pop__risk-label {
+  flex: 1;
+  color: var(--ds-text-primary);
+}
+
+/* Product popover (single product) */
+.opp-pop--product {
+  min-width: 240px;
+  gap: var(--ds-spacing-02);
+}
+.opp-pop__product-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-03);
+}
+.opp-pop__product-icon {
+  display: inline-flex;
+  width: 18px;
+  height: 18px;
+  align-items: center;
+  justify-content: center;
+}
+.opp-pop__product-icon--missing {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background-color: var(--ds-lines-neutral-rest);
+}
+.opp-pop__product-name {
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+.opp-pop__product-meta {
+  display: flex;
+  align-items: baseline;
+  gap: var(--ds-spacing-02);
+  padding-left: calc(18px + var(--ds-spacing-03)); /* align under name */
+}
+.opp-pop__product-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+.opp-pop__product-share {
+  font-size: 12px;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* Product overflow popover (full list of overflowed products) */
+.opp-pop--product-overflow { min-width: 280px; }
+.opp-pop__product-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-03);
+}
+.opp-pop__product-list-item {
+  display: grid;
+  grid-template-columns: 18px 1fr auto;
+  align-items: center;
+  gap: var(--ds-spacing-03);
+  font-size: 13px;
+  line-height: 20px;
+}
+.opp-pop__product-list-item .opp-pop__product-name {
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-secondary-rest);
+}
+.opp-pop__product-list-item .opp-pop__product-amount {
+  color: var(--ds-text-primary);
+}
+
+/* Sparkline — sits in opp-pop__chart wrapper */
+.opp-sparkline {
+  display: block;
 }
 
 /* Hover-only row actions */

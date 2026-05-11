@@ -733,17 +733,127 @@ const TAG_BASE = {
   size: 'large' as const,
 }
 
-// ─── PHASE 0 — minimal table render ─────────────────────────────────────
-// The shell + header row + empty body cells, just enough to verify
-// layout math. Filters and per-column renderers come in later phases.
+// ─── Sort flyout (forked from opp-table) ─────────────────────────────────
+
+interface SortFlyoutProps {
+  sortKey: SortKey
+  sortDir: SortDir
+  onChange: (key: SortKey) => void
+}
+
+function SortFlyout({ sortKey, sortDir, onChange }: SortFlyoutProps) {
+  const [open, setOpen] = useState(false)
+  const triggerRef = useRef<HTMLButtonElement>(null)
+  const currentLabel = SORT_OPTIONS.find(o => o.key === sortKey)?.label ?? 'risk factor count'
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="acc-sort-trigger"
+        aria-haspopup="listbox"
+        aria-expanded={open}
+        onClick={() => setOpen(v => !v)}>
+        <span>sort: {currentLabel} {sortDir === 'asc' ? '↑' : '↓'}</span>
+        {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+      </button>
+      <Flyout
+        open={open}
+        onOpenChange={setOpen}
+        anchorRef={triggerRef}
+        mode="single"
+        selected={[sortKey]}
+        onSelectionChange={(values) => {
+          if (values[0]) onChange(values[0] as SortKey)
+          setOpen(false)
+        }}
+        placement="bottom-end">
+        <FlyoutList>
+          {SORT_OPTIONS.map(opt => (
+            <FlyoutItem key={opt.key} value={opt.key}>{opt.label}</FlyoutItem>
+          ))}
+        </FlyoutList>
+      </Flyout>
+    </>
+  )
+}
+
+// ─── PHASE 1 — controls + sort ────────────────────────────────────────────
+// Search input (with documented exclusions per spec §3.1), sort flyout
+// with default = Risk Factor Count desc (spec §5), and a key-metrics
+// label "10 accounts · $XX ARR · $XX pipeline next 4Q" rolled up from
+// the current filter slice.
 
 function AEAccountTable() {
+  const [search, setSearch] = useState('')
+  // Default sort per spec §5: most-broken accounts at top of triage queue.
+  const [sortKey, setSortKey] = useState<SortKey>('riskCount')
+  const [sortDir, setSortDir] = useState<SortDir>('desc')
+
+  // Filtering wiring lands later. For now, sort renders against the full
+  // fixture so the default-sort behavior is visibly verifiable.
+  const sortedRows = useMemo(() => {
+    const arr = [...ROWS]
+    arr.sort((a, b) => {
+      let cmp = 0
+      switch (sortKey) {
+        case 'name':              cmp = a.name.localeCompare(b.name); break
+        case 'totalPipeline':     cmp = a.totalPipelineUsd - b.totalPipelineUsd; break
+        case 'ltv':               cmp = a.ltvUsd - b.ltvUsd; break
+        case 'riskCount':         cmp = a.risks.length - b.risks.length; break
+        case 'daysSinceEbc':      {
+          const ad = a.ebc.absent ? Number.POSITIVE_INFINITY : daysBetween(a.ebc.date)
+          const bd = b.ebc.absent ? Number.POSITIVE_INFINITY : daysBetween(b.ebc.date)
+          cmp = ad - bd; break
+        }
+        case 'daysSinceActivity': cmp = a.activity.daysAgo - b.activity.daysAgo; break
+      }
+      return sortDir === 'asc' ? cmp : -cmp
+    })
+    return arr
+  }, [sortKey, sortDir])
+
+  // Key metrics — three numbers rolled up from the current view (spec §3.3).
+  // Filtering isn't wired so this is currently the full fixture.
+  const totalArr = sortedRows.reduce((s, r) => s + r.arrUsd, 0)
+  const totalPipeline4q = sortedRows.reduce((s, r) => s + r.totalPipelineUsd, 0)
+  const accountCount = sortedRows.length
+
   return (
     <>
       <style>{LAYOUT_CSS}</style>
       <div className="acc-page">
         <div className="acc-page__shell">
-          {/* Search row + filter rows land in Phase 1/2. */}
+          {/* Search row: counts left · search center · sort right.
+              Search excludes opportunity names and quote IDs by spec
+              §3.1 — placeholder reflects what IS searched. */}
+          <div className="acc-search-row">
+            <span className="acc-counts" aria-live="polite">
+              {accountCount} accounts · {formatUsdCompact(totalArr)} ARR · {formatUsdCompact(totalPipeline4q)} pipeline next 4Q
+            </span>
+            <div className="acc-search-row__search">
+              <Search
+                size="md"
+                placeholder="account, apex, product, sales play…"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                onClear={() => setSearch('')}
+              />
+            </div>
+            <SortFlyout
+              sortKey={sortKey}
+              sortDir={sortDir}
+              onChange={(k) => {
+                setSortKey(k)
+                // 'name' defaults asc; all numeric axes default desc
+                // (largest / most-broken / most-overdue at top).
+                setSortDir(k === 'name' ? 'asc' : 'desc')
+              }}
+            />
+          </div>
+
+          {/* Filter row lands in Phase 2. */}
+
           <div className="acc-table-shell">
             <table className="acc-table">
               <thead>
@@ -758,7 +868,7 @@ function AEAccountTable() {
                 </tr>
               </thead>
               <tbody>
-                {ROWS.map(row => (
+                {sortedRows.map(row => (
                   <tr key={row.id} className="acc-row">
                     <td className="acc-c-account">
                       <div className="acc-multiline">
@@ -820,6 +930,60 @@ const LAYOUT_CSS = `
 .acc-page__shell {
   background-color: transparent;
   border: 0;
+}
+
+/* ── Search row ─────────────────────────────────────────────────────────
+ * Counts left · search center (flex:1) · sort right. Same vertical
+ * rhythm as opp-table's search row. */
+.acc-search-row {
+  display: flex;
+  align-items: center;
+  gap: var(--ds-spacing-04);
+  padding: var(--ds-spacing-04) var(--ds-spacing-04) var(--ds-spacing-02);
+}
+.acc-counts {
+  /* body-02 bold (DS type scale: 16px / 24px / semibold), tabular nums. */
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+  flex-shrink: 0;
+  font-size: 16px;
+  line-height: 24px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+}
+.acc-search-row__search {
+  flex: 1;
+  min-width: 0;
+}
+.acc-search-row__search .panw--search {
+  width: 100%;
+}
+
+/* Sort trigger — ghost-button shape, opens single-select Flyout.
+ * Stretches to match the search input's height. */
+.acc-sort-trigger {
+  display: inline-flex;
+  align-items: center;
+  align-self: stretch;
+  gap: var(--ds-spacing-02);
+  padding: 0 var(--ds-spacing-05);
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: var(--ds-text-secondary-rest);
+  border-radius: var(--ds-radius-tight);
+  white-space: nowrap;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.acc-sort-trigger:hover {
+  background-color: var(--ds-ghost-hover);
+  color: var(--ds-text-primary);
+}
+.acc-sort-trigger[aria-expanded="true"] {
+  background-color: var(--ds-ghost-pressed);
+  color: var(--ds-text-primary);
 }
 
 /* Table shell — no own border. */

@@ -1056,12 +1056,22 @@ const LAYOUT_CSS = `
   width: 100%;
 }
 
-/* Sort trigger — ghost-button shape, opens a single-select Flyout */
+/* Sort trigger — ghost-button shape, opens a single-select Flyout.
+ *
+ * Height tracking: align-self: stretch makes the trigger fill the search
+ * row's cross-axis (vertical) height. The row's height is set by its
+ * tallest child — the Search input — so the sort button always matches
+ * the current search-bar height, no matter what size/padding the DS
+ * Search component evolves to. Robust by construction; no magic number,
+ * no fixed height to drift. Vertical padding is removed because the
+ * stretch handles outer height, and content stays centered via the
+ * inline-flex align-items: center on the button itself. */
 .opp-sort-trigger {
   display: inline-flex;
   align-items: center;
+  align-self: stretch;
   gap: var(--ds-spacing-02); /* 4 */
-  padding: var(--ds-spacing-02) var(--ds-spacing-03); /* 4 8 */
+  padding: 0 var(--ds-spacing-03); /* 0 8 — horizontal only; vertical comes from stretch */
   border: 0;
   background: transparent;
   cursor: pointer;

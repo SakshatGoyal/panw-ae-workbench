@@ -120,11 +120,11 @@ The system has at least two parallel naming sets for renewal outcome — **flag 
 | Source | Values |
 |---|---|
 | `Renewal Disposition Chip` variant prop `disposition` | `Unknown`, `Full Renewal`, `Partial Renewal`, `Churn` **[C]** |
-| Disposition Chip's open dropdown menu (screenshot) | `Unknown`, `Full Renewal/Upsell`, `Downsell`, `Churn`, `Displacement (HW Refresh)`, `Duplicate` **[C]** |
+| Disposition Chip's open dropdown menu (screenshot) | `Unknown`, `Full Renewal`, `Upsell`, `Downsell`, `Churn`, `Displacement`, `Duplicate` **[C]** |
 | `Renewal Snapshot` variant prop `Outcome Selection` | `Unknown`, `Full`, `Churn` **[C]** |
-| `Opportunity Snapshot` rail dropdown | `Full Renewal/Upsell`, `Downsell`, `Churn`, `Unknown` **[C]** (matches the "fly-out" set, no `Partial Renewal`) |
+| `Opportunity Snapshot` rail dropdown | `Full Renewal`, `Upsell`, `Downsell`, `Churn`, `Unknown` **[C]** (matches the "fly-out" set, no `Partial Renewal`) |
 
-> Best guess at the canonical enum: `Unknown`, `Full Renewal/Upsell`, `Downsell`, `Churn`, `Displacement (HW Refresh)`, `Duplicate`. The chip variants and the snapshot variants are abbreviated/stale subsets. **[I]**
+> Best guess at the canonical enum: `Unknown`, `Full Renewal`, `Upsell`, `Downsell`, `Churn`, `Displacement`, `Duplicate`. The chip variants and the snapshot variants are abbreviated/stale subsets. Pass-2 update: `Full Renewal/Upsell` was split into `Full Renewal` (flat) + `Upsell` (flat + growth), and `Displacement (HW Refresh)` was shortened to `Displacement`. **[I]**
 
 **Workflow states (`Renewal Snapshot.Property 1`)**
 
@@ -336,7 +336,7 @@ This **confirms** the icon→category mapping inferred in the prior section. **[
 ### `Renewal Disposition Chip` — `16890:151581`
 - Represents `Renewal.renewalOutcome` in compact tag form.
 - Variant props **[C]**: `Disposition` = `Unknown | Full Renewal | Partial Renewal | Churn`; `Open` = `Yes | No`
-- When `Open=Yes`, exposes a dropdown with options `Unknown | Full Renewal/Upsell | Downsell | Churn | Displacement (HW Refresh) | Duplicate` — **note enum mismatch with the variant prop**, see Renewal entity above.
+- When `Open=Yes`, exposes a dropdown with options `Unknown | Full Renewal | Upsell | Downsell | Churn | Displacement | Duplicate` — **note enum mismatch with the variant prop**, see Renewal entity above.
 
 ### `Renewal Snapshot` — `21729:55802`
 - Represents the **Renewal workflow** (entity #3) state machine.
@@ -381,7 +381,7 @@ This **confirms** the icon→category mapping inferred in the prior section. **[
 ## Section 3 — Resolved by SME (2026-05-08) + remaining gaps
 
 **Resolved**
-1. ~~**Renewal outcome canonical enum**~~ — confirmed: the 6-value dropdown is canonical: `Unknown | Full Renewal/Upsell | Downsell | Churn | Displacement (HW Refresh) | Duplicate`. Chip variant prop and Renewal Snapshot variant prop are both stale. *(Designer fix.)* **[Resolved — SME]**
+1. ~~**Renewal outcome canonical enum**~~ — confirmed: the dropdown is canonical. Pass-2 update (2026-05-12): split `Full Renewal/Upsell` into `Full Renewal` (flat) + `Upsell` (flat + growth) and shortened `Displacement (HW Refresh)` to `Displacement`. The 7-value canonical enum is now `Unknown | Full Renewal | Upsell | Downsell | Churn | Displacement | Duplicate`. Chip variant prop and Renewal Snapshot variant prop are both still stale. *(Designer fix.)* **[Resolved — SME]**
 2. ~~**`Partial Renewal`**~~ — not part of the canonical enum; chip variant is stale. **[Resolved — SME]**
 4. ~~**`RUNN`**~~ — stands for **R**enewal / **U**psell / **N**et **N**ew. It's the `Opportunity.type` enum, not a separate concept. **[Resolved — SME]**
 9. ~~**`forecastCategory` enum**~~ — `Pipeline | Best Case | Commit | Closed`. Rep-assigned. **[Resolved — SME]**

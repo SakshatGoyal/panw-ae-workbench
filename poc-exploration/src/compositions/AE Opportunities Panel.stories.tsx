@@ -95,12 +95,13 @@ type TagColor = 'grey' | 'jade' | 'orange' | 'red' | 'green'
 interface Outcome { value: string; label: string; color: TagColor }
 
 const OUTCOMES: Outcome[] = [
-  { value: 'unknown',      label: 'Unknown',                  color: 'grey'   },
-  { value: 'full',         label: 'Full Renewal / Upsell',    color: 'jade'   },
-  { value: 'downsell',     label: 'Downsell',                 color: 'orange' },
-  { value: 'churn',        label: 'Churn',                    color: 'red'    },
-  { value: 'displacement', label: 'Displacement (HW Refresh)',color: 'grey'   },
-  { value: 'duplicate',    label: 'Duplicate',                color: 'grey'   },
+  { value: 'unknown',      label: 'Unknown',      color: 'grey'   },
+  { value: 'full',         label: 'Full Renewal', color: 'jade'   },
+  { value: 'upsell',       label: 'Upsell',       color: 'jade'   },  // same positive family as `full`
+  { value: 'downsell',     label: 'Downsell',     color: 'orange' },
+  { value: 'churn',        label: 'Churn',        color: 'red'    },
+  { value: 'displacement', label: 'Displacement', color: 'grey'   },
+  { value: 'duplicate',    label: 'Duplicate',    color: 'grey'   },
 ]
 
 const HEALTH_ROWS = [

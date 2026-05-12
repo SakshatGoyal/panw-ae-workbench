@@ -174,17 +174,17 @@ Close Date and Risk Factor Count are the most operationally useful — they
 let the AE put the urgent-or-broken deals at the top. The other three are
 for organization, not triage.
 
-### 3.3 Key Metrics (Row 1, right side)
+### 3.3 Key Metrics (Row 1, left side)
 
 A small, always-visible summary of what the AE is currently looking at:
 
-> **47 deals · $12.4M ARR**
+> **47 deals · $12.4M**
 
 These numbers reflect the *filtered* view, not the AE's entire pipeline.
 When filters change, these change with them. That's deliberate — the AE
 uses this to gauge "how big is the slice I'm looking at."
 
-### 3.4 The Tag Filter (Row 2, multi-select)
+### 3.4 The Tag Filter (inline at the start of the filter row, multi-select)
 
 This filter is unusual: it doesn't reduce the number of rows. It controls
 **how much information each row shows.** A row in the table has many tags
@@ -198,10 +198,11 @@ review might turn off everything except Last Activity, Account Health,
 and Risk Factors.
 
 > **Designer note:** the tag filter is a *density control*, not a data
-> filter. Make it visually distinct from the row-filtering controls
-> below it. The two callouts in the spec ("controls how much
-> information…" vs. "controls how many opportunities…") are the
-> mental model to preserve.
+> filter. Make it visually distinct from the data filters it sits
+> alongside (the density filter shares one row with the data filters,
+> set off by a vertical divider). The two callouts in the spec
+> ("controls how much information…" vs. "controls how many
+> opportunities…") are the mental model to preserve.
 
 ### 3.5 Forecast Filter (single-select)
 
@@ -316,8 +317,10 @@ This is the row's identity. Everything else is qualifying information.
 Visually quiet enough that the AE can scan down the column and read it as
 a list of deal names.
 
-**No interactions** — the row itself is clickable (via the expand action
-in Column 6), so the name doesn't need its own behavior.
+**Interactions** — both the Opportunity Name and the Account Name are
+links (hover-underline). The opportunity name is the primary affordance
+and opens the opportunity detail; the account name routes to the
+account page.
 
 ---
 
@@ -339,12 +342,16 @@ Any of these tags can be hidden via the tag filter (section 3.4).
 
 **Interactions**
 
-Most tags are read-only. Forecast, Stage, Close Date, and Quote Number do
-nothing on hover. **Opportunity Type is the exception**, and it behaves
-differently depending on its value:
+Most tags are read-only. Forecast, Stage, and Close Date do nothing on
+hover. **Opportunity Type is the exception**, and it behaves differently
+depending on its value:
 
 #### Net New
 No interaction. It's a label.
+
+#### Quote Number
+On hover (1-second delay), a small tooltip with a single *View Quote*
+ghost-brand button. Same pattern as Upsell's *Modify* affordance.
 
 #### Upsell
 After a **1-second hover delay**, a small tooltip appears with a single
@@ -372,21 +379,24 @@ table. The next subsection covers it in detail.
 
 A **Renewal Outcome** is the AE's current best guess at how this renewal
 is going to land. It's a forward-looking call, not a result. It can take
-one of six values, each with its own color treatment:
+one of seven values, each with its own color treatment:
 
 - **Unknown** (gray) — AE hasn't decided yet.
-- **Full Renewal / Upsell** (green) — the customer is staying, possibly
-  buying more.
+- **Full Renewal** (green) — the customer is staying, renewing at the
+  same scope.
+- **Upsell** (green) — the customer is staying *and* buying more. Same
+  positive-outcome color family as Full Renewal; the distinction is
+  authored by the AE.
 - **Downsell** (orange) — the customer is renewing but for less.
 - **Churn** (red) — the customer is leaving.
-- **Displacement (HW Refresh)** (purple) — the contract is ending
-  because the hardware is being refreshed; the relationship continues
-  but the renewal record itself goes away.
+- **Displacement** (purple) — the contract is ending because the
+  hardware (or product line) is being displaced; the relationship
+  continues but the renewal record itself goes away.
 - **Duplicate** (slate) — this renewal record shouldn't exist; it's a
   data artifact.
 
 The AE can change the outcome inline. The tag carries a chevron to
-signal it's interactive. Clicking it reveals a dropdown of the six
+signal it's interactive. Clicking it reveals a dropdown of the seven
 values.
 
 **What happens when the AE picks a new outcome:**
@@ -401,15 +411,16 @@ The fields differ by outcome:
 | --- | --- | --- |
 | Unknown | — | Notes (text area) |
 | Full Renewal / Upsell | — | Notes (text area) |
-| Downsell | Notes (text area) | — |
-| Displacement | Notes (text area) | — |
-| Duplicate | Notes (text area) | — |
+| Downsell | — | Notes (text area) |
+| Displacement | — | Notes (text area) |
+| Duplicate | — | Notes (text area) |
 | **Churn** | **Reason** (dropdown) and **Competitor replacement**  (dropdown) | Notes (text area) |
 
 **Why Churn is different:** when an AE marks a deal as Churn, the
 organization needs to know *why* and *to whom*. That information feeds
-loss analysis and competitive intel. It's the only outcome where we
-require structured data, not just prose.
+loss analysis and competitive intel. Churn is the only outcome with
+required structured fields (Reason + Competitor replacement). Notes is
+universally optional across every outcome.
 
 The **Reason** dropdown options:
 - Customer dissatisfied
@@ -490,12 +501,12 @@ last touchpoint be a low-stakes email.
 #### Account Health — hover popover
 On hover, a richer popover containing:
 
-1. A **12-month trend** chart at the top — the account's overall health
+1. A **12-month trend** chart, below an account-name heading and a
+   *12-month health trend* subhead — the account's overall health
    rating over the past year. The shape of the curve is the signal: is
    this account getting worse, holding steady, or recovering?
 2. **Technical Health** as a tag (Critical / At-Risk / Healthy).
-3. **Adoption & Deployment Health** as a tag (Critical / At-Risk /
-   Healthy).
+3. **Adoption & Deployment** as a tag (Critical / At-Risk / Healthy).
 4. A single **ghost brand button** at the bottom: **View Account
    Health.** This is the escape hatch into the full account-health view.
 
@@ -579,7 +590,7 @@ Two popover behaviors, depending on which tag is hovered:
 #### Hovering an individual product tag
 A small popover showing a **single row**:
 
-> [brand icon] **Product Name** *— $XXX,XXX of total opportunity value*
+> [brand icon] **Product Name** *— $XXX,XXX of total opportunity value (XX%)*
 
 This is how the AE gets to per-product value attribution without leaving
 the table. It answers "of this $2M deal, how much is the SASE piece?"
@@ -601,15 +612,15 @@ is product-heavy.
 
 **What it shows**
 
-The total opportunity value, in `body-02` size, secondary text color.
-Formatted as compact currency — e.g., `$2.4M`, `$642K`.
+The total opportunity value, formatted as compact currency — e.g.,
+`$2.4M`, `$642K`. Value is a **co-primary surface** paired with the
+opportunity name in Column 1: bold, primary text color, same scale as
+the name so the eye reads them as a paired unit. *Who is this deal* and
+*what is it worth* are the two anchors of a row; the rest is qualifying
+detail.
 
-No interactions. The per-product breakdown lives on Column 4's hover; the
-value cell itself is just the number.
-
-This column is intentionally quiet. Dollar values are easy to over-emphasize,
-and an AE scanning the table benefits more from understanding *risk* than
-*size* — the table sorts deals by their problems, not their wealth.
+**No interactions.** The per-product breakdown lives on Column 4's
+hover; the value cell itself is just the number.
 
 ---
 
@@ -617,7 +628,7 @@ and an AE scanning the table benefits more from understanding *risk* than
 
 **What it shows**
 
-Two ghost brand icon buttons, side by side:
+Two ghost accent icon buttons, side by side:
 
 - An **AI** action (icon TBD — the brand AI icon).
 - An **expand** action (chevron / arrow icon).

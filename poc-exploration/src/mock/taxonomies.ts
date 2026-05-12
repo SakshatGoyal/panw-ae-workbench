@@ -93,12 +93,13 @@ export const OPPORTUNITY_TYPE_LABELS: Record<OpportunityType, string> = {
 };
 
 export const RENEWAL_OUTCOME_LABELS: Record<RenewalOutcome, string> = {
-  'unknown':                'Unknown',
-  'full-renewal-upsell':    'Full Renewal/Upsell',
-  'downsell':               'Downsell',
-  'churn':                  'Churn',
-  'displacement-hw-refresh':'Displacement (HW Refresh)',
-  'duplicate':              'Duplicate',
+  'unknown':      'Unknown',
+  'full':         'Full Renewal',
+  'upsell':       'Upsell',
+  'downsell':     'Downsell',
+  'churn':        'Churn',
+  'displacement': 'Displacement',
+  'duplicate':    'Duplicate',
 };
 
 // ─── Health (3-value enum, applies across 5 axes) ───────────────────────────

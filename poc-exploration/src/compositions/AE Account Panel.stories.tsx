@@ -576,24 +576,28 @@ const ACC_SP_STATUS_LABEL: Record<AccSalesPlayStatus, string> = {
 // "Duplicate" maps to grey alongside Unknown / Displacement per the
 // outcomes preset already shipped on the sibling Opportunities Panel.
 const OUTCOME_TAG_COLOR: Record<RenewalOutcome, 'grey' | 'jade' | 'orange' | 'red'> = {
-  'unknown':                 'grey',
-  'full-renewal-upsell':     'jade',
-  'downsell':                'orange',
-  'churn':                   'red',
-  'displacement-hw-refresh': 'grey',
-  'duplicate':               'grey',
+  'unknown':      'grey',
+  'full':         'jade',
+  'upsell':       'jade',     // same positive-outcome family as `full`
+  'downsell':     'orange',
+  'churn':        'red',
+  'displacement': 'grey',
+  'duplicate':    'grey',
 }
 
 // Ordered outcomes for the Flyout list — Unknown first as the resting
-// default, then Full Renewal / Upsell (the happy path), then degrading
-// outcomes (Downsell, Churn), then the two structural outcomes
-// (Displacement, Duplicate). Matches the spec §6 enum order.
+// default, then the positive outcomes (Full Renewal, Upsell — flat vs
+// renewal-plus-growth), then degrading outcomes (Downsell, Churn),
+// then the two structural outcomes (Displacement, Duplicate). Matches
+// the spec §6 enum order with `upsell` slotted in after `full` per the
+// pass-2 renewal-outcome split.
 const OUTCOME_ORDER: RenewalOutcome[] = [
   'unknown',
-  'full-renewal-upsell',
+  'full',
+  'upsell',
   'downsell',
   'churn',
-  'displacement-hw-refresh',
+  'displacement',
   'duplicate',
 ]
 

@@ -60,18 +60,17 @@ The non-accordion top block. Always visible.
 
 Fields, in order:
 
-- **Account Preview** — the panel title.
 - **Account** — the account name (e.g., *Ironic Arts and Crafts*) with
   an open-in-new-tab affordance that links to the full account detail
   surface.
 - **Apex Account** — the parent/roll-up account (e.g., *Ironic Inc.*),
   also with an open-in-new-tab. Omitted when the account *is* its own
   apex.
-- **LTV** — Lifetime Value, shown large (e.g., *$7.35M*). This is the
+- **LTV** — Lifetime Value (e.g., *$7.35M*). This is the
   same LTV definition used in `accounts-table-reference.md` (total
-  contracted revenue across the lifetime of the relationship). It lives
-  in the header because it's the single number AEs use to *size* a
-  customer at a glance.
+  contracted revenue across the lifetime of the relationship). It sits
+  in the identity plate alongside Account and Apex Account, sharing the
+  same row treatment so the three read as one identity block.
 
 The header has no actions beyond close and the two link-outs.
 
@@ -165,8 +164,12 @@ Base: the panel is a summary; the console is the manage surface.
 > the current quarter or the next three.
 
 Defaults to **expanded**. This section is the panel's tightest parity
-surface with the opportunities table — the same tag tokens, popover
-patterns, and interaction grammar are reused here.
+surface with the opportunities table — the same tag tokens and
+interaction grammar are reused here. Most rows render as static tags
+with no popover; Active Quote follows the table's tag-as-trigger →
+single-button popover pattern; and Risks, Products, and Last Activity
+Date use content-rich multi-row popovers instead of a single action
+button.
 
 > **Terminology note:** throughout this section, "**tag**" means the
 > DS `<Tags />` component (the same one used in
@@ -203,41 +206,36 @@ Rows, in order:
 1. **Active Quote** — a tag showing the quote ID (e.g., *Q-100874*).
    On hover, a popover with a single *View Quote* ghost-brand button.
    Omitted when no quote exists.
-2. **Closing in** — a tag showing days to close (e.g., *38 days*). On
-   hover, a popover with a single *View in SFDC* ghost-brand button.
-3. **Stage** — a tag using the canonical stage name (*Discovery*,
+2. **Stage** — a tag using the canonical stage name (*Discovery*,
    *Solutioning*, *Tech Validation*, *Active POV*, *Negotiation*) plus
-   days-in-stage. On hover, a popover with *View in SFDC*.
-4. **ARR** — the ARR figure, displayed as a value. (Not interactive on
+   days-in-stage.
+3. **ARR** — the ARR figure, displayed as a value. (Not interactive on
    its own.)
-5. **Forecast** — a tag with the forecast category (*Pipeline*, *Best
-   Case*, *Commit*, *Closed*) and days-in-forecast. On hover, a
-   popover with *View in SFDC*. Added for parity with the table; the
-   earlier draft did not include this row.
-6. **Opportunity Type** — a tag with the type (*Net-New*, *Upsell*,
-   *Renewal*). On hover, a popover with *View in SFDC*. (The table's
-   Upsell-specific *Modify* tooltip and Renewal-specific subscription
-   popover live on the table only; the panel keeps a single pattern
-   for simplicity.)
-7. **Opportunity Risks** — a danger-toned count tag (e.g., *4*) using
+4. **Forecast** — a tag with the forecast category (*Pipeline*, *Best
+   Case*, *Commit*, *Closed*) and days-in-forecast. Added for parity
+   with the table; the earlier draft did not include this row.
+5. **Opportunity Type** — a tag with the type (*Net-New*, *Upsell*,
+   *Renewal*). (The table's Upsell-specific *Modify* tooltip and
+   Renewal-specific subscription popover live on the table only; the
+   panel keeps a single pattern for simplicity.)
+6. **Opportunity Risks** — a danger-toned count tag (e.g., *4*) using
    the same red-tag treatment as the table. On hover, a popover
    listing every applied risk, identical to the table's risk popover.
    Risk taxonomy is the 9-value opportunity-level set in
    `opportunities-table-reference.md`.
-8. **Products** — a single tag carrying the **unique brand icons** for
+7. **Products** — a single tag carrying the **unique brand icons** for
    the products on the opportunity (e.g., one Strata + one Prisma +
    one Cortex icon, even if there are multiple Prisma products).
    Brand icons are not recolored by the tag. On hover, a popover
    listing each product on the opportunity and its **contribution to
    the opportunity's total value** (same per-product-contribution
    pattern as the table's product popover).
-9. **Last Activity** — a tag showing the activity *type* (e.g.,
-   *Customer Engagement*). On hover, a popover with *View in SFDC*.
-10. **Last Activity Date** — a tag showing the formatted date (e.g.,
-    *12 Mar 2026*). On hover, a popover showing the **actual activity
-    record** (subject + short description) — not just a link.
-11. **Renewal Outcome** — present **only when Opportunity Type is
-    Renewal**. See below.
+8. **Last Activity Date** — a tag showing the formatted date (e.g.,
+   *12 Mar 2026*). On hover, a popover with two rows — `Type` (the
+   activity type label) and `When` (days ago) — not the full activity
+   record subject or description.
+9. **Renewal Outcome** — present **only when Opportunity Type is
+   Renewal**. See below.
 
 Every account should have at least one Renewal-type opportunity inside
 the 4-quarter window — this is a mock-data invariant, not a UI rule,
@@ -256,18 +254,23 @@ want to leave the panel entirely.
 Renders **only when Opportunity Type = Renewal**. For all other types
 the row is omitted.
 
-Same six-value enum as in the opportunities table:
-- **Unknown** — gray
-- **Full Renewal / Upsell** — green
+Same seven-value enum as in the opportunities table:
+- **Unknown** — grey
+- **Full Renewal** — jade
+- **Upsell** — jade (same positive family as Full Renewal; a flat
+  renewal plus added scope)
 - **Downsell** — orange
 - **Churn** — red
-- **Displacement (HW Refresh)** — purple
-- **Duplicate** — slate
+- **Displacement** — grey
+- **Duplicate** — grey
+
+Slate is not a Tags color in the DS palette; Duplicate, Displacement,
+and Unknown all map to grey.
 
 The trigger is a tag-as-button. Clicking opens a DS Flyout
 (equivalent to the table's Renewal Outcome editor) with two flows:
 
-- **Non-Churn flow** *(Unknown, Full Renewal/Upsell, Downsell,
+- **Non-Churn flow** *(Unknown, Full Renewal, Upsell, Downsell,
   Displacement, Duplicate)* — a single optional *Notes* field. *Save*
   is enabled the moment the disposition is chosen.
 - **Churn flow** — adds two required dropdowns *before* notes:

@@ -98,7 +98,7 @@ export type OpportunityType = 'net-new' | 'upsell' | 'renewal' | 'renewal-and-up
 export type ForecastCategory = 'pipeline' | 'best-case' | 'commit' | 'closed';
 export type StageId = 'discovery' | 'solutioning' | 'technical-validation' | 'active-pov' | 'negotiate';
 export type HealthStatus = 'healthy' | 'at-risk' | 'critical';
-export type RenewalOutcome = 'unknown' | 'full-renewal-upsell' | 'downsell' | 'churn' | 'displacement-hw-refresh' | 'duplicate';
+export type RenewalOutcome = 'unknown' | 'full' | 'upsell' | 'downsell' | 'churn' | 'displacement' | 'duplicate';
 export type SalesPlayStatus = 'not-touched' | 'pitched' | 'interested' | 'open-pipeline' | 'closed-won' | 'deferred' | 'closed-lost';
 export type Severity = 'ok' | 'caution' | 'error';
 

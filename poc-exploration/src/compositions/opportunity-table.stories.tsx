@@ -176,7 +176,7 @@ type SalesPlayStatus =
   | 'pursuing' | 'closed-won' | 'closed-lost'
 
 type RenewalOutcome =
-  | 'unknown' | 'full' | 'downsell' | 'churn' | 'displacement' | 'duplicate'
+  | 'unknown' | 'full' | 'upsell' | 'downsell' | 'churn' | 'displacement' | 'duplicate'
 
 interface Product { name: string; brand: Brand; valueUsd: number }
 interface RiskFactor { id: RiskId; emoji: string; label: string }
@@ -1565,12 +1565,13 @@ function ProductPanel({ product, totalUsd }: { product: Product; totalUsd: numbe
 // Displacement and "slate" for Duplicate, both of which exist in TagColors.
 
 const RENEWAL_OUTCOMES: { value: RenewalOutcome; label: string; color: TagColor }[] = [
-  { value: 'unknown',      label: 'Unknown',                  color: 'neutral' },
-  { value: 'full',         label: 'Full Renewal / Upsell',    color: 'green' },
-  { value: 'downsell',     label: 'Downsell',                 color: 'orange' },
-  { value: 'churn',        label: 'Churn',                    color: 'red' },
-  { value: 'displacement', label: 'Displacement (HW Refresh)', color: 'purple' },
-  { value: 'duplicate',    label: 'Duplicate',                color: 'slate' },
+  { value: 'unknown',      label: 'Unknown',      color: 'neutral' },
+  { value: 'full',         label: 'Full Renewal', color: 'green'   },
+  { value: 'upsell',       label: 'Upsell',       color: 'green'   },  // same positive family as `full`
+  { value: 'downsell',     label: 'Downsell',     color: 'orange'  },
+  { value: 'churn',        label: 'Churn',        color: 'red'     },
+  { value: 'displacement', label: 'Displacement', color: 'purple'  },
+  { value: 'duplicate',    label: 'Duplicate',    color: 'slate'   },
 ]
 const outcomeMeta = (v: RenewalOutcome) =>
   RENEWAL_OUTCOMES.find(o => o.value === v) ?? RENEWAL_OUTCOMES[0]

@@ -32,8 +32,8 @@ export type ForecastCategory = 'pipeline' | 'best-case' | 'commit' | 'closed';
 export type HealthStatus = 'healthy' | 'at-risk' | 'critical';
 
 export type RenewalOutcome =
-  | 'unknown' | 'full-renewal-upsell' | 'downsell'
-  | 'churn' | 'displacement-hw-refresh' | 'duplicate';
+  | 'unknown' | 'full' | 'upsell' | 'downsell'
+  | 'churn' | 'displacement' | 'duplicate';
 
 export type SalesPlayStatusId =
   | 'not-touched' | 'pitched' | 'interested' | 'open-pipeline'

@@ -2130,7 +2130,7 @@ function OppRow({
 
 // ─── Main composition ────────────────────────────────────────────────────────
 
-function AEOpportunityTable({
+export function AEOpportunityTable({
   rows = DEFAULT_ROWS,
   totalItems = 47,
   summaryLabel = '47 deals · $12.4M',
@@ -3043,7 +3043,7 @@ const LAYOUT_CSS = `
 
 // ─── Storybook meta ──────────────────────────────────────────────────────────
 
-const meta: Meta = { title: 'compositions/AE Opportunity Table' }
+const meta: Meta = { title: 'compositions/AE Opportunity Table', excludeStories: ['AEOpportunityTable'] }
 export default meta
 
 export const Default: StoryObj = {

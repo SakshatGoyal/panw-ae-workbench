@@ -242,7 +242,7 @@ function Cell({ datum }: { datum: CategoryDatum }) {
 
 // ── Composition ─────────────────────────────────────────────────────────────
 
-function PlanForecastSummary({
+export function PlanForecastSummary({
   data = DEFAULT_PLAN_SUMMARY_DATA,
   defaultOpen = false,
 }: PlanSummaryProps = {}) {
@@ -537,6 +537,7 @@ const COMPOSITION_CSS = `
 const meta: Meta<typeof PlanForecastSummary> = {
   title: 'compositions/Plan & Forecast Summary',
   component: PlanForecastSummary,
+  excludeStories: ['PlanForecastSummary'],
 }
 export default meta
 

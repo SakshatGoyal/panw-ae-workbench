@@ -1377,7 +1377,7 @@ function ProductTreeGroup({
           className="acc-tree__chev"
           aria-label={isOpen ? `Collapse ${group.label}` : `Expand ${group.label}`}
           onClick={(e) => { e.stopPropagation(); setOpen(o => !o) }}>
-          <Chev size={16} />
+          <Chev size={20} />
         </button>
         <span className="acc-tree__row-action" onClick={onToggleGroup}>
           <Checkbox status={status} label="" tabIndex={-1} />
@@ -1946,7 +1946,7 @@ export interface AccountTableProps {
   totalItems?: number
 }
 
-function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) {
+export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) {
   const [search, setSearch] = useState('')
   // Default sort per spec §5: most-broken accounts at top of triage queue.
   const [sortKey, setSortKey] = useState<SortKey>('riskCount')
@@ -2144,7 +2144,7 @@ function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) {
                           ? 'No EBC on record'
                           : `EBC on ${formatEbcDate(row.ebc.date)}`
                         return (
-                          <div className="acc-tag-cluster acc-tag-cluster--stack">
+                          <div className="acc-tag-cluster">
                             {density.includes('lastActivity') && (
                               <HoverShell
                                 render={() => (
@@ -2377,12 +2377,17 @@ const LAYOUT_CSS = `
 }
 
 /* ── Tree (product filter) ──────────────────────────────────────────── */
-.acc-tree { padding: var(--ds-spacing-02) 0; }
+/* Tree filter rows mirror DS FlyoutItem dimensions exactly
+ * (padding 8/12, gap 8, no forced min-height) so the product
+ * filter reads at the same density as every other filter
+ * dropdown in this row. See @ds/styles/.../flyout/_flyout.scss
+ * .panw--flyout__item. */
+.acc-tree { padding: var(--ds-spacing-03) 0; }
 .acc-tree__select-all {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: var(--ds-spacing-02) var(--ds-spacing-04);
+  padding: var(--ds-spacing-03) var(--ds-spacing-04);
   cursor: pointer;
 }
 .acc-tree__select-all-divider {
@@ -2394,9 +2399,8 @@ const LAYOUT_CSS = `
 .acc-tree__row {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-02);
-  padding: var(--ds-spacing-02) var(--ds-spacing-04);
-  min-height: 32px;
+  gap: var(--ds-spacing-03);
+  padding: var(--ds-spacing-03) var(--ds-spacing-04);
   cursor: pointer;
 }
 .acc-tree__row:hover { background-color: var(--ds-ghost-hover); }
@@ -2405,8 +2409,8 @@ const LAYOUT_CSS = `
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 24px;
   border: 0;
   background: transparent;
   cursor: pointer;
@@ -2414,7 +2418,7 @@ const LAYOUT_CSS = `
   border-radius: var(--ds-radius-tight);
 }
 .acc-tree__chev:hover { background-color: var(--ds-ghost-hover); color: var(--ds-text-primary); }
-.acc-tree__chev-spacer { display: inline-block; width: 20px; height: 1px; }
+.acc-tree__chev-spacer { display: inline-block; width: 24px; height: 1px; }
 .acc-tree__row-action {
   display: inline-flex;
   align-items: center;
@@ -2731,15 +2735,18 @@ const LAYOUT_CSS = `
   white-space: nowrap;
   cursor: default;
 }
+/* DS "black" Link palette — text.link-neutral family.
+ * rest:  --ds-text-link-neutral-rest  (resolved by stage to neutral text)
+ * hover: --ds-text-link-neutral-hover (shifts to brand on hover, with underline) */
 .acc-multiline__link {
-  color: inherit;
+  color: var(--ds-text-link-neutral-rest);
   text-decoration: none;
   cursor: pointer;
 }
 .acc-multiline__link:hover {
+  color: var(--ds-text-link-neutral-hover);
   text-decoration: underline;
   text-underline-offset: 2px;
-  color: var(--ds-text-primary);
 }
 
 /* Tag cluster inside a cell. Wraps; gap-04 between tags. */
@@ -2753,13 +2760,6 @@ const LAYOUT_CSS = `
    * the column gets narrower than the chip's natural width. Without
    * this the chip would force the cell to overflow horizontally. */
   min-width: 0;
-}
-
-/* Column 3 stacks sub-cells vertically (each row in the cell is a
- * distinct concept — activity / health / risks / EBC). */
-.acc-tag-cluster--stack {
-  flex-direction: column;
-  align-items: flex-start;
 }
 
 /* ── Tag ellipsis truncation ─────────────────────────────────────────
@@ -2902,8 +2902,9 @@ const LAYOUT_CSS = `
 }
 .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--not-touched .panw--tag__icon { color: var(--ds-icons-status-danger); }
 .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--pursuing    .panw--tag__icon { color: var(--ds-icons-success); }
-/* closed-won keeps its DS-authored success-teal. */
-.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--closed-won  .panw--tag__icon { color: #29a393; }
+/* closed-won uses DS mint-50 so it reads as a positive outcome but stays
+ * visually distinct from pursuing (which uses --ds-icons-success). */
+.panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--closed-won  .panw--tag__icon { color: var(--ds-color-core-mint-50); }
 .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--pitched     .panw--tag__icon,
 .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--deferred    .panw--tag__icon,
 .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag--declined    .panw--tag__icon,
@@ -2961,7 +2962,7 @@ const LAYOUT_CSS = `
 `
 
 // ─── Storybook meta ──────────────────────────────────────────────────────
-const meta: Meta = { title: 'compositions/AE Account Table' }
+const meta: Meta = { title: 'compositions/AE Account Table', excludeStories: ['AEAccountTable'] }
 export default meta
 
 export const Default: StoryObj = {

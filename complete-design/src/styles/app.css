@@ -1,0 +1,273 @@
+/* Complete-design app shell. Tokens only — no raw hex, no off-grid spacing.   */
+/* Stage tokens come from .stage on document.body (see main.tsx).              */
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body.stage {
+  background: var(--ds-stage-base);
+  color: var(--ds-text-primary);
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 1.42857;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ── Shell grid ───────────────────────────────────────────────────────────── */
+
+.cd-app {
+  display: grid;
+  grid-template-columns: 64px 1fr var(--cd-right-rail-width, 430px);
+  min-height: 100vh;
+  background: var(--ds-stage-base);
+}
+
+.cd-app__rail-left {
+  background: var(--ds-surface-inverse-rest);
+  border-right: 1px solid var(--ds-lines-neutral-rest);
+}
+
+/* ── SideNav (copied from poc side-nav.stories COMPOSITION_CSS, .snav-* only).
+   The story file injects this CSS via a <style> tag only inside the wrapper
+   SideNavComposition. We render bare SideNav, so we own the rules here. */
+
+.snav {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  width: 64px;
+  height: 100%;
+  flex-shrink: 0;
+  background: var(--ds-surface-inverse-rest);
+  color: var(--ds-icons-inverse-rest);
+}
+.snav__brand {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 64px;
+  height: 66px;
+  flex-shrink: 0;
+}
+.snav__primary {
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  padding-top: var(--ds-spacing-03);
+  min-height: 0;
+}
+.snav__global {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  flex-shrink: 0;
+}
+.snav__expand {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+.snav__divider {
+  height: 1px;
+  background: var(--ds-surface-inverse-hover);
+}
+.snav-row {
+  width: 64px;
+  height: 40px;
+  flex-shrink: 0;
+  display: flex;
+  align-items: stretch;
+  cursor: pointer;
+  transition: background 110ms var(--ds-motion-easing-standard, cubic-bezier(0.2, 0, 0.38, 0.9));
+}
+.snav-row:hover { background: var(--ds-surface-inverse-hover); }
+.snav-row[data-active='true'] { background: var(--ds-surface-inverse-hover); }
+.snav-row:focus-visible { outline: 2px solid var(--ds-brand-rest); outline-offset: -2px; }
+.snav-row__bar { width: 4px; flex-shrink: 0; background: transparent; }
+.snav-row[data-active='true'] .snav-row__bar { background: var(--ds-brand-rest); }
+.snav-row__slot {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  padding-left: 18px;
+  padding-right: 2px;
+  opacity: 0.65;
+  transition: opacity 110ms var(--ds-motion-easing-standard, cubic-bezier(0.2, 0, 0.38, 0.9));
+}
+.snav-row:hover .snav-row__slot,
+.snav-row[data-active='true'] .snav-row__slot { opacity: 1; }
+.snav-row__caret { display: inline-flex; align-items: center; margin-left: var(--ds-spacing-02); }
+@media (prefers-reduced-motion: reduce) {
+  .snav-row, .snav-row__slot { transition: none; }
+}
+
+.cd-app__column {
+  display: flex;
+  flex-direction: column;
+  min-width: 0; /* let tables overflow-scroll without bursting the grid */
+}
+
+.cd-app__main {
+  flex: 1 0 auto;
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.cd-app__rail-right {
+  position: relative;
+  background: var(--ds-surface-rest);
+  border-left: 1px solid var(--ds-lines-neutral-rest);
+  min-width: 320px;
+  max-width: 480px;
+}
+
+/* ── Page header ──────────────────────────────────────────────────────────── */
+
+.cd-page-header {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  padding-bottom: 8px;
+}
+.cd-page-header__title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.2;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  letter-spacing: -0.01em;
+}
+.cd-page-header__subtitle {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.42857;
+  color: var(--ds-text-secondary-rest);
+}
+
+/* ── Container tabs + table tile ──────────────────────────────────────────── */
+
+.cd-tabs-host {
+  /* Tabs sit flush above the tile beneath. No gap. */
+}
+.cd-tabs-host .ds--tabs {
+  margin-bottom: 0;
+}
+
+/* PlanForecastSummary wraps itself in `.psum-page` which assumes it owns the
+   viewport (min-height: 100vh, 32px padding). Inside our shell it is one tile
+   in a column, not the page. Neutralize the outer wrapper here. */
+.cd-app .psum-page,
+.cd-app .acc-page,
+.cd-app .opp-page {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.cd-table-tile {
+  /* Layout-only container; visual surface comes from the table composition.
+     Keeping this transparent avoids the tile-in-tile double, per Stage 1
+     fallback. If a real tile chrome is needed later, set background +
+     border + radius here. */
+  background: transparent;
+  min-height: 0;
+}
+
+/* ── Footer ───────────────────────────────────────────────────────────────── */
+
+.cd-footer {
+  margin-top: 32px;
+  padding: 24px 0;
+  border-top: 1px solid var(--ds-lines-neutral-rest);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--ds-text-tertiary-rest);
+}
+.cd-footer__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--ds-text-secondary-rest);
+}
+.cd-footer__mark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border: 1px solid var(--ds-lines-neutral-rest);
+  border-radius: var(--ds-radius-standard);
+  font-size: 8px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  letter-spacing: 0.04em;
+  color: var(--ds-text-primary);
+}
+.cd-footer__copy {
+  color: var(--ds-text-tertiary-rest);
+}
+.cd-footer__links {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+  margin-left: auto;
+}
+.cd-footer__link {
+  color: var(--ds-text-secondary-rest);
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 0;
+  border-radius: var(--ds-radius-standard);
+}
+.cd-footer__link:hover {
+  color: var(--ds-text-primary);
+}
+.cd-footer__link:focus-visible {
+  outline: 2px solid var(--ds-brand-rest);
+  outline-offset: 2px;
+}
+.cd-footer__sep {
+  color: var(--ds-lines-neutral-rest);
+  user-select: none;
+}
+
+/* ── Resize handle (right rail) ──────────────────────────────────────────── */
+
+.cd-resize-handle {
+  position: absolute;
+  top: 0;
+  left: -2px;
+  width: 4px;
+  height: 100%;
+  cursor: col-resize;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  z-index: 2;
+}
+.cd-resize-handle:hover,
+.cd-resize-handle:focus-visible,
+.cd-resize-handle[data-dragging='true'] {
+  background: var(--ds-brand-rest);
+  outline: none;
+}
+.cd-resize-handle:focus-visible {
+  outline: 2px solid var(--ds-brand-rest);
+  outline-offset: 0;
+}
+
+.cd-rail-empty {
+  padding: 32px 24px;
+  color: var(--ds-text-tertiary-rest);
+  font-size: 12px;
+  line-height: 1.42857;
+}

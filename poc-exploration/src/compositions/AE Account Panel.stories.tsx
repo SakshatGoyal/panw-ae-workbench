@@ -1169,6 +1169,17 @@ export const DEFAULT_ACCOUNT_PANEL_DATA: AccountPanelData = {
 export interface AccountPanelProps {
   /** Override the panel's data. Defaults to the Cyberdyne fixture. */
   data?: AccountPanelData
+  /**
+   * Open this opp's snapshot accordion by default. Falls back to
+   * `data.renewalOpp.id`. Multiple opps can still toggle open via user
+   * click; this prop only seeds the initial state. Unknown ids are
+   * silent no-ops (no matching row renders, the panel's other state is
+   * unaffected).
+   *
+   * Use case: the opportunity-table-row-click demo flow needs the panel
+   * to open with the clicked opp's snapshot expanded, not the renewal's.
+   */
+  initialOpenOppId?: string
 }
 
 // Health-trend visualization. 12 past-month bars + 10 future-month
@@ -1270,7 +1281,10 @@ function ProductHealthBlock({ row }: { row: ProductHealthRow }) {
   )
 }
 
-function AccountPanel({ data = DEFAULT_ACCOUNT_PANEL_DATA }: AccountPanelProps = {}) {
+function AccountPanel({
+  data = DEFAULT_ACCOUNT_PANEL_DATA,
+  initialOpenOppId,
+}: AccountPanelProps = {}) {
   // Derived rollups — recomputed per render from whatever data was passed
   // in. These were module-scope constants before plumbing; pulling them
   // inside the component is what lets a caller pass a different `data`
@@ -1309,11 +1323,13 @@ function AccountPanel({ data = DEFAULT_ACCOUNT_PANEL_DATA }: AccountPanelProps =
   const toggleFamily = (id: string) =>
     setOpenFamilies(p => ({ ...p, [id]: !p[id] }))
 
-  // Opportunity-row open state. The renewal opp opens by default so the
+  // Opportunity-row open state. By default the renewal opp opens so the
   // Renewal Outcome row (the unique-to-Phase-3 row in the snapshot) shows
-  // in initial render.
+  // in initial render. Callers can override via `initialOpenOppId` — used
+  // by the opp-table-row-click demo flow so the panel opens with the
+  // clicked opp expanded.
   const [openOpps, setOpenOpps] = useState<Record<string, boolean>>({
-    [data.renewalOpp.id]: true,
+    [initialOpenOppId ?? data.renewalOpp.id]: true,
   })
   const toggleOpp = (id: string) =>
     setOpenOpps(p => ({ ...p, [id]: !p[id] }))

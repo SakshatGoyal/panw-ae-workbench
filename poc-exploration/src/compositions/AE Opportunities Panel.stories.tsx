@@ -123,6 +123,56 @@ const SUGGESTIONS = [
   'Show me the product breakdown for this deal.',
 ] as const
 
+// ─── Public data contract ────────────────────────────────────────────────────
+//
+// Everything the panel renders flows through `OpportunityPanelData`. The
+// `DEFAULT_OPPORTUNITY_PANEL_DATA` constant assembled below packs the existing
+// module-scope POC fixtures so the existing story renders unchanged. A
+// downstream consumer can swap in real data by passing the `data` prop.
+//
+// `STATUS_ICONS` stays local (icon component lookup, not data).
+
+export interface HealthAxisRowData {
+  label: string
+  value: string
+  color: TagColor
+  /** Marks the Overall Health row — rendered bold + drives the section tag. */
+  primary?: boolean
+}
+
+export interface OpportunityPanelData {
+  accountName: string
+  opportunityName: string
+  renewals: ReadonlyArray<{ label: string; value: string }>
+  installBase: ReadonlyArray<{ label: string; value: string }>
+  installBaseTotalLabel: string
+  salesPlays: SalesPlay[]
+  salesPlayTotalLabel: string
+  outcomes: Outcome[]
+  healthRows: HealthAxisRowData[]
+  products: Product[]
+  suggestions: ReadonlyArray<string>
+}
+
+export const DEFAULT_OPPORTUNITY_PANEL_DATA: OpportunityPanelData = {
+  accountName: '[Account Name]',
+  opportunityName: '[Opportunity Name]',
+  renewals: RENEWAL_ROWS,
+  installBase: INSTALL_BASE_ROWS,
+  installBaseTotalLabel: '$25.8M',
+  salesPlays: SALES_PLAYS,
+  salesPlayTotalLabel: '$287K',
+  outcomes: OUTCOMES,
+  healthRows: [...HEALTH_ROWS],
+  products: PRODUCTS,
+  suggestions: SUGGESTIONS,
+}
+
+export interface OpportunityPanelProps {
+  /** Override the panel's data. Defaults to the POC placeholder fixture. */
+  data?: OpportunityPanelData
+}
+
 // ─── Sub-components ───────────────────────────────────────────────────────────
 
 function DataRow({ label, value }: { label: string; value: string }) {
@@ -149,7 +199,7 @@ function DealRow({ deal }: { deal: Deal }) {
 
 // ─── Panel ────────────────────────────────────────────────────────────────────
 
-function OpportunityPanel() {
+function OpportunityPanel({ data = DEFAULT_OPPORTUNITY_PANEL_DATA }: OpportunityPanelProps = {}) {
   const [outcomeOpen, setOutcomeOpen]     = useState(false)
   const [outcome, setOutcome]             = useState<string>('unknown')
   const [openPlays, setOpenPlays]         = useState<Record<string, boolean>>({})
@@ -169,7 +219,10 @@ function OpportunityPanel() {
 
   const togglePlay = (id: string) => setOpenPlays((p) => ({ ...p, [id]: !p[id] }))
   const toggleSection = (id: string) => setOpenSections((p) => ({ ...p, [id]: !p[id] }))
-  const currentOutcome = OUTCOMES.find((o) => o.value === outcome) ?? OUTCOMES[0]
+  const currentOutcome = data.outcomes.find((o) => o.value === outcome) ?? data.outcomes[0]
+  // Overall Health drives the Account Health section's section tag. Fall
+  // back to the first row if no row is flagged primary.
+  const overallHealth = data.healthRows.find(r => r.primary) ?? data.healthRows[0]
   const formVisible   = outcome !== 'unknown'
   const churnVisible  = outcome === 'churn'
 
@@ -193,8 +246,8 @@ function OpportunityPanel() {
             the data layer actually provides. */}
         <header className="ops-panel__header">
           <div className="ops-panel__title-group">
-            <h1 className="ops-panel__account-name">[Account Name]</h1>
-            <Link href="#" color="blue" size="14px">[Opportunity Name]</Link>
+            <h1 className="ops-panel__account-name">{data.accountName}</h1>
+            <Link href="#" color="blue" size="14px">{data.opportunityName}</Link>
           </div>
           <Button kind="ghost" size="small" renderIcon={Close} iconDescription="Close panel" />
         </header>
@@ -225,7 +278,7 @@ function OpportunityPanel() {
           onToggle={() => toggleSection('renewals')}
         >
           <div className="ops-data-table">
-            {RENEWAL_ROWS.map((r, i) => (
+            {data.renewals.map((r, i) => (
               <React.Fragment key={r.label}>
                 {i > 0 && <div className="ops-divider" />}
                 <DataRow {...r} />
@@ -264,7 +317,7 @@ function OpportunityPanel() {
                   placement="bottom-start"
                 >
                   <FlyoutList>
-                    {OUTCOMES.map((o) => (
+                    {data.outcomes.map((o) => (
                       <FlyoutItem key={o.value} value={o.value}>{o.label}</FlyoutItem>
                     ))}
                   </FlyoutList>
@@ -340,14 +393,14 @@ function OpportunityPanel() {
           title="Install base"
           showIcon={false}
           showTag
-          tagLabel="$25.8M"
+          tagLabel={data.installBaseTotalLabel}
           tagColor="grey"
           tagContrast="low"
           open={openSections.installBase}
           onToggle={() => toggleSection('installBase')}
         >
           <div className="ops-data-table">
-            {INSTALL_BASE_ROWS.map((r, i) => (
+            {data.installBase.map((r, i) => (
               <React.Fragment key={r.label}>
                 {i > 0 && <div className="ops-divider" />}
                 <DataRow {...r} />
@@ -370,14 +423,14 @@ function OpportunityPanel() {
           title="Sales play"
           showIcon={false}
           showTag
-          tagLabel="$287K"
+          tagLabel={data.salesPlayTotalLabel}
           tagColor="orange"
           tagContrast="low"
           open={openSections.salesPlay}
           onToggle={() => toggleSection('salesPlay')}
         >
           <div className="ops-salesplay-list">
-            {SALES_PLAYS.map((p) => (
+            {data.salesPlays.map((p) => (
               <Accordion
                 key={p.id}
                 size="default"
@@ -416,8 +469,8 @@ function OpportunityPanel() {
           title="Account health"
           showIcon={false}
           showTag
-          tagLabel="Critical"
-          tagColor="red"
+          tagLabel={overallHealth.value}
+          tagColor={overallHealth.color}
           tagContrast="low"
           open={openSections.accountHealth}
           onToggle={() => toggleSection('accountHealth')}
@@ -425,20 +478,15 @@ function OpportunityPanel() {
           {/* Hierarchy: Overall (parent, bold) → Technical / Deployment-Adoption
               (children, indented) → per-product breakdown (table). */}
           <div className="ops-health-rows">
-            <div className="ops-health-row ops-health-row--primary">
-              <span className="ops-health-row__label">Overall Health</span>
-              <Tags label="Critical" color="red" contrast="low" size="default" shape="pill" />
-            </div>
-            <div className="ops-divider" />
-            <div className="ops-health-row ops-health-row--child">
-              <span className="ops-health-row__label">Technical Health</span>
-              <Tags label="Critical" color="red" contrast="low" size="default" shape="pill" />
-            </div>
-            <div className="ops-divider" />
-            <div className="ops-health-row ops-health-row--child">
-              <span className="ops-health-row__label">Deployment and Adoption</span>
-              <Tags label="At-Risk" color="orange" contrast="low" size="default" shape="pill" />
-            </div>
+            {data.healthRows.map((row, i) => (
+              <React.Fragment key={row.label}>
+                {i > 0 && <div className="ops-divider" />}
+                <div className={`ops-health-row ops-health-row--${row.primary ? 'primary' : 'child'}`}>
+                  <span className="ops-health-row__label">{row.label}</span>
+                  <Tags label={row.value} color={row.color} contrast="low" size="default" shape="pill" />
+                </div>
+              </React.Fragment>
+            ))}
           </div>
 
           <div className="ops-product-table" role="table">
@@ -447,7 +495,7 @@ function OpportunityPanel() {
               <Header type="basic" alignment="left">Technical</Header>
               <Header type="basic" alignment="left">Adoption</Header>
             </div>
-            {PRODUCTS.map((prod, i) => (
+            {data.products.map((prod, i) => (
               <React.Fragment key={prod.name}>
                 {i > 0 && <div className="ops-divider" />}
                 <div className="ops-product-row" role="row">
@@ -472,14 +520,14 @@ function OpportunityPanel() {
           title="Suggestions"
           showIcon={false}
           showTag
-          tagLabel={String(SUGGESTIONS.length)}
+          tagLabel={String(data.suggestions.length)}
           tagColor="grey"
           tagContrast="low"
           open={openSections.suggestions}
           onToggle={() => toggleSection('suggestions')}
         >
           <div className="ops-suggestions">
-            {SUGGESTIONS.map((s, i) => (
+            {data.suggestions.map((s, i) => (
               <React.Fragment key={s}>
                 {i > 0 && <div className="ops-divider" />}
                 <button className="ops-prompt-card" type="button">

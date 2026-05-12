@@ -13,7 +13,7 @@ $panw-prefix: 'panw';
   box-sizing: border-box;
   // Entrance motion mirrors tooltip — 8px directional slide + opacity fade,
   // 70ms (fast-01) with entrance easing. Direction matches placement.
-  animation: panw-popover-enter-up 70ms cubic-bezier(0, 0, 0.38, 0.9);
+  animation: panw-popover-enter-up 70ms var(--ds-motion-easing-entrance);
 }
 
 .#{$panw-prefix}--popover--direction-top    { animation-name: panw-popover-enter-up;    }
@@ -119,4 +119,17 @@ $panw-prefix: 'panw';
   display: flex;
   align-items: center;
   gap: 4px;
+}
+
+// ─── HoverPopover host ───────────────────────────────────────────────────────
+// Wrapper for a Popover panel anchored to a trigger element and shown on
+// hover with a grace period. Positioning math lives in the React component;
+// this rule just owns the stacking context and ensures the host doesn't
+// interfere with the panel's intrinsic sizing or entrance animation.
+.#{$panw-prefix}--hover-popover {
+  // Sit above scrolled content and below modal overlays. No --ds-z-* token
+  // family exists yet — when one lands, this becomes var(--ds-z-popover).
+  z-index: 1000;
+  // The .panw--popover child handles all visual chrome (radius, shadow,
+  // padding, animation). Host only positions.
 }

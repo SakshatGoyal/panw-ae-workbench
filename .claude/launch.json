@@ -34,6 +34,7 @@
       "runtimeExecutable": "npx",
       "runtimeArgs": ["storybook", "dev", "-p", "38274", "--no-open"],
       "port": 38274,
+      "autoPort": false,
       "cwd": "poc-exploration"
     }
   ]

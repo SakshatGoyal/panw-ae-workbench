@@ -112,6 +112,36 @@ const PRODUCT_OPTIONS: SortOption[] = [
   { label: 'Enterprise DLP', value: 'edlp' },
 ]
 
+// ── Public data contract ────────────────────────────────────────────────────
+//
+// Everything the summary renders flows through `PlanSummaryData`. The
+// `DEFAULT_PLAN_SUMMARY_DATA` constant packs the existing module-scope POC
+// fixtures so the existing Collapsed/Expanded stories render unchanged.
+
+export interface PlanSummaryData {
+  /** "Plan:" label + "$1.00B" headline value. */
+  plan: { label: string; value: string }
+  /** Attainment percentage that drives the bar fill, the tag, and the on-track ladder. */
+  planPercent: number
+  /** Six forecast-category cells, rendered left-to-right in the order given. */
+  categories: CategoryDatum[]
+  quarterOptions: SortOption[]
+  productOptions: SortOption[]
+}
+
+export const DEFAULT_PLAN_SUMMARY_DATA: PlanSummaryData = {
+  plan: { label: 'Plan:', value: '$1.00B' },
+  planPercent: 88,
+  categories: CATEGORIES,
+  quarterOptions: QUARTER_OPTIONS,
+  productOptions: PRODUCT_OPTIONS,
+}
+
+export interface PlanSummaryProps {
+  data?: PlanSummaryData
+  defaultOpen?: boolean
+}
+
 // ── Subcomponents ───────────────────────────────────────────────────────────
 
 /**
@@ -208,12 +238,15 @@ function Cell({ datum }: { datum: CategoryDatum }) {
 
 // ── Composition ─────────────────────────────────────────────────────────────
 
-function PlanForecastSummary({ defaultOpen }: { defaultOpen: boolean }) {
+function PlanForecastSummary({
+  data = DEFAULT_PLAN_SUMMARY_DATA,
+  defaultOpen = false,
+}: PlanSummaryProps = {}) {
   const [open, setOpen] = useState(defaultOpen)
   const [quarter, setQuarter] = useState<string>('cq')
   const [product, setProduct] = useState<string>('all')
 
-  const planPercent = 88
+  const { planPercent } = data
   const level = attainmentLevel(planPercent)
 
   return (
@@ -227,14 +260,14 @@ function PlanForecastSummary({ defaultOpen }: { defaultOpen: boolean }) {
             <Sort
               className="psum-pill"
               label="Quarter"
-              options={QUARTER_OPTIONS}
+              options={data.quarterOptions}
               value={quarter}
               onChange={setQuarter}
             />
             <Sort
               className="psum-pill"
               label="Product"
-              options={PRODUCT_OPTIONS}
+              options={data.productOptions}
               value={product}
               onChange={setProduct}
             />
@@ -251,8 +284,8 @@ function PlanForecastSummary({ defaultOpen }: { defaultOpen: boolean }) {
         {/* ── Plan row (h=48) ──────────────────────────────────────── */}
         <div className="psum-planrow">
           <div className="psum-planrow__title">
-            <span className="psum-planrow__label">Plan:</span>
-            <span className="psum-planrow__value">$1.00B</span>
+            <span className="psum-planrow__label">{data.plan.label}</span>
+            <span className="psum-planrow__value">{data.plan.value}</span>
           </div>
           <PlanProgress percent={planPercent} />
           <Tags
@@ -267,7 +300,7 @@ function PlanForecastSummary({ defaultOpen }: { defaultOpen: boolean }) {
         {/* ── Cells strip (expanded only) ──────────────────────────── */}
         {open && (
           <div className="psum-cells" role="list">
-            {CATEGORIES.map((c, i) => (
+            {data.categories.map((c, i) => (
               <React.Fragment key={c.label}>
                 {i > 0 && <span className="psum-cell-divider" aria-hidden />}
                 <div role="listitem" className="psum-cell-wrap">

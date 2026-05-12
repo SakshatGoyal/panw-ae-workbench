@@ -175,7 +175,7 @@ interface SalesPlayBucket {
   plays: { name: string; usd: number }[]
 }
 
-interface AccountRow {
+export interface AccountRow {
   id: string
   name: string
   apex: string | null
@@ -386,7 +386,7 @@ function mkPipeline(
   ] as AccountRow['pipeline']
 }
 
-const ROWS: AccountRow[] = (() => {
+export const DEFAULT_ROWS: AccountRow[] = (() => {
   const rows: Omit<AccountRow, 'totalPipelineUsd' | 'hasUpsellPipeline'>[] = [
     {
       id: '1',
@@ -707,7 +707,7 @@ const ROWS: AccountRow[] = (() => {
 
 // Self-consistency check on EBC vs `no-ebc` risk (cr-failure §14).
 ;(() => {
-  for (const r of ROWS) {
+  for (const r of DEFAULT_ROWS) {
     const sev = ebcSeverity(r.ebc)
     const hasNoEbcRisk = r.risks.some(x => x.id === 'no-ebc')
     if (sev === 'danger' && !hasNoEbcRisk) {
@@ -1933,7 +1933,20 @@ function SortFlyout({ sortKey, sortDir, onChange }: SortFlyoutProps) {
 // label "10 accounts · $XX ARR · $XX pipeline next 4Q" rolled up from
 // the current filter slice.
 
-function AEAccountTable() {
+/**
+ * Plumbing props. `totalItems` is reserved for the eventual pagination
+ * footer (spec §3 mentions "showing N of M" but no Pagination is rendered
+ * today); accept it now so the contract is in place. The summary header
+ * counts (`accountCount`, `totalArr`, `totalPipeline4q`) keep deriving
+ * from `rows` per spec §3.3.
+ */
+export interface AccountTableProps {
+  rows?: AccountRow[]
+  /** Pagination footer override; not currently consumed (no pagination rendered). */
+  totalItems?: number
+}
+
+function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) {
   const [search, setSearch] = useState('')
   // Default sort per spec §5: most-broken accounts at top of triage queue.
   const [sortKey, setSortKey] = useState<SortKey>('riskCount')
@@ -1952,7 +1965,7 @@ function AEAccountTable() {
   // Filtering wiring lands later. For now, sort renders against the full
   // fixture so the default-sort behavior is visibly verifiable.
   const sortedRows = useMemo(() => {
-    const arr = [...ROWS]
+    const arr = [...rows]
     arr.sort((a, b) => {
       let cmp = 0
       switch (sortKey) {
@@ -1970,7 +1983,7 @@ function AEAccountTable() {
       return sortDir === 'asc' ? cmp : -cmp
     })
     return arr
-  }, [sortKey, sortDir])
+  }, [rows, sortKey, sortDir])
 
   // Key metrics — three numbers rolled up from the current view (spec §3.3).
   // Filtering isn't wired so this is currently the full fixture.
@@ -2081,7 +2094,7 @@ function AEAccountTable() {
                           <HoverShell
                             interactive
                             openDelayMs={400}
-                            render={() => <ApexHoverPanel apex={row.apex!} rows={ROWS} />}>
+                            render={() => <ApexHoverPanel apex={row.apex!} rows={rows} />}>
                             <span className="acc-multiline__sub">{row.apex}</span>
                           </HoverShell>
                         )}

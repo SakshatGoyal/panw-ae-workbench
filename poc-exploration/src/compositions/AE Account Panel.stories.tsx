@@ -382,7 +382,12 @@ function SectionTitleWithTag({
     <span className="acc-sp-tag-title">
       <span className="acc-sp-tag-title__text">{text}</span>
       {status !== null && amountUsd !== null && (
-        <SalesPlayValueTag status={status} amountUsd={amountUsd} />
+        <PanelHover
+          openDelayMs={100}
+          panel={<Tooltip pointerDirection="top" content={ACC_SP_STATUS_LABEL[status]} />}
+        >
+          <SalesPlayValueTag status={status} amountUsd={amountUsd} />
+        </PanelHover>
       )}
     </span>
   )
@@ -639,7 +644,7 @@ function ProductsTag({ productIds }: { productIds: ProductId[] }) {
   }
   return (
     <span
-      className="panw--tag panw--tag--size-large panw--tag--rounded panw--tag--low panw--tag--neutral acc-opp-products-tag"
+      className="panw--tag panw--tag--size-large panw--tag--shape-rounded panw--tag--low panw--tag--neutral acc-opp-products-tag"
       role="presentation"
       aria-label={`${icons.length} product brand${icons.length === 1 ? '' : 's'}`}
     >
@@ -1063,12 +1068,12 @@ const HEALTH_TAG_COLOR: Record<HealthStatus, 'green' | 'orange' | 'red'> = {
   'critical': 'red',
 }
 
-// Bar-fill colors for the trend sparkline. Lifted verbatim from
-// account-table.stories.tsx (≈line 1551) — raw hex per the same
-// justification: these primitives are not exposed as CSS custom
-// properties at the theme layer, only semantic tokens are. Keeping the
-// values in lockstep with the account-table popover preserves the
-// table↔panel visual parity the spec calls for.
+// Bar-fill colors for past-month trend bars. Hex lifted verbatim from
+// account-table.stories.tsx (≈L1551) — these primitives (green-40,
+// yellow-30, red-50) live one stop lighter than `status.*.strong` and
+// aren't exposed as semantic tokens, so the account-table popover
+// declares them inline. Keeping the values in lockstep preserves
+// table-↔-panel visual parity per the user's direction.
 const HEALTH_BAR_FILL: Record<HealthStatus, string> = {
   'healthy':  '#3cc29a', // green-40
   'at-risk':  '#ffbe4f', // yellow-30
@@ -1124,73 +1129,58 @@ const PRODUCT_HEALTH: ProductHealthRow[] = [
   { name: 'Cortex XSOAR', brand: BrandCortex, arrUsd:   480_000, technical: 'critical', adoption: 'at-risk' },
 ]
 
-// Health-trend visualization. 12 past-month bars + 6 future-month
+// Health-trend visualization. 12 past-month bars + 10 future-month
 // circles, with the 3rd future circle marking the next renewal.
 //
-// Past bars: --ds-surface-accent-rest (neutral), pill-shaped, variable
-// height by HEALTH_BAR_HEIGHT_FRACTION. The chromatic health signal
-// now lives on the OUTER status-tinted container, not on the bars
-// themselves; the bars carry only the trend shape.
-//
-// Future dots: same width (8px) at full-circle, --ds-surface-accent-rest.
-// Renewal dot: --ds-surface-inverse-rest with an SVG <title> so a
-// native browser tooltip surfaces "Renewal" on hover. Per directive,
-// the renewal sits at the 3rd future month position.
+// Rendered in HTML (not SVG) so:
+//   - Surface-accent fill is a direct CSS variable on the element,
+//     resolving 1:1 to the same color the per-product tiles use —
+//     no SVG antialiasing weirdness making the dots look paler than
+//     the bars.
+//   - The renewal dot is a real DOM node, so PanelHover can wrap it
+//     and the DS Tooltip can hang off it the same way it does on
+//     every other panel chip. (The earlier SVG <title> approach was
+//     a browser-native tooltip; it's unreliable and not what the rest
+//     of the panel uses.)
 const PAST_MONTHS = 12
-const FUTURE_MONTHS = 6
+const FUTURE_MONTHS = 10
 const RENEWAL_FUTURE_INDEX = 2 // 3rd future month (0-indexed)
+const TREND_INNER_H = 60
 function HealthTrendSparkline({ trend }: { trend: HealthStatus[] }) {
-  const barW = 8, gap = 4, padX = 0, padY = 4, innerH = 60
-  const dotR = barW / 2
-  const totalSlots = PAST_MONTHS + FUTURE_MONTHS
-  const w = padX * 2 + totalSlots * barW + Math.max(0, totalSlots - 1) * gap
-  const h = innerH + padY * 2
   return (
-    <svg
-      width={w} height={h} viewBox={`0 0 ${w} ${h}`}
-      role="img" aria-label="Account health trend with upcoming renewal"
-      className="acc-health-sparkline"
+    <div
+      className="acc-health-trend-row"
+      role="img"
+      aria-label="Account health trend with upcoming renewal"
     >
       {trend.slice(0, PAST_MONTHS).map((sev, i) => {
         const frac = HEALTH_BAR_HEIGHT_FRACTION[sev]
-        const barH = Math.max(barW, innerH * frac)
-        const x = padX + i * (barW + gap)
-        const y = padY + (innerH - barH)
+        const barH = Math.max(8, TREND_INNER_H * frac)
         return (
-          <rect
+          <span
             key={`p${i}`}
-            x={x} y={y} width={barW} height={barH}
-            rx={barW / 2} ry={barW / 2}
-            fill="var(--ds-surface-accent-rest)"
+            className="acc-health-trend-bar"
+            style={{ height: `${barH}px`, backgroundColor: HEALTH_BAR_FILL[sev] }}
           />
         )
       })}
       {Array.from({ length: FUTURE_MONTHS }, (_, i) => {
         const isRenewal = i === RENEWAL_FUTURE_INDEX
-        const x = padX + (PAST_MONTHS + i) * (barW + gap)
-        const cx = x + dotR
-        const cy = padY + innerH - dotR
-        const fill = isRenewal
-          ? 'var(--ds-surface-inverse-rest)'
-          : 'var(--ds-surface-accent-rest)'
-        return (
-          <circle key={`f${i}`} cx={cx} cy={cy} r={dotR} fill={fill}>
-            {isRenewal && <title>Renewal</title>}
-          </circle>
-        )
+        if (isRenewal) {
+          return (
+            <PanelHover
+              key={`f${i}`}
+              openDelayMs={100}
+              panel={<Tooltip pointerDirection="top" content="Renewal" />}
+            >
+              <span className="acc-health-trend-dot acc-health-trend-dot--renewal" />
+            </PanelHover>
+          )
+        }
+        return <span key={`f${i}`} className="acc-health-trend-dot" />
       })}
-    </svg>
+    </div>
   )
-}
-
-// Overall-health → status-tinted surface for the Account Health top
-// container. Subtle status tokens (status.error.subtle etc.) provide
-// the soft tinted backgrounds the health signal lives on. Critical →
-// error, at-risk → caution, healthy → success.
-const HEALTH_CONTAINER_BG: Record<HealthStatus, string> = {
-  'critical': 'var(--ds-status-error-subtle)',
-  'at-risk':  'var(--ds-status-caution-subtle)',
-  'healthy':  'var(--ds-status-success-subtle)',
 }
 
 // One sub-axis row inside Account Health. Label on the left, health
@@ -1231,6 +1221,7 @@ function ProductHealthBlock({ row }: { row: ProductHealthRow }) {
       </div>
       <div className="acc-product-health__axes">
         <HealthAxisRow label="Technical Health"             status={row.technical} />
+        <div className="acc-divider" aria-hidden="true" />
         <HealthAxisRow label="Deployment and Adoption Health" status={row.adoption} />
       </div>
     </div>
@@ -1355,7 +1346,7 @@ function AccountPanel() {
         <Accordion
           size="large" theme="gray00" orientation="right"
           title="Install Base" showIcon={false}
-          showTag tagLabel="$25.8M" tagColor="cobalt" tagContrast="low" tagSize="large"
+          showTag tagLabel="$25.8M" tagColor="cobalt" tagContrast="low" tagShape="rounded" tagSize="large"
           open={openSections.installBase}
           onToggle={() => toggle('installBase')}
         >
@@ -1486,7 +1477,7 @@ function AccountPanel() {
           size="large" theme="gray00" orientation="right"
           title="Opportunities in Next 4Q" showIcon={false}
           showTag tagLabel={fmtMoneyShort(ACC_OPPS_TOTAL)}
-          tagColor="lime" tagContrast="low" tagSize="large"
+          tagColor="lime" tagContrast="low" tagShape="rounded" tagSize="large"
           /* Bold the section tag's label via CSS hook below — the DS Tag
              label is regular weight by default; the directive calls for
              bold inside this lime rollup specifically, not across the
@@ -1553,7 +1544,7 @@ function AccountPanel() {
           showTag
           tagLabel={HEALTH_LABELS[OVERALL_HEALTH]}
           tagColor={HEALTH_TAG_COLOR[OVERALL_HEALTH]}
-          tagContrast="low" tagSize="large"
+          tagContrast="low" tagShape="rounded" tagSize="large"
           open={openSections.accountHealth}
           onToggle={() => toggle('accountHealth')}
         >
@@ -1567,15 +1558,13 @@ function AccountPanel() {
               (8px H / 4px V padding) so the bars read against neutral
               ground while the parent communicates status by color.
             */}
-            <div
-              className="acc-health-status-tile"
-              style={{ backgroundColor: HEALTH_CONTAINER_BG[OVERALL_HEALTH] }}
-            >
+            <div className="acc-health-status-tile">
               <div className="acc-health-trend">
                 <HealthTrendSparkline trend={HEALTH_TREND_12} />
               </div>
               <div className="acc-health-axes">
                 <HealthAxisRow label="Technical Health"               status={TECH_HEALTH} />
+                <div className="acc-divider" aria-hidden="true" />
                 <HealthAxisRow label="Deployment and Adoption Health" status={ADOPT_HEALTH} />
               </div>
             </div>
@@ -1678,7 +1667,7 @@ const PANEL_CSS = `
     --panw-dropdown-menu-selected-fg:  var(--ds-text-brand-rest);
     --panw-dropdown-helper:            var(--ds-text-tertiary-rest);
     --panw-dropdown-helper-error:      var(--ds-text-danger-rest);
-    --panw-dropdown-helper-success:    var(--ds-text-success-rest);
+    --panw-dropdown-helper-success:    var(--ds-text-success);
     --panw-dropdown-helper-disabled:   var(--ds-text-tertiary-disabled);
 
     /* Text entry (Phase 4 — renewal form Notes) */
@@ -1752,7 +1741,9 @@ const PANEL_CSS = `
     width: 400px;
     height: 100vh;
     background-color: var(--ds-surface-rest);
-    box-shadow: -4px 0 16px -4px rgb(0 0 0 / 10%);
+    /* Panel-shell elevation. --ds-shadow-flyout is the system's "panel
+       floating above the page" token; the panel is exactly that. */
+    box-shadow: var(--ds-shadow-flyout);
     display: flex;
     flex-direction: column;
     gap: 0;
@@ -1780,7 +1771,12 @@ const PANEL_CSS = `
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: center;
+    /* Title left-aligned; spacing-05 (16px) of left padding so it sits
+       on the same vertical rail as the section accordions' headers
+       below. Close button is absolute-positioned to top-right and
+       doesn't participate in this flex axis. */
+    justify-content: flex-start;
+    padding-left: var(--ds-spacing-05);
     background-color: var(--ds-surface-rest);
   }
   .acc-panel__close {
@@ -2029,13 +2025,62 @@ const PANEL_CSS = `
   }
 
   /* ── Data tile (Install Base body) ───────────────────────────────────
-     Mirrors the per-product tile in Account Health: gray10 ground,
-     tight radius, internal padding handles the breathing room that
-     was previously injected as a horizontal section-inset. */
+     Gray10 ground with a softer 12px radius — matches the panel-wide
+     gray-container family (per-product tiles, status tile, nested
+     sales-play family accordions). Internal padding handles the
+     breathing room that was previously a horizontal section-inset. */
   .acc-data-tile {
     background-color: var(--ds-surface-alt-rest);
-    border-radius: var(--ds-radius-tight);
+    /* --ds-radius-generous (12px) — system token, panel-wide gray
+       container family. */
+    border-radius: var(--ds-radius-generous);
     padding: var(--ds-spacing-03) var(--ds-spacing-04);
+  }
+
+  /* ── Account Health status tile ──────────────────────────────────────
+     Holds the trend graph + the two account-level axis rows. Bg is
+     status.info.subtle per directive — calm cobalt tint, not health-
+     driven. Uniform spacing-04 (12px) padding all four sides. */
+  .acc-health-status-tile {
+    background-color: var(--ds-status-info-subtle);
+    border-radius: var(--ds-radius-generous);
+    padding: var(--ds-spacing-04);
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-spacing-03);
+  }
+
+  /* ── Trend bar row (HTML, not SVG) ───────────────────────────────────
+     Bars hang from a 60px baseline; alignment-flex-end keeps the row
+     bottom-anchored so tall bars rise up. Gap 4px between bars.
+     Past-month bar: 8px wide, height set inline. Future-month dot:
+     8×8 circle. Renewal dot: surface.inverse. All share the same
+     CSS variable for surface.accent so they render identical color. */
+  .acc-health-trend-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 4px;
+    height: 60px;
+  }
+  .acc-health-trend-bar {
+    display: inline-block;
+    width: 8px;
+    /* Past-month bars carry the health-status color (see HEALTH_STATUS_VAR
+       in TSX). Per-bar bg lands via inline style with the resolved
+       --ds-status-* token, so each past month reads its own signal. */
+    border-radius: var(--ds-radius-tight);
+    flex-shrink: 0;
+  }
+  .acc-health-trend-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background-color: var(--ds-surface-accent-rest);
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .acc-health-trend-dot--renewal {
+    background-color: var(--ds-surface-inverse-rest);
   }
 
   /* ── Opportunities section header tag — bold label ──────────────────────
@@ -2076,7 +2121,7 @@ const PANEL_CSS = `
      dividers are their own 1px elements — never a border on the
      accordion, never a hairline shadow standing in. */
   .acc-section-stack > .panw--accordion {
-    border-radius: 0;
+    border-radius: var(--ds-radius-square);
   }
   .acc-section-stack > .panw--accordion.panw--accordion--open {
     margin: 0;
@@ -2107,7 +2152,15 @@ const PANEL_CSS = `
   .acc-sp-family-list {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    /* 4px gap between family tiles per directive. */
+    gap: 4px;
+  }
+  /* 12px radius on nested DS accordions inside sales-play families
+     and opps — overrides the DS's default --ds-radius-tight (4px) so
+     all gray containers in the panel share the same shape language. */
+  .acc-sp-family-list > .panw--accordion,
+  .acc-opp-list > .panw--accordion {
+    border-radius: var(--ds-radius-generous);
   }
   .acc-sp-family-list .panw--accordion--closed .panw--accordion__content-area {
     max-height: 0;
@@ -2196,15 +2249,26 @@ const PANEL_CSS = `
      specificity chain (.panw--tag.panw--tag--low.panw--tag--neutral)
      matches the DS-shipped rule at (0,4,0), so each override needs
      (0,5,0) to win — lifted verbatim from account-table. */
-  .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag .panw--tag__icon svg,
-  .panw--tag.panw--tag--low.panw--tag--neutral.acc-sp-tag .panw--tag__icon svg path {
+  /* Scope fill:currentColor to ONLY the statuses we recolor — leaves
+     closed-won with its DS-authored fill (no need for a hand-rolled
+     teal hex override). The selector chain on each rule sets the
+     color the icon will paint with via currentColor. */
+  .acc-sp-tag--not-touched .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg,
+  .acc-sp-tag--not-touched .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg path,
+  .acc-sp-tag--pursuing    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg,
+  .acc-sp-tag--pursuing    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg path,
+  .acc-sp-tag--pitched     .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg,
+  .acc-sp-tag--pitched     .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg path,
+  .acc-sp-tag--deferred    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg,
+  .acc-sp-tag--deferred    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg path,
+  .acc-sp-tag--declined    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg,
+  .acc-sp-tag--declined    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg path,
+  .acc-sp-tag--closed-lost .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg,
+  .acc-sp-tag--closed-lost .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon svg path {
     fill: currentColor;
   }
   .acc-sp-tag--not-touched .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon { color: var(--ds-icons-status-danger); }
   .acc-sp-tag--pursuing    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon { color: var(--ds-icons-success); }
-  /* closed-won keeps its DS-authored teal — explicit hex matches the
-     account-table override. */
-  .acc-sp-tag--closed-won  .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon { color: #29a393; }
   .acc-sp-tag--pitched     .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon,
   .acc-sp-tag--deferred    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon,
   .acc-sp-tag--declined    .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon,
@@ -2221,7 +2285,8 @@ const PANEL_CSS = `
   .acc-opp-list {
     display: flex;
     flex-direction: column;
-    gap: 2px;
+    /* 4px gap between opp tiles per directive. */
+    gap: 4px;
   }
   .acc-opp-list .panw--accordion--closed .panw--accordion__content-area {
     max-height: 0;
@@ -2348,7 +2413,9 @@ const PANEL_CSS = `
     cursor: pointer;
     display: inline-flex;
     align-items: center;
-    border-radius: var(--ds-radius-rounded);
+    /* Match the wrapped Tags(shape=rounded, size=large) radius (4px =
+       --ds-radius-tight) so the focus outline traces the chip outline. */
+    border-radius: var(--ds-radius-tight);
   }
   .acc-opp-outcome-trigger:focus-visible {
     outline: 2px solid var(--ds-lines-brand-rest);
@@ -2390,36 +2457,22 @@ const PANEL_CSS = `
   .acc-health-body {
     display: flex;
     flex-direction: column;
-    gap: var(--ds-spacing-05);
+    /* 4px between status tile and per-product list per directive —
+       all gray containers in this section sit 4px apart. */
+    gap: 4px;
   }
 
-  /* Status-tinted tile holding trend + two account-level axis rows.
-     Bg color set inline from the overall health (per directive) so the
-     container itself communicates "this is the critical/at-risk/healthy
-     summary." Internal stack: trend (in its own white tile) → axes. */
-  .acc-health-status-tile {
-    border-radius: var(--ds-radius-tight);
-    padding: var(--ds-spacing-03) var(--ds-spacing-04);
-    display: flex;
-    flex-direction: column;
-    gap: var(--ds-spacing-03);
-  }
-
-  /* Trend lives inside a white sub-tile per directive — 8px horizontal,
-     4px vertical padding. Left-aligned so the bars start at the tile's
-     left edge with the future-month dots trailing toward the right. */
+  /* Trend lives inside a white sub-tile — 8px horizontal, 4px vertical
+     padding. Left-aligned so the bars start at the tile's left edge
+     with the future-month dots trailing toward the right. */
   .acc-health-trend {
     display: flex;
     align-items: center;
     justify-content: flex-start;
     background-color: var(--ds-surface-rest);
-    border-radius: var(--ds-radius-tight);
+    border-radius: var(--ds-radius-standard);
     padding: 4px 8px;
     overflow: hidden;
-  }
-  .acc-health-sparkline {
-    display: block;
-    flex-shrink: 0;
   }
 
   /* ── Sub-axis rows ───────────────────────────────────────────────────────
@@ -2463,14 +2516,15 @@ const PANEL_CSS = `
   .acc-product-health-list {
     display: flex;
     flex-direction: column;
-    gap: 2px;
-    padding-top: var(--ds-spacing-03);
+    /* 4px gap between product tiles per directive. */
+    gap: 4px;
   }
   .acc-product-health {
     display: flex;
     flex-direction: column;
     background-color: var(--ds-surface-alt-rest);
-    border-radius: var(--ds-radius-tight);
+    /* --ds-radius-generous — panel-wide gray-container family. */
+    border-radius: var(--ds-radius-generous);
     padding: var(--ds-spacing-03) var(--ds-spacing-04);
   }
   .acc-product-health__head {
@@ -2575,24 +2629,24 @@ const PANEL_CSS = `
   }
 
   /* ── Popover bodies ─────────────────────────────────────────────────────
-     Two variants: --button (single ghost-brand action) and --list
-     (titled list of rows). Both ride on surface-rest with the
-     panel-on-tile shadow so they read as elevated above the panel
-     itself. Min/max width keeps the popover compact under panel
-     density; long product labels truncate inside the row. */
+     DS Popover canonical: surface.rest ground, --ds-radius-standard,
+     --ds-shadow-flyout, plus a 1px neutral-tile border (matches the
+     tooltip-style boundary the directive calls for). max-width caps
+     the popover at panel-friendly width; min-width is unset so the
+     popover sizes to its content — no forced whitespace around small
+     contents like a single action button. */
   .acc-popover {
     background-color: var(--ds-surface-rest);
-    border-radius: var(--ds-radius-tight);
-    box-shadow: var(--ds-shadow-panel-on-tile);
-    min-width: 200px;
+    border-radius: var(--ds-radius-standard);
+    box-shadow: var(--ds-shadow-flyout);
+    border: 1px solid var(--ds-lines-neutral-tile-rest);
     max-width: 320px;
+    box-sizing: border-box;
   }
   .acc-popover--button {
     padding: var(--ds-spacing-03);
-    min-width: 160px;
   }
   .acc-popover--button .panw--button {
-    width: 100%;
     justify-content: center;
   }
   .acc-popover--list {

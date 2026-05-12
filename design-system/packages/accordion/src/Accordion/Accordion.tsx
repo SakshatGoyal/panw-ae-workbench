@@ -8,9 +8,11 @@ import {
   Tags,
   TagColors,
   TagContrasts,
+  TagShapes,
   TagSizes,
   type TagColor,
   type TagContrast,
+  type TagShape,
   type TagSize,
 } from '@ds/tags';
 
@@ -40,6 +42,7 @@ export interface AccordionProps {
   tagLabel?: string;
   tagColor?: TagColor;
   tagContrast?: TagContrast;
+  tagShape?: TagShape;
   tagSize?: TagSize;
   children?: React.ReactNode;
   onToggle?: () => void;
@@ -63,6 +66,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       tagLabel = 'Placeholder',
       tagColor = 'orange',
       tagContrast = 'low',
+      tagShape = 'pill',
       tagSize = 'default',
       children,
       onToggle,
@@ -127,6 +131,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
                       label={tagLabel}
                       color={tagColor}
                       contrast={tagContrast}
+                      shape={tagShape}
                       size={tagSize}
                     />
                   )}
@@ -164,6 +169,7 @@ Accordion.propTypes = {
   tagLabel: PropTypes.string,
   tagColor: PropTypes.oneOf(TagColors),
   tagContrast: PropTypes.oneOf(TagContrasts),
+  tagShape: PropTypes.oneOf(TagShapes),
   tagSize: PropTypes.oneOf(TagSizes),
   children: PropTypes.node,
   onToggle: PropTypes.func,

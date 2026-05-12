@@ -90,30 +90,30 @@ export const StageTokens = {
   "base": neutral0,
   "surface": {
     "rest": neutral0,
-    "hover": "#f2f2f2",     // alpha(neutral20, 40) over neutral0
-    "pressed": "#e4e4e4",   // alpha(neutral30, 50) over neutral0
-    "selected": "#cee9ff",  // alpha(brand30, 40) over neutral0
+    "hover": "#F4F6F7",     // alpha(neutral20, 40) over neutral0
+    "pressed": "#E2E6E8",   // alpha(neutral30, 50) over neutral0
+    "selected": "#CEE9FF",  // alpha(brand30, 40) over neutral0
     "disabled": neutral0,
   },
   "surface.alt": {
     "rest": neutral5,
-    "hover": "#ededed",     // alpha(neutral20, 40) over neutral5
-    "pressed": "#e0e0e0",   // alpha(neutral30, 50) over neutral5
-    "selected": "#c9e4fa",  // alpha(brand30, 40) over neutral5
+    "hover": "#EFF3F5",     // alpha(neutral20, 40) over neutral5
+    "pressed": "#DEE3E6",   // alpha(neutral30, 50) over neutral5
+    "selected": "#C9E6FD",  // alpha(brand30, 40) over neutral5
     "disabled": neutral5,
   },
   "surface.accent": {
     "rest": neutral20,
-    "hover": "#d4d4d4",     // alpha(neutral30, 50) over neutral20
-    "pressed": "#c1c1c1",   // alpha(neutral40, 60) over neutral20
-    "selected": "#bad5eb",  // alpha(brand30, 40) over neutral20
+    "hover": "#D5DADE",     // alpha(neutral30, 50) over neutral20
+    "pressed": "#BFC5C9",   // alpha(neutral40, 60) over neutral20
+    "selected": "#BEDBF3",  // alpha(brand30, 40) over neutral20
     "disabled": neutral20,
   },
   "surface.n": {
     "rest": neutral0,
-    "hover": "#f2f2f2",     // alpha(neutral20, 40) over neutral0
-    "pressed": "#e4e4e4",   // alpha(neutral30, 50) over neutral0
-    "selected": "#cee9ff",  // alpha(brand30, 40) over neutral0
+    "hover": "#F4F6F7",     // alpha(neutral20, 40) over neutral0
+    "pressed": "#E2E6E8",   // alpha(neutral30, 50) over neutral0
+    "selected": "#CEE9FF",  // alpha(brand30, 40) over neutral0
     "disabled": neutral0,
   },
   "surface.inverse": {
@@ -159,15 +159,15 @@ export const StageTokens = {
   },
   "field": {
     "rest": neutral5,
-    "hover": "#ededed",     // alpha(neutral20, 40) over neutral5
-    "pressed": "#e0e0e0",   // alpha(neutral30, 50) over neutral5
+    "hover": "#EFF3F5",     // alpha(neutral20, 40) over neutral5
+    "pressed": "#DEE3E6",   // alpha(neutral30, 50) over neutral5
     "selected": neutral0,
     "disabled": neutral5,
   },
   "field.alt": {
     "rest": neutral0,
-    "hover": "#f2f2f2",     // alpha(neutral20, 40) over neutral0
-    "pressed": "#e4e4e4",   // alpha(neutral30, 50) over neutral0
+    "hover": "#F4F6F7",     // alpha(neutral20, 40) over neutral0
+    "pressed": "#E2E6E8",   // alpha(neutral30, 50) over neutral0
     "selected": neutral0,
     "disabled": neutral5,
   },

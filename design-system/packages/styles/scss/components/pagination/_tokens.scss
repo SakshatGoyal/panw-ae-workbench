@@ -1,12 +1,9 @@
 // Pagination — Stage tokens.
 //
 // Three text tiers: numerals/strong values in primary, surrounding
-// uppercase labels in secondary, separators in tertiary. Hex values
-// match the wired stage primitives (--ds-stage-text-primary etc.) —
-// the shell-level --ds-text-primary aliases aren't wired through, so
-// referencing them resolves to the fallback magenta-flag color.
+// uppercase labels in secondary, separators in tertiary.
 .stage {
-  --panw-pagination-text:           #0f0f0f;
-  --panw-pagination-text-secondary: #3b3b3b;
-  --panw-pagination-ellipsis:       #545454;
+  --panw-pagination-text:           var(--ds-text-primary);
+  --panw-pagination-text-secondary: var(--ds-text-secondary-rest);
+  --panw-pagination-ellipsis:       var(--ds-text-tertiary-rest);
 }

@@ -70,41 +70,34 @@ The dialog is a single centered modal. Inside, top to bottom:
   unique across families). Same naming the AE uses out loud.
 - **Account name** — a link below the title, opens the account panel
   or the account record.
-- **Close (×)** — top-right. Discards unsaved changes (same as
-  Cancel).
+- **Close (×)** — top-right. Visual affordance; the close handler is
+  not currently wired in the build (Cancel is the working discard).
 
 **Body** (one labeled row per field, left-aligned labels, right-aligned
 controls)
 
-1. **Status** — segmented control with the **7-status enum** from
-   `sales-play-reference.md`: *not touched / pitched / deferred /
-   declined / pursuing / closed won / closed lost*. Single-select.
+1. **Status** — tag-styled radiogroup (a chip-cloud of selectable
+   status tags with `role='radiogroup'`) with the **7-status enum**
+   from `sales-play-reference.md`: *Not touched / Pitched / Deferred /
+   Declined / Pursuing / Closed won / Closed lost*. Single-select.
    This is the only required field; everything else is optional.
-2. **Pitched to whom?** — one or more contact pills, each with a
-   remove (×). A `+ Add Contact` action opens the
-   [Link Contact sub-view](#3-link-contact-sub-view). Only meaningful
-   once Status is past *not touched*; the field is still visible (and
-   editable) at *not touched* so an AE can pre-stage the contact.
-3. **Opportunity (incl. Omitted)** — a stacked list of linked
-   opportunities. Each row is the opportunity name as a link out
-   (opens the opportunity in SFDC or the account panel scoped to that
-   opp). A **gold star** on a row marks it as the **primary**
+2. **Pitch contact** — one labeled `Tags` chip per contact (label is
+   `name · title · phone · email`) with a trash-icon close to unlink.
+   A `+ Add contact` ghost button opens the
+   [Link Contact sub-view](#3-link-contact-sub-view).
+3. **Opportunities** — a list of linked opportunities, each rendered
+   as a `Tags` chip prefixed with a gold `Star` (or `StarEmpty`) icon
+   and a trash-icon close. The gold star marks the **primary**
    opportunity for the play (exactly one primary at a time;
-   tie-breaker if none set is *highest-value pursuing opp*). The
-   parenthetical *"incl. Omitted"* means opps flagged as omitted
-   still appear here so the AE can see them — they're excluded from
-   rollups (e.g., Cumulative Opportunity Size), not from the list.
-   A `+ Add Opportunity` action opens the
-   [Link Opportunity sub-view](#4-link-opportunity-sub-view).
+   tie-breaker if none set is *highest-value pursuing opp*). A
+   `+ Add opportunity` ghost button opens the
+   [Link Opportunity sub-view](#4-link-opportunity-sub-view). The
+   *incl. Omitted* qualifier from the original spec is not currently
+   surfaced in the build — there is no omit-state styling on linked
+   opps and no surfaced omit flag. Pending design follow-up.
 4. **Note** — optional free-text **textarea**. Placeholder *"Optional
-   Notes"*. Multi-line. AE-private context, not for customer
+   notes"*. Multi-line. AE-private context, not for customer
    consumption.
-5. **Account Selection & Sizing Methodology** — optional free-text
-   **textarea**. Placeholder *"Optional Notes"*. The audit trail for
-   *why this play applies to this account and how the dollar value
-   was sized*. Captured here because the qualification oracle that
-   surfaces plays is opaque — this is the AE's chance to write down
-   their own reasoning for posterity.
 
 **Footer**
 
@@ -118,8 +111,7 @@ Footer is right-aligned at the bottom of the modal.
 > **Designer takeaway:** the dialog deliberately has *only one
 > required field* (Status). Everything else is optional so an AE can
 > bump the status forward in two clicks (open → pitched → Update)
-> without being blocked. The richer fields exist for plays that
-> matter.
+> without being blocked. Note exists for plays that matter.
 
 ---
 
@@ -131,20 +123,18 @@ Footer is right-aligned at the bottom of the modal.
 Opened by `+ Add Contact` from the main dialog. Replaces the modal
 body; the same modal frame and title are retained for context.
 
-- **Back to Sales Play Modals** — left-aligned breadcrumb with a
-  back arrow. Returns to the main dialog *without losing unsaved
-  changes*.
+- **Back to Sales Play Details** — a left-aligned `Link` with an
+  `ArrowLeft` icon. Returns to the main dialog *without losing
+  unsaved changes*.
 - **Search contacts** — search input, scoped to the account's
   contacts.
 - **New Contact** — secondary button, opens contact-creation flow
   (out of scope for this reference).
-- **Currently linked** — selected contacts appear as pills above the
-  list, each with a remove (×). This is the same set that will show
-  in *Pitched to whom?* when the AE returns.
 - **Contacts table** — columns: checkbox, **Name**, **Title**,
   **Phone** (link, click-to-call), **Email** (link + copy icon).
   Checking a row links that contact to the play; unchecking removes
-  it.
+  it. The row's checkbox state is the only linked indicator — there
+  is no chip cloud above the table.
 - **Pagination** — page numbers + items-per-page selector at the
   bottom right.
 
@@ -163,12 +153,11 @@ main dialog to commit.
 Opened by `+ Add Opportunity` from the main dialog. Same modal-frame
 pattern as Link Contact.
 
-- **Back to Sales Play Modals** — breadcrumb back to the main
-  dialog.
+- **Back to Sales Play Details** — a left-aligned `Link` with an
+  `ArrowLeft` icon. Returns to the main dialog *without losing
+  unsaved changes*.
 - **Search opportunities** — search input, scoped to the account's
   open opportunities.
-- **New Opportunity** — secondary button, opens opportunity-creation
-  flow (out of scope here).
 - **Opportunities table** — columns: checkbox, **gold star** (sets
   primary; exactly one row can hold the star), **Opportunity Name**
   (link), **Stage**, **Amount**, **Close Date**. Checking a row links
@@ -194,9 +183,10 @@ and omitted at the same time.
 - **Unsaved changes persist across sub-views.** Navigating into
   Link Contact / Link Opportunity and back does not discard pending
   edits.
-- **Cancel and × discard.** Both return the play to its last saved
-  state. No confirm dialog on discard — call this out to the data
-  team if they want one.
+- **Cancel discards.** Cancel returns the play to its last saved
+  state with no confirm dialog (call this out to the data team if
+  they want one). The × close button is not currently wired in the
+  build.
 - **Primary opportunity is exclusive.** Setting the star on one row
   in the Link Opportunity sub-view clears the star on the previous
   primary.
@@ -230,13 +220,7 @@ Opportunity Size.
 
 Maps to: gold-star reassignment in the Link Opportunity sub-view.
 
-> "Why did we even qualify Lucid for this play? Let me read the
-> **Account Selection & Sizing Methodology** the rep wrote down."
-
-Maps to: the methodology textarea — the manual audit trail for the
-opaque qualification oracle.
-
-These four sentences are the acceptance test. If the dialog can't
+These three sentences are the acceptance test. If the dialog can't
 answer one of them in a single open–edit–save cycle, the layout has
 a gap.
 
@@ -258,6 +242,10 @@ a gap.
   surface; this dialog only links to them.
 - **Bulk operations and matrix-level interactions.** Belong to the
   matrix view spec.
+- **The dropped Account Selection & Sizing Methodology textarea.**
+  Removed from the build; the modal no longer carries the AE's
+  qualification audit trail. Pending design follow-up on whether
+  this returns.
 
 ---
 

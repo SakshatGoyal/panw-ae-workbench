@@ -11,8 +11,8 @@
   --panw-cell-row-active-bg:       var(--ds-highlight-rest);
   --panw-cell-row-locked-bg:       var(--ds-surface-rest);
   --panw-cell-row-locked-text:     var(--ds-text-secondary-disabled);
-  --panw-cell-row-locked-tag-bg:   #e0e0e0;
-  --panw-cell-row-locked-tag-text: #404a52;
+  --panw-cell-row-locked-tag-bg:   var(--ds-surface-alt-pressed);
+  --panw-cell-row-locked-tag-text: var(--ds-text-secondary-rest);
   --panw-cell-row-expand-color:    var(--ds-icons-secondary-rest);
   --panw-cell-row-active-cb-color: var(--ds-icons-brand-rest);
 }

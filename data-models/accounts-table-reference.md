@@ -47,10 +47,11 @@ shown as quiet secondary information on the row; it's never a primary
 identifier.
 
 ### Pipeline by Quarter
-For each of the next four fiscal quarters, the sum of opportunity values
-expected to close in that quarter. This is *forward-looking* money — not
-booked, not earned, in flight. A quarter with zero pipeline is still
-shown (as a placeholder) so the AE can see absence as data.
+For the current quarter and the next three fiscal quarters, the sum of
+opportunity values expected to close in that quarter. This is *forward-
+looking* money — not booked, not earned, in flight. A quarter with zero
+pipeline is still shown (as a placeholder) so the AE can see absence as
+data.
 
 ### ARR (Annual Recurring Revenue)
 The recurring annual revenue contributed by this account, summed across
@@ -168,9 +169,10 @@ not the full territory.
 
 ### 3.4 The Tag Filter (density control)
 Same pattern as the opportunities table. Toggles the visibility of: each
-per-quarter pipeline tag, each Account Risk tag, EBC, Last Activity,
-Account Health, Risk Factors, Products, and each Sales Play status tag.
-All on by default. Account Name and Apex Account are never toggleable.
+per-quarter pipeline tag, EBC, Last Activity, Account Health, Risk
+Factors, Products. All on by default. Account Name and Apex Account are
+never toggleable. Per-Account-Risk visibility lives inside the risk-
+count popover; Sales Plays toggle as a single column.
 
 ### 3.5 Close Date / Pipeline Quarters (multi-select)
 Same as the opportunities table. Defaults: **This Quarter + next three
@@ -223,7 +225,7 @@ Same product tree as the opportunities table. `All` by default.
 
 ## 4. The Columns
 
-Six columns, narrated left-to-right: **who · where the money is going ·
+Seven columns, narrated left-to-right: **who · where the money is going ·
 what's wrong · what they own · what we're pitching them · what they're
 worth.**
 
@@ -266,9 +268,10 @@ em-dash where the value would be (`Q2FY27: $—`). The AE should see the
 
 **Interactions**
 
-On hover, a popover for that quarter: a small, no-header table listing
-the opportunities closing in that quarter. Each row shows opportunity
-type and dollar value, no opportunity name.
+On hover, a popover for that quarter, headed with the quarter label
+(e.g., *Q1FY27 pipeline*), then a small table listing the opportunities
+closing in that quarter. Each row shows opportunity type and dollar
+value, no opportunity name.
 
 > Net New &nbsp;&nbsp; $200K  
 > Upsell &nbsp;&nbsp;&nbsp;&nbsp; $256K
@@ -300,7 +303,9 @@ Adoption) rule applies here unchanged.
 #### Risk Factors
 Count of *account-level* risk factors (the six-value taxonomy in section
 2). Neutral color, no icon. Hover shows the full list, in the same
-emoji + label format as the filter.
+emoji + label format as the filter. When an account has zero account-
+level risks, this sub-cell is omitted from the column rather than
+rendered as a zero.
 
 > **Important:** these are different from the risk factors on the
 > opportunities table. Deal-level risks belong to a single opportunity;
@@ -321,8 +326,9 @@ Color treatment per the severity ladder in section 2:
 **Hover:** a small popover showing the EBC date, the topic/agenda
 summary (if recorded), the executive attendees from PANW's side, and a
 ghost brand "View EBC details" button. For accounts with no EBC on
-record, the hover instead shows a single line: *"This account has not
-had an EBC on file."* No View details button in that case.
+record, the hover instead shows an *EBC history* heading followed by
+the line *"This account has not had an EBC on file."* No View details
+button in that case.
 
 ---
 
@@ -330,10 +336,12 @@ had an EBC on file."* No View details button in that case.
 
 **What it shows**
 
-Same tag rendering, same brand-icon mapping, same `+N` overflow behavior
-as the opportunities table. Refer to `opportunities-table-reference.md`
-section 4.4 for the full brand-icon mapping table — it's identical
-here.
+Same tag rendering and same brand-icon mapping as the opportunities
+table, but products wrap vertically inside the cell rather than
+collapsing into `+N`. The row is tall enough that hiding products
+behind an overflow tag would trade legibility for no visual gain. Refer
+to `opportunities-table-reference.md` section 4.4 for the full brand-
+icon mapping table — it's identical here.
 
 **Tag ordering within the cell**
 
@@ -350,8 +358,6 @@ a deal value.
 
 - Hovering an individual product tag → popover with `[brand icon]
   Product Name — $XXX,XXX ARR`.
-- Hovering a `+N` tag → popover listing every collapsed product in the
-  same format.
 
 The visual pattern is the same as the opportunities table; the meaning
 of the dollar number is different. This is the difference between
@@ -390,26 +396,31 @@ intervene, and that's the information that benefits from being visually
 
 **Color treatment**
 
-The status tags are not all neutral. There's an emphasis hierarchy:
+Every status renders as a neutral chip; emphasis moves off the chip
+ground onto the leading status **icon color**. The icon carries the
+entire hierarchy:
 
-- **Not Touched** gets the strongest emphasis — these are the action
-  items the table exists to surface.
-- **Pursuing** gets a softer emphasis — these are real opportunities in
-  motion.
-- **Pitched** and **Deferred** are neutral — informational.
-- **Declined**, **Closed Won**, **Closed Lost** are deemphasized — they
-  document history, not action.
+- **Not Touched** — strongest icon emphasis. The action items the
+  table exists to surface.
+- **Pursuing** — softer icon emphasis. Real opportunities in motion.
+- **Pitched** and **Deferred** — neutral icon. Informational.
+- **Declined**, **Closed Won**, **Closed Lost** — de-emphasized icon.
+  They document history, not action.
 
-The specific token mapping is a design decision; the principle is that
-the AE's eye should be pulled to Not Touched.
+Keeping the chip neutral and routing emphasis through the icon keeps
+the column quiet at scan distance — the AE's eye still lands on Not
+Touched without the row becoming a wall of red tags.
 
 **Interactions**
 
 On hover, a popover listing the individual Sales Plays in that status
 bucket. Each row shows the play name and its dollar value.
 
+> Not Touched — $850K  
 > Hardware Refresh &nbsp;&nbsp; $400K  
 > Fortinet Displacement &nbsp;&nbsp; $450K
+
+The popover heading format is `{Status label} — {bucket total}`.
 
 This is how the AE goes from "I have $850K of Not Touched plays on Exxon"
 to "the ones that haven't been touched are Hardware Refresh and Fortinet

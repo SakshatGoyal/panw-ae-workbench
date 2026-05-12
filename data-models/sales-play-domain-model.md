@@ -107,11 +107,13 @@ This is the most-reused entity. A status pill represents *one bucket of opportun
 |---|---|---|---|
 | `Not Touched` | red exclamation circle | account hasn't been worked yet | **[I]** |
 | `Pitched` | headphones | rep has pitched it | **[I]** |
-| `Interested` | thumbs-up | customer signaled interest | **[I]** |
-| `Open Pipeline` | lightbulb | active opportunity in pipe | **[I]** |
-| `Closed Won` | green check | sold | **[I]** |
 | `Deferred` | calendar/clipboard | rep has chosen to run this play *at a different time* (not now, not declined) | **[C — SME]** |
+| `Declined` | gray X circle | rep declined to run this play against this account | **[I]** |
+| `Pursuing` | lightbulb | rep is actively pursuing — opportunities linked | **[I]** |
+| `Closed Won` | green check | sold | **[I]** |
 | `Closed Lost` | gray X circle | customer declined / lost | **[I]** |
+
+> **Modal-vs-matrix divergence [flag]:** The modal's `Status` control (in `sales-play-modal.stories.tsx`) uses the seven values above. The matrix-pill taxonomy in `poc-exploration/src/mock/taxonomies.ts` still carries the legacy enum (`not-touched / pitched / interested / open-pipeline / closed-won / deferred / closed-lost`). This fork is a real data divergence pending SME reconciliation, not a stale doc.
 
 > **Inconsistency to flag:** The sibling component `Sales play icons` (`13036:43002`) declares only 6 categories and renames `Open Pipeline` → `Open Opportunities` and omits `Deferred`. The status pill component is the source of truth (7 categories, `Open Pipeline`); the icon library appears stale. **[C]** on the discrepancy.
 
@@ -152,26 +154,18 @@ The state object backing **Sales Play Modal /01**. Tracks rep-driven progress fo
 |---|---|---|---|
 | `salesPlay` | Sales Play (FK) | header title | **[C]** |
 | `account` | Account (FK) | header sub-link | **[C]** |
-| `pitched` | enum `Yes \| No` | content switcher row 1 | **[C]** |
-| `pitchedTo` | Contact[] | chip list + "Add Contact" | **[C]** multiple contacts can be added |
-| `customerInterested` | enum `Yes \| No \| Unknown` | content switcher row 3 | **[C]** |
-| `decision` | enum `Defer \| Decline \| Pursue` | content switcher row 4, label "Defer / Decline / Pursue" | **[C]** |
-| `opportunities` | Opportunity[] | list of links + "Add Opportunity" | **[C]** |
-| `cumulativeOpportunitySize` | currency | label "Cumulative Opportunity Size (excl. Omitted)" | **[C]** label; *value cell in screenshot reads `Customer Interested?` — likely Figma authoring slip; **flag*** |
-| `forecastCategory` | string / enum | label "Forecast Category" — sample "Various" | **[C]** label; the value `Various` suggests aggregation across the linked opportunities. **[I]** Underlying enum likely SFDC standard (`Pipeline`, `Best Case`, `Commit`, `Closed`) but **not confirmed in this design**. |
-| `closeDate` | date | label "Close Date" — sample value in screenshot is `$4,567,890.00` (currency, not a date — **misalignment to flag**) | **[C]** label, **[?]** value |
+| `pitchedTo` | Contact[] | Pitch contact section · "+ Add contact" | **[C]** multiple contacts can be added |
+| `opportunities` | Opportunity[] | Tags chip list with primary star · "+ Add opportunity" | **[C]** |
+| `primaryOpportunityId` | Opportunity (FK) | star icon on opportunity chip | **[C]** one primary per engagement, exclusive — toggled by the star icon |
 | `note` | long string | "Note" text-entry field | **[C]** |
-| `accountSelectionAndSizingMethodology` | long string | text-entry field | **[C]** |
 
 **Implied state machine**
-1. Rep marks `pitched=Yes` and adds `pitchedTo` contacts.
-2. Rep records `customerInterested`.
-3. Rep takes a `decision` (Defer / Decline / Pursue).
-4. If Pursue → links one or more `opportunities`; cumulative size + forecast category + close date roll up. **[I]**
 
-**The starred opportunity** — three opportunities in the modal list show a yellow star prefix. **[I]** Likely "primary opportunity for this Sales Play" or "auto-suggested by system". Needs confirmation.
+The rep advances `status` through the 7-value enum; once `status = Pursuing`, the rep links one or more opportunities and (optionally) marks one as primary via the star icon.
 
-**Omitted opportunities** — the label says "Cumulative Opportunity Size (**excl. Omitted**)" and the link list label says "Opportunity (**incl. Omitted**)" — suggests opportunities can be flagged "omitted" so they appear in the link list but don't count toward the cumulative. **[I]** No explicit "omit" UI is visible in this section — needs confirmation.
+**The starred opportunity** — **Confirmed:** the star marks `primaryOpportunityId` — one primary per engagement, exclusive (setting the star on one row clears it on the previous primary).
+
+**Omitted opportunities** — **Dropped:** the *incl. Omitted / excl. Omitted* labels from Figma did not survive into the built modal. No `omitted` field exists on the `Opportunity` type, and no omit affordance is rendered.
 
 **Where it appears**
 - `Sales Play Modal Window /01` (`21028:48764`)
@@ -212,12 +206,11 @@ A revenue opportunity in the CRM that can be linked to a Sales Play Engagement.
 | Field | Type | Source | Sample |
 |---|---|---|---|
 | `name` | string (formatted `<Account> – <Product line> – <Initiative>`) | Modal /03 table | "Aurora Enterprises – Firewall – Compliance Hard…", "Beacon Corp – Unit 42 – SOC Modernization", "Beacon Solutions – Cortex & Cloud – Secure Access Reva…", "Blue Horizon – Firewall – Edge Protection Program", "BlueSun Corp – Firewall – Edge Protection Pr…" **[C]** |
-| `stage` | enum (likely numbered SFDC stages) | Modal /03 column | All visible rows show `1 - Qualify`. Implies enum values like `1 - Qualify`, `2 - Discover`, `3 - …`, etc. — **only `1 - Qualify` confirmed**, full enum **[?]** |
+| `stage` | enum (likely numbered SFDC stages) | Modal /03 column | 5 SME-confirmed named stages: Discovery, Solutioning, Technical Validation, Active POV, Negotiate. **[C — SME, §3 item 5]** |
 | `amount` | currency (USD, 2 decimals) | Modal /03 column | "$5,678,901.00", "$4,567,890.00", "$3,456,789.00", "$2,345,678.00", "$1,567,890.00" **[C]** |
 | `closeDate` | date (`Mmm dd, yyyy`) | Modal /03 column | "Jul 30, 2027", "Jun 20, 2027", "Aug 10, 2027", "Sep 25, 2027", "May 15, 2027" **[C]** |
 | `starred` | boolean | yellow star prefix on some rows | **[C]** visible flag, **[?]** semantics |
 | `selected` | boolean | row checkbox state | **[C]** UI state, persisted as Engagement linkage |
-| `omitted` | boolean | implied from "incl. Omitted / excl. Omitted" labels in Modal /01 | **[I]** |
 
 **Actions**
 - Multi-select via checkbox; selected opportunities flow back as links in Modal /01 **[C]**
@@ -285,12 +278,10 @@ A revenue opportunity in the CRM that can be linked to a Sales Play Engagement.
 - No variant props **[C]** (single composition)
 - Composes:
   - Header: `Title` text, `Link` (Account name), `Button (icon)` close
-  - Field rows for `Pitched / Engaged?`, `Pitched to whom?`, `Customer Interested?`, `Defer / Decline / Pursue`, `Opportunity (incl. Omitted)`, `Cumulative Opportunity Size (excl. Omitted)`, `Forecast Category`, `Close Date`, `Note`, `Account Selection & Sizing Methodology`
-  - Stage/decision rows use a `Content Switcher` primitive (Yes/No or 3-segment)
-  - Selected contacts as `Chips` with × removal
+  - Body composes four sections in this order: **Status** (custom radiogroup of seven status tags, `role='radiogroup'`), **Pitch contact** (Tags chips + "+ Add contact" ghost button), **Opportunities** (Tags chips with primary star + "+ Add opportunity" ghost button), **Note** (single `TextEntry inputType='area'`).
+  - Selected contacts as Tags chips with trash-icon close
   - Opportunities as `Link` rows + `Button (Standard)` "Add Opportunity"
-  - Free-text rows use `Text Entry - Rounded`
-- **Bug to flag:** in the screenshot, the value cell next to `Cumulative Opportunity Size (excl. Omitted)` shows the string `Customer Interested?`, and the value next to `Close Date` shows `$4,567,890.00`. Looks like rows in this part of the modal are misaligned in the Figma. **[C]** discrepancy.
+  - Single `TextEntry inputType='area'` for Note
 
 ### `Sales Play Modal Window /02` — `21028:48762`
 
@@ -316,7 +307,7 @@ A revenue opportunity in the CRM that can be linked to a Sales Play Engagement.
 3. **`Sales Play Status.value` units** — confirmed as currency ($ amount of opportunities sitting in that status, against that play, against that account).
 4. ~~**`Forecast Category` enum**~~ — `Pipeline | Best Case | Commit | Closed`. Rep-assigned, judgment call. **[Resolved — SME]**
 5. ~~**`Opportunity.stage` enum**~~ — 5 named stages (no numbers), then `Closed` or `Lost`. **Canonical names [SME-confirmed anchors + provisional fill-ins, 2026-05-08]:** `Discovery → Solutioning → Technical Validation → Active POV → Negotiate`. Stages 1 (Discovery) and 5 (Negotiate) are SME-confirmed; Technical Validation and Active POV are SME-named without position; Solutioning is the working name for the missing 2nd stage (matches the `Solution` label seen on the Sales Stage filter chip). The earlier "stage 1 – stage 5" numeric form should be deprecated in favor of names. **[Provisional — SME-led]**
-6. **`Omitted` opportunities** — still open. Labels reference "incl. Omitted / excl. Omitted" but no omit-action UI surfaces in any section seen so far. **[?]**
+6. **`Omitted` opportunities** — **Dropped** — the *incl. Omitted / excl. Omitted* concept did not survive into the built modal. No omit field on `Opportunity`, no omit affordance in the UI.
 7. ~~**Starred opportunity**~~ — `star = Primary Quote` (tooltip text on Deal Tile in the Account & Opportunity section confirms). **[Resolved]**
 8. **Modal /01 row misalignment** — Figma authoring slip. *(Designer fix.)*
 9. **`SWFW Acceleration` × 3 / `XSIAM Splunk Takeout` × 2 duplicate columns** — likely Figma copy-paste, treat as a single play in code. *(Designer fix.)*

@@ -48,39 +48,43 @@ card.
 **Header**
 
 - **Plan & Forecast Summary** — the component title, left-aligned.
-- **Quarter selector** — shows both the relative label and the
-  absolute fiscal quarter, e.g., *"Quarter: CQ (Q4FY25)"*. *CQ*
-  (Current Quarter) is the default; the AE can also pick PQ (Prior
-  Quarter) or any named future quarter in the rolling window.
+- **Quarter selector** — a single-select pill labeled *Quarter*.
+  Options are `PQ (Q3FY26)`, `CQ (Q4FY26)`, `NQ (Q1FY27)`,
+  `NQ+1 (Q2FY27)` — relative label plus absolute fiscal quarter.
+  **CQ** is the default. The fiscal-quarter labels are anchored to
+  TODAY = 2026-05-11 in PANW's Aug→Jul fiscal calendar (May 2026 sits
+  in Q4FY26); they roll forward when the anchoring date does.
 - **Product filter** — defaults to *All Products*. Scopes every
   number in the summary to the chosen product or product family.
   Same product taxonomy as the rest of the workbench.
-- **Expand toggle** *(chevron)* — flips the component between
-  collapsed and expanded. State is per-session, not persisted.
+- **Expand toggle** — a ghost `IconButton` with a chevron that
+  flips up/down by state. State is per-session, not persisted.
 
-> **Component note:** the Quarter and Product selectors are the
-> **same filter component** used in the opportunities table (see
-> `opportunities-table-reference.md`). Reusing the same primitive
-> across the page is intentional — same look, same keyboard
+> **Component note:** the Quarter and Product selectors use the
+> DS **`Sort`** primitive (single-select, sibling of `Filter`),
+> with the directional glyph suppressed. Same trigger chrome
+> family as `Filter`, same keyboard behavior, but the underlying
+> primitive is `Sort`, not `Filter`. Reusing the primitive across
+> the page is still intentional — same look, same keyboard
 > behavior, same single-select grammar. Their visual treatment in
 > the Figma (dark-filled vs. outline) reflects the selector's
 > *state*, not a different component.
 
 **Row 1 — Attainment readout**
 
-- **Plan: $1.00B** — the quarterly plan/target for the selected
-  quarter, scoped to the selected product filter.
+- **Plan: $1.00B** — the quarterly plan/target, rendered as a
+  `Plan:` label + bold `$1.00B` value, scoped to the selected
+  quarter and product filter.
 - **Progress bar** — a horizontal bar filled to the share of plan
   that's currently *committed or better*. In the screenshots,
   ~88% green corresponds to *Total - In = $880M* against a $1.00B
-  plan. The bar is the visual anchor for the on-track classification
-  tag.
+  plan, i.e., *"88% on track"*. The bar is the visual anchor for
+  the on-track classification tag.
 - **On-track tag** — a single tag on the right end of the bar
-  reading e.g., *"90% on track"*. The color reflects an on-track
-  classification (green = on track; presumably amber / red at lower
-  thresholds — to confirm with the data team). The percentage is a
-  rounded, threshold-aware reading of the same underlying signal the
-  bar visualizes, not a separate metric.
+  reading e.g., *"88% on track"*. Color follows the on-track
+  ladder: **0–25% red**, **26–75% yellow**, **76%+ green**. The
+  percentage is a rounded reading of the same underlying signal
+  the bar visualizes, not a separate metric.
 
 > **Designer takeaway:** the collapsed state is meant to be readable
 > in *one glance from across the room*. The number is the plan, the
@@ -115,22 +119,25 @@ blocks, the last three are rollups.
    quarter-over-quarter change in this category's contribution.
    Green = up, red = down. The color is a directional signal, not a
    value judgment — *↓Pipeline* and *↑Closed* are both arguably
-   good, but the tag just reports direction.
+   good, but the tag just reports direction. QoQ lives in the cell
+   header (top-right of the cell), while `% of plan` and the
+   dollar value stack in the lower-left.
 3. **% of plan** — the category's share of the quarterly plan, e.g.,
-   *"26% of plan"*. Small, muted text, sits directly below the QoQ
-   line.
+   *"26% of plan"*. Small, muted text, sits in the lower-left of
+   the cell above the dollar value.
 4. **Dollar value** — the category's absolute dollar value for the
    selected quarter, large and bold (e.g., *$268.0M*). This is the
    number the AE reads first when scanning a cell.
-5. **Mini history chart** — a small bar chart (4–5 bars) showing the
-   category's value over recent quarters. The **current quarter is
-   emphasized in solid blue**; surrounding quarters are light gray.
-   No axis labels — this is a sparkline, not a chart. Its job is to
-   tell the AE *"is this category trending up, flat, or down over
-   time?"* at a glance.
+5. **Mini trend sparkline** — a 7-bar sparkline spanning **2 past +
+   current + 4 future** quarters relative to the selected quarter.
+   **Past** bars are neutral gray; the **current** bar is solid
+   cobalt (`cobalt-60`); **future** bars are light cobalt
+   (`cobalt-30`). No axis labels — this is a sparkline, not a
+   chart. Its job is to tell the AE *"where is this category
+   trending, past → present → forward?"* at a glance.
 
-The cells are evenly distributed across the strip. No vertical
-dividers; whitespace handles separation.
+The cells are evenly distributed across the strip, separated by
+1px vertical dividers that span the full strip height.
 
 ---
 
@@ -185,7 +192,8 @@ six expanded cells and the attainment bar.
   AE/manager sessions are answering; switching to a future quarter
   turns the summary into a forward-look. The mini history charts
   re-anchor on the chosen quarter (the emphasized bar is always *the
-  chosen quarter*, with prior quarters trailing to the left).
+  chosen quarter*, with two past quarters to its left and four
+  future quarters to its right).
 - **Product filter** — scopes Plan, all six categories, the
   attainment bar, and the mini history charts to the selected
   product. *All Products* is the default. Selecting a single
@@ -219,7 +227,7 @@ already chosen their team) and the summary inherits it.
 
 ## 7. How an AE or Manager Talks About It
 
-> "We're $880M In against a $1.00B plan — 90% on track for the
+> "We're $880M In against a $1.00B plan — 88% on track for the
 > quarter."
 
 Maps to: collapsed state — Plan number, attainment bar, on-track
@@ -257,11 +265,6 @@ can't answer one of them in a single read, the layout has a gap.
   / planning system. The workbench reads them.
 - **The exact derivation of Total Forecast's judgment slice.** A
   finance rule, not a UI rule. Flagged for the data team.
-- **The on-track tag's threshold ladder.** Green at 90%; amber and
-  red thresholds need confirmation with the data team.
-- **Mini history chart granularity.** Assumed to be quarters
-  matching the selected quarter's cadence. Lookback window (4? 5?
-  6?) to confirm.
 
 ---
 

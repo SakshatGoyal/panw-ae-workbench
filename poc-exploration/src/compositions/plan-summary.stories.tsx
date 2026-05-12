@@ -96,11 +96,15 @@ const CATEGORIES: CategoryDatum[] = [
   { label: 'Total Forecast',  qoqPercent:  3, percentOfPlan: 88, value: '$995.0M', spark: [0.70, 0.75, 1.00, 0.62, 0.68, 0.65, 0.72] },
 ]
 
+// Anchored to TODAY = 2026-05-11 in PANW's Aug→Jul fiscal calendar:
+// May 2026 sits in Q4FY26 (CQ). PQ is the quarter just ended (Q3FY26 =
+// Feb–Apr 2026); NQ and NQ+1 step into FY27. `value` keys are stable
+// identifiers; only the labels move when the anchoring date rolls.
 const QUARTER_OPTIONS: SortOption[] = [
-  { label: 'PQ (Q3FY25)',   value: 'pq' },
-  { label: 'CQ (Q4FY25)',   value: 'cq' },
-  { label: 'NQ (Q1FY26)',   value: 'nq' },
-  { label: 'NQ+1 (Q2FY26)', value: 'nq1' },
+  { label: 'PQ (Q3FY26)',   value: 'pq' },
+  { label: 'CQ (Q4FY26)',   value: 'cq' },
+  { label: 'NQ (Q1FY27)',   value: 'nq' },
+  { label: 'NQ+1 (Q2FY27)', value: 'nq1' },
 ]
 
 const PRODUCT_OPTIONS: SortOption[] = [

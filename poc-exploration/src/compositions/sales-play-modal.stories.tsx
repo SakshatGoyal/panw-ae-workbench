@@ -82,6 +82,7 @@ import {
   PLAY_HEADER,
   SalesPlayStatuses,
   type PlayContact,
+  type PlayHeader,
   type PlayOpportunity,
   type SalesPlayEdits,
   type SalesPlayStatus,
@@ -142,15 +143,42 @@ function editsEqual(a: SalesPlayEdits, b: SalesPlayEdits): boolean {
 
 // ── Root composition ──────────────────────────────────────────────────
 
-interface SalesPlayModalProps {
+export interface SalesPlayModalProps {
   /** Optional override of the initial view, for story variants. */
   initialView?: View
+  /** Play header — family / play name / account name. Defaults to PLAY_HEADER. */
+  header?: PlayHeader
+  /** Account-scoped contacts visible in the LinkContact subview. Defaults to CONTACTS. */
+  contacts?: PlayContact[]
+  /** Account-scoped opportunities visible in the LinkOpportunity subview. Defaults to OPPORTUNITIES. */
+  opportunities?: PlayOpportunity[]
+  /** Initial edit state. Defaults to INITIAL_EDITS. */
+  initialEdits?: SalesPlayEdits
+  /**
+   * Fired when the AE clicks Update. Receives the pending edits.
+   * Default: `console.info` — replace at the consumer level when a real
+   * backend exists. (Dormant per Stage 1 plumbing pass.)
+   */
+  onSave?: (edits: SalesPlayEdits) => void
+  /**
+   * Fired when the AE clicks Cancel, in addition to the modal's own
+   * internal reset (pending → loaded). Default: no-op.
+   */
+  onCancel?: () => void
 }
 
-function SalesPlayModal({ initialView = 'main' }: SalesPlayModalProps) {
+function SalesPlayModal({
+  initialView = 'main',
+  header = PLAY_HEADER,
+  contacts = CONTACTS,
+  opportunities = OPPORTUNITIES,
+  initialEdits = INITIAL_EDITS,
+  onSave,
+  onCancel: onCancelProp,
+}: SalesPlayModalProps = {}) {
   const [view, setView] = useState<View>(initialView)
-  const [loaded] = useState<SalesPlayEdits>(INITIAL_EDITS)
-  const [pending, setPending] = useState<SalesPlayEdits>(INITIAL_EDITS)
+  const [loaded] = useState<SalesPlayEdits>(initialEdits)
+  const [pending, setPending] = useState<SalesPlayEdits>(initialEdits)
 
   const dirty = useMemo(() => !editsEqual(pending, loaded), [pending, loaded])
 
@@ -209,10 +237,16 @@ function SalesPlayModal({ initialView = 'main' }: SalesPlayModalProps) {
         p.primaryOpportunityId === id ? null : p.primaryOpportunityId,
     }))
 
-  const onCancel = () => setPending(loaded)
+  const onCancel = () => {
+    setPending(loaded)
+    onCancelProp?.()
+  }
   const onUpdate = () => {
-    // In exploration: just persist locally (no backend).
-    // To wire a real save: replace this body with a callback.
+    if (onSave) {
+      onSave(pending)
+      return
+    }
+    // Default: persist locally (no backend). Replace by passing `onSave`.
     // eslint-disable-next-line no-console
     console.info('SalesPlayModal — Update', pending)
   }
@@ -232,10 +266,10 @@ function SalesPlayModal({ initialView = 'main' }: SalesPlayModalProps) {
         <div className="spm-header">
           <div className="spm-header__titles">
             <h2 id="spm-title" className="spm-title">
-              {PLAY_HEADER.family} | {PLAY_HEADER.name}
+              {header.family} | {header.name}
             </h2>
             <Link href="#" size="14px" color="blue" className="spm-account-link">
-              {PLAY_HEADER.accountName}
+              {header.accountName}
             </Link>
           </div>
           <IconButton
@@ -252,6 +286,8 @@ function SalesPlayModal({ initialView = 'main' }: SalesPlayModalProps) {
           {view === 'main' && (
             <MainView
               pending={pending}
+              contacts={contacts}
+              opportunities={opportunities}
               onStatusChange={setStatus}
               onRemoveContact={removeContact}
               onUnlinkOpportunity={unlinkOpportunity}
@@ -263,6 +299,7 @@ function SalesPlayModal({ initialView = 'main' }: SalesPlayModalProps) {
           )}
           {view === 'linkContact' && (
             <LinkContactView
+              contacts={contacts}
               linkedIds={pending.contactIds}
               onToggle={toggleContact}
               onRemove={removeContact}
@@ -271,6 +308,7 @@ function SalesPlayModal({ initialView = 'main' }: SalesPlayModalProps) {
           )}
           {view === 'linkOpportunity' && (
             <LinkOpportunityView
+              opportunities={opportunities}
               linkedIds={pending.opportunityIds}
               primaryId={pending.primaryOpportunityId}
               onToggle={toggleOpportunity}
@@ -300,6 +338,8 @@ function SalesPlayModal({ initialView = 'main' }: SalesPlayModalProps) {
 
 interface MainViewProps {
   pending: SalesPlayEdits
+  contacts: PlayContact[]
+  opportunities: PlayOpportunity[]
   onStatusChange: (status: SalesPlayStatus) => void
   onRemoveContact: (id: string) => void
   onUnlinkOpportunity: (id: string) => void
@@ -311,6 +351,8 @@ interface MainViewProps {
 
 function MainView({
   pending,
+  contacts,
+  opportunities,
   onStatusChange,
   onRemoveContact,
   onUnlinkOpportunity,
@@ -320,11 +362,11 @@ function MainView({
   onOpenLinkOpportunity,
 }: MainViewProps) {
   const linkedContacts = pending.contactIds
-    .map((id) => CONTACTS.find((c) => c.id === id))
+    .map((id) => contacts.find((c) => c.id === id))
     .filter((c): c is PlayContact => Boolean(c))
 
   const linkedOpps = pending.opportunityIds
-    .map((id) => OPPORTUNITIES.find((o) => o.id === id))
+    .map((id) => opportunities.find((o) => o.id === id))
     .filter((o): o is PlayOpportunity => Boolean(o))
 
   return (
@@ -470,6 +512,7 @@ function MainView({
 // ── LinkContactView ───────────────────────────────────────────────────
 
 interface LinkContactViewProps {
+  contacts: PlayContact[]
   linkedIds: string[]
   onToggle: (id: string) => void
   onRemove: (id: string) => void
@@ -477,6 +520,7 @@ interface LinkContactViewProps {
 }
 
 function LinkContactView({
+  contacts,
   linkedIds,
   onToggle,
   onRemove,
@@ -486,7 +530,7 @@ function LinkContactView({
 
   const linkedSet = new Set(linkedIds)
 
-  const filtered = CONTACTS.filter((c) =>
+  const filtered = contacts.filter((c) =>
     [c.name, c.title, c.email].some((field) =>
       field.toLowerCase().includes(query.toLowerCase())
     )
@@ -598,6 +642,7 @@ function LinkContactView({
 // ── LinkOpportunityView ───────────────────────────────────────────────
 
 interface LinkOpportunityViewProps {
+  opportunities: PlayOpportunity[]
   linkedIds: string[]
   primaryId: string | null
   onToggle: (id: string) => void
@@ -606,6 +651,7 @@ interface LinkOpportunityViewProps {
 }
 
 function LinkOpportunityView({
+  opportunities,
   linkedIds,
   primaryId,
   onToggle,
@@ -615,7 +661,7 @@ function LinkOpportunityView({
   const [query, setQuery] = useState('')
   const linkedSet = new Set(linkedIds)
 
-  const filtered = OPPORTUNITIES.filter((o) =>
+  const filtered = opportunities.filter((o) =>
     o.name.toLowerCase().includes(query.toLowerCase())
   )
 

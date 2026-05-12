@@ -40,9 +40,9 @@ $panw-prefix: 'panw';
   background-color: var(--panw-ni-bg);
   box-sizing: border-box;
   transition:
-    border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
-    background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
-    box-shadow 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+    border-color 110ms var(--ds-motion-easing-standard),
+    background-color 110ms var(--ds-motion-easing-standard),
+    box-shadow 110ms var(--ds-motion-easing-standard);
 }
 
 .#{$panw-prefix}--number-input__value {

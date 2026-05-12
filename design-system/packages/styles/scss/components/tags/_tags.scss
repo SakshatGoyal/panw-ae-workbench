@@ -16,8 +16,8 @@
   // primitive-60. Transition covers both axes. 110ms/entrance curve
   // matches button and flyout-item motion.
   transition:
-    background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
-    box-shadow       110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+    background-color 110ms var(--ds-motion-easing-standard),
+    box-shadow       110ms var(--ds-motion-easing-standard);
 }
 
 // ─── Shapes ──────────────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@
   flex-shrink: 0;
   // Color is set per color × contrast in the matrix below; transition lives
   // here so every variant inherits the same productive easing.
-  transition: color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: color 110ms var(--ds-motion-easing-standard);
 
   svg { display: block; color: currentColor; fill: currentColor; }
 }
@@ -119,7 +119,7 @@
   cursor: pointer;
   // Same per-variant icon tokens as the leading icon — set in the matrix
   // below. Transition matches the icon slot.
-  transition: color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: color 110ms var(--ds-motion-easing-standard);
   border-radius: 50%;
 
   &:focus-visible {
@@ -204,11 +204,13 @@
   // doesn't ladder by 2px.
   box-shadow: inset 0 0 0 1px var(--ds-lines-neutral-rest);
 
-  // Neutral icon = icons.primary (neutral90), one stop lighter than
-  // text.primary (neutral100) per stage-text-and-icons.md. Hover pulls
-  // the icon to icons.secondary.hover (neutral80); pressed to neutral90.
+  // Neutral is an interactive chip — icon follows the system's interactive
+  // icon family (icons.secondary), not the static icons.primary. Sourcing
+  // from --ds-icons-secondary-* directly so future shifts to that family
+  // (rest/hover/pressed) flow into neutral tags automatically without
+  // anyone having to override per-instance.
   .panw--tag__icon,
-  .panw--tag__close-btn { color: var(--ds-icons-primary); }
+  .panw--tag__close-btn { color: var(--ds-icons-secondary-rest); }
 
   &:hover  {
     background-color: var(--ds-field-alt-hover);
@@ -260,4 +262,24 @@
   @include _tag-color('jade');
   @include _tag-color('teal');
   @include _tag-color('cobalt');
+}
+
+// ─── Grey low — icon family override ─────────────────────────────────────────
+// Grey is categorical for bg/text but its icon should follow the system's
+// interactive-icon family (icons.secondary), not the one-stop-lighter
+// primitive the categorical mixin emits. Pulling from --ds-icons-secondary-*
+// directly means any future shift to that family carries through to grey tags
+// without anyone having to override per-tag.
+.panw--tag.panw--tag--low.panw--tag--grey {
+  .panw--tag__icon,
+  .panw--tag__close-btn { color: var(--ds-icons-secondary-rest); }
+
+  &:hover {
+    .panw--tag__icon,
+    .panw--tag__close-btn { color: var(--ds-icons-secondary-hover); }
+  }
+  &:active {
+    .panw--tag__icon,
+    .panw--tag__close-btn { color: var(--ds-icons-secondary-pressed); }
+  }
 }

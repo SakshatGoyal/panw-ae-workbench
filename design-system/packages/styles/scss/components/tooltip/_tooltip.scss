@@ -24,7 +24,7 @@ $panw-prefix: 'panw';
   // Without the slide the tooltip "pops" mechanically; the 8px drift gives
   // the appearance just enough physicality to feel placed rather than
   // teleported.
-  animation: panw-tooltip-enter-up 70ms cubic-bezier(0, 0, 0.38, 0.9);
+  animation: panw-tooltip-enter-up 70ms var(--ds-motion-easing-entrance);
 }
 
 .#{$panw-prefix}--tooltip--direction-top    { animation-name: panw-tooltip-enter-up;    }

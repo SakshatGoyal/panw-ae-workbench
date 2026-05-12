@@ -11,14 +11,26 @@
   font-family: var(--ds-type-font-family-sans);
   font-weight: 400;
   letter-spacing: 0.25px;
-  text-decoration: underline;
+  // Underline is reserved for hover/pressed. At rest the link reads as a
+  // colored text token — the underline is reveal-on-interaction, matching
+  // current PANW conventions and keeping body copy quieter when dense.
+  text-decoration: none;
   text-decoration-skip-ink: none;
   cursor: pointer;
   user-select: none;
   border: none;
   background: none;
   padding: 0;
-  transition: color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: color 110ms var(--ds-motion-easing-standard), text-decoration-color 110ms var(--ds-motion-easing-standard);
+
+  &:hover,
+  &.panw--link--hover {
+    text-decoration: underline;
+  }
+  &:active,
+  &.panw--link--pressed {
+    text-decoration: underline;
+  }
 
   &:focus-visible {
     outline: 2px solid currentColor;
@@ -84,8 +96,8 @@
 
 // ─── Black palette (quiet, neutral-default link-neutral) ────────────────────
 //
-// Underlined at rest like all hyperlinks. Color shifts to brand on hover and
-// pressed per text.link-neutral's family.
+// No underline at rest. Underline reveals on hover/pressed (base rule) and
+// color shifts to brand per text.link-neutral's family.
 
 .panw--link--black {
   color: var(--panw-link-black-default);

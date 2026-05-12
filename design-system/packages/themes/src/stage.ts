@@ -424,6 +424,11 @@ export const StageTokens = {
    * for hover. High icons are white on dark grounds — no further change.
    */
   "tag": {
+    // Grey low icons reference the icons.secondary family directly via SCSS
+    // (see _tags.scss). The token values below are retained for completeness
+    // and for any consumer reading the tag-grey-low-icon-* alias, but the
+    // tag's runtime icon color is sourced from --ds-icons-secondary-* so it
+    // automatically follows future shifts to the secondary icon family.
     "grey":     { "low": { "bg": neutral20, "text": neutral80, "icon": { "rest": neutral70, "hover": neutral80, "pressed": neutral90 } }, "high": { "bg": neutral70, "bg-hover": neutral60, "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
     "accent":   { "low": { "bg": brand20,   "text": brand70,   "icon": { "rest": brand60,   "hover": brand70,   "pressed": brand80   } }, "high": { "bg": brand70,   "bg-hover": brand60,   "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },
     "red":      { "low": { "bg": red20,     "text": red70,     "icon": { "rest": red60,     "hover": red70,     "pressed": red80     } }, "high": { "bg": red70,     "bg-hover": red60,     "text": "#ffffff", "icon": { "rest": "#ffffff", "hover": "#ffffff", "pressed": "#ffffff" } } },

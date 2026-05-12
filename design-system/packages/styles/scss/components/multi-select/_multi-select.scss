@@ -65,9 +65,9 @@ $panw-prefix: 'panw';
   cursor: pointer;
   box-sizing: border-box;
   transition:
-    background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
-    border-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9),
-    box-shadow 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+    background-color 110ms var(--ds-motion-easing-standard),
+    border-color 110ms var(--ds-motion-easing-standard),
+    box-shadow 110ms var(--ds-motion-easing-standard);
 }
 
 .#{$panw-prefix}--multi-select__placeholder {
@@ -179,7 +179,7 @@ $panw-prefix: 'panw';
   z-index: 10;
   max-height: 200px;
   overflow-y: auto;
-  animation: panw-flyout-enter 90ms cubic-bezier(0, 0, 0.38, 0.9);
+  animation: panw-flyout-enter 90ms var(--ds-motion-easing-entrance);
 }
 
 .#{$panw-prefix}--multi-select__menu-item {
@@ -193,7 +193,7 @@ $panw-prefix: 'panw';
   line-height: 1.286;
   color: var(--panw-ms-text);
   cursor: pointer;
-  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: background-color 110ms var(--ds-motion-easing-standard);
 
   &:hover  { background-color: var(--panw-ms-menu-item-hover); }
   &:active { background-color: var(--panw-ms-menu-item-pressed); }
@@ -229,7 +229,7 @@ $panw-prefix: 'panw';
   border-radius: 8px;
   box-shadow: var(--ds-shadow-flyout);
   z-index: 11; // sits above the field; menu (z:10) is mutually exclusive.
-  animation: panw-flyout-enter 90ms cubic-bezier(0, 0, 0.38, 0.9);
+  animation: panw-flyout-enter 90ms var(--ds-motion-easing-entrance);
 }
 
 .#{$panw-prefix}--multi-select__chip-popover-row {

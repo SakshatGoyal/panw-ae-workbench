@@ -34,7 +34,7 @@
 
 .panw--rb-icon { display: block; }
 
-.panw--rb-ring { fill: var(--panw-radio-ring); transition: fill 70ms cubic-bezier(0.2, 0, 0.38, 0.9); }
+.panw--rb-ring { fill: var(--panw-radio-ring); transition: fill 70ms var(--ds-motion-easing-standard); }
 .panw--rb-dot  { fill: var(--panw-radio-dot); }
 
 .panw--radio-button:hover:not(.panw--radio-button--disabled) .panw--rb-ring { fill: var(--panw-radio-ring-hover); }

@@ -1,0 +1,37 @@
+// Motion easing tokens — mode-agnostic, emitted at :root.
+//
+// Only EASING is published here. Durations are intentionally absent: the
+// system has not yet committed to a duration scale, and the prior practice
+// of hand-typing `110ms` etc. into components is what these tokens replace
+// at the curve level only.
+//
+// Curves come from the existing in-tree usage:
+//   standard   — cubic-bezier(0.2, 0, 0.38, 0.9)
+//                Symmetric ease-in-out; the default for state changes
+//                (hover, press, color shifts, small layout moves).
+//   entrance   — cubic-bezier(0, 0, 0.38, 0.9)
+//                Ease-out only; for elements coming INTO view (panels
+//                opening, content revealing, drawers expanding).
+//
+// Usage:
+//   transition: background-color 110ms var(--ds-motion-easing-standard);
+//   transition: max-height 240ms var(--ds-motion-easing-entrance);
+
+@use 'sass:map';
+
+:root {
+  --ds-motion-easing-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ds-motion-easing-entrance: cubic-bezier(0, 0, 0.38, 0.9);
+}
+
+$_easings: (
+  'standard': var(--ds-motion-easing-standard),
+  'entrance': var(--ds-motion-easing-entrance),
+);
+
+@function easing($key) {
+  @if map.has-key($_easings, $key) {
+    @return map.get($_easings, $key);
+  }
+  @error 'Unknown easing key: #{$key}';
+}

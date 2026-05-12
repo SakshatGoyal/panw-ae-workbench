@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Check, ChevronDown, ChevronUp } from '@ds/icons';
-import { XCircle } from 'lucide-react';
+import { Check, ChevronDown, ChevronUp, Close } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const ChipSizes = ['default', 'small'] as const;
@@ -44,9 +43,9 @@ export interface ChipProps
   onClick?: (event: React.MouseEvent | React.KeyboardEvent) => void;
   /** Close icon click handler. */
   onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void;
-  /** Override the leading icon component (defaults to lucide `Check`). */
+  /** Override the leading icon component (defaults to DS `Check`). */
   renderLeadingIcon?: React.ElementType;
-  /** Override the close icon component (defaults to lucide `XCircle`). */
+  /** Override the close icon component (defaults to DS `Close`). */
   renderCloseIcon?: React.ElementType;
 }
 
@@ -68,7 +67,7 @@ export const Chip = React.forwardRef<HTMLDivElement, ChipProps>(function Chip(
     onClick,
     onClose,
     renderLeadingIcon: LeadingIconElement = Check,
-    renderCloseIcon: CloseIconElement = XCircle,
+    renderCloseIcon: CloseIconElement = Close,
     ...rest
   },
   ref

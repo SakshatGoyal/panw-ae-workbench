@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Info, ExclamationTriangle as AlertTriangle, CircleCheck as CheckCircle, Close as X } from '@ds/icons';
-import { XCircle } from 'lucide-react';
+import { Info, ExclamationTriangle as AlertTriangle, CircleCheck as CheckCircle, Close as X, ExclamationCircle } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { IconButton } from '@ds/button';
 
@@ -24,7 +23,7 @@ export interface InlineNotificationProps
 const TYPE_ICON: Record<InlineNotificationType, React.ElementType> = {
   info: Info,
   alert: AlertTriangle,
-  error: XCircle,
+  error: ExclamationCircle,
   success: CheckCircle,
 };
 

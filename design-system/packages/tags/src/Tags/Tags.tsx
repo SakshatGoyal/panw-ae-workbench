@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Close as X } from '@ds/icons';
-import { Sun } from 'lucide-react';
+import { Close as X, Star } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 // ─── Color / contrast / size enumerations ────────────────────────────────────
@@ -67,14 +66,14 @@ export interface TagsProps
   onClose?: (event: React.MouseEvent<HTMLButtonElement>) => void;
   /**
    * Icon component for the leading slot.
-   * Pass an ElementType (e.g. a lucide-react component), not a ReactNode.
-   * Carbon convention: renderIcon accepts ElementType.
-   * Defaults to lucide-react `Sun` (matches PANW's default "light" SVG).
+   * Pass an ElementType, not a ReactNode. Carbon convention: renderIcon
+   * accepts ElementType. Defaults to `Star` from `@ds/icons` as a neutral
+   * placeholder when `icon` is true but no override is provided.
    */
   renderIcon?: React.ElementType;
   /**
-   * Icon component for the close button.
-   * Pass an ElementType (lucide-react component). Defaults to `X`.
+   * Icon component for the close button. Pass an ElementType. Defaults to
+   * `Close` from `@ds/icons`.
    */
   renderCloseIcon?: React.ElementType;
 }
@@ -91,7 +90,7 @@ export const Tags = React.forwardRef<HTMLSpanElement, TagsProps>(function Tags(
     icon = false,
     close = false,
     onClose,
-    renderIcon: IconElement = Sun,
+    renderIcon: IconElement = Star,
     renderCloseIcon: CloseIconElement = X,
     className,
     ...rest

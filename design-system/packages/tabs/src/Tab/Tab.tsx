@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Sun } from 'lucide-react';
+import { Star } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { Tags } from '@ds/tags';
 import { useTabsContext } from '../Tabs/TabsContext';
@@ -12,7 +12,7 @@ export interface TabProps {
   showTag?: boolean;
   tagLabel?: string;
   disabled?: boolean;
-  /** lucide-style component for the leading icon. */
+  /** Element-type component for the leading icon. Defaults to the DS `Star` placeholder. */
   renderIcon?: React.ElementType;
   showIcon?: boolean;
   /** Internal: injected by `<Tabs>` — its position in the children list. */
@@ -27,7 +27,7 @@ export const Tab = React.forwardRef<HTMLButtonElement, TabProps>(function Tab(
     showTag = false,
     tagLabel = 'Tag',
     disabled = false,
-    renderIcon: IconElement = Sun,
+    renderIcon: IconElement = Star,
     showIcon = false,
     index = 0,
     className,

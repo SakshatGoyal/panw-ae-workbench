@@ -1,19 +1,17 @@
 import React, { useEffect, useRef } from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
+import { CheckboxFilled, CheckboxIndeterminate, CheckboxEmpty } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const CheckboxStatuses = ['checked', 'unchecked', 'indeterminate'] as const;
 export type CheckboxStatus = (typeof CheckboxStatuses)[number];
 
-const CHECKED_PATH =
-  'M26 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V26C4 26.5304 4.21071 27.0391 4.58579 27.4142C4.96086 27.7893 5.46957 28 6 28H26C26.5304 28 27.0391 27.7893 27.4142 27.4142C27.7893 27.0391 28 26.5304 28 26V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4ZM14 21.5L9 16.5427L10.5908 15L14 18.3456L21.4087 11L23.0005 12.5772L14 21.5Z';
-
-const INDETERMINATE_PATH =
-  'M26 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V26C4 26.5304 4.21071 27.0391 4.58579 27.4142C4.96086 27.7893 5.46957 28 6 28H26C26.5304 28 27.0391 27.7893 27.4142 27.4142C27.7893 27.0391 28 26.5304 28 26V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4ZM22 18H10V14H22V18Z';
-
-const UNCHECKED_PATH =
-  'M26 4H6C5.46957 4 4.96086 4.21071 4.58579 4.58579C4.21071 4.96086 4 5.46957 4 6V26C4 26.5304 4.21071 27.0391 4.58579 27.4142C4.96086 27.7893 5.46957 28 6 28H26C26.5304 28 27.0391 27.7893 27.4142 27.4142C27.7893 27.0391 28 26.5304 28 26V6C28 5.46957 27.7893 4.96086 27.4142 4.58579C27.0391 4.21071 26.5304 4 26 4ZM6 26V6H26V26H6Z';
+const STATUS_ICON: Record<CheckboxStatus, React.ElementType> = {
+  checked: CheckboxFilled,
+  indeterminate: CheckboxIndeterminate,
+  unchecked: CheckboxEmpty,
+};
 
 export interface CheckboxProps
   extends Omit<React.InputHTMLAttributes<HTMLInputElement>, 'onChange' | 'type' | 'checked'> {
@@ -76,12 +74,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
     { [`${prefix}--checkbox-icon--disabled`]: disabled }
   );
 
-  const path =
-    status === 'checked'
-      ? CHECKED_PATH
-      : status === 'indeterminate'
-      ? INDETERMINATE_PATH
-      : UNCHECKED_PATH;
+  const IconElement = STATUS_ICON[status];
 
   return (
     <label className={rootClasses} data-status={status}>
@@ -98,14 +91,7 @@ export const Checkbox = React.forwardRef<HTMLInputElement, CheckboxProps>(functi
         {...rest}
       />
       <span className={iconClasses}>
-        <svg
-          width="16"
-          height="16"
-          viewBox="0 0 32 32"
-          fill="none"
-          aria-hidden="true">
-          <path d={path} fill="currentColor" />
-        </svg>
+        <IconElement size={16} aria-hidden="true" />
       </span>
       {label && <span className={`${prefix}--checkbox-label`}>{label}</span>}
     </label>

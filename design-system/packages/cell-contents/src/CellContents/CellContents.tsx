@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ArrowUp, ArrowDown, Info, CircleCheck as CheckCircle, ExclamationTriangle as AlertTriangle } from '@ds/icons';
-import { XCircle } from 'lucide-react';
+import { ArrowUp, ArrowDown, Info, CircleCheck as CheckCircle, ExclamationTriangle as AlertTriangle, ExclamationCircle } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import { Tags, type TagColor, type TagContrast } from '@ds/tags';
 
@@ -38,7 +37,7 @@ const STATE_ICON: Record<Exclude<CellState, 'none'>, React.ElementType> = {
   info: Info,
   success: CheckCircle,
   warning: AlertTriangle,
-  error: XCircle,
+  error: ExclamationCircle,
 };
 
 export const CellContents = React.forwardRef<HTMLDivElement, CellContentsProps>(

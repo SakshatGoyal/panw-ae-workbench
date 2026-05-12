@@ -1,8 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { ChevronDown } from '@ds/icons';
-import { Sun } from 'lucide-react';
+import { ChevronDown, Star } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 import {
   Tags,
@@ -36,7 +35,7 @@ export interface AccordionProps {
   title?: string;
   description?: string;
   showIcon?: boolean;
-  /** lucide-style component for the leading icon. Defaults to `Sun`. */
+  /** Element-type component for the leading icon. Defaults to the DS `Star` placeholder. */
   renderIcon?: React.ElementType;
   showTag?: boolean;
   tagLabel?: string;
@@ -61,7 +60,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       title = 'Accordion',
       description,
       showIcon = false,
-      renderIcon: IconElement = Sun,
+      renderIcon: IconElement = Star,
       showTag = false,
       tagLabel = 'Placeholder',
       tagColor = 'orange',

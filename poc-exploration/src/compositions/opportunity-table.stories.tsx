@@ -196,7 +196,7 @@ interface RenewalData {
   outcome: RenewalOutcome
 }
 
-interface OpportunityRow {
+export interface OpportunityRow {
   id: string
   oppName: string
   account: string
@@ -212,6 +212,19 @@ interface OpportunityRow {
   risks: RiskFactor[]
   salesPlay: SalesPlay
   renewal?: RenewalData
+}
+
+/**
+ * Plumbing props. Defaults preserve the current Storybook surface
+ * verbatim — `summaryLabel` and `totalItems` are literal strings/numbers
+ * (`"47 deals · $12.4M"` / `47`), not derived from `rows`, because the
+ * 8-row fixture is a slice of an implied 47-deal set. When a consumer
+ * wires real data, they compute both and pass them in.
+ */
+export interface OpportunityTableProps {
+  rows?: OpportunityRow[]
+  totalItems?: number
+  summaryLabel?: string
 }
 
 type SortKey = 'accountName' | 'oppName' | 'closeDate' | 'value' | 'riskCount'
@@ -342,7 +355,7 @@ const mkProduct = (name: string, valueUsd: number): Product => ({
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const ROWS: OpportunityRow[] = [
+export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '1',
     oppName: 'Prisma Access annual renewal with global bandwidth upgrade',
@@ -2116,7 +2129,11 @@ function OppRow({
 
 // ─── Main composition ────────────────────────────────────────────────────────
 
-function AEOpportunityTable() {
+function AEOpportunityTable({
+  rows = DEFAULT_ROWS,
+  totalItems = 47,
+  summaryLabel = '47 deals · $12.4M',
+}: OpportunityTableProps = {}) {
   const [search, setSearch] = useState('')
   const [single, setSingle] = useState<Record<string, string | null>>(INITIAL_SINGLE)
   const [multi, setMulti] = useState<Record<string, string[]>>(INITIAL_MULTI)
@@ -2143,7 +2160,7 @@ function AEOpportunityTable() {
   // outside it).
   const [renewalOutcomes, setRenewalOutcomes] = useState<Record<string, RenewalOutcome>>(() => {
     const seed: Record<string, RenewalOutcome> = {}
-    for (const r of ROWS) if (r.renewal) seed[r.id] = r.renewal.outcome
+    for (const r of rows) if (r.renewal) seed[r.id] = r.renewal.outcome
     return seed
   })
   const setRenewalOutcome = (id: string, v: RenewalOutcome) =>
@@ -2167,7 +2184,7 @@ function AEOpportunityTable() {
   // density / grouped-health filters. Pass 1 is structural; the controls
   // exist and hold state, but the table renders the full row set.
   const sortedRows = useMemo(() => {
-    const arr = [...ROWS]
+    const arr = [...rows]
     arr.sort((a, b) => {
       let cmp = 0
       switch (sortKey) {
@@ -2180,7 +2197,7 @@ function AEOpportunityTable() {
       return sortDir === 'asc' ? cmp : -cmp
     })
     return arr
-  }, [sortKey, sortDir])
+  }, [rows, sortKey, sortDir])
 
   type HeaderSortKey = Extract<SortKey, 'oppName' | 'value'>
   const headerType = (key: HeaderSortKey) =>
@@ -2197,7 +2214,7 @@ function AEOpportunityTable() {
                filter affordances. Search expands to fill the middle so
                the bar reads as a single line of search context. */}
           <div className="opp-search-row">
-            <span className="opp-counts" aria-live="polite">47 deals · $12.4M</span>
+            <span className="opp-counts" aria-live="polite">{summaryLabel}</span>
             <div className="opp-search-row__search">
               <Search
                 size="md"
@@ -2306,7 +2323,7 @@ function AEOpportunityTable() {
           {/* ── Pagination ──────────────────────────────────────────── */}
           <div className="opp-table-footer">
             <Pagination
-              totalItems={47}
+              totalItems={totalItems}
               currentPage={page}
               rowsPerPage={rowsPerPage}
               recordLabel="deal"

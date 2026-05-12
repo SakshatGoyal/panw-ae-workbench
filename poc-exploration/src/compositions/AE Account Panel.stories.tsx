@@ -42,6 +42,7 @@ import {
   ACTIVITY_TYPES,
   PRODUCTS,
   HEALTH_LABELS,
+  type Account,
   type Opportunity,
   type ProductId,
   type RenewalOutcome,
@@ -311,7 +312,6 @@ const ACC_SALES_PLAYS: AccSalesPlayFamily[] = [
 const notTouchedTotal = (family: AccSalesPlayFamily) =>
   family.plays.filter(p => p.status === 'not-touched')
               .reduce((s, p) => s + p.amountUsd, 0)
-const allNotTouchedTotal = ACC_SALES_PLAYS.reduce((s, f) => s + notTouchedTotal(f), 0)
 
 function fmtMoneyFull(n: number) {
   return new Intl.NumberFormat('en-US', {
@@ -496,7 +496,6 @@ const ACC_OPPS: AccOpp[] = [
     daysInForecast: 42,
   })),
 ]
-const ACC_OPPS_TOTAL = ACC_OPPS.reduce((s, o) => s + o.amount, 0)
 
 // Closing-quarter label. Anchored to today = May 2026 (Q4FY26 = "CQ");
 // fiscal year runs Aug → Jul, so day-buckets approximate quarter ends:
@@ -1099,17 +1098,11 @@ const HEALTH_TREND_12: HealthStatus[] = [
 ]
 
 // Account-level sub-axes. Overall is *derived* (worst of these two) —
-// never authored independently per the spec caution at §7 bottom.
+// never authored independently per the spec caution at §7 bottom. The
+// overall computation now lives inside `AccountPanel` so it picks up
+// whatever `data.techHealth` / `data.adoptHealth` are passed in.
 const TECH_HEALTH: HealthStatus  = 'critical'
 const ADOPT_HEALTH: HealthStatus = 'healthy'
-const OVERALL_HEALTH: HealthStatus =
-  ([TECH_HEALTH, ADOPT_HEALTH] as HealthStatus[]).reduce<HealthStatus>(
-    (worst, h) => {
-      const rank: Record<HealthStatus, number> = { 'healthy': 0, 'at-risk': 1, 'critical': 2 }
-      return rank[h] > rank[worst] ? h : worst
-    },
-    'healthy'
-  )
 
 interface ProductHealthRow {
   name: string
@@ -1128,6 +1121,55 @@ const PRODUCT_HEALTH: ProductHealthRow[] = [
   { name: 'CDSS',         brand: BrandStrata, arrUsd: 1_800_000, technical: 'healthy',  adoption: 'healthy' },
   { name: 'Cortex XSOAR', brand: BrandCortex, arrUsd:   480_000, technical: 'critical', adoption: 'at-risk' },
 ]
+
+// ─── Public data contract ────────────────────────────────────────────────────
+//
+// Everything the panel renders flows through `AccountPanelData`. The
+// `DEFAULT_ACCOUNT_PANEL_DATA` constant assembled below resolves the
+// `ACCOUNTS.find(...)` / `OPPORTUNITIES.filter(...)` lookups *once* at module
+// load and packs the result alongside the file-local POC fixtures. Inside the
+// panel function nothing reads `ACCOUNTS` / `OPPORTUNITIES` directly — the
+// component is data-agnostic, and consumers can override by passing `data`.
+//
+// `renewalOpp` is a separate field from `opportunities` because the panel
+// uses its id as the "open by default" marker; `opportunities` carries the
+// full merged list the AE sees (renewal + real opps). When a CSV-backed
+// consumer wires this up, they pick which opp opens by default and pass it
+// here.
+//
+// Sub-axis values (`techHealth` / `adoptHealth`) are authored independently;
+// `OVERALL_HEALTH` stays derived inside the component (worst-of-two per the
+// spec's §7 caution).
+export interface AccountPanelData {
+  account: Account
+  opportunities: AccOpp[]
+  apexName: string
+  renewalOpp: AccOpp
+  installBase: Array<{ label: string; value: string; tone?: 'success' }>
+  salesPlays: AccSalesPlayFamily[]
+  healthTrend12: HealthStatus[]
+  techHealth: HealthStatus
+  adoptHealth: HealthStatus
+  productHealth: ProductHealthRow[]
+}
+
+export const DEFAULT_ACCOUNT_PANEL_DATA: AccountPanelData = {
+  account,
+  opportunities: ACC_OPPS,
+  apexName: APEX_NAME,
+  renewalOpp: STUB_CYBERDYNE_RENEWAL,
+  installBase: INSTALL_BASE,
+  salesPlays: ACC_SALES_PLAYS,
+  healthTrend12: HEALTH_TREND_12,
+  techHealth: TECH_HEALTH,
+  adoptHealth: ADOPT_HEALTH,
+  productHealth: PRODUCT_HEALTH,
+}
+
+export interface AccountPanelProps {
+  /** Override the panel's data. Defaults to the Cyberdyne fixture. */
+  data?: AccountPanelData
+}
 
 // Health-trend visualization. 12 past-month bars + 10 future-month
 // circles, with the 3rd future circle marking the next renewal.
@@ -1228,7 +1270,24 @@ function ProductHealthBlock({ row }: { row: ProductHealthRow }) {
   )
 }
 
-function AccountPanel() {
+function AccountPanel({ data = DEFAULT_ACCOUNT_PANEL_DATA }: AccountPanelProps = {}) {
+  // Derived rollups — recomputed per render from whatever data was passed
+  // in. These were module-scope constants before plumbing; pulling them
+  // inside the component is what lets a caller pass a different `data`
+  // and see different totals.
+  const allNotTouchedTotal = data.salesPlays.reduce(
+    (s, f) => s + notTouchedTotal(f), 0
+  )
+  const accOppsTotal = data.opportunities.reduce((s, o) => s + o.amount, 0)
+  const overallHealth: HealthStatus =
+    ([data.techHealth, data.adoptHealth] as HealthStatus[]).reduce<HealthStatus>(
+      (worst, h) => {
+        const rank: Record<HealthStatus, number> = { 'healthy': 0, 'at-risk': 1, 'critical': 2 }
+        return rank[h] > rank[worst] ? h : worst
+      },
+      'healthy'
+    )
+
   // Spec default is all sections open. As each phase lands its real content,
   // the default flips. Phase 2 → Sales Play opens. Opportunities and Account
   // Health stay closed until their phases land.
@@ -1250,11 +1309,11 @@ function AccountPanel() {
   const toggleFamily = (id: string) =>
     setOpenFamilies(p => ({ ...p, [id]: !p[id] }))
 
-  // Opportunity-row open state. The stub renewal opens by default so the
+  // Opportunity-row open state. The renewal opp opens by default so the
   // Renewal Outcome row (the unique-to-Phase-3 row in the snapshot) shows
   // in initial render.
   const [openOpps, setOpenOpps] = useState<Record<string, boolean>>({
-    [STUB_CYBERDYNE_RENEWAL.id]: true,
+    [data.renewalOpp.id]: true,
   })
   const toggleOpp = (id: string) =>
     setOpenOpps(p => ({ ...p, [id]: !p[id] }))
@@ -1293,12 +1352,12 @@ function AccountPanel() {
           <div className="acc-id-row">
             <span className="acc-id-row__label">Account</span>
             <div className="acc-id-row__value-row">
-              <span className="acc-id-row__value">{account.name}</span>
+              <span className="acc-id-row__value">{data.account.name}</span>
               <Button
                 kind="ghost-brand"
                 size="small"
                 renderIcon={ExternalLink}
-                iconDescription={`Open ${account.name} in new tab`}
+                iconDescription={`Open ${data.account.name} in new tab`}
                 className="acc-id-row__open-btn"
               />
             </div>
@@ -1307,12 +1366,12 @@ function AccountPanel() {
           <div className="acc-id-row">
             <span className="acc-id-row__label">Apex Account</span>
             <div className="acc-id-row__value-row">
-              <span className="acc-id-row__value">{APEX_NAME}</span>
+              <span className="acc-id-row__value">{data.apexName}</span>
               <Button
                 kind="ghost-brand"
                 size="small"
                 renderIcon={ExternalLink}
-                iconDescription={`Open ${APEX_NAME} in new tab`}
+                iconDescription={`Open ${data.apexName} in new tab`}
                 className="acc-id-row__open-btn"
               />
             </div>
@@ -1321,7 +1380,7 @@ function AccountPanel() {
           <div className="acc-id-row">
             <span className="acc-id-row__label">LTV</span>
             <div className="acc-id-row__value-row">
-              <span className="acc-id-row__value">{fmtMoneyShort(account.lifetimeValue)}</span>
+              <span className="acc-id-row__value">{fmtMoneyShort(data.account.lifetimeValue)}</span>
             </div>
           </div>
         </header>
@@ -1364,7 +1423,7 @@ function AccountPanel() {
           */}
           <div className="acc-data-tile">
             <div className="acc-data-table acc-data-table--dense">
-              {INSTALL_BASE.map((row, i) => (
+              {data.installBase.map((row, i) => (
                 <React.Fragment key={row.label}>
                   {i > 0 && <div className="acc-divider" aria-hidden="true" />}
                   <DataRow {...row} />
@@ -1422,7 +1481,7 @@ function AccountPanel() {
             (per direction); no dividers — lines as dividers are reserved
             for table rows. */}
           <div className="acc-sp-family-list">
-            {ACC_SALES_PLAYS.map(family => {
+            {data.salesPlays.map(family => {
               const nt = notTouchedTotal(family)
               return (
                 <Accordion
@@ -1476,7 +1535,7 @@ function AccountPanel() {
         <Accordion
           size="large" theme="gray00" orientation="right"
           title="Opportunities in Next 4Q" showIcon={false}
-          showTag tagLabel={fmtMoneyShort(ACC_OPPS_TOTAL)}
+          showTag tagLabel={fmtMoneyShort(accOppsTotal)}
           tagColor="lime" tagContrast="low" tagShape="rounded" tagSize="large"
           /* Bold the section tag's label via CSS hook below — the DS Tag
              label is regular weight by default; the directive calls for
@@ -1487,7 +1546,7 @@ function AccountPanel() {
           onToggle={() => toggle('opportunities')}
         >
           <div className="acc-opp-list">
-            {ACC_OPPS.map(opp => {
+            {data.opportunities.map(opp => {
               const typeLabel = OPPORTUNITY_TYPE_LABELS[opp.type].toLowerCase()
               // Description renders as a JSX fragment so the $value can
               // carry bold + primary tone while the rest of the line
@@ -1542,8 +1601,8 @@ function AccountPanel() {
           size="large" theme="gray00" orientation="right"
           title="Account Health" showIcon={false}
           showTag
-          tagLabel={HEALTH_LABELS[OVERALL_HEALTH]}
-          tagColor={HEALTH_TAG_COLOR[OVERALL_HEALTH]}
+          tagLabel={HEALTH_LABELS[overallHealth]}
+          tagColor={HEALTH_TAG_COLOR[overallHealth]}
           tagContrast="low" tagShape="rounded" tagSize="large"
           open={openSections.accountHealth}
           onToggle={() => toggle('accountHealth')}
@@ -1560,12 +1619,12 @@ function AccountPanel() {
             */}
             <div className="acc-health-status-tile">
               <div className="acc-health-trend">
-                <HealthTrendSparkline trend={HEALTH_TREND_12} />
+                <HealthTrendSparkline trend={data.healthTrend12} />
               </div>
               <div className="acc-health-axes">
-                <HealthAxisRow label="Technical Health"               status={TECH_HEALTH} />
+                <HealthAxisRow label="Technical Health"               status={data.techHealth} />
                 <div className="acc-divider" aria-hidden="true" />
-                <HealthAxisRow label="Deployment and Adoption Health" status={ADOPT_HEALTH} />
+                <HealthAxisRow label="Deployment and Adoption Health" status={data.adoptHealth} />
               </div>
             </div>
 
@@ -1573,7 +1632,7 @@ function AccountPanel() {
                 tile with a 2px gap separating siblings, mirroring the
                 Sales Play family list grammar. */}
             <div className="acc-product-health-list">
-              {PRODUCT_HEALTH.map(p => (
+              {data.productHealth.map(p => (
                 <ProductHealthBlock key={p.name} row={p} />
               ))}
             </div>

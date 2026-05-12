@@ -116,19 +116,15 @@ $panw-prefix: 'panw';
   background-color: var(--panw-accordion-bg-pressing-gray10);
 }
 
-.#{$panw-prefix}--accordion--orientation-left .#{$panw-prefix}--accordion__item {
-  flex-direction: row;
+// Orientation drives chevron placement INSIDE the padded inner-container,
+// not as a fixed outer column. Default is right — the chevron lives at the
+// row's trailing edge alongside the title and tag, sharing the same padding
+// the rest of the content sits inside.
+.#{$panw-prefix}--accordion--orientation-right .#{$panw-prefix}--accordion__expansion-icon {
+  order: 99;
 }
-.#{$panw-prefix}--accordion--orientation-right .#{$panw-prefix}--accordion__item {
-  flex-direction: row-reverse;
-}
-
-.#{$panw-prefix}--accordion__expansion {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-  box-sizing: border-box;
+.#{$panw-prefix}--accordion--orientation-left .#{$panw-prefix}--accordion__expansion-icon {
+  order: -1;
 }
 
 .#{$panw-prefix}--accordion__expansion-icon {
@@ -136,7 +132,10 @@ $panw-prefix: 'panw';
   align-items: center;
   justify-content: center;
   width: 16px;
-  height: 16px;
+  // Match title-row line-box so the chevron's optical centerline lines up
+  // with the title text, not its glyph top.
+  height: 24px;
+  flex-shrink: 0;
   color: var(--panw-accordion-icon-color);
   transition: transform 110ms cubic-bezier(0.2, 0, 0.38, 0.9), color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 
@@ -158,10 +157,13 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--accordion__inner-container {
   display: flex;
   flex-direction: row;
+  // Top-align so the chevron sits flush with the title row even when a
+  // multi-line description expands the text column.
   align-items: flex-start;
   gap: 8px;
   flex: 1;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .#{$panw-prefix}--accordion__icon-container {
@@ -241,40 +243,25 @@ $panw-prefix: 'panw';
 }
 
 // Sizes
-// Content-inner padding aligns content with the title column past the
-// chevron — left padding equals the chevron width per size — so children
-// read as continuing the title's left grid line, not a separate inset.
-// Top/right/bottom = 16px is enough breathing room without the redundant
-// padding stack the previous version had.
+// Padding now lives on the inner-container per Figma spec — no more
+// asymmetric 40px left inset from a fixed expansion column. The chevron
+// sits inside the same padded row as the title, sharing horizontal padding
+// equally with the leading edge.
 //
-// Closed-state header padding: when no description, the existing 8/12/4
-// bottom paddings are right and untouched. When a description IS rendered,
-// the container's bottom padding bumps to 16px so the description doesn't
-// hug the accordion's bottom edge — :has() detects the description's
-// presence without needing a JS class flag.
+// Content-inner mirrors the header's horizontal inset so the drawer's
+// children align with the title column, but uses a uniform pad (no extra
+// chevron offset on the right since the chevron lives in the header only).
+.#{$panw-prefix}--accordion--size-small {
+  .#{$panw-prefix}--accordion__inner-container { padding: 4px 8px; }
+  .#{$panw-prefix}--accordion__content-inner    { padding: 8px; }
+}
+
 .#{$panw-prefix}--accordion--size-default {
-  .#{$panw-prefix}--accordion__expansion { width: 40px; height: 40px; }
-  .#{$panw-prefix}--accordion__container { padding: 8px 16px 8px 0; }
-  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
-    padding-bottom: 16px;
-  }
-  .#{$panw-prefix}--accordion__content-inner { padding: 16px 16px 16px 40px; }
+  .#{$panw-prefix}--accordion__inner-container { padding: 8px 12px; }
+  .#{$panw-prefix}--accordion__content-inner    { padding: 12px; }
 }
 
 .#{$panw-prefix}--accordion--size-large {
-  .#{$panw-prefix}--accordion__expansion { width: 48px; height: 48px; }
-  .#{$panw-prefix}--accordion__container { padding: 12px 16px 12px 0; }
-  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
-    padding-bottom: 16px;
-  }
-  .#{$panw-prefix}--accordion__content-inner { padding: 16px 16px 16px 48px; }
-}
-
-.#{$panw-prefix}--accordion--size-small {
-  .#{$panw-prefix}--accordion__expansion { width: 32px; height: 32px; }
-  .#{$panw-prefix}--accordion__container { padding: 4px 16px 4px 0; }
-  .#{$panw-prefix}--accordion__container:has(.#{$panw-prefix}--accordion__description) {
-    padding-bottom: 16px;
-  }
-  .#{$panw-prefix}--accordion__content-inner { padding: 16px 16px 16px 32px; }
+  .#{$panw-prefix}--accordion__inner-container { padding: 12px 16px; }
+  .#{$panw-prefix}--accordion__content-inner    { padding: 16px; }
 }

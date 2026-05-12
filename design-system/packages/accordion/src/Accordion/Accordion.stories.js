@@ -62,7 +62,7 @@ export const Default = (args) => {
 Default.args = {
   size: 'default',
   theme: 'gray00',
-  orientation: 'left',
+  orientation: 'right',
   open: false,
   title: 'Accordion title',
   description: '',
@@ -125,10 +125,10 @@ export const Disabled = () => (
   </Accordion>
 );
 
-export const RightOrientation = () => {
+export const LeftOrientation = () => {
   const [open, toggle] = useToggle(false);
   return (
-    <Accordion title="Right orientation" orientation="right" open={open} onToggle={toggle}>
+    <Accordion title="Left orientation" orientation="left" open={open} onToggle={toggle}>
       Content
     </Accordion>
   );
@@ -250,8 +250,8 @@ export const AllVariants = () => (
       <Accordion theme="gray10" title="Gray 10 theme" />
     </div>
     <div>
-      <h3 style={{ margin: '8px 0', fontSize: 13, fontWeight: 600 }}>Orientation: right</h3>
-      <Accordion orientation="right" title="Right orientation" />
+      <h3 style={{ margin: '8px 0', fontSize: 13, fontWeight: 600 }}>Orientation: left</h3>
+      <Accordion orientation="left" title="Left orientation" />
     </div>
     <div>
       <h3 style={{ margin: '8px 0', fontSize: 13, fontWeight: 600 }}>Disabled</h3>

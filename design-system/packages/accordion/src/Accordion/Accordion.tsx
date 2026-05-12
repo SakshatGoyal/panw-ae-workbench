@@ -54,7 +54,7 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
       size = 'default',
       open = false,
       theme = 'gray00',
-      orientation = 'left',
+      orientation = 'right',
       title = 'Accordion',
       description,
       showIcon = false,
@@ -112,11 +112,6 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
           aria-disabled={isDisabled}
           onClick={handleClick}
           onKeyDown={handleKeyDown}>
-          <div className={`${prefix}--accordion__expansion`}>
-            <span className={`${prefix}--accordion__expansion-icon`} aria-hidden="true">
-              <ChevronDown size={16} />
-            </span>
-          </div>
           <div className={`${prefix}--accordion__container`}>
             <div className={`${prefix}--accordion__inner-container`}>
               {showIcon && (
@@ -140,6 +135,9 @@ export const Accordion = React.forwardRef<HTMLDivElement, AccordionProps>(
                   <div className={`${prefix}--accordion__description`}>{description}</div>
                 )}
               </div>
+              <span className={`${prefix}--accordion__expansion-icon`} aria-hidden="true">
+                <ChevronDown size={16} />
+              </span>
             </div>
           </div>
         </div>

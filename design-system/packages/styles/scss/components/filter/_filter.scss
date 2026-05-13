@@ -24,22 +24,16 @@ $panw-prefix: 'panw';
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  // Mirror the small Button row: 32px tall, 12px end inset, on Stage's
-  // 4px grid. Vertical padding 0 because height is fixed.
-  //
-  // Pin both height AND min-height/max-height so the trigger can't grow
-  // when an inner Tags chip carries an intrinsic height (the chip's
-  // line-height doesn't get absorbed by inline-flex's default baseline
-  // alignment, and without the explicit max-height the trigger will
-  // expand to match the tallest descendant). box-sizing: border-box
-  // keeps the 32px inclusive of the 1px border.
+  // 40px tall, 12px horizontal inset, borderless.
+  // Pin height with min/max so the trigger can't grow when an inner Tags chip
+  // carries an intrinsic height.
   box-sizing: border-box;
-  height: 32px;
-  min-height: 32px;
-  max-height: 32px;
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
   padding: 0 12px;
   background-color: var(--panw-filter-bg);
-  border: 1px solid var(--panw-filter-border);
+  border: none;
   border-radius: 4px;
   font-family: var(--ds-type-font-family-sans);
   font-size: 14px;
@@ -47,16 +41,12 @@ $panw-prefix: 'panw';
   line-height: 1.286;
   color: var(--panw-filter-label);
   cursor: pointer;
-  transition:
-    background-color 110ms var(--ds-motion-easing-standard),
-    border-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 110ms var(--ds-motion-easing-standard);
 
   // Hover suppressed when open — the cursor stays on the trigger after click,
-  // so without this the hover ground bleeds over the open/selected state and
-  // the user never sees a visual confirmation that the panel is active.
+  // so without this the hover ground bleeds over the open/selected state.
   &:hover:not(:disabled):not(.#{$panw-prefix}--filter--open) {
     background-color: var(--panw-filter-bg-hover);
-    border-color: var(--panw-filter-border-hover);
   }
   &:active:not(:disabled) {
     background-color: var(--panw-filter-bg-pressed);
@@ -69,13 +59,11 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--filter--open {
   background-color: var(--panw-filter-bg-open);
-  border-color: transparent;
 }
 
 .#{$panw-prefix}--filter--disabled,
 .#{$panw-prefix}--filter:disabled {
   background-color: var(--panw-filter-bg-disabled);
-  border-color: var(--panw-filter-border-disabled);
   color: var(--panw-filter-label-disabled);
   cursor: not-allowed;
 

@@ -3,9 +3,10 @@ import ResizableRightRail from './ResizableRightRail'
 
 interface AppShellProps {
   children: React.ReactNode
+  rightRailContent?: React.ReactNode
 }
 
-export default function AppShell({ children }: AppShellProps) {
+export default function AppShell({ children, rightRailContent }: AppShellProps) {
   return (
     <div className="cd-app">
       <div className="cd-app__rail-left">
@@ -14,7 +15,7 @@ export default function AppShell({ children }: AppShellProps) {
       <div className="cd-app__column">
         {children}
       </div>
-      <ResizableRightRail />
+      <ResizableRightRail>{rightRailContent}</ResizableRightRail>
     </div>
   )
 }

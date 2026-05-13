@@ -90,14 +90,14 @@ export const StageTokens = {
   "base": neutral10,
   "surface": {
     "rest": neutral0,
-    "hover": "#F4F6F7",     // alpha(neutral20, 40) over neutral0
+    "hover": "#ECEFF1",     // alpha(neutral20, 70) over neutral0
     "pressed": "#E2E6E8",   // alpha(neutral30, 50) over neutral0
     "selected": "#CEE9FF",  // alpha(brand30, 40) over neutral0
     "disabled": neutral0,
   },
   "surface.alt": {
     "rest": neutral5,
-    "hover": "#EFF3F5",     // alpha(neutral20, 40) over neutral5
+    "hover": "#EAEDF0",     // alpha(neutral20, 70) over neutral5
     "pressed": "#DEE3E6",   // alpha(neutral30, 50) over neutral5
     "selected": "#C9E6FD",  // alpha(brand30, 40) over neutral5
     "disabled": neutral5,
@@ -111,7 +111,7 @@ export const StageTokens = {
   },
   "surface.n": {
     "rest": neutral0,
-    "hover": "#F4F6F7",     // alpha(neutral20, 40) over neutral0
+    "hover": "#ECEFF1",     // alpha(neutral20, 70) over neutral0
     "pressed": "#E2E6E8",   // alpha(neutral30, 50) over neutral0
     "selected": "#CEE9FF",  // alpha(brand30, 40) over neutral0
     "disabled": neutral0,
@@ -159,14 +159,14 @@ export const StageTokens = {
   },
   "field": {
     "rest": neutral5,
-    "hover": "#EFF3F5",     // alpha(neutral20, 40) over neutral5
+    "hover": "#EAEDF0",     // alpha(neutral20, 70) over neutral5
     "pressed": "#DEE3E6",   // alpha(neutral30, 50) over neutral5
     "selected": neutral0,
     "disabled": neutral5,
   },
   "field.alt": {
     "rest": neutral0,
-    "hover": "#F4F6F7",     // alpha(neutral20, 40) over neutral0
+    "hover": "#ECEFF1",     // alpha(neutral20, 70) over neutral0
     "pressed": "#E2E6E8",   // alpha(neutral30, 50) over neutral0
     "selected": neutral0,
     "disabled": neutral5,
@@ -180,14 +180,14 @@ export const StageTokens = {
   },
   "ghost": {
     "rest": transparent,
-    "hover": alpha(neutral20, 40),
+    "hover": alpha(neutral20, 70),
     "pressed": alpha(neutral30, 50),
     "selected": alpha(brand30, 40),
     "disabled": transparent,
   },
   "ghost.field": {
     "rest": transparent,
-    "hover": alpha(neutral20, 40),
+    "hover": alpha(neutral20, 70),
     "pressed": alpha(neutral30, 50),
     "selected": alpha(brand30, 40),
     "disabled": transparent,

@@ -1,4 +1,11 @@
 /**
+ * ─────────────────────────────────────────────────────────────────────────────
+ * CANONICAL — promoted from explorations on 2026-05-13.
+ * This IS the source of truth for the AE Opportunity Table.
+ * Do NOT edit to "match" any other variant; do not fork a *-exp version.
+ * Prior canonical archived at .tmp/opportunity-table.stories.archived-2026-05-13.tsx.
+ * ─────────────────────────────────────────────────────────────────────────────
+ *
  * AE Opportunity Table — sales pipeline composition
  *
  * ── Pass 3 scope (additive on top of Pass 2) ────────────────────────────────
@@ -132,10 +139,11 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  Calendar, Clock, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
+  Calendar, Clock, ChevronDown, ChevronUp, ChevronRight, Folder,
   ExclamationTriangle, ExclamationCircle,
   BrandStrata, BrandPrisma, BrandCortex,
   Close,
+  CommentAdd, Maximize,
 } from '@ds/icons'
 import { Search } from '@ds/search'
 import { Filter, type FilterOption } from '@ds/filter'
@@ -226,6 +234,8 @@ export interface OpportunityTableProps {
   rows?: OpportunityRow[]
   totalItems?: number
   summaryLabel?: string
+  /** Fired when the per-row Maximize (expand) button is clicked. */
+  onExpand?: (id: string) => void
 }
 
 type SortKey = 'accountName' | 'oppName' | 'closeDate' | 'value' | 'riskCount'
@@ -777,6 +787,7 @@ function SingleSelectFilter({ label, options, value, onChange, allLabel = 'All' 
                 color="neutral"
                 contrast="high"
                 size="default"
+                shape="rounded"
               />
             </span>
           </span>
@@ -894,6 +905,7 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
                 color="neutral"
                 contrast="high"
                 size="default"
+                shape="rounded"
               />
             </span>
           </span>
@@ -1251,7 +1263,7 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
               className="panw--filter__chip-target"
               onMouseEnter={chipHover.openOnEnter}
               onMouseLeave={chipHover.scheduleClose}>
-              <Tags label={chipLabel} color="neutral" contrast="high" size="default" />
+              <Tags label={chipLabel} color="neutral" contrast="high" size="default" shape="rounded" />
             </span>
           </span>
         )}
@@ -1530,10 +1542,16 @@ function HoverShell({
 // (radius = half-width for pill ends). The whole strip is anchored to
 // a shared baseline so the eye reads "height = vitality".
 
+// Bar palette mirrors the acc-table sparkline so the two health popovers
+// share one chart. Raw hex (green-40 / yellow-30 / red-50) rather than
+// semantic tokens — the semantic status tokens resolve to text-tier dark
+// greens / oranges / reds that make the strip read as a warning glyph
+// instead of a vitality readout. The healthy bar should feel buoyant,
+// not severe.
 const HEALTH_BAR_FILL: Record<Health, string> = {
-  'healthy':  'var(--ds-text-status-success)',
-  'at-risk':  'var(--ds-text-status-warning)',
-  'critical': 'var(--ds-text-status-danger)',
+  'healthy':  '#3cc29a', // green-40
+  'at-risk':  '#ffbe4f', // yellow-30
+  'critical': '#f55868', // red-50
 }
 const HEALTH_FROM_LEVEL: Record<number, Health> = {
   0: 'healthy', 1: 'at-risk', 2: 'critical',
@@ -1601,16 +1619,18 @@ function AccountHealthPanel({ row }: { row: OpportunityRow }) {
         <div className="opp-pop__kv">
           <span className="opp-pop__kv-label">Technical Health</span>
           <Tags
-            shape="rounded" size="default" contrast="low"
+            shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.technical]}
-            label={HEALTH_LABEL[h.technical]} />
+            label={HEALTH_LABEL[h.technical]}
+            className="opp-tag--static" />
         </div>
         <div className="opp-pop__kv">
           <span className="opp-pop__kv-label">Adoption &amp; Deployment</span>
           <Tags
-            shape="rounded" size="default" contrast="low"
+            shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.adoption]}
-            label={HEALTH_LABEL[h.adoption]} />
+            label={HEALTH_LABEL[h.adoption]}
+            className="opp-tag--static" />
         </div>
       </div>
       <div className="opp-pop__cta">
@@ -1622,13 +1642,19 @@ function AccountHealthPanel({ row }: { row: OpportunityRow }) {
 
 function RiskFactorsPanel({ risks }: { risks: RiskFactor[] }) {
   if (risks.length === 0) {
+    // Empty branch carries the --empty modifier so the heading↔sub
+    // gap relaxes to 2px (default is 0). Width still pins to the
+    // 320 tier so the empty card lines up with the populated ones.
     return (
-      <div className="opp-pop opp-pop--risks">
+      <div className="opp-pop opp-pop--risks opp-pop--empty">
         <div className="opp-pop__heading">No risk factors</div>
         <div className="opp-pop__sub">This deal isn't flagged with any risks.</div>
       </div>
     )
   }
+  // Tabular row list — hairline dividers between rows, 14px throughout.
+  // Mirrors the acc-table risk panel so the two tables share one popover
+  // grammar.
   return (
     <div className="opp-pop opp-pop--risks">
       <div className="opp-pop__heading">
@@ -1636,9 +1662,11 @@ function RiskFactorsPanel({ risks }: { risks: RiskFactor[] }) {
       </div>
       <ul className="opp-pop__risk-list">
         {risks.map(r => (
-          <li key={r.id} className="opp-pop__risk-item">
+          <li key={r.id}>
             <span className="opp-pop__risk-emoji" aria-hidden="true">{r.emoji}</span>
-            <span className="opp-pop__risk-label">{r.label}</span>
+            {/* title carries the full string so the truncated row
+             * can be re-read on hover via the browser-native tooltip. */}
+            <span className="opp-pop__risk-label" title={r.label}>{r.label}</span>
           </li>
         ))}
       </ul>
@@ -1657,18 +1685,25 @@ const SALES_PLAY_STATUS_LABEL: Record<SalesPlayStatus, string> = {
   'closed-lost': 'Closed Lost',
 }
 
-function ProductPanel({ product, totalUsd }: { product: Product; totalUsd: number }) {
+// Single-product popover. Mirrors the acc-table's ProductARRPanel — one
+// row, three cells (icon · name · absolute value). The absolute dollar
+// figure replaces the earlier "share of deal value (n%)" treatment per
+// design call: percentage of a deal is one inferential hop the AE has to
+// make in their head; the raw dollar is what they actually need.
+function ProductPanel({ product }: { product: Product; totalUsd?: number }) {
   const Icon = BRAND_ICON[product.brand]
-  const pct = Math.round((product.valueUsd / Math.max(1, totalUsd)) * 100)
+  // Single-row popover (no list chrome) wrapped in .opp-pop so the
+  // popover keeps its 16px content padding — without the wrapper the
+  // frame collapses onto the row outline and the popover reads as a
+  // sliver. Tier (240) is inherited from .opp-pop's default width.
   return (
     <div className="opp-pop opp-pop--product">
-      <div className="opp-pop__product-row">
-        {Icon && <span className="opp-pop__product-icon" aria-hidden="true"><Icon /></span>}
-        <span className="opp-pop__product-name">{product.name}</span>
-      </div>
-      <div className="opp-pop__product-meta">
-        <span className="opp-pop__product-amount">{formatUsdCompact(product.valueUsd)}</span>
-        <span className="opp-pop__product-share">of total opportunity value ({pct}%)</span>
+      <div className="opp-pop-row">
+        <span className="opp-pop-row__icon" aria-hidden="true">
+          {Icon ? <Icon size={20} /> : null}
+        </span>
+        <span className="opp-pop-row__name">{product.name}</span>
+        <span className="opp-pop-row__value">{formatUsdCompact(product.valueUsd)}</span>
       </div>
     </div>
   )
@@ -1768,8 +1803,8 @@ function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalO
 
   return (
     <>
-      <div className="opp-renewal-row opp-renewal-row--outcome">
-        <span className="opp-renewal-row__label">Renewal Outcome</span>
+      <div className="opp-renewal-outcome">
+        <span className="opp-renewal-outcome__label">Renewal Outcome</span>
         <div className="opp-outcome-wrapper">
           <button
             ref={triggerRef}
@@ -1860,153 +1895,56 @@ function RenewalPanel({ row, outcome, onOutcomeChange, onClose }: RenewalPanelPr
   const r = row.renewal
   return (
     <div className="opp-pop opp-pop--renewal">
-      <div className="opp-renewal-rows">
-        <div className="opp-renewal-row">
-          <span className="opp-renewal-row__label">Subscription end</span>
-          <span className="opp-renewal-row__value">{r.subEnd}</span>
-        </div>
-        <div className="opp-renewal-row">
-          <span className="opp-renewal-row__label">Renewable TCV</span>
-          <span className="opp-renewal-row__value">{formatUsdCompact(r.renewableTcvUsd)}</span>
-        </div>
-        <div className="opp-renewal-row">
-          <span className="opp-renewal-row__label">ARR</span>
-          <span className="opp-renewal-row__value">{formatUsdCompact(r.arrUsd)}</span>
-        </div>
-        <RenewalOutcomeEditor
-          value={outcome}
-          onChange={onOutcomeChange}
-          onConfirm={onClose}
-          onCancel={onClose}
-        />
-      </div>
-    </div>
-  )
-}
-
-function ProductOverflowPanel({ products, totalUsd }: { products: Product[]; totalUsd: number }) {
-  return (
-    <div className="opp-pop opp-pop--product-overflow">
-      <div className="opp-pop__heading">
-        {products.length} additional {products.length === 1 ? 'product' : 'products'}
-      </div>
-      <ul className="opp-pop__product-list">
-        {products.map(p => {
-          const Icon = BRAND_ICON[p.brand]
-          return (
-            <li key={p.name} className="opp-pop__product-list-item">
-              <span className="opp-pop__product-icon" aria-hidden="true">
-                {Icon ? <Icon /> : <span className="opp-pop__product-icon--missing" />}
-              </span>
-              <span className="opp-pop__product-name">{p.name}</span>
-              <span className="opp-pop__product-amount">{formatUsdCompact(p.valueUsd)}</span>
-            </li>
-          )
-        })}
+      <ul className="opp-pop__kv-list">
+        <li>
+          <span className="opp-pop__kv-label">Subscription end</span>
+          <span className="opp-pop__kv-value">{r.subEnd}</span>
+        </li>
+        <li>
+          <span className="opp-pop__kv-label">Renewable TCV</span>
+          <span className="opp-pop__kv-value">{formatUsdCompact(r.renewableTcvUsd)}</span>
+        </li>
+        <li>
+          <span className="opp-pop__kv-label">ARR</span>
+          <span className="opp-pop__kv-value">{formatUsdCompact(r.arrUsd)}</span>
+        </li>
       </ul>
+      <RenewalOutcomeEditor
+        value={outcome}
+        onChange={onOutcomeChange}
+        onConfirm={onClose}
+        onCancel={onClose}
+      />
     </div>
   )
 }
 
-// ─── Product cluster (space-driven +N overflow) ──────────────────────────────
-// Spec §4.4: "The cell shows as many tags as fit, then collapses the
-// remainder into a +N tag at the end. The decision about how many tags
-// fit is space-driven, not a fixed limit. Re-flow on resize."
-//
-// Implementation: a hidden measurement layer renders every tag (and a
-// sample +N badge) at natural width. On mount and on container resize we
-// walk those widths against the container's clientWidth, deciding how
-// many fit. The visible layer then renders only that count + a +N tag if
-// anything was hidden. The measurement layer sits absolutely-positioned
-// inside the cluster and is clipped by the cluster's overflow:hidden so
-// it never paints anywhere.
+// ─── Product cluster — full wrapping, no +N collapse ─────────────────────
+// Earlier iteration measured-and-truncated to +N. Per design call, every
+// product is now visible: the column has enough vertical budget for the
+// cluster to wrap, and hiding products behind a +N collapses information
+// the AE actually needs to size the deal. Mirrors the account-table
+// cluster — products pass in already sorted descending by value, the
+// flex-wrap reflows that order left-to-right then top-to-bottom.
 
-const PRODUCT_GAP = 4 // px — matches --ds-spacing-02
+interface ProductClusterProps { products: Product[]; totalUsd?: number }
 
-interface ProductClusterProps { products: Product[]; totalUsd: number }
-
-function ProductCluster({ products, totalUsd }: ProductClusterProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const measureRef = useRef<HTMLDivElement>(null)
-  const [visibleCount, setVisibleCount] = useState(products.length)
-
-  useLayoutEffect(() => {
-    const container = containerRef.current
-    const measure = measureRef.current
-    if (!container || !measure) return
-
-    const recompute = () => {
-      const parentWidth = container.clientWidth
-      if (parentWidth <= 0) return
-
-      const tagWidths: number[] = []
-      let badgeWidth = 0
-      for (const child of Array.from(measure.children) as HTMLElement[]) {
-        if (child.dataset.role === 'badge') badgeWidth = child.offsetWidth
-        else tagWidths.push(child.offsetWidth)
-      }
-
-      // First test: do all tags fit with no badge?
-      const allWidth = tagWidths.reduce(
-        (s, w, i) => s + w + (i > 0 ? PRODUCT_GAP : 0), 0)
-      if (allWidth <= parentWidth) {
-        setVisibleCount(prev => (prev === products.length ? prev : products.length))
-        return
-      }
-
-      // Otherwise reserve room for the badge and count how many fit.
-      const limit = parentWidth - badgeWidth - PRODUCT_GAP
-      let used = 0
-      let fit = 0
-      for (let i = 0; i < tagWidths.length; i++) {
-        const candidate = used + (i > 0 ? PRODUCT_GAP : 0) + tagWidths[i]
-        if (candidate <= limit) {
-          used = candidate
-          fit++
-        } else break
-      }
-      setVisibleCount(prev => (prev === fit ? prev : fit))
-    }
-
-    recompute()
-    const ro = new ResizeObserver(recompute)
-    ro.observe(container)
-    return () => ro.disconnect()
-  }, [products])
-
-  const overflow = products.length - visibleCount
-  const overflowedProducts = products.slice(visibleCount)
-
-  const renderTagPlain = (p: Product, keyHint: string) => {
-    const Icon = BRAND_ICON[p.brand]
-    return Icon
-      ? <Tags key={keyHint} {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
-      : <Tags key={keyHint} {...TAG_BASE} label={p.name} />
-  }
-
+function ProductCluster({ products }: ProductClusterProps) {
   return (
-    <div className="opp-product-cluster" ref={containerRef}>
-      {products.slice(0, visibleCount).map((p, i) => (
-        <HoverShell
-          key={`v-${p.name}-${i}`}
-          render={() => <ProductPanel product={p} totalUsd={totalUsd} />}>
-          {renderTagPlain(p, `v-tag-${p.name}-${i}`)}
-        </HoverShell>
-      ))}
-      {overflow > 0 && (
-        <HoverShell
-          render={() => <ProductOverflowPanel products={overflowedProducts} totalUsd={totalUsd} />}>
-          <Tags {...TAG_BASE} label={`+${overflow}`} />
-        </HoverShell>
-      )}
-      <div ref={measureRef} className="opp-product-cluster__measure" aria-hidden="true">
-        {products.map((p, i) => (
-          <span key={`m-${p.name}-${i}`}>
-            {renderTagPlain(p, `m-inner-${p.name}-${i}`)}
-          </span>
-        ))}
-        <span data-role="badge"><Tags {...TAG_BASE} label="+99" /></span>
-      </div>
+    <div className="opp-product-cluster">
+      {products.map((p, i) => {
+        const Icon = BRAND_ICON[p.brand]
+        const tag = Icon
+          ? <Tags {...TAG_BASE} icon renderIcon={Icon} label={p.name} />
+          : <Tags {...TAG_BASE} label={p.name} />
+        return (
+          <HoverShell
+            key={`${p.name}-${i}`}
+            render={() => <ProductPanel product={p} />}>
+            {tag}
+          </HoverShell>
+        )
+      })}
     </div>
   )
 }
@@ -2027,9 +1965,13 @@ interface TypeTagCellProps {
 }
 
 function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps) {
+  // net-new has no popover; upsell/renewal each anchor their own
+  // HoverShell. Static class is only applied in the no-popover case
+  // so the tag doesn't pick up a hover state it doesn't deliver on.
+  if (row.type === 'net-new') {
+    return <Tags {...TAG_BASE} label={TYPE_LABEL[row.type]} className="opp-tag--static" />
+  }
   const plain = <Tags {...TAG_BASE} label={TYPE_LABEL[row.type]} />
-
-  if (row.type === 'net-new') return plain
 
   if (row.type === 'upsell') {
     return (
@@ -2067,11 +2009,13 @@ function OppRow({
   renewalOutcome,
   onOutcomeChange,
   density,
+  onExpand,
 }: {
   row: OpportunityRow
   renewalOutcome: RenewalOutcome
   onOutcomeChange: (v: RenewalOutcome) => void
   density: DensityKey[]
+  onExpand?: (id: string) => void
 }) {
   const showTag = (k: DensityKey) => density.includes(k)
   const dayLabel =
@@ -2086,11 +2030,10 @@ function OppRow({
 
   return (
     <tr className="opp-row">
-      <td>
-        {/* Column 1 — opportunity name + account name as neutral
-            (gray) links. Both are clickable. The opp-name link is the
-            primary affordance; the account link drops to the account
-            page. Hover underline is the affordance. */}
+      <td className="opp-c-name">
+        {/* Column 1 — opp name · account · value stacked. Value moves
+            here from the removed standalone column so the primary
+            numeric always reads in context of its deal. */}
         <div className="opp-multiline">
           <a
             href="#"
@@ -2104,6 +2047,7 @@ function OppRow({
             onClick={(e) => e.preventDefault()}>
             {row.account}
           </a>
+          <span className="opp-multiline__value">{formatUsdFull(row.valueUsd)}</span>
         </div>
       </td>
       <td>
@@ -2159,17 +2103,14 @@ function OppRow({
           {showTag('lastActivity') && (
             <HoverShell
               render={() => (
-                <Tooltip
-                  pointerDirection="bottom"
-                  content={`${row.activity.description} — ${dayLabel}`}
-                />
+                <div className="opp-pop opp-pop--simple">{row.activity.description} — {dayLabel}</div>
               )}>
               <Tags
                 shape={TAG_BASE.shape}
                 size={TAG_BASE.size}
                 contrast={TAG_BASE.contrast}
-                color={actStyle.color}
-                className="opp-tag--icon-quiet"
+                color="neutral"
+                className={`opp-tag--icon-quiet opp-act--${actStyle.color}`}
                 icon
                 renderIcon={actStyle.icon ?? Clock}
                 label={dayLabel}
@@ -2192,9 +2133,12 @@ function OppRow({
             </HoverShell>
           )}
 
-          {/* Risk Factors — non-interactive popover listing applied risks */}
+          {/* Risk Factors — interactive popover listing applied risks.
+              `interactive` lets the user hover off the trigger and onto
+              the panel without dismiss; matches the acc-table behavior. */}
           {showTag('riskCount') && (
             <HoverShell
+              interactive
               render={() => <RiskFactorsPanel risks={row.risks} />}>
               <Tags {...TAG_BASE} label={riskLabel} />
             </HoverShell>
@@ -2204,10 +2148,7 @@ function OppRow({
           {showTag('salesPlay') && (
             <HoverShell
               render={() => (
-                <Tooltip
-                  pointerDirection="bottom"
-                  content={SALES_PLAY_STATUS_LABEL[row.salesPlay.status]}
-                />
+                <div className="opp-pop opp-pop--simple">{SALES_PLAY_STATUS_LABEL[row.salesPlay.status]}</div>
               )}>
               <Tags {...TAG_BASE} label={row.salesPlay.name} />
             </HoverShell>
@@ -2217,25 +2158,19 @@ function OppRow({
       <td>
         {/* Column 4 — products. Brand icon per product (BrandUnit42 absent
             from @ds/icons exports; unit-42 products render iconless until
-            the index lands). Space-driven +N overflow via ProductCluster.
-            Each visible product tag and the +N tag carry their own hover
-            popover (per-product value of total, or full overflow list).
+            the index lands). Full wrapping cluster — every product is
+            visible, no +N collapse. Each product tag carries its own
+            hover popover with absolute per-product value.
             Density toggle hides the entire cluster, not individual items. */}
         {showTag('products') && (
-          <ProductCluster products={row.products} totalUsd={row.valueUsd} />
+          <ProductCluster products={row.products} />
         )}
-      </td>
-      <td className="opp-c-value">
-        {/* Value matches the opportunity-name text properties — bold,
-            primary text, same scale — so the eye reads value + name as
-            a paired primary surface. Full digits with thousand
-            separators, tabular nums. */}
-        <span className="opp-value">{formatUsdFull(row.valueUsd)}</span>
-      </td>
-      <td className="opp-c-actions">
-        <div className="opp-actions">
-          <IconButton kind="ghost-accent" size="sm" iconSize={16} renderIcon={Stars} aria-label="AI" />
-          <IconButton kind="ghost-accent" size="sm" iconSize={16} renderIcon={ChevronRight} aria-label="Expand" />
+        {/* Row-level action buttons — absolutely positioned to top-right
+            of the <tr> (which carries position:relative). Ghost at rest,
+            promoted to secondary when the row is hovered via CSS. */}
+        <div className="opp-row-actions">
+          <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask" />
+          <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Expand" onClick={() => onExpand?.(row.id)} />
         </div>
       </td>
     </tr>
@@ -2248,6 +2183,7 @@ export function AEOpportunityTable({
   rows = DEFAULT_ROWS,
   totalItems = 47,
   summaryLabel = '47 deals · $12.4M',
+  onExpand,
 }: OpportunityTableProps = {}) {
   const [search, setSearch] = useState('')
   const [single, setSingle] = useState<Record<string, string | null>>(INITIAL_SINGLE)
@@ -2329,10 +2265,10 @@ export function AEOpportunityTable({
                filter affordances. Search expands to fill the middle so
                the bar reads as a single line of search context. */}
           <div className="opp-search-row">
-            <span className="opp-counts" aria-live="polite">{summaryLabel}</span>
             <div className="opp-search-row__search">
               <Search
                 size="md"
+                background="grey0"
                 placeholder="account, quote id, opportunity name, product…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -2417,19 +2353,30 @@ export function AEOpportunityTable({
                   <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Deal State</Header></th>
                   <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Activity &amp; Blockers</Header></th>
                   <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Products</Header></th>
-                  <th className="opp-c-value"><Header size="md" type={headerType('value')} alignment="right" onHeaderClick={() => toggleSort('value')}>Value</Header></th>
-                  <th className="opp-c-actions opp-no-sort" />
                 </tr>
               </thead>
               <tbody>
-                {sortedRows.map(row => (
-                  <OppRow
-                    key={row.id}
-                    row={row}
-                    renewalOutcome={renewalOutcomes[row.id] ?? 'unknown'}
-                    onOutcomeChange={(v) => setRenewalOutcome(row.id, v)}
-                    density={density}
-                  />
+                {/* Header → first-row divider. Same element + class as
+                 * the inter-row dividers below, so the entire table
+                 * uses one line grammar (no thead border). */}
+                <tr className="opp-divider-row" aria-hidden="true">
+                  <td colSpan={4}><div className="opp-divider" /></td>
+                </tr>
+                {sortedRows.map((row, i) => (
+                  <React.Fragment key={row.id}>
+                    <OppRow
+                      row={row}
+                      renewalOutcome={renewalOutcomes[row.id] ?? 'unknown'}
+                      onOutcomeChange={(v) => setRenewalOutcome(row.id, v)}
+                      density={density}
+                      onExpand={onExpand}
+                    />
+                    {i < sortedRows.length - 1 && (
+                      <tr className="opp-divider-row" aria-hidden="true">
+                        <td colSpan={4}><div className="opp-divider" /></td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -2471,19 +2418,31 @@ const LAYOUT_CSS = `
   --panw-flyout-filter-text: var(--ds-text-primary);
   --panw-flyout-filter-placeholder: var(--ds-text-placeholder-rest);
   --panw-flyout-filter-border: var(--ds-lines-neutral-rest);
+  /* Column headers ride the ghost surface — transparent at rest so the
+   * page ground reads through, ghost.hover / pressed for interaction.
+   * No paint of its own; the band is built by hover, not by fill. */
+  --panw-header-bg:         var(--ds-ghost-rest);
+  --panw-header-bg-hover:   var(--ds-ghost-hover);
+  --panw-header-bg-onclick: var(--ds-ghost-pressed);
 }
 
 .opp-page {
   min-height: 100vh;
-  background-color: var(--ds-surface-alt-rest);
+  background-color: var(--ds-ghost-rest);
   font-family: var(--ds-type-font-family-sans);
   padding: var(--ds-spacing-07) var(--ds-spacing-07) var(--ds-spacing-10);
 }
 
-/* Shell sits inside a parent card/tile. No own border or background. */
+/* Shell sits inside a parent card/tile. No own border or background.
+ * Vertical rhythm is asymmetric (8px search to filter, 20px filter
+ * to table), so a single flex gap won't carry it — each row owns
+ * the space below it via margin-bottom. Children should NOT add
+ * their own vertical padding — one source per gap. */
 .opp-page__shell {
   background-color: transparent;
   border: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Search row ─────────────────────────────────────────────────────────── *
@@ -2493,19 +2452,8 @@ const LAYOUT_CSS = `
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-04); /* 12 — proximity between distinct regions */
-  padding: var(--ds-spacing-04) var(--ds-spacing-04) var(--ds-spacing-02);
-}
-.opp-counts {
-  /* body-02 bold (DS type scale: 16px / 24px / semibold). Tabular
-   * nums so the figures align cleanly. */
-  color: var(--ds-text-primary);
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  font-feature-settings: 'tnum' 1, 'lnum' 1;
-  font-variant-numeric: tabular-nums;
+  /* Owns the 8px gap to the filter row below it. */
+  margin-bottom: var(--ds-spacing-03); /* 8 */
 }
 .opp-search-row__search {
   flex: 1;
@@ -2555,16 +2503,23 @@ const LAYOUT_CSS = `
 .opp-filter-row {
   display: flex;
   align-items: flex-start;
-  gap: var(--ds-spacing-03);
-  padding: var(--ds-spacing-02) var(--ds-spacing-04) var(--ds-spacing-03);
+  /* 6px matches .opp-tag-cluster — the filter row reads with the
+   * same rhythm as a tag cluster inside a row, so the eye crosses
+   * both clusters at the same density. Not a --ds-spacing step
+   * (4/8/12), so a literal here. */
+  gap: 6px;
   flex-wrap: wrap;
+  /* Owns the 20px gap to the table header below it. 20 isn't a
+   * native --ds-spacing step, so it's a literal here. */
+  margin-bottom: 20px;
 }
 .opp-filter-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ds-spacing-02);
-  row-gap: var(--ds-spacing-02);
+  /* Matches .opp-tag-cluster — see note above. */
+  gap: 6px;
+  row-gap: 6px;
   flex: 1;
   min-width: 0;
 }
@@ -2578,10 +2533,13 @@ const LAYOUT_CSS = `
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
 .opp-table-shell { overflow-x: auto; }
-.opp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.opp-table thead tr {
-  border-bottom: 1px solid var(--ds-lines-neutral-rest);
-}
+/* border-separate + border-spacing:0 allows border-radius on <td> —
+ * border-collapse:collapse silently ignores border-radius on cells. */
+.opp-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
+/* No border on header cells — the separator between header and the
+ * first data row is a standalone .opp-divider-row injected at the
+ * top of <tbody>, identical to the inter-row dividers. One line
+ * grammar across the entire table. */
 .opp-table th {
   text-align: left;
   padding: 0; /* Header owns its own padding */
@@ -2594,71 +2552,89 @@ const LAYOUT_CSS = `
   display: none;
 }
 
-/* Equal-width columns for the four content columns; Value reserves
- * 140px for full-precision USD, Actions 80px for two icon buttons.
- * The four equal columns split the remainder. table-layout: fixed
- * honors these widths literally — without it the value column
- * collapses to first-digit width. */
+/* Four equal columns split the full width — value and actions columns
+ * both removed; value lives in column 1, actions float over the row. */
 .opp-table th.opp-c-equal,
-.opp-table td.opp-c-equal { width: calc((100% - 220px) / 4); }
-.opp-table th.opp-c-value,
-.opp-table td.opp-c-value {
-  text-align: right;
-  width: 140px;
-  white-space: nowrap;
-}
-.opp-table th.opp-c-actions,
-.opp-table td.opp-c-actions {
-  text-align: right;
-  width: 80px;
-  white-space: nowrap;
-}
+.opp-table td.opp-c-equal { width: 25%; }
 
-/* Value column — matches opp-name text properties (semibold primary
- * text), full-precision USD with tabular nums. */
-.opp-value {
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
-  font-feature-settings: 'tnum' 1, 'lnum' 1;
-  font-variant-numeric: tabular-nums;
-  font-size: 14px;
-  line-height: 20px;
-}
-
-/* Row dividers, no zebra. Rows are now uniform surface.rest with a
- * hairline divider; hover is the only ground that lights up. */
-.opp-table tbody tr { background-color: var(--ds-surface-rest); }
-.opp-table tbody tr + tr { border-top: 1px solid var(--ds-lines-neutral-rest); }
+/* Row backgrounds — data rows only.
+ * Hover lifts the band so row-level floating actions read as engaged;
+ * no :active state — clicking a row does nothing, so a pressed
+ * background would write a check the interaction can't cash. */
+.opp-table tbody tr { background-color: var(--ds-ghost-rest); }
 .opp-table tbody tr:hover  { background-color: var(--ds-ghost-hover); }
-.opp-table tbody tr:active { background-color: var(--ds-ghost-pressed); }
 
+/* Standalone divider rows — an independent element between rows, not
+ * a border that belongs to either adjacent row. The <div> is the line;
+ * the <tr> is just a carrier with no own appearance. */
+.opp-divider-row { background-color: transparent !important; pointer-events: none; }
+/* Specificity must beat .opp-table td (0,1,1), .opp-table tbody td:first-child (0,2,2),
+ * and .opp-table tbody td:last-child (0,2,2). Three-class chain = (0,3,1). */
+.opp-table .opp-divider-row td,
+.opp-table .opp-divider-row td:first-child,
+.opp-table .opp-divider-row td:last-child {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+}
+.opp-divider { height: 1px; background-color: var(--ds-lines-neutral-rest); transition: opacity 110ms ease; margin: 0 16px; }
+/* Hide the divider below the hovered row */
+.opp-row:hover + .opp-divider-row .opp-divider { opacity: 0; }
+/* Hide the divider above the hovered row — :has() (Chrome 105+, Safari 15.4+, FF 121+) */
+.opp-divider-row:has(+ .opp-row:hover) .opp-divider { opacity: 0; }
+/* Per-cell padding + top-left alignment.
+ * First cell:  t:12  r:8   b:12  l:16
+ * Last cell:   t:12  r:8   b:16  l:8
+ * Other cells: t:12  r:8   b:12  l:8
+ * Row corners: 12px radius clipped on first/last td. */
 .opp-table td {
-  padding: var(--ds-spacing-04); /* 12 */
-  vertical-align: middle;
+  padding: 12px 8px;
+  vertical-align: top;
   color: var(--ds-text-secondary-rest);
 }
+.opp-table tbody td:first-child {
+  padding: 12px 8px 12px 16px;
+  border-radius: 8px 0 0 8px;
+}
+.opp-table tbody td:last-child {
+  padding: 12px 8px 16px 8px;
+  border-radius: 0 8px 8px 0;
+}
 
-/* Column 1 — opportunity name + account name as gray (text-secondary)
- * clickable links. The opp name carries primary weight; account is
- * lighter. Underline on hover signals interactivity without the
- * "always underlined" link aesthetic that fights the table density. */
+/* Column 1 — name · account · value stacked.
+ * Gaps are explicit margins (not flex gap) so each inter-element
+ * space can be tuned independently: 4px name→account, 6px account→value. */
 .opp-multiline {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-03); /* 8 — more breathing room between name and account */
+  gap: 0;
   align-items: flex-start;
 }
 .opp-multiline__name {
   font-weight: var(--ds-type-font-weight-semibold);
   font-size: 14px;
   line-height: 20px;
-  color: var(--ds-text-primary);
+  color: var(--ds-text-secondary-rest);
 }
 .opp-multiline__sub {
+  margin-top: 4px;
   font-weight: var(--ds-type-font-weight-regular);
   font-size: 13px;
   line-height: 18px;
-  color: var(--ds-text-secondary-rest);
+  color: var(--ds-text-tertiary-rest);
+}
+.opp-multiline__value {
+  margin-top: 12px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 /* DS "black" Link palette — text.link-neutral family.
  * rest:  --ds-text-link-neutral-rest  (resolved by stage to neutral text)
@@ -2684,37 +2660,22 @@ const LAYOUT_CSS = `
 .opp-tag-cluster {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-spacing-02);
+  gap: 6px;
   align-items: center;
 }
 
-/* ── Product cluster — single-row, space-driven +N overflow ──────────────
- * Visible layer = flex row, NO wrap, clipped horizontally.
- * Measurement layer = absolutely positioned (zero layout footprint),
- *   visually hidden, used only to read natural offsetWidths.
- * The visible-vs-measure layers share Tag styles, so widths match.
- */
+/* ── Product cluster — full wrapping, no +N collapse ─────────────────────
+ * Earlier iteration kept this on a single line and measured-and-truncated
+ * to +N. Per design call, the cluster now wraps and shows every product;
+ * the column has the vertical budget for it and the AE needs the full
+ * inventory, not a teaser. Tags pass through the standard DS chrome. */
 .opp-product-cluster {
-  position: relative;
   display: flex;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   align-items: center;
   gap: var(--ds-spacing-02);
   min-width: 0;
   max-width: 100%;
-  overflow: hidden;
-}
-.opp-product-cluster__measure {
-  position: absolute;
-  left: 0;
-  top: 0;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  gap: var(--ds-spacing-02);
-  white-space: nowrap;
-  visibility: hidden;
-  pointer-events: none;
 }
 
 /* ── Hover trigger + portaled panel ─────────────────────────────────────── *
@@ -2731,6 +2692,12 @@ const LAYOUT_CSS = `
   /* Reset against whatever the host page might inject. */
   font-family: var(--ds-type-font-family-sans);
   color: var(--ds-text-primary);
+  /* Surface chrome lives on the wrapper (mirrors acc-table). The
+   * .opp-pop content layer carries padding + typography only. */
+  background-color: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-rest);
+  border-radius: var(--ds-radius-generous);
+  box-shadow: var(--ds-shadow-flyout);
   /* Entrance: opacity fade + 4px slide from above DOWN into place. The
    * direction reads as "the popover descends out of the trigger" for
    * panels positioned below the trigger (the default placement). */
@@ -2745,174 +2712,288 @@ const LAYOUT_CSS = `
 }
 
 /* ── Hand-rolled popover panel (used for Account Health, Risk Factors,
- *    Product, +N overflow). DS Tooltip handles its own styling and
- *    renders directly inside the portal; this panel is for the rich
- *    surfaces. Visual lineage: surface.rest + shadow-flyout + radius-
- *    standard, 16px padding (structured per stage-spacing.md flyout/
- *    popover rules). */
+ *    Product, Renewal). Ported from the acc-table pattern — the two
+ *    tables now share one popover grammar:
+ *      • 14px floor on every text class (no 12/13px below)
+ *      • tabular row lists with hairline dividers between rows AND
+ *        top/bottom hairlines on the list itself, drawn as absolutely
+ *        positioned pseudos so the row's border-radius doesn't bend
+ *        the line at the corners.
+ *      • rows extend to the popover's content edge (negative margin)
+ *        so the hover band reads as a generous shape, then re-impose
+ *        their own 8px text inset so labels land on a single rail.
+ *
+ *    Visual lineage: surface.rest + shadow-flyout + radius-generous,
+ *    16px padding (structured per stage-spacing.md flyout/popover
+ *    rules + the Figma "Active Quote" reference). */
+/* Popover width tiers (system rule).
+ * Every popover commits to one of three widths: 160 / 240 / 320.
+ * Variants below opt into a tier by setting an explicit width on
+ * the .opp-pop wrapper. The wrapper itself stays width-agnostic so
+ * the tier choice is visible at the variant level, not buried in a
+ * default. */
 .opp-pop {
-  background-color: var(--ds-surface-rest);
-  border: 1px solid var(--ds-lines-neutral-tile-rest);
-  border-radius: var(--ds-radius-standard);
-  box-shadow: var(--ds-shadow-flyout);
-  padding: var(--ds-spacing-05); /* 16 */
-  font-size: 13px;
-  line-height: 20px;
-  color: var(--ds-text-primary);
-  min-width: 220px;
-  max-width: 320px;
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-04); /* 12 */
-}
-.opp-pop__heading {
-  font-weight: var(--ds-type-font-weight-semibold);
+  gap: var(--ds-spacing-03); /* 8 between blocks */
+  width: 240px; /* default tier — overridden by variant modifiers */
+  padding: var(--ds-spacing-05); /* 16 all sides */
   font-size: 14px;
   line-height: 20px;
   color: var(--ds-text-primary);
+  box-sizing: border-box;
+}
+/* 320 — content-dense surfaces (health, risks, renewal). */
+.opp-pop--health,
+.opp-pop--risks,
+.opp-pop--renewal { width: 320px; }
+/* 240 — single-concept surfaces (activity-simple). */
+.opp-pop--simple { width: 240px; }
+/* 160 — atomic surfaces (single button, no copy). */
+.opp-pop--action { width: 160px; }
+/* Empty-state risks — 2px breathing room between heading and sub
+ * (default is 0 because the sub's negative top margin cancels the
+ * parent gap-8; for the empty branch we want the sub to read as
+ * "directly related to" the heading rather than collapsed onto it). */
+.opp-pop--empty .opp-pop__sub {
+  margin-top: calc(-1 * var(--ds-spacing-03) + 2px);
+}
+.opp-pop__heading {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
 }
 .opp-pop__sub {
-  font-size: 12px;
-  line-height: 16px;
+  /* Tertiary text + negative top margin = the "tight under heading"
+   * treatment. Held at 14/20 per popover-text floor. */
+  margin-top: calc(-1 * var(--ds-spacing-03));
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-tertiary-rest);
-  margin-top: calc(-1 * var(--ds-spacing-03)); /* tighten under heading */
 }
 .opp-pop__chart {
   display: flex;
   margin: var(--ds-spacing-01) 0;
 }
-.opp-pop__rows {
+.opp-pop__cta {
+  display: flex;
+  /* Whitespace between the last row and the CTA is the parent
+   * .opp-pop gap-8 alone — no padding-top here. Matches the acc-pop
+   * CTA contract. */
+}
+.opp-pop__cta .panw--btn {
+  /* Health CTA renders as a full-width centered button inside the
+   * popover frame — the button is the popover's single commitment,
+   * not a corner action. Mirrors the acc-pop CTA treatment. */
+  width: 100%;
+  justify-content: center;
+}
+
+/* ── Tabular row pattern ─────────────────────────────────────────────
+ * See the matching block in acc-table for the architecture note.
+ * Dividers are pseudos, not borders, so the row's border-radius
+ * doesn't curve them at the corners. Rows extend 8px past the
+ * popover content edge via negative margin, then re-impose an 8px
+ * text inset internally, so labels land on the same 16px rail as
+ * the popover's heading. */
+.opp-pop__rows,
+.opp-pop__kv-list,
+.opp-pop__risk-list,
+.opp-pop__product-list {
+  position: relative;
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-03); /* 8 */
+  gap: 0;
+  list-style: none;
+  margin: 0 calc(-1 * var(--ds-spacing-03));
+  padding: 0;
 }
-.opp-pop__kv {
+/* List top hairline. */
+.opp-pop__rows::before,
+.opp-pop__kv-list::before,
+.opp-pop__risk-list::before,
+.opp-pop__product-list::before {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 0 var(--ds-spacing-03);
+  background-color: var(--ds-lines-neutral-rest);
+}
+/* List bottom hairline. */
+.opp-pop__rows::after,
+.opp-pop__kv-list::after,
+.opp-pop__risk-list::after,
+.opp-pop__product-list::after {
+  content: '';
+  display: block;
+  height: 1px;
+  margin: 0 var(--ds-spacing-03);
+  background-color: var(--ds-lines-neutral-rest);
+}
+/* Each row. Click target is the row itself; no-op until a destination
+ * is wired in, but the hover ground signals affordance. */
+.opp-pop__rows > *,
+.opp-pop__kv-list > *,
+.opp-pop__risk-list > *,
+.opp-pop__product-list > * {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--ds-spacing-04);
-  min-height: 28px;
+  margin: 0;
+  padding: 0 var(--ds-spacing-03); /* 0 vertical / 8 horizontal — height comes from the fixed row-height tier alone */
+  background-color: var(--ds-ghost-field-rest);
+  border-radius: var(--ds-radius-tight);
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
-.opp-pop__kv-label {
-  font-size: 12px;
-  line-height: 16px;
-  color: var(--ds-text-secondary-rest);
+/* Row-height convention (matches the live table cells):
+ *   if the row carries a tag    → 40px fixed
+ *   else (text-only / emoji)    → 32px fixed
+ * Tag-bearing lists in opp-pop: .opp-pop__rows (health kv with the
+ * adoption / technical Tag chips). Everything else is text-only. */
+.opp-pop__rows > * { height: 40px; }
+.opp-pop__kv-list > *,
+.opp-pop__risk-list > *,
+.opp-pop__product-list > * { height: 32px; }
+/* Inter-row line. */
+.opp-pop__rows > * + *::before,
+.opp-pop__kv-list > * + *::before,
+.opp-pop__risk-list > * + *::before,
+.opp-pop__product-list > * + *::before {
+  content: '';
+  position: absolute;
+  top: -1px;
+  left: var(--ds-spacing-03);
+  right: var(--ds-spacing-03);
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
 }
-.opp-pop__cta {
-  display: flex;
-  justify-content: flex-end;
+/* No hover affordance — these rows are display-only; no click destination.
+ * Cursor stays default so the popover doesn't promise interactivity it
+ * can't deliver. */
+.opp-pop__rows > *,
+.opp-pop__kv-list > *,
+.opp-pop__risk-list > *,
+.opp-pop__product-list > * {
+  cursor: default;
 }
 
-/* Risk factors list */
-.opp-pop__risk-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-03);
+/* KV row — label left, value right. */
+.opp-pop__kv-label {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ds-text-secondary-rest);
 }
-.opp-pop__risk-item {
-  display: flex;
-  align-items: flex-start;
+.opp-pop__kv-value {
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* Risk row — leading emoji, then label. justify-content:flex-start
+ * overrides the list default (space-between) so the emoji and label
+ * stay snug. */
+.opp-pop__risk-list > * {
+  justify-content: flex-start;
   gap: var(--ds-spacing-03);
-  font-size: 13px;
-  line-height: 18px;
 }
 .opp-pop__risk-emoji {
   flex-shrink: 0;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 18px;
-  height: 18px;
-  font-size: 14px;
+  width: 20px;
+  height: 20px;
+  font-size: 16px;
   line-height: 1;
 }
 .opp-pop__risk-label {
   flex: 1;
+  /* Truncate to a single line — rows are fixed-height (32px), so a
+   * second line would overflow and break the rhythm. min-width:0
+   * unlocks the flex child so it can shrink below its content size
+   * and the ellipsis takes effect. Full text is preserved on the
+   * title attribute (browser tooltip on hover). */
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-primary);
 }
 
-/* Product popover (single product) */
-.opp-pop--product {
-  min-width: 240px;
-  gap: var(--ds-spacing-02);
-}
-.opp-pop__product-row {
+/* Product popover (single-row, no list chrome). Mirrors
+ * .acc-pop-row exactly: icon · name · value on a 40px CellStandard
+ * row. 16px horizontal padding matches the popover's text rail.
+ * Restored per design call — a product popover is a tag expanded,
+ * not a row of a table. */
+.opp-pop-row {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-03);
+  /* Text + icon row (no tag) → 32px per the popover row-height
+   * convention. Tag-bearing rows use the 40px tier. */
+  height: 32px;
+  /* No horizontal padding: the wrapping .opp-pop already provides
+   * 16px horizontal padding around the row. Compounding the two
+   * would push content to 32px from the popover frame. */
+  padding: 0;
+  gap: var(--ds-spacing-03);       /* 8  */
+  min-width: 0;
+  white-space: nowrap;
 }
-.opp-pop__product-icon {
+.opp-pop-row__icon {
   display: inline-flex;
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
   align-items: center;
   justify-content: center;
 }
-.opp-pop__product-icon--missing {
-  display: inline-block;
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background-color: var(--ds-lines-neutral-rest);
-}
-.opp-pop__product-name {
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
-}
-.opp-pop__product-meta {
-  display: flex;
-  align-items: baseline;
-  gap: var(--ds-spacing-02);
-  padding-left: calc(18px + var(--ds-spacing-03)); /* align under name */
-}
-.opp-pop__product-amount {
-  font-variant-numeric: tabular-nums;
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
-}
-.opp-pop__product-share {
-  font-size: 12px;
-  color: var(--ds-text-tertiary-rest);
-}
-
-/* Product overflow popover (full list of overflowed products) */
-.opp-pop--product-overflow { min-width: 280px; }
-.opp-pop__product-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-03);
-}
-.opp-pop__product-list-item {
-  display: grid;
-  grid-template-columns: 18px 1fr auto;
-  align-items: center;
-  gap: var(--ds-spacing-03);
-  font-size: 13px;
+.opp-pop-row__name {
+  font-size: 14px;
   line-height: 20px;
-}
-.opp-pop__product-list-item .opp-pop__product-name {
-  font-weight: var(--ds-type-font-weight-regular);
-  color: var(--ds-text-secondary-rest);
-}
-.opp-pop__product-list-item .opp-pop__product-amount {
+  font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
+.opp-pop-row__value {
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ds-text-secondary-rest);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+  margin-left: var(--ds-spacing-06); /* 24 — clear separation from name */
+}
 
-/* Hover-only row actions */
-.opp-actions {
-  display: inline-flex;
+/* ── Row-level floating actions ──────────────────────────────────────────
+ * Absolutely positioned relative to the <tr> (position:relative).
+ * Two highlight-kind buttons that surface only on row hover. The
+ * highlight kind ships its own rest / hover / pressed treatment, so
+ * no per-state CSS swap is needed here. */
+.opp-row { position: relative; }
+.opp-row-actions {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  display: flex;
   gap: var(--ds-spacing-02);
+  z-index: 1;
+  pointer-events: none; /* invisible at rest — row hover enables them */
   opacity: 0;
   transition: opacity 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
-.opp-table tbody tr:hover .opp-actions,
-.opp-table tbody tr:focus-within .opp-actions { opacity: 1; }
+.opp-row:hover .opp-row-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* DS IconButton ships 4px (radius.tight) natively — no local
+ * override needed. */
 
 /* ── Pagination ─────────────────────────────────────────────────────────── */
 .opp-table-footer {
@@ -2958,7 +3039,7 @@ const LAYOUT_CSS = `
 .opp-tree__row:hover { background-color: var(--ds-ghost-hover); }
 .opp-tree__row--root { font-weight: var(--ds-type-font-weight-semibold); }
 .opp-tree__row--group { padding-left: var(--ds-spacing-04); }
-.opp-tree__row--leaf { padding-left: var(--ds-spacing-08); /* 32 — child indent */ }
+.opp-tree__row--leaf { padding-left: 28px; }
 
 /* Icon-only SelectAll header — mirrors @ds/flyout's FlyoutSelectAll
  * markup: a single tri-state checkbox row above the list, with an
@@ -3002,53 +3083,47 @@ const LAYOUT_CSS = `
 /* ── Button-only action popover (spec §4.2 + design call) ─────────────────
  * Single ghost-brand button on a surface.rest ground. No copy, no
  * heading. Used for Upsell type tag (Modify) and Quote ID tag
- * (View Quote). Intrinsic width — sized to the button. */
+ * (View Quote). Width tier = 160.
+ *
+ * Padding exception: when the popover holds ONE button and nothing
+ * else, the system's 16px inner padding doubles up with the button's
+ * own internal padding and the popover reads as a button trapped in
+ * a frame. Drop to 4px on all four sides so the popover becomes a
+ * tight halo around the button — the affordance, not the frame, is
+ * what the user sees. Applies only to single-button popovers; any
+ * popover with copy or multiple controls returns to the 16px floor. */
 .opp-pop--action {
-  min-width: 0;
-  max-width: none;
-  padding: var(--ds-spacing-02); /* 4 — tight halo around the button */
+  padding: var(--ds-spacing-02); /* 4 — tight halo around the lone button */
   gap: 0;
 }
-.opp-pop--action .panw--btn { width: 100%; }
+.opp-pop--action .panw--btn { width: 100%; justify-content: center; }
 
 /* ── Renewal popover (spec §4.2) ──────────────────────────────────────────
- * No heading. Tight two-column key/value rows. The final row (Outcome)
- * is the interactive control; subsequent rows below are the expanded
- * edit form.
+ * Renewal rows ride the shared .opp-pop__kv-list pattern — hairline
+ * dividers between rows, top/bottom hairlines on the list, 14px
+ * typography. The outcome editor sits below as a separate form block
+ * (not a list row — its content is interactive, not display).
  */
-.opp-pop--renewal {
-  min-width: 360px;
-  max-width: 420px;
-  padding: var(--ds-spacing-05);
-  gap: 0;
-}
-.opp-renewal-rows {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-03); /* 8 */
-}
-.opp-renewal-row {
+/* Renewal popover width is governed by the 320 tier (set on the
+ * shared variant block at the top of this section). No bespoke
+ * min/max here — the renewal surface must read at the same width
+ * as the other 320-tier popovers (health, risks, EBC). */
+/* Outcome row is the interactive control — break it out of the
+ * tabular list as a dedicated row with a leading divider. Same
+ * label/value rhythm as the list rows above. */
+.opp-renewal-outcome {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: var(--ds-spacing-04);
-  min-height: 24px;
+  /* Tag-bearing row (outcome chip with trailing chevron) → 40px,
+   * matching the convention used by .opp-pop__rows. */
+  height: 40px;
 }
-.opp-renewal-row__label {
-  font-size: 13px;
+.opp-renewal-outcome__label {
+  font-size: 14px;
+  line-height: 20px;
   color: var(--ds-text-secondary-rest);
-}
-.opp-renewal-row__value {
-  font-size: 13px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
-  font-feature-settings: 'tnum' 1, 'lnum' 1;
-  font-variant-numeric: tabular-nums;
-}
-.opp-renewal-row--outcome {
-  margin-top: var(--ds-spacing-02);
-  padding-top: var(--ds-spacing-04);
-  border-top: 1px solid var(--ds-lines-neutral-rest);
 }
 
 /* Outcome trigger — tag with trailing chevron. The DS Tags component
@@ -3114,36 +3189,51 @@ const LAYOUT_CSS = `
 .panw--tag.opp-tag--icon-quiet.panw--tag--low.panw--tag--neutral .panw--tag__close-btn {
   color: var(--ds-icons-secondary-rest);
 }
+/* Last-activity severity icons — tag is forced neutral but the icon
+ * keeps its semantic color. Specificity (0,5,1) beats icon-quiet (0,4,1). */
+.panw--tag.opp-tag--icon-quiet.panw--tag--low.panw--tag--neutral.opp-act--orange .panw--tag__icon {
+  color: var(--ds-icons-status-caution);
+}
+.panw--tag.opp-tag--icon-quiet.panw--tag--low.panw--tag--neutral.opp-act--red .panw--tag__icon {
+  color: var(--ds-icons-status-danger);
+}
 
 /* Filter-chip hover popover lives entirely in the DS — see
  * @ds/styles/scss/components/filter/_filter.scss for the
  * .panw--filter__chip-popover ruleset. No local override needed. */
 
+/* Tag padding + shape-rounded radius are now shipped natively by
+ * @ds/tags (size-large: 5/10, shape-rounded+size-large: 4px radius).
+ * Inline .stage overrides removed — let the DS rules take effect. */
+
+/* ── Neutral-low tag reskin ───────────────────────────────────────────────
+ * Neutral-low tags ride the surface family: rest = surface.rest (the
+ * canonical card-white token, not a literal hex), hover = surface.hover.
+ * Removes the DS default 1px inset box-shadow — the surface family
+ * carries the affordance, not a border. The previous row-hover override
+ * that forced #ffffff is gone: rest already IS surface.rest (white), so
+ * the tag stays legible against the ghost-hover row band without a
+ * separate rule fighting the tag's own :hover. */
+.stage .panw--tag.panw--tag--low.panw--tag--neutral {
+  background-color: var(--ds-surface-rest);
+  box-shadow: none;
+}
+.stage .panw--tag.panw--tag--low.panw--tag--neutral:hover {
+  background-color: var(--ds-surface-hover);
+}
+
 /* ── Static-tag override ─────────────────────────────────────────────────
  * Tags rendered without a hover surface should not pick up the DS
  * Tag's default :hover bg shift — they're labels, not affordances.
- * Apply the .opp-tag--static class to lock the rest tokens across
- * states. */
-.panw--tag.opp-tag--static:hover  {
-  background-color: var(--ds-field-alt-rest);
+ * pointer-events: none routes hover/click through to the wrapping
+ * element (a filter trigger button, a popover row, etc.) without
+ * needing per-color :hover overrides for every categorical palette
+ * the tag might use. The wrapper owns interaction; the tag is a
+ * label. Mirrors the .acc-tag--static contract. */
+.panw--tag.opp-tag--static {
+  pointer-events: none;
+  cursor: default;
 }
-.panw--tag.opp-tag--static.panw--tag--low.panw--tag--neutral:hover {
-  background-color: var(--ds-field-alt-rest);
-}
-/* Re-apply the rest icon color on hover to prevent the DS Tag scss
- * from rolling the icon to hover when we've locked the bg to rest. */
-.panw--tag.opp-tag--static .panw--tag__icon,
-.panw--tag.opp-tag--static:hover .panw--tag__icon {
-  color: var(--ds-icons-primary);
-}
-/* Categorical-color statics (forecast bronze/teal/olive) need the
- * same lock against the hover bg darkening from the matrix mixin. */
-.panw--tag.opp-tag--static.panw--tag--low.panw--tag--bronze:hover  { background-color: var(--ds-tag-bronze-low-bg); }
-.panw--tag.opp-tag--static.panw--tag--low.panw--tag--teal:hover    { background-color: var(--ds-tag-teal-low-bg); }
-.panw--tag.opp-tag--static.panw--tag--low.panw--tag--olive:hover   { background-color: var(--ds-tag-olive-low-bg); }
-
-/* Cursor stays default on static tags — they're not interactive. */
-.panw--tag.opp-tag--static { cursor: default; }
 
 /* ── Health-trend bar chart (account-health popover) ─────────────────────
  * No special styles — the SVG carries its own geometry. Reserved for
@@ -3153,9 +3243,25 @@ const LAYOUT_CSS = `
 
 // ─── Storybook meta ──────────────────────────────────────────────────────────
 
-const meta: Meta = { title: 'compositions/AE Opportunity Table', excludeStories: ['AEOpportunityTable'] }
+const meta: Meta = {
+  title: 'compositions/AE Opportunity Table',
+  excludeStories: ['AEOpportunityTable', 'DEFAULT_ROWS', '__oppPopoverParts'],
+}
 export default meta
 
 export const Default: StoryObj = {
   render: () => <AEOpportunityTable />
+}
+
+// Internal handle used by the "explorations/Table Popovers" showcase.
+// Exposed as a single object so Storybook's auto-story-detection ignores
+// it (object exports aren't treated as story renderers). Do not import
+// this from product code — it's a demo seam, not API.
+export const __oppPopoverParts = {
+  LAYOUT_CSS,
+  AccountHealthPanel,
+  RiskFactorsPanel,
+  ProductPanel,
+  ActionButtonPanel,
+  RenewalPanel,
 }

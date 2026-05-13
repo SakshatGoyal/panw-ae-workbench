@@ -37,12 +37,12 @@ import {
   __oppPopoverParts,
   DEFAULT_ROWS as OPP_ROWS,
   type OpportunityRow,
-} from './opportunity-table-exp.stories'
+} from './opportunity-table.stories'
 import {
   __accPopoverParts,
   DEFAULT_ROWS as ACC_ROWS,
   type AccountRow,
-} from './account-table-exp.stories'
+} from './account-table.stories'
 
 const opp = __oppPopoverParts
 const acc = __accPopoverParts

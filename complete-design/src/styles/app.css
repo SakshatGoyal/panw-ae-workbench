@@ -145,14 +145,20 @@ body.stage {
   flex-direction: column;
   gap: 4px;
   padding-bottom: 8px;
+  /* Title + subtitle sit 16px inset from the section's content edge —
+     a deliberate offset so the page-tier label hangs to the right of
+     the tiles' left edge. */
+  padding-left: 16px;
 }
 .cd-page-header__title {
+  /* @ds/type heading-03 — 20px / 1.4 / -0.15px letter-spacing. Weight
+     overridden to semibold per design call ("keep it bold"). */
   margin: 0;
-  font-size: 28px;
-  line-height: 1.2;
+  font-size: 1.25rem;
+  line-height: 1.4;
   font-weight: var(--ds-type-font-weight-semibold);
+  letter-spacing: -0.15px;
   color: var(--ds-text-primary);
-  letter-spacing: -0.01em;
 }
 .cd-page-header__subtitle {
   margin: 0;
@@ -162,21 +168,44 @@ body.stage {
   color: var(--ds-text-tertiary-rest);
 }
 
-/* ── Container tabs + table tile ──────────────────────────────────────────── */
-
-/* Container-tab semantics per the wireframe: the tab strip sits OUTSIDE the
-   tile, on stage.base (the page ground). The tile holds only the table. */
-.cd-tabs-host {
-  /* No surface, no shadow, no border — tabs render on stage.base. The
-     @ds/tabs container mode draws its own selected/unselected backgrounds
-     inside the strip. */
+/* ── Top section (header · plan summary · switcher) ───────────────────────
+ *
+ * Edge-to-edge white band on the grey page. The page header, plan summary
+ * tile, and switcher live together inside this single container so they
+ * read as one structural unit, separated from the table below by a single
+ * bottom hairline. The section breaks out of the main's 32px horizontal
+ * padding with a negative margin so its background spans the full column
+ * width, then re-establishes the same 32px inset internally so content
+ * positions exactly where it sat before. */
+.cd-top-section {
+  /* Cancel main's 32px top + horizontal padding so the white band sits
+     flush against the column edges. */
+  margin: -32px -32px 0 -32px;
+  padding: 32px 32px 0 32px;
+  background: var(--ds-surface-rest);
+  /* 2px inner hairline at the bottom edge — painted inside the box so it
+     doesn't add to the section's height the way a real border-bottom would. */
+  box-shadow: inset 0 -2px 0 var(--ds-lines-neutral-rest);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
-/* The active tab's bottom edge fuses with the tile top — collapse the
-   column gap between tabs and table to 0 so the tile starts immediately
-   below the tab strip. Other column siblings keep the 24px section gap. */
-.cd-tabs-host + .cd-table-tile {
-  margin-top: -24px;
+/* ── Switcher + untiled tables ────────────────────────────────────────────── */
+
+/* The Switcher composition replaces container tabs. Its swcr-page wrapper
+   assumes full-viewport ownership (min-height: 100vh + padding); neutralize
+   that the same way we do for the other composition wrappers below. */
+.cd-switcher-host .swcr-page {
+  min-height: 0;
+  padding: 0;
+  background: transparent;
+}
+.cd-switcher-host {
+  /* Switcher tile strip hangs 12px inset from the section's content
+     edge — pulls the tablist off the column rule without breaking the
+     32px page gutter on the outer surface. */
+  padding-left: 12px;
 }
 
 /* PlanForecastSummary wraps itself in `.psum-page` which assumes it owns the
@@ -191,17 +220,29 @@ body.stage {
   background: transparent;
 }
 
-/* The table sits in its own tile. stage-background-colors.md "default card →
-   surface.rest"; stage-radius.md "radius.standard — table containers";
-   stage-shadows.md "Cards, tiles, panels at default elevation → shadow.tiles";
-   stage-lines.md "lines.neutral-tile > 48px (cards, large tiles)". */
-.cd-table-tile {
-  background: var(--ds-surface-rest);
-  border: 1px solid var(--ds-lines-neutral-tile-rest);
-  border-radius: var(--ds-radius-standard);
-  box-shadow: var(--ds-shadow-tiles);
-  overflow: hidden;
-  min-height: 0;
+/* Tables now sit directly on the page background — no tile chrome. The
+   table composition draws its own internal rows/dividers on surface.rest. */
+
+/* Row hover — the poc tables flip the row background to ghost.hover but
+   apply it instantly. Per stage-motion.md hover micro-interactions are
+   fast-02 (110ms) with productive-standard easing. Add the transition
+   here without touching the composition. The adjacent divider opacity
+   fade rides the same curve so the row-hover "stitch" feels coherent. */
+.cd-app .opp-table tbody tr,
+.cd-app .acc-table tbody tr {
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.cd-app .opp-divider,
+.cd-app .acc-divider {
+  transition: opacity 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+@media (prefers-reduced-motion: reduce) {
+  .cd-app .opp-table tbody tr,
+  .cd-app .acc-table tbody tr,
+  .cd-app .opp-divider,
+  .cd-app .acc-divider {
+    transition: none;
+  }
 }
 
 /* ── Footer ───────────────────────────────────────────────────────────────── */
@@ -279,6 +320,21 @@ body.stage {
 .cd-resize-handle:focus-visible {
   outline: 2px solid var(--ds-brand-rest);
   outline-offset: 0;
+}
+
+/* ── AccountPanel embedded in right rail ─────────────────────────────────── */
+
+/* The poc AccountPanel composition is built as a `position: fixed` flyout
+   that owns the viewport's right edge. Inside our shell the right rail is
+   the container, so we re-flow the panel as a static block that fills its
+   parent — width 100%, no fixed positioning, no flyout shadow (the rail
+   already provides the elevation via its left border). */
+.cd-app__rail-right .acc-panel {
+  position: static;
+  width: 100%;
+  height: auto;
+  min-height: 100%;
+  box-shadow: none;
 }
 
 /* ── Right rail empty state ───────────────────────────────────────────────── */

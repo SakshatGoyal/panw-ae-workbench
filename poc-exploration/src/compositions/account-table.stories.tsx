@@ -82,8 +82,9 @@ import type { Meta, StoryObj } from '@storybook/react'
 import React, { useCallback, useEffect, useLayoutEffect, useMemo, useRef, useState } from 'react'
 import { createPortal } from 'react-dom'
 import {
-  Calendar, Clock, Stars, ChevronDown, ChevronUp, ChevronRight, Folder,
+  Calendar, Clock, ChevronDown, ChevronUp, ChevronRight, Folder,
   ExclamationTriangle, ExclamationCircle, Close,
+  CommentAdd, Maximize,
   BrandStrata, BrandPrisma, BrandCortex,
   // Sales Play status icons. Chips are neutral; per-status color is
   // applied to the icon only via CSS (see SALES_PLAY_ICON_COLOR_VAR map
@@ -212,7 +213,7 @@ type SortDir = 'asc' | 'desc'
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
   { key: 'name',              label: 'account name' },
   { key: 'totalPipeline',     label: 'total pipeline' },
-  { key: 'ltv',               label: 'LTV' },
+  { key: 'ltv',               label: 'ARR' },
   { key: 'riskCount',         label: 'risk factor count' },
   { key: 'daysSinceEbc',      label: 'days since EBC' },
   { key: 'daysSinceActivity', label: 'days since last activity' },
@@ -1137,7 +1138,7 @@ function SingleSelectFilter({ label, options, value, onChange, allLabel = 'All' 
         {selectedOption && (
           <span className="panw--filter__values">
             <span className="panw--filter__chip-target">
-              <Tags label={selectedOption.label} color="neutral" contrast="high" size="default" className="acc-tag--static" />
+              <Tags label={selectedOption.label} color="neutral" contrast="high" size="default" shape="rounded" className="acc-tag--static" />
             </span>
           </span>
         )}
@@ -1296,7 +1297,7 @@ function GroupedHealthFilter({ value, onApply }: GroupedHealthFilterProps) {
               className="panw--filter__chip-target"
               onMouseEnter={chipHover.openOnEnter}
               onMouseLeave={chipHover.scheduleClose}>
-              <Tags label={chipLabel} color="neutral" contrast="high" size="default" className="acc-tag--static" />
+              <Tags label={chipLabel} color="neutral" contrast="high" size="default" shape="rounded" className="acc-tag--static" />
             </span>
           </span>
         )}
@@ -1480,7 +1481,7 @@ function ProductFilter({ selected, onApply }: ProductFilterProps) {
               className="panw--filter__chip-target"
               onMouseEnter={chipHover.openOnEnter}
               onMouseLeave={chipHover.scheduleClose}>
-              <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" className="acc-tag--static" />
+              <Tags label={String(selected.length)} color="neutral" contrast="high" size="default" shape="rounded" className="acc-tag--static" />
             </span>
           </span>
         )}
@@ -1597,16 +1598,18 @@ function AccountHealthPanel({ row }: { row: AccountRow }) {
         <div className="acc-pop__kv">
           <span className="acc-pop__kv-label">Technical Health</span>
           <Tags
-            shape="rounded" size="default" contrast="low"
+            shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.technical]}
-            label={HEALTH_LABEL[h.technical]} />
+            label={HEALTH_LABEL[h.technical]}
+            className="acc-tag--static" />
         </div>
         <div className="acc-pop__kv">
           <span className="acc-pop__kv-label">Adoption &amp; Deployment</span>
           <Tags
-            shape="rounded" size="default" contrast="low"
+            shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.adoption]}
-            label={HEALTH_LABEL[h.adoption]} />
+            label={HEALTH_LABEL[h.adoption]}
+            className="acc-tag--static" />
         </div>
       </div>
       <div className="acc-pop__cta">
@@ -1628,8 +1631,10 @@ function AccountRiskFactorsPanel({ risks }: { risks: AccountRiskFactor[] }) {
   // not row-level chips). The popover always shows every risk on the
   // account; empty rows fall back to a "no risks" line.
   if (risks.length === 0) {
+    // Empty branch carries the --empty modifier so the heading↔sub
+    // gap relaxes to 2px. Width still pins to the 320 tier.
     return (
-      <div className="acc-pop acc-pop--risks">
+      <div className="acc-pop acc-pop--risks acc-pop--empty">
         <div className="acc-pop__heading">Account-level risk factors</div>
         <div className="acc-pop__sub">No risk factors flagged on this account.</div>
       </div>
@@ -1642,7 +1647,9 @@ function AccountRiskFactorsPanel({ risks }: { risks: AccountRiskFactor[] }) {
         {risks.map(r => (
           <li key={r.id} className="acc-pop__risk-row">
             <span className="acc-pop__risk-emoji" aria-hidden="true">{r.emoji}</span>
-            <span className="acc-pop__risk-label">{r.label}</span>
+            {/* title carries the full string so the truncated row
+             * can be re-read on hover via the browser-native tooltip. */}
+            <span className="acc-pop__risk-label" title={r.label}>{r.label}</span>
           </li>
         ))}
       </ul>
@@ -1653,8 +1660,10 @@ function AccountRiskFactorsPanel({ risks }: { risks: AccountRiskFactor[] }) {
 // ─── EBC hover popover (spec §4.3) ───────────────────────────────────────
 function EBCPanel({ ebc }: { ebc: EBC }) {
   if (ebc.absent) {
+    // Empty branch — 2px breathing room between heading and sub per
+    // the cross-popover empty-state rule.
     return (
-      <div className="acc-pop acc-pop--ebc">
+      <div className="acc-pop acc-pop--ebc acc-pop--empty">
         <div className="acc-pop__heading">EBC history</div>
         <div className="acc-pop__sub">This account has not had an EBC on file.</div>
       </div>
@@ -1775,15 +1784,21 @@ function SalesPlayCluster({ buckets }: SalesPlayClusterProps) {
 
 function ProductARRPanel({ product }: { product: Product }) {
   const Icon = BRAND_ICON[product.brand]
+  // Single-row popover (no list chrome) wrapped in .acc-pop so the
+  // popover keeps its 16px content padding — without the wrapper the
+  // frame collapses onto the row outline and the popover reads as a
+  // sliver. Tier (240) is inherited from .acc-pop's default width.
   return (
-    <div className="acc-pop-row">
-      <span className="acc-pop-row__icon" aria-hidden="true">
-        {Icon ? <Icon size={20} /> : null}
-      </span>
-      <span className="acc-pop-row__name">{product.name}</span>
-      <span className="acc-pop-row__value">
-        {formatUsdCompact(product.arrUsd)} ARR
-      </span>
+    <div className="acc-pop acc-pop--product">
+      <div className="acc-pop-row">
+        <span className="acc-pop-row__icon" aria-hidden="true">
+          {Icon ? <Icon size={20} /> : null}
+        </span>
+        <span className="acc-pop-row__name">{product.name}</span>
+        <span className="acc-pop-row__value">
+          {formatUsdCompact(product.arrUsd)} ARR
+        </span>
+      </div>
     </div>
   )
 }
@@ -1828,8 +1843,10 @@ const OPP_TYPE_LABEL: Record<'net-new'|'upsell'|'renewal', string> = {
 
 function QuarterPipelinePanel({ quarter }: { quarter: QuarterPipeline }) {
   if (quarter.opps.length === 0) {
+    // Empty branch — 2px breathing room between heading and sub per
+    // the cross-popover empty-state rule.
     return (
-      <div className="acc-pop acc-pop--quarter">
+      <div className="acc-pop acc-pop--quarter acc-pop--empty">
         <div className="acc-pop__heading">{quarter.label}</div>
         <div className="acc-pop__sub">No pipeline in this quarter.</div>
       </div>
@@ -1856,31 +1873,10 @@ function QuarterPipelinePanel({ quarter }: { quarter: QuarterPipeline }) {
   )
 }
 
-// ─── Apex roll-up popover (spec §4.1) ────────────────────────────────────
-// Derived at render time from the dataset so the numbers can't drift
-// from the visible siblings (cr-failure §8). Memoized via useMemo at
-// the call site.
-
-function ApexHoverPanel({ apex, rows }: { apex: string; rows: AccountRow[] }) {
-  const siblings = rows.filter(r => r.apex === apex)
-  const combinedArr = siblings.reduce((s, r) => s + r.arrUsd, 0)
-  const count = siblings.length
-  return (
-    <div className="acc-pop acc-pop--apex">
-      <div className="acc-pop__heading">{apex}</div>
-      <div className="acc-pop__rows">
-        <div className="acc-pop__kv">
-          <span className="acc-pop__kv-label">Sub-accounts</span>
-          <span className="acc-pop__kv-value">{count}</span>
-        </div>
-        <div className="acc-pop__kv">
-          <span className="acc-pop__kv-label">Combined ARR</span>
-          <span className="acc-pop__kv-value">{formatUsdCompact(combinedArr)}</span>
-        </div>
-      </div>
-    </div>
-  )
-}
+// Apex roll-up popover removed per design call. The apex itself is
+// surfaced beneath the account name as a tertiary-toned link
+// (`acc-multiline__sub-link`); the rollup wasn't earning its
+// presence as a hover surface.
 
 // ─── Sort flyout (forked from opp-table) ─────────────────────────────────
 
@@ -1944,9 +1940,11 @@ export interface AccountTableProps {
   rows?: AccountRow[]
   /** Pagination footer override; not currently consumed (no pagination rendered). */
   totalItems?: number
+  /** Fired when the per-row Maximize (expand) button is clicked. */
+  onExpand?: (id: string) => void
 }
 
-export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) {
+export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTableProps = {}) {
   const [search, setSearch] = useState('')
   // Default sort per spec §5: most-broken accounts at top of triage queue.
   const [sortKey, setSortKey] = useState<SortKey>('riskCount')
@@ -1971,7 +1969,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
       switch (sortKey) {
         case 'name':              cmp = a.name.localeCompare(b.name); break
         case 'totalPipeline':     cmp = a.totalPipelineUsd - b.totalPipelineUsd; break
-        case 'ltv':               cmp = a.ltvUsd - b.ltvUsd; break
+        case 'ltv':               cmp = a.arrUsd - b.arrUsd; break
         case 'riskCount':         cmp = a.risks.length - b.risks.length; break
         case 'daysSinceEbc':      {
           const ad = a.ebc.absent ? Number.POSITIVE_INFINITY : daysBetween(a.ebc.date)
@@ -1985,12 +1983,6 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
     return arr
   }, [rows, sortKey, sortDir])
 
-  // Key metrics — three numbers rolled up from the current view (spec §3.3).
-  // Filtering isn't wired so this is currently the full fixture.
-  const totalArr = sortedRows.reduce((s, r) => s + r.arrUsd, 0)
-  const totalPipeline4q = sortedRows.reduce((s, r) => s + r.totalPipelineUsd, 0)
-  const accountCount = sortedRows.length
-
   return (
     <>
       <style>{LAYOUT_CSS}</style>
@@ -2000,12 +1992,10 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
               Search excludes opportunity names and quote IDs by spec
               §3.1 — placeholder reflects what IS searched. */}
           <div className="acc-search-row">
-            <span className="acc-counts" aria-live="polite">
-              {accountCount} accounts · {formatUsdCompact(totalArr)} ARR · {formatUsdCompact(totalPipeline4q)} pipeline next 4Q
-            </span>
             <div className="acc-search-row__search">
               <Search
                 size="md"
+                background="grey0"
                 placeholder="account, apex, product, sales play…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -2071,18 +2061,22 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
                   <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Activities &amp; Risks</Header></th>
                   <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Products</Header></th>
                   <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Sales Plays</Header></th>
-                  <th className="acc-c-value acc-no-sort"><Header size="md" type="basic" alignment="right">Value</Header></th>
-                  <th className="acc-c-actions acc-no-sort" />
                 </tr>
               </thead>
               <tbody>
-                {sortedRows.map(row => (
-                  <tr key={row.id} className="acc-row">
+                {/* Header → first-row divider. Same element + class as
+                 * the inter-row dividers below, so the entire table
+                 * uses one line grammar (no thead border). */}
+                <tr className="acc-divider-row" aria-hidden="true">
+                  <td colSpan={5}><div className="acc-divider" /></td>
+                </tr>
+                {sortedRows.map((row, i) => (
+                  <React.Fragment key={row.id}>
+                  <tr className="acc-row">
                     <td className="acc-c-account">
-                      {/* Column 1 — Account Name (link, body-compact-02
-                          bold) + Apex Account (smaller, tertiary,
-                          hover → roll-up popover). Apex line omitted
-                          when account is standalone (spec §2 / §4.1). */}
+                      {/* Column 1 — Account Name · Apex · ARR stacked.
+                          Value moves here from the removed standalone
+                          column. LTV removed per exploration brief. */}
                       <div className="acc-multiline">
                         <a
                           href="#"
@@ -2091,13 +2085,18 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
                           {row.name}
                         </a>
                         {row.apex && (
-                          <HoverShell
-                            interactive
-                            openDelayMs={400}
-                            render={() => <ApexHoverPanel apex={row.apex!} rows={rows} />}>
-                            <span className="acc-multiline__sub">{row.apex}</span>
-                          </HoverShell>
+                          // Apex renders as a tertiary-toned link beneath
+                          // the account name. No popover (no rollup
+                          // surface) — the apex is a navigation
+                          // affordance, not a data display.
+                          <a
+                            href="#"
+                            className="acc-multiline__sub acc-multiline__sub-link"
+                            onClick={(e) => e.preventDefault()}>
+                            {row.apex}
+                          </a>
                         )}
+                        <span className="acc-multiline__value">{formatUsdCompact(row.arrUsd)} ARR</span>
                       </div>
                     </td>
                     <td className="acc-c-equal">
@@ -2148,17 +2147,14 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
                             {density.includes('lastActivity') && (
                               <HoverShell
                                 render={() => (
-                                  <Tooltip
-                                    pointerDirection="bottom"
-                                    content={`${row.activity.description} — ${dayLabel}`}
-                                  />
+                                  <div className="acc-pop acc-pop--simple">{row.activity.description} — {dayLabel}</div>
                                 )}>
                                 <Tags
                                   shape={TAG_BASE.shape}
                                   size={TAG_BASE.size}
                                   contrast={TAG_BASE.contrast}
-                                  color={actStyle.color}
-                                  className="acc-tag--icon-quiet"
+                                  color="neutral"
+                                  className={`acc-tag--icon-quiet acc-act--${actStyle.color}`}
                                   icon
                                   renderIcon={actStyle.icon ?? Clock}
                                   label={dayLabel}
@@ -2193,8 +2189,8 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
                                   shape={TAG_BASE.shape}
                                   size={TAG_BASE.size}
                                   contrast={TAG_BASE.contrast}
-                                  color={EBC_SEVERITY_COLOR[ebcSev]}
-                                  className="acc-tag--icon-quiet"
+                                  color="neutral"
+                                  className={`acc-tag--icon-quiet acc-ebc--${ebcSev}`}
                                   icon
                                   renderIcon={Calendar}
                                   label={ebcLabel}
@@ -2222,36 +2218,20 @@ export function AEAccountTable({ rows = DEFAULT_ROWS }: AccountTableProps = {}) 
                           deemphasized priority, NOT rightmost
                           (spec §4.5 + cr-failure §2). */}
                       <SalesPlayCluster buckets={row.salesPlays} />
-                    </td>
-                    <td className="acc-c-value">
-                      <div className="acc-value">
-                        <div><span className="acc-value__num">{formatUsdCompact(row.arrUsd)}</span> <span className="acc-value__unit">ARR</span></div>
-                        <div><span className="acc-value__num">{formatUsdCompact(row.ltvUsd)}</span> <span className="acc-value__unit">LTV</span></div>
-                      </div>
-                    </td>
-                    <td className="acc-c-actions">
-                      {/* Column 7 — Actions. Two ghost-accent
-                          IconButtons: AI (Stars) and Expand
-                          (ChevronRight). Behavior placeholder, mirrors
-                          opp-table. */}
-                      <div className="acc-actions">
-                        <IconButton
-                          kind="ghost-accent"
-                          size="sm"
-                          iconSize={16}
-                          renderIcon={Stars}
-                          aria-label="AI actions for this account"
-                        />
-                        <IconButton
-                          kind="ghost-accent"
-                          size="sm"
-                          iconSize={16}
-                          renderIcon={ChevronRight}
-                          aria-label="Open account detail"
-                        />
+                      {/* Row-level floating actions — absolutely positioned
+                          to top-right of the <tr>. Mirrors opp-table. */}
+                      <div className="acc-row-actions">
+                        <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask" />
+                        <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Expand" onClick={() => onExpand?.(row.id)} />
                       </div>
                     </td>
                   </tr>
+                  {i < sortedRows.length - 1 && (
+                    <tr className="acc-divider-row" aria-hidden="true">
+                      <td colSpan={5}><div className="acc-divider" /></td>
+                    </tr>
+                  )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
@@ -2281,17 +2261,29 @@ const LAYOUT_CSS = `
   --panw-flyout-filter-text: var(--ds-text-primary);
   --panw-flyout-filter-placeholder: var(--ds-text-placeholder-rest);
   --panw-flyout-filter-border: var(--ds-lines-neutral-rest);
+  /* Column headers ride the ghost surface — transparent at rest so the
+   * page ground reads through, ghost.hover / pressed for interaction.
+   * No paint of its own; the band is built by hover, not by fill. */
+  --panw-header-bg:         var(--ds-ghost-rest);
+  --panw-header-bg-hover:   var(--ds-ghost-hover);
+  --panw-header-bg-onclick: var(--ds-ghost-pressed);
 }
 
 .acc-page {
   min-height: 100vh;
-  background-color: var(--ds-surface-alt-rest);
+  background-color: var(--ds-ghost-rest);
   font-family: var(--ds-type-font-family-sans);
   padding: var(--ds-spacing-07) var(--ds-spacing-07) var(--ds-spacing-10);
 }
+/* Vertical rhythm is asymmetric (8px search to filter, 20px filter to
+ * table), so a single flex gap won't carry it — each row owns the
+ * space below it via margin-bottom. Children should NOT add their
+ * own vertical padding — one source per gap. */
 .acc-page__shell {
   background-color: transparent;
   border: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 /* ── Search row ─────────────────────────────────────────────────────────
@@ -2301,18 +2293,8 @@ const LAYOUT_CSS = `
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-04);
-  padding: var(--ds-spacing-04) var(--ds-spacing-04) var(--ds-spacing-02);
-}
-.acc-counts {
-  /* body-02 bold (DS type scale: 16px / 24px / semibold), tabular nums. */
-  color: var(--ds-text-primary);
-  white-space: nowrap;
-  flex-shrink: 0;
-  font-size: 16px;
-  line-height: 24px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  font-feature-settings: 'tnum' 1, 'lnum' 1;
-  font-variant-numeric: tabular-nums;
+  /* Owns the 8px gap to the filter row below it. */
+  margin-bottom: var(--ds-spacing-03); /* 8 */
 }
 .acc-search-row__search {
   flex: 1;
@@ -2355,16 +2337,23 @@ const LAYOUT_CSS = `
 .acc-filter-row {
   display: flex;
   align-items: flex-start;
-  gap: var(--ds-spacing-03);
-  padding: var(--ds-spacing-02) var(--ds-spacing-04) var(--ds-spacing-03);
+  /* 6px matches .acc-tag-cluster — the filter row reads with the
+   * same rhythm as a tag cluster inside a row, so the eye crosses
+   * both clusters at the same density. Not a --ds-spacing step
+   * (4/8/12), so a literal here. */
+  gap: 6px;
   flex-wrap: wrap;
+  /* Owns the 20px gap to the table header below it. 20 isn't a
+   * native --ds-spacing step, so it's a literal here. */
+  margin-bottom: 20px;
 }
 .acc-filter-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  gap: var(--ds-spacing-02);
-  row-gap: var(--ds-spacing-02);
+  /* Matches .acc-tag-cluster — see note above. */
+  gap: 6px;
+  row-gap: 6px;
   flex: 1;
   min-width: 0;
 }
@@ -2415,7 +2404,7 @@ const LAYOUT_CSS = `
   cursor: pointer;
 }
 .acc-tree__row:hover { background-color: var(--ds-ghost-hover); }
-.acc-tree__row--leaf { padding-left: var(--ds-spacing-08); }
+.acc-tree__row--leaf { padding-left: 28px; }
 .acc-tree__chev {
   display: inline-flex;
   align-items: center;
@@ -2470,16 +2459,39 @@ const LAYOUT_CSS = `
  * frame — labels still respect 12px horizontal inset internally.
  * Per the project rule "no popover text below 14px," every text
  * class inside .acc-pop floors at 14. */
+/* Popover width tiers (system rule).
+ * Every popover commits to one of three widths: 160 / 240 / 320.
+ * Variants below opt into a tier by setting an explicit width on
+ * the .acc-pop wrapper. The wrapper itself stays width-agnostic so
+ * the tier choice is visible at the variant level, not buried in a
+ * default. */
 .acc-pop {
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-03); /* 8 between blocks */
-  min-width: 220px;
-  max-width: 320px;
+  width: 240px; /* default tier — overridden by variant modifiers */
   padding: var(--ds-spacing-05); /* 16 all sides */
   font-size: 14px;
   line-height: 20px;
   color: var(--ds-text-primary);
+  box-sizing: border-box;
+}
+/* 320 — content-dense surfaces (health, risks, EBC). */
+.acc-pop--health,
+.acc-pop--risks,
+.acc-pop--ebc { width: 320px; }
+/* 240 — single-concept surfaces (sales-play bucket, quarter pipeline,
+ * activity-simple). */
+.acc-pop--simple,
+.acc-pop--quarter,
+.acc-pop--play-bucket { width: 240px; }
+/* Empty-state popovers (any variant) — 2px breathing room between
+ * heading and sub. Default is 0 because the sub's negative top
+ * margin cancels the parent gap-8; for empty branches we want the
+ * sub to read as "directly related to" the heading rather than
+ * collapsed onto it. */
+.acc-pop--empty .acc-pop__sub {
+  margin-top: calc(-1 * var(--ds-spacing-03) + 2px);
 }
 /* Heading + sub sit at the popover's content edge — no extra
  * horizontal margin. With the popover's 16px padding, they land
@@ -2576,7 +2588,6 @@ const LAYOUT_CSS = `
 .acc-pop__risk-list > *,
 .acc-pop__applied-list > * {
   position: relative;
-  min-height: 32px;
   margin: 0;
   padding: 0 var(--ds-spacing-03); /* 8px text inset from row edge */
   cursor: pointer;
@@ -2584,6 +2595,15 @@ const LAYOUT_CSS = `
   border-radius: var(--ds-radius-tight);
   transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
+/* Row-height convention (matches the live table cells):
+ *   if the row carries a tag    → 40px fixed
+ *   else (text-only / emoji)    → 32px fixed
+ * Tag-bearing lists in acc-pop: .acc-pop__rows (health kv with the
+ * adoption / technical Tag chips). Everything else is text-only. */
+.acc-pop__rows > * { height: 40px; }
+.acc-pop__kv-list > *,
+.acc-pop__risk-list > *,
+.acc-pop__applied-list > * { height: 32px; }
 /* Line between rows — inset 8px on each side to align with the
  * text rail rather than the row's outer edge. */
 .acc-pop__rows > * + *::before,
@@ -2654,9 +2674,12 @@ const LAYOUT_CSS = `
 
 /* Table shell — no own border. */
 .acc-table-shell { overflow-x: auto; }
+/* border-separate + border-spacing:0 allows border-radius on <td> —
+ * border-collapse:collapse silently ignores border-radius on cells. */
 .acc-table {
   width: 100%;
-  border-collapse: collapse;
+  border-collapse: separate;
+  border-spacing: 0;
   table-layout: fixed;
 }
 /* th owns no padding; the DS Header component renders its own
@@ -2668,9 +2691,10 @@ const LAYOUT_CSS = `
   padding: 0;
   vertical-align: middle;
 }
-.acc-table thead tr {
-  border-bottom: 1px solid var(--ds-lines-neutral-rest);
-}
+/* No border on header cells — the separator between header and the
+ * first data row is a standalone .acc-divider-row injected at the
+ * top of <tbody>, identical to the inter-row dividers. One line
+ * grammar across the entire table. */
 /* Kill the resting "up-down" indicator on every header — only the
  * active sort arrow on the currently-sorted column remains. Mirrors
  * the opp-table override; without it every column reads as
@@ -2678,48 +2702,94 @@ const LAYOUT_CSS = `
 .acc-table .panw--header__sort-indicator:not(.panw--header__sort-indicator--active) {
   display: none;
 }
+
+/* Per-cell padding + top-left alignment.
+ * First cell:  t:12  r:8   b:12  l:16
+ * Last cell:   t:12  r:8   b:16  l:8
+ * Other cells: t:12  r:8   b:12  l:8
+ * Row corners: 12px radius clipped on first/last td. */
 .acc-table td {
-  padding: var(--ds-spacing-04);
-  vertical-align: middle;
+  padding: 12px 8px;
+  vertical-align: top;
   color: var(--ds-text-secondary-rest);
+}
+.acc-table tbody td:first-child {
+  padding: 12px 8px 12px 16px;
+  border-radius: 8px 0 0 8px;
+}
+.acc-table tbody td:last-child {
+  padding: 12px 8px 16px 8px;
+  border-radius: 0 8px 8px 0;
 }
 
 /* Column widths.
- * Account column gets a fixed 240px to absorb long names without
- * crowding the four equal columns. Value is 140 (compact tabular
- * pair); Actions is 80. The remaining width splits evenly across the
- * four equal columns. */
+ * Account column fixed at 200px (absorbs long names + ARR line).
+ * Value column removed — ARR now lives inside the account column.
+ * Four equal columns split the remainder minus actions. */
 .acc-table th.acc-c-account,
 .acc-table td.acc-c-account { width: 200px; }
+/* Four equal columns take the remainder after the fixed account column.
+ * Actions column removed — buttons float over the row. */
 .acc-table th.acc-c-equal,
-.acc-table td.acc-c-equal { width: calc((100% - 200px - 130px - 72px) / 4); }
-.acc-table th.acc-c-value,
-.acc-table td.acc-c-value { width: 130px; text-align: right; }
-.acc-table th.acc-c-actions,
-.acc-table td.acc-c-actions { width: 72px; }
-.acc-actions {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: var(--ds-spacing-02); /* 4 — button-group spacing per Stage guide */
-}
-
-/* Body row treatment — no zebra, hairline dividers between rows. */
-.acc-table tbody tr { background-color: var(--ds-surface-rest); }
-.acc-table tbody tr + tr { border-top: 1px solid var(--ds-lines-neutral-rest); }
+.acc-table td.acc-c-equal { width: calc((100% - 200px) / 4); }
+/* Row backgrounds — data rows only.
+ * Hover lifts the band so row-level floating actions read as engaged;
+ * no :active state — clicking a row does nothing, so a pressed
+ * background would write a check the interaction can't cash. */
+.acc-table tbody tr { background-color: var(--ds-ghost-rest); }
 .acc-table tbody tr:hover  { background-color: var(--ds-ghost-hover); }
-.acc-table tbody tr:active { background-color: var(--ds-ghost-pressed); }
 
-/* ── Column 1 — Account ─────────────────────────────────────────────────
- * Two-line stack. Name is body-compact-02 bold, secondary text.
- * Apex is label-02, tertiary text. Both clamp to two lines max and
- * ellipsize beyond. */
+/* Standalone divider rows — an independent element between rows, not
+ * a border that belongs to either adjacent row. */
+.acc-divider-row { background-color: transparent !important; pointer-events: none; }
+/* Specificity must beat .acc-table td (0,1,1) and .acc-table tbody td:first-child (0,2,2). */
+.acc-table .acc-divider-row td,
+.acc-table .acc-divider-row td:first-child,
+.acc-table .acc-divider-row td:last-child {
+  padding: 0;
+  border: none;
+  border-radius: 0;
+  height: 0;
+  line-height: 0;
+  font-size: 0;
+}
+.acc-divider { height: 1px; background-color: var(--ds-lines-neutral-rest); transition: opacity 110ms ease; margin: 0 16px; }
+/* Hide the divider below the hovered row */
+.acc-row:hover + .acc-divider-row .acc-divider { opacity: 0; }
+/* Hide the divider above the hovered row */
+.acc-divider-row:has(+ .acc-row:hover) .acc-divider { opacity: 0; }
+/* ── Row-level floating actions ──────────────────────────────────────────
+ * Two highlight-kind buttons that surface only on row hover. The
+ * highlight kind ships its own rest / hover / pressed treatment, so
+ * no per-state CSS swap is needed here. Mirrors the opp-table pattern. */
+.acc-row { position: relative; }
+.acc-row-actions {
+  position: absolute;
+  bottom: 6px;
+  right: 6px;
+  display: flex;
+  gap: var(--ds-spacing-02);
+  z-index: 1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.acc-row:hover .acc-row-actions {
+  opacity: 1;
+  pointer-events: auto;
+}
+/* DS IconButton ships 4px (radius.tight) natively — no local
+ * override needed. */
+
+/* ── Column 1 — Account · Apex · ARR ───────────────────────────────────
+ * Three-line stack. Name bold, Apex secondary, ARR 20px semibold.
+ * Gaps explicit via margin-top: 4px name→apex, 6px apex→ARR.
+ * When apex is absent the ARR reads 4px below the account name.
+ * Padding and alignment handled by the first-child rule above. */
 .acc-multiline {
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-03); /* 8 — matches opp-table rhythm so the
-                                two lines read as a connected pair,
-                                not two collapsed-tight strings. */
+  gap: 0;
   align-items: flex-start;
   min-width: 0;
 }
@@ -2727,7 +2797,7 @@ const LAYOUT_CSS = `
   font-size: 14px;
   line-height: 20px;
   font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
+  color: var(--ds-text-secondary-rest);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
@@ -2735,16 +2805,37 @@ const LAYOUT_CSS = `
   -webkit-box-orient: vertical;
 }
 .acc-multiline__sub {
-  /* 13/18 secondary — mirrors .opp-multiline__sub so the account
-   * name + apex stack reads at the same scale as the opp-name +
-   * account stack in the opp-table. */
+  margin-top: 4px;
   font-size: 13px;
   line-height: 18px;
-  color: var(--ds-text-secondary-rest);
+  color: var(--ds-text-tertiary-rest);
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  cursor: default;
+}
+/* Apex sub-link — gray at rest, underlines on hover. Clickable
+ * affordance without competing visually with the account name link
+ * above it. */
+.acc-multiline__sub-link {
+  text-decoration: none;
+  cursor: pointer;
+  display: inline-block;
+  max-width: 100%;
+}
+.acc-multiline__sub-link:hover {
+  color: var(--ds-text-link-neutral-hover);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+.acc-multiline__value {
+  margin-top: 12px;
+  font-size: 20px;
+  line-height: 28px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
 }
 /* DS "black" Link palette — text.link-neutral family.
  * rest:  --ds-text-link-neutral-rest  (resolved by stage to neutral text)
@@ -2764,7 +2855,7 @@ const LAYOUT_CSS = `
 .acc-tag-cluster {
   display: flex;
   flex-wrap: wrap;
-  gap: var(--ds-spacing-02);
+  gap: 6px;
   align-items: center;
   /* min-width:0 unlocks flex-children to shrink below their content
    * width — required for tag ellipsis truncation below to engage when
@@ -2803,9 +2894,20 @@ const LAYOUT_CSS = `
 .panw--tag.acc-tag--icon-quiet.panw--tag--low.panw--tag--neutral .panw--tag__close-btn {
   color: var(--ds-icons-secondary-rest);
 }
+/* Severity icon colors — tag forced neutral but icon keeps semantic signal.
+ * Specificity (0,5,1) beats icon-quiet (0,4,1). */
+.panw--tag.acc-tag--icon-quiet.panw--tag--low.panw--tag--neutral.acc-act--orange .panw--tag__icon,
+.panw--tag.acc-tag--icon-quiet.panw--tag--low.panw--tag--neutral.acc-ebc--caution .panw--tag__icon {
+  color: var(--ds-icons-status-caution);
+}
+.panw--tag.acc-tag--icon-quiet.panw--tag--low.panw--tag--neutral.acc-act--red .panw--tag__icon,
+.panw--tag.acc-tag--icon-quiet.panw--tag--low.panw--tag--neutral.acc-ebc--danger .panw--tag__icon {
+  color: var(--ds-icons-status-danger);
+}
 
-/* Risk-list inside RiskFactorsPanel popover */
-.acc-pop--risks { max-width: 360px; }
+/* Width for .acc-pop--risks is governed by the 320 tier (top of
+ * this section). The previous max-width:360 override is dropped so
+ * the empty / few / many variants all render at the same width. */
 /* Risk rows: 20px emoji column + 1fr label. Height + dividers +
  * click states come from the shared .acc-pop__risk-list > * rule. */
 .acc-pop__risk-row {
@@ -2816,6 +2918,15 @@ const LAYOUT_CSS = `
 }
 .acc-pop__risk-emoji { font-size: 14px; line-height: 20px; }
 .acc-pop__risk-label {
+  /* Truncate to a single line — rows are fixed-height (32px), so a
+   * second line would overflow and break the rhythm. min-width:0
+   * unlocks the grid child so it can shrink below its content size
+   * and the ellipsis takes effect. Full text is preserved on the
+   * title attribute (browser tooltip on hover). */
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   font-size: 14px;
   line-height: 20px;
   color: var(--ds-text-primary);
@@ -2830,13 +2941,19 @@ const LAYOUT_CSS = `
 }
 .acc-pop__cta {
   display: flex;
-  justify-content: flex-end;
-  /* CTA sits on the same rail as heading + row text (16px from
-   * frame via popover padding alone). The list above already draws
-   * its own bottom hairline, so the CTA adds no second line. */
-  padding-top: var(--ds-spacing-03);
+  /* Whitespace between the last row and the CTA is delegated to the
+   * parent .acc-pop gap-8 (var(--ds-spacing-03)) — adding padding-top
+   * here would compound to 16px and break parity with the opp-pop
+   * CTAs. One spacing source, one rule. */
 }
-.acc-pop--ebc { min-width: 280px; }
+.acc-pop__cta .panw--btn {
+  /* Health + EBC CTAs render as full-width centered buttons inside
+   * the popover frame — the button is the popover's single
+   * commitment, not a corner action. */
+  width: 100%;
+  justify-content: center;
+}
+/* .acc-pop--ebc width is set in the tier block above (320). */
 .acc-health-bars { display: block; }
 
 /* Product popover — single horizontal row at CellStandard default
@@ -2850,8 +2967,13 @@ const LAYOUT_CSS = `
 .acc-pop-row {
   display: flex;
   align-items: center;
-  height: 40px;
-  padding: 0 var(--ds-spacing-05); /* 16 */
+  /* Text + icon row (no tag) → 32px per the popover row-height
+   * convention. Tag-bearing rows use the 40px tier. */
+  height: 32px;
+  /* No horizontal padding: the wrapping .acc-pop already provides
+   * 16px horizontal padding around the row. Compounding the two
+   * would push content to 32px from the popover frame. */
+  padding: 0;
   gap: var(--ds-spacing-03);       /* 8  */
   min-width: 0;
   white-space: nowrap;
@@ -2879,8 +3001,27 @@ const LAYOUT_CSS = `
   margin-left: var(--ds-spacing-06); /* 24 — clear separation from name */
 }
 
-.acc-pop--play-bucket { min-width: 240px; }
+/* .acc-pop--play-bucket width is set in the tier block above (240). */
 
+
+/* Tag padding + shape-rounded radius are now shipped natively by
+ * @ds/tags (size-large: 5/10, shape-rounded+size-large: 4px radius).
+ * Inline .stage overrides removed — let the DS rules take effect. */
+
+/* ── Neutral-low tag reskin ──────────────────────────────────────────────
+ * Neutral-low tags ride the surface family: rest = surface.rest (the
+ * canonical card-white token), hover = surface.hover. Removes the DS
+ * default 1px inset box-shadow. The previous row-hover override that
+ * forced #ffffff is gone: rest already IS surface.rest (white), so the
+ * tag stays legible against the ghost-hover row band without a separate
+ * rule fighting the tag's own :hover. Mirrors opportunity-table. */
+.stage .panw--tag.panw--tag--low.panw--tag--neutral {
+  background-color: var(--ds-surface-rest);
+  box-shadow: none;
+}
+.stage .panw--tag.panw--tag--low.panw--tag--neutral:hover {
+  background-color: var(--ds-surface-hover);
+}
 
 /* Static tag — display-only label inside an interactive wrapper
  * (e.g. a filter trigger button, or a FlyoutItem row). The wrapper
@@ -2944,38 +3085,29 @@ const LAYOUT_CSS = `
   font-variant-numeric: tabular-nums;
 }
 
-/* ── Column 6 — Value (ARR / LTV stack) ─────────────────────────────── */
-.acc-value {
-  /* 14/20 matches .opp-value — the canonical body-compact size for
-   * tabular money in a row. Earlier this was 16/24 to "shout" the
-   * number, but consistency with opp-table wins; users read both
-   * tables back-to-back. */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: var(--ds-spacing-01);
-  font-size: 14px;
-  line-height: 20px;
-  color: var(--ds-text-secondary-rest);
-  font-feature-settings: 'tnum' 1, 'lnum' 1;
-  font-variant-numeric: tabular-nums;
-}
-.acc-value__num {
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
-}
-.acc-value__unit {
-  font-size: 11px;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--ds-text-tertiary-rest);
-}
 `
 
 // ─── Storybook meta ──────────────────────────────────────────────────────
-const meta: Meta = { title: 'compositions/AE Account Table', excludeStories: ['AEAccountTable'] }
+const meta: Meta = {
+  title: 'compositions/AE Account Table',
+  excludeStories: ['AEAccountTable', 'DEFAULT_ROWS', '__accPopoverParts'],
+}
 export default meta
 
 export const Default: StoryObj = {
   render: () => <AEAccountTable />
+}
+
+// Internal handle used by the "explorations/Table Popovers" showcase.
+// Exposed as a single object so Storybook's auto-story-detection ignores
+// it (object exports aren't treated as story renderers). Do not import
+// this from product code — it's a demo seam, not API.
+export const __accPopoverParts = {
+  LAYOUT_CSS,
+  AccountHealthPanel,
+  AccountRiskFactorsPanel,
+  EBCPanel,
+  SalesPlayBucketPanel,
+  ProductARRPanel,
+  QuarterPipelinePanel,
 }

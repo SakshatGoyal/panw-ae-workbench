@@ -66,33 +66,83 @@ $panw-prefix: 'panw';
   }
 }
 
+// No-container variant wrapper — full-width 1px track runs across the entire
+// strip. gap: 16px spaces tabs without left/right padding on the items, so
+// the gap between any two tab labels is exactly 16px (not 32px from double
+// padding). Individual tab ::after pseudo-elements sit at bottom: -1px and
+// span left: 0 / right: 0 (full tab width). Positioned children paint above
+// parent borders in CSS, so the per-tab lines always win over the track.
+.#{$panw-prefix}--tabs--no-container {
+  gap: 8px;
+  border-bottom: 1px solid var(--panw-tabs-border-subtle);
+}
+
 // No-container variant
 //
-// Both states use the same 2px border + 4px text-to-line gap so the
-// baseline stays consistent across the strip — the previous build had
-// selected at 6px and unselected at 4px which shifted the selected
-// label upward by 2px relative to its neighbours.
+// Underline design:
+//   - A full-width 1px neutral track runs across the strip (on the container).
+//   - Each tab owns a full-width underline via ::after (left: 0 / right: 0).
+//     bottom: -1px overlaps the container's border-bottom; positioned children
+//     always paint above parent borders, so the per-tab lines win.
+//   - Selected: 2px brand blue (grows upward from the track).
+//   - Unselected rest: 1px neutral (visually merges with the track).
+//   - Unselected hover: 2px neutral (same thickness as selected, neutral color).
+.#{$panw-prefix}--tabs__item--no-container {
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    transition: height 110ms var(--ds-motion-easing-standard),
+                background-color 110ms var(--ds-motion-easing-standard);
+  }
+}
+
 .#{$panw-prefix}--tabs__item--no-container.#{$panw-prefix}--tabs__item--selected {
   background-color: transparent;
   color: var(--panw-tabs-text);
-  border-bottom: 2px solid var(--panw-tabs-border-accent);
-  padding: 0 16px 4px 16px;
+  padding: 0 4px 4px 4px;
   font-weight: 600;
+
+  &::after {
+    height: 2px;
+    background-color: var(--panw-tabs-border-accent);
+  }
 }
 
 .#{$panw-prefix}--tabs__item--no-container.#{$panw-prefix}--tabs__item--unselected {
   background-color: transparent;
   color: var(--panw-tabs-text-secondary);
-  border-bottom: 2px solid var(--panw-tabs-border-subtle);
-  padding: 0 16px 4px 16px;
+  padding: 0 4px 4px 4px;
   font-weight: 400;
 
-  &:hover, &.#{$panw-prefix}--tabs__item--force-hover { border-bottom-color: var(--panw-tabs-border-medium); }
-  &:active, &.#{$panw-prefix}--tabs__item--force-pressed { border-bottom-color: var(--panw-tabs-border-bold); }
-  &:disabled, &.#{$panw-prefix}--tabs__item--force-disabled {
+  &::after {
+    height: 1px;
+    background-color: var(--panw-tabs-border-subtle);
+  }
+
+  &:hover::after,
+  &.#{$panw-prefix}--tabs__item--force-hover::after {
+    height: 2px;
+    background-color: var(--panw-tabs-border-medium);
+  }
+  &:active::after,
+  &.#{$panw-prefix}--tabs__item--force-pressed::after {
+    height: 2px;
+    background-color: var(--panw-tabs-border-bold);
+  }
+  &:disabled,
+  &.#{$panw-prefix}--tabs__item--force-disabled {
     color: var(--panw-tabs-text-disabled);
-    border-bottom-color: var(--panw-tabs-border-subtle);
     cursor: not-allowed;
+
+    &::after {
+      height: 1px;
+      background-color: var(--panw-tabs-border-subtle);
+    }
   }
 }
 

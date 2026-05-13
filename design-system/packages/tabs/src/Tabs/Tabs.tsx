@@ -30,7 +30,7 @@ export const Tabs = React.forwardRef<HTMLDivElement, TabsProps>(function Tabs(
     <TabsContext.Provider value={{ selectedIndex, onChange, container, forceState }}>
       <div
         ref={ref}
-        className={classNames(`${prefix}--tabs`, className)}
+        className={classNames(`${prefix}--tabs`, !container && `${prefix}--tabs--no-container`, className)}
         role="tablist">
         {items.map((child, index) =>
           React.cloneElement(child as React.ReactElement<{ index?: number }>, { index })

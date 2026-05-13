@@ -42,9 +42,7 @@
 import React, { useState } from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { IconButton } from '@ds/button'
-import { Sort, type SortOption } from '@ds/filter'
-import { Tags, type TagColor } from '@ds/tags'
+import { type SortOption } from '@ds/filter'
 import {
   ArrowDown,
   ArrowUp,
@@ -60,12 +58,6 @@ const ATTAINMENT_BAR_FILL: Record<AttainmentLevel, string> = {
   red:    '#f55868', // red-50    — HEALTH_BAR_FILL.critical
   yellow: '#ffbe4f', // yellow-30 — HEALTH_BAR_FILL.at-risk
   green:  '#3cc29a', // green-40  — HEALTH_BAR_FILL.healthy
-}
-
-const ATTAINMENT_TAG_COLOR: Record<AttainmentLevel, TagColor> = {
-  red:    'red',
-  yellow: 'yellow',
-  green:  'green',
 }
 
 function attainmentLevel(pct: number): AttainmentLevel {
@@ -131,7 +123,7 @@ export interface PlanSummaryData {
 
 export const DEFAULT_PLAN_SUMMARY_DATA: PlanSummaryData = {
   plan: { label: 'Plan:', value: '$1.00B' },
-  planPercent: 88,
+  planPercent: 78,
   categories: CATEGORIES,
   quarterOptions: QUARTER_OPTIONS,
   productOptions: PRODUCT_OPTIONS,
@@ -206,70 +198,70 @@ export function PlanForecastSummary({
   defaultOpen = false,
 }: PlanSummaryProps = {}) {
   const [open, setOpen] = useState(defaultOpen)
-  const [quarter, setQuarter] = useState<string>('cq')
-  const [product, setProduct] = useState<string>('all')
 
   const { planPercent } = data
-  const level = attainmentLevel(planPercent)
 
+  const toggle = () => setOpen((o) => !o)
+  // Keyboard: Enter / Space on the card toggles. Space's default page-scroll
+  // is suppressed via preventDefault.
+  const onKey = (e: React.KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault()
+      toggle()
+    }
+  }
   return (
     <div className="psum-page">
       <style>{COMPOSITION_CSS}</style>
-      <section className="psum-card" aria-label="Plan and Forecast Summary">
-        {/* ── Filter bar (h=48) ───────────────────────────────────── */}
-        <div className="psum-filterbar">
-          <h2 className="psum-title">Plan &amp; Forecast Summary</h2>
-          <div className="psum-controls">
-            <Sort
-              className="psum-pill"
-              label="Quarter"
-              options={data.quarterOptions}
-              value={quarter}
-              onChange={setQuarter}
-            />
-            <Sort
-              className="psum-pill"
-              label="Product"
-              options={data.productOptions}
-              value={product}
-              onChange={setProduct}
-            />
-            <IconButton
-              renderIcon={open ? ChevronUp : ChevronDown}
-              aria-label={open ? 'Collapse summary' : 'Expand summary'}
-              kind="ghost"
-              size="sm"
-              onClick={() => setOpen((o) => !o)}
-            />
-          </div>
-        </div>
-
-        {/* ── Plan row (h=48) ──────────────────────────────────────── */}
+      <section
+        className="psum-card"
+        role="button"
+        tabIndex={0}
+        aria-label="Plan and Forecast Summary — click to toggle details"
+        aria-expanded={open}
+        onClick={toggle}
+        onKeyDown={onKey}
+      >
+        {/* ── Plan row (h=48) ──────────────────────────────────────────
+            Single horizontal row: text · bar · chevron, 16px gaps.
+            Text format: "FY26: 78% of $14.00 attained" — body-02 with
+            the middle phrase ("78% of $14.00") bold. Bar fill width
+            tracks the attainment percent so visual length matches the
+            numeric readout. Chevron is decorative; clicks bubble up to
+            the card's toggle handler. */}
         <div className="psum-planrow">
-          <div className="psum-planrow__title">
-            <span className="psum-planrow__label">{data.plan.label}</span>
-            <span className="psum-planrow__value">{data.plan.value}</span>
-          </div>
+          <span className="psum-planrow__title">
+            FY26:{' '}
+            <strong className="psum-planrow__emph">
+              {planPercent}% of $14.00
+            </strong>
+            {' '}attained
+          </span>
           <PlanProgress percent={planPercent} />
-          <Tags
-            color={ATTAINMENT_TAG_COLOR[level]}
-            contrast="low"
-            shape="rounded"
-            size="large"
-            label={`${planPercent}% on track`}
-          />
+          <span className="psum-chevron" aria-hidden="true">
+            {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+          </span>
         </div>
 
-        {/* ── Cells strip (expanded only) ──────────────────────────── */}
-        {open && (
-          <div className="psum-cells" role="list">
-            {data.categories.map((c) => (
-              <div role="listitem" key={c.label} className="psum-cell-wrap">
-                <Cell datum={c} />
-              </div>
-            ))}
+        {/* ── Cells drawer ───────────────────────────────────────────
+            Always rendered so the open/close transition animates
+            height via the grid-template-rows 0fr → 1fr trick. The
+            inner wrapper carries overflow:hidden so collapsed content
+            doesn't paint outside the row. */}
+        <div
+          className={`psum-drawer${open ? ' psum-drawer--open' : ''}`}
+          aria-hidden={!open}
+        >
+          <div className="psum-drawer__inner">
+            <div className="psum-cells" role="list">
+              {data.categories.map((c) => (
+                <div role="listitem" key={c.label} className="psum-cell-wrap">
+                  <Cell datum={c} />
+                </div>
+              ))}
+            </div>
           </div>
-        )}
+        </div>
       </section>
     </div>
   )
@@ -285,89 +277,68 @@ const COMPOSITION_CSS = `
   font-family: var(--ds-type-font-family-sans);
 }
 
-/* ── Card — no shadow, no border, neutral-10 ground.
- * Separation from the page (stage.base) is carried by the surface
- * delta alone — no elevation, no outline. */
+/* ── Card — interactive ghost surface.
+ * The whole card is the click target — anywhere outside a nested
+ * interactive (Sort triggers, chevron) toggles the cells drawer.
+ * State chrome follows the ghost family:
+ *   rest      ghost.rest    (transparent)
+ *   hover     ghost.hover   (alpha neutral, only when no child is hovered)
+ *   pressed   ghost.pressed
+ * :hover:not(:has(:hover)) per stage-background-colors.md "Nested
+ * interactive scopes never both hover at once." */
 .psum-card {
-  background-color: var(--ds-color-core-neutral-10);
+  background-color: var(--ds-ghost-rest);
   border-radius: var(--ds-radius-standard);
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  cursor: pointer;
+  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+/* The card no longer has any interactive descendants — the chevron is
+ * decorative and the filters are gone — so plain :hover is correct.
+ * Hover lifts the filter-bar divider to lines.bold for stronger
+ * affordance signal that the whole card is the click target. */
+.psum-card:hover {
+  background-color: var(--ds-ghost-hover);
+}
+.psum-card:active {
+  background-color: var(--ds-ghost-pressed);
+}
+.psum-card:focus-visible {
+  outline: 2px solid var(--ds-text-brand-rest);
+  outline-offset: -2px;
 }
 
-/* ── Filter bar (h=48) ──────────────────────────────────────────────────
- * Divider below the filter bar is inset 16px from each side — does not
- * run edge to edge. Drawn as a ::after pseudo so the inset is intrinsic
- * to the strip, not a separate JSX node. */
-.psum-filterbar {
-  position: relative;
-  display: flex;
+/* Chevron — decorative affordance, not a button. Sits at the right
+ * edge of the plan row, inherits the card's color and reads through
+ * currentColor on the icon. No pointer-events override needed: with no
+ * onClick of its own, clicks pass through to the card's toggle handler. */
+.psum-chevron {
+  display: inline-flex;
   align-items: center;
-  gap: var(--ds-spacing-03);             /* 8 */
-  padding: 0 var(--ds-spacing-05);       /* 0 16 */
-  min-height: 48px;
-}
-.psum-filterbar::after {
-  content: '';
-  position: absolute;
-  left: var(--ds-spacing-05);            /* 16 from left */
-  right: var(--ds-spacing-05);           /* 16 from right */
-  bottom: 0;
-  height: 1px;
-  background-color: var(--ds-lines-neutral-rest);
-}
-.psum-title {
-  flex: 1;
-  min-width: 0;
-  margin: 0;
-  color: var(--ds-text-primary);
-  font-size: 16px;
-  line-height: 1.5;
-  font-weight: var(--ds-type-font-weight-semibold);
-  letter-spacing: 0;
-}
-.psum-controls {
-  display: flex;
-  align-items: center;
-  gap: var(--ds-spacing-02);             /* 4 */
+  justify-content: center;
+  color: var(--ds-icons-secondary-rest);
 }
 
-/* Sort with direction glyph hidden — the Plan Summary's Quarter and
- * Product selectors are pure single-selects (no asc/desc dimension).
- * We CSS-suppress the direction slot without touching the DS package. */
-.psum-pill .panw--sort__direction {
-  display: none !important;
-}
-
-/* ── Plan row (h=48) ──────────────────────────────────────────────────────
- * No border-bottom: in the collapsed state this is the last child and
- * its bottom border would stack on top of the card's outer border,
- * producing a visible 2px double-line on the straight bottom edge.
- * The divider between plan row and cells (expanded) is carried by
- * .psum-cells border-top instead. */
+/* ── Plan row — single horizontal row: text · bar · chevron, gap 16.
+ * Text is body-02 (16/24 regular); the middle phrase carries the
+ * semibold weight via inline <strong>. */
 .psum-planrow {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-03);             /* 8 */
+  gap: var(--ds-spacing-05);             /* 16 */
   padding: 0 var(--ds-spacing-05);       /* 0 16 */
   min-height: 48px;
 }
 .psum-planrow__title {
-  display: inline-flex;
-  align-items: baseline;
-  gap: var(--ds-spacing-02);             /* 4 */
   flex-shrink: 0;
-}
-.psum-planrow__label {
-  color: var(--ds-text-secondary-rest);
-  font-size: 14px;
-  line-height: 1.42857;
-}
-.psum-planrow__value {
   color: var(--ds-text-primary);
-  font-size: 14px;
-  line-height: 1.42857;
+  font-size: 16px;                       /* body-02 */
+  line-height: 1.5;
+  letter-spacing: 0;
+}
+.psum-planrow__emph {
   font-weight: var(--ds-type-font-weight-semibold);
   font-variant-numeric: tabular-nums;
 }
@@ -392,6 +363,42 @@ const COMPOSITION_CSS = `
   top: 0;
   bottom: 0;
   border-radius: var(--ds-radius-pill);
+}
+
+/* ── Drawer — animated open/close ────────────────────────────────────────
+ * Per stage-motion.md: the drawer is transitioning in place inside the
+ * card (not entering/leaving view from elsewhere) — productive STANDARD
+ * easing on both axes. 120ms duration sits between fast-02 (110ms) and
+ * moderate-01 (150ms); off-scale but tuned per "When no named scale
+ * fits — calculate from the same logic" in the doc.
+ *
+ * Height animates via the grid-template-rows 0fr → 1fr pattern so the
+ * row resolves to its content height without a fixed max-height. A
+ * parallel opacity fade carries the content arrival so the height
+ * change doesn't read as an empty pop.
+ *
+ * prefers-reduced-motion: drop both transitions, render in final state. */
+.psum-drawer {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 120ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.psum-drawer--open {
+  grid-template-rows: 1fr;
+}
+.psum-drawer__inner {
+  overflow: hidden;
+  opacity: 0;
+  transition: opacity 120ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+.psum-drawer--open .psum-drawer__inner {
+  opacity: 1;
+}
+@media (prefers-reduced-motion: reduce) {
+  .psum-drawer,
+  .psum-drawer__inner {
+    transition: none;
+  }
 }
 
 /* ── Cells strip (Segment Container) ─────────────────────────────────────

@@ -1,7 +1,7 @@
 export default function PageHeader() {
   return (
     <header className="cd-page-header">
-      <h1 className="cd-page-header__title">Account Executive Workbench</h1>
+      <h3 className="cd-page-header__title">Account Executive Workbench</h3>
       <p className="cd-page-header__subtitle">
         Plan, forecast, and triage your book of business.
       </p>

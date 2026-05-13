@@ -32,7 +32,7 @@
 }
 
 .panw--tag--shape-rounded.panw--tag--size-default {
-  border-radius: 2px;
+  border-radius: 4px;
 }
 
 .panw--tag--shape-rounded.panw--tag--size-large {
@@ -42,7 +42,7 @@
 // ─── Sizes ───────────────────────────────────────────────────────────────────
 
 .panw--tag--size-default {
-  padding: 4px 8px;
+  padding: 2px 6px;
   gap: 4px;
 
   .panw--tag__icon,
@@ -58,14 +58,14 @@
   }
 
   .panw--tag__label {
-    // Tags never wrap — line-height tracks the glyph (100%) so the chip
-    // height comes from padding alone, with no extra leading.
-    @include tag-typography(12px, 12px);
+    // Tags never wrap — 120% line-height gives glyph clearance for
+    // descenders and accented characters without adding visible leading.
+    @include tag-typography(12px, 14.4px);
   }
 }
 
 .panw--tag--size-large {
-  padding: 8px 12px;
+  padding: 5px 10px;
   gap: 8px;
 
   .panw--tag__icon,
@@ -81,7 +81,7 @@
   }
 
   .panw--tag__label {
-    @include tag-typography(14px, 14px);
+    @include tag-typography(14px, 16.8px);
   }
 }
 
@@ -145,13 +145,11 @@
     .panw--tag__icon,
     .panw--tag__close-btn { color: var(--ds-tag-#{$name}-low-icon-rest); }
 
-    // Pastel grounds darken too aggressively when the bg moves to
-    // primitive-30. Instead the hover state pulls in a 1px inset border
-    // in currentColor (the variant's text), which echoes the family
-    // without dimming the chip. The icon pulls in alongside, stepping
-    // toward text-tier so the chip reads as a single engaged object.
+    // Hover shifts the ground to a 30%-blend toward primitive-30 —
+    // gentle enough to stay in the same color lane, visible enough to
+    // read as engaged. No border artifact. The icon steps in alongside.
     &:hover {
-      box-shadow: inset 0 0 0 1px currentColor;
+      background-color: var(--ds-tag-#{$name}-low-bg-hover);
       .panw--tag__icon,
       .panw--tag__close-btn { color: var(--ds-tag-#{$name}-low-icon-hover); }
     }
@@ -186,23 +184,21 @@
 }
 
 // ─── Neutral (structural odd-one-out) ───────────────────────────────────────
-// Neutral departs from the categorical palette: low sits on field.alt
-// (neutral0) with a 1px neutral line, high sits on surface.inverse (neutral90)
-// like the tooltip ground. Both carry hover/pressed states sourced from the
-// same families — it's the one tag variant that responds to interaction the
-// way a control would.
+// Neutral departs from the categorical palette: low sits on field (neutral5)
+// with no border — borderless, like all other low tags after this change.
+// High sits on surface.inverse (neutral90) like the tooltip ground.
+// Both carry hover/pressed states sourced from the same families.
 //
-// Color/surface propagation follows the matching-family rule: text and the
-// border on low neutral both move through the neutral family; high neutral
-// uses inverse text.
+// Using field (neutral5) instead of field.alt (neutral0/white) gives the tag
+// a distinct resting ground that reads as a chip, not a floating label.
+// Hover/pressed follow the field sequence: neutral5 → field.hover → field.pressed.
 
 .panw--tag.panw--tag--low.panw--tag--neutral {
-  background-color: var(--ds-field-alt-rest);
+  background-color: var(--ds-field-rest);
   color: var(--ds-text-primary);
-  // Inset shadow rather than a real border — keeps neutral the same outer
-  // dimensions as the categorical tags so a chip cloud mixing the two
-  // doesn't ladder by 2px.
-  box-shadow: inset 0 0 0 1px var(--ds-lines-neutral-rest);
+  // No border — neutral now uses a field-ground chip, same shape as
+  // categorical low tags. Inset shadow removed to match the new borderless
+  // stance.
 
   // Neutral is an interactive chip — icon follows the system's interactive
   // icon family (icons.secondary), not the static icons.primary. Sourcing
@@ -213,12 +209,12 @@
   .panw--tag__close-btn { color: var(--ds-icons-secondary-rest); }
 
   &:hover  {
-    background-color: var(--ds-field-alt-hover);
+    background-color: var(--ds-field-hover);
     .panw--tag__icon,
     .panw--tag__close-btn { color: var(--ds-icons-secondary-hover); }
   }
   &:active {
-    background-color: var(--ds-field-alt-pressed);
+    background-color: var(--ds-field-pressed);
     .panw--tag__icon,
     .panw--tag__close-btn { color: var(--ds-icons-secondary-pressed); }
   }

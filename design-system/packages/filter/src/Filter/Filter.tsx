@@ -194,6 +194,7 @@ export const Filter = React.forwardRef<HTMLButtonElement, FilterProps>(
                     color="neutral"
                     contrast="high"
                     size="default"
+                    shape="rounded"
                   />
                 </span>
               </span>

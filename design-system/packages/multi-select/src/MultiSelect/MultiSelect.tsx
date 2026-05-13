@@ -230,6 +230,7 @@ export const MultiSelect = React.forwardRef<HTMLDivElement, MultiSelectProps>(
                     color="neutral"
                     contrast="high"
                     size="default"
+                    shape="rounded"
                     close
                     onClose={(e) => {
                       e.stopPropagation();

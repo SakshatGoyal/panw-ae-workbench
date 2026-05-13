@@ -6,7 +6,7 @@
 //
 // Geometry per stage-spacing.md flyout pattern:
 //   container = radius.standard (8px), 8px internal padding all sides
-//   items     = 8v / 12h padding, gap 0 (contiguous), radius.tight (4px)
+//   items     = 8v / 12h padding, 2px row gap, radius.tight (4px)
 //   shadow    = --ds-shadow-flyout
 //
 // Items get radius.tight so they read as inset chips inside the padded ground.
@@ -25,6 +25,15 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  // Width sizes to content between a 200px floor (so the panel never
+  // collapses to icon-button width off a small trigger) and a 320px
+  // ceiling (so long labels truncate rather than producing a runway
+  // panel). Mirrors FLYOUT_WIDTH in types.ts. The positioning hook
+  // (Flyout.tsx usePosition) measures the actually-rendered width and
+  // uses it for the bottom-end left-anchor and viewport-edge clamp.
+  width: max-content;
+  min-width: 200px;
+  max-width: 320px;
   // Outer max-height set inline by positioning hook; List handles overflow.
 
   // Subtle entrance — flyouts hold interactive lists, not narrative, so the
@@ -272,7 +281,7 @@
   font-family: var(--ds-type-font-family-sans);
   font-size: 12px;
   line-height: 16px;
-  letter-spacing: 0.25px;
+  letter-spacing: 0.10px;
   max-width: 280px;
   // Vertically center against the item via translateY(-50%).
   transform: translateY(-50%);
@@ -298,4 +307,10 @@
   padding: 8px;
   border-top: 1px solid var(--panw-flyout-divider);
   margin: 4px -8px -8px;
+  // Pin the footer so Apply/Cancel stay visible when the panel's
+  // computed max-height is tight (trigger near the viewport bottom).
+  // The panel is a flex column with overflow:hidden; without this the
+  // footer would shrink past its natural height and be clipped, while
+  // the list (flex:1 1 auto, overflow-y:auto) scrolls internally.
+  flex-shrink: 0;
 }

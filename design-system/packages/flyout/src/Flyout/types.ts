@@ -14,10 +14,14 @@ export type FlyoutPlacement = (typeof FlyoutPlacements)[number];
 export const FLYOUT_MAX_DEPTH = 3;
 
 /**
- * Fixed flyout width. The width does not track the anchor — labels truncate
- * with ellipsis at 320px and reveal full text via a delayed hover tooltip
- * on the item. This keeps flyouts from being narrow off small triggers
- * (kebabs, icon buttons) or absurdly wide off long ones.
+ * Maximum flyout width. The panel sizes to its content (`width: max-content`
+ * in CSS) and is clamped between a 200px floor (so the panel never collapses
+ * to icon-button width off a small trigger) and this 320px ceiling (so a
+ * long label can't produce a runway-long panel — labels truncate with
+ * ellipsis at this width and reveal full text via a delayed hover tooltip
+ * on the item). This constant is also used by the positioning hook as the
+ * worst-case width for the initial viewport-edge clamp before the panel's
+ * real width is measured.
  */
 export const FLYOUT_WIDTH = 320;
 

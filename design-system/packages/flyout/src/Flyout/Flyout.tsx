@@ -52,7 +52,6 @@ export const FLYOUT_DEPTH_MAX = FLYOUT_MAX_DEPTH;
 interface PositionStyle {
   top: number;
   left: number;
-  width: number;
   maxHeight: number;
   visibility: 'hidden' | 'visible';
 }
@@ -66,7 +65,6 @@ function usePosition(
   const [style, setStyle] = useState<PositionStyle>({
     top: 0,
     left: 0,
-    width: 0,
     maxHeight: 0,
     visibility: 'hidden',
   });
@@ -81,10 +79,13 @@ function usePosition(
     const viewportWidth = window.innerWidth;
     const offset = 4; // Stage's trigger-to-flyout gap
 
-    // Fixed 320px width per Stage flyout convention — width does not track
-    // the anchor. Long item labels truncate and reveal on hover (Item.tsx).
+    // Width is governed by CSS now (.panw--flyout: width: max-content with
+    // 200px floor + FLYOUT_WIDTH ceiling). Measure the actually-rendered
+    // width so the bottom-end left-anchor and viewport-edge clamp use the
+    // panel's real footprint, not a constant ceiling. Fall back to
+    // FLYOUT_WIDTH on the very first pass before layout settles.
     const flyoutHeight = flyout.scrollHeight;
-    const flyoutWidth = FLYOUT_WIDTH;
+    const flyoutWidth = flyout.offsetWidth || FLYOUT_WIDTH;
 
     const spaceBelow = viewportHeight - anchorRect.bottom - offset - 8;
     const spaceAbove = anchorRect.top - offset - 8;
@@ -110,7 +111,6 @@ function usePosition(
     setStyle({
       top,
       left,
-      width: flyoutWidth,
       maxHeight: Math.max(120, maxHeight),
       visibility: 'visible',
     });
@@ -285,7 +285,6 @@ export const Flyout = React.forwardRef<HTMLDivElement, FlyoutProps>(function Fly
             position: 'fixed',
             top: position.top,
             left: position.left,
-            width: position.width,
             maxHeight: position.maxHeight,
             visibility: position.visibility,
           }}>

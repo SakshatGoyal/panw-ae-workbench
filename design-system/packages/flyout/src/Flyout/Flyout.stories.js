@@ -311,7 +311,7 @@ export const LongLabels = () => {
         <FlyoutList>
           <FlyoutItem value="a">Short</FlyoutItem>
           <FlyoutItem value="b">A reasonably long option label that fits</FlyoutItem>
-          <FlyoutItem value="c">An exceptionally long option label that will definitely truncate at the 320px flyout width</FlyoutItem>
+          <FlyoutItem value="c">An exceptionally long option label that will definitely truncate at the 320px flyout max-width</FlyoutItem>
           <FlyoutItem value="d">Q3 FY24 enterprise expansion deal — Acme Corp customer success forecast</FlyoutItem>
           <FlyoutItem value="e">Another genuinely lengthy option to test the hover-after-1s tooltip behavior properly</FlyoutItem>
         </FlyoutList>

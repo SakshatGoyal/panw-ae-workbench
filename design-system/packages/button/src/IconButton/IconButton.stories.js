@@ -32,7 +32,7 @@ const iconMap = {
 
 const sharedArgTypes = {
   kind: {
-    options: ['ghost', 'ghost-accent', 'primary', 'secondary', 'danger'],
+    options: ['ghost', 'ghost-accent', 'primary', 'secondary', 'danger', 'highlight'],
     control: { type: 'select' },
     table: { defaultValue: { summary: '"ghost"' } },
   },
@@ -123,6 +123,10 @@ export const Danger = () => (
   <IconButton kind="danger" renderIcon={(p) => <Trash2 size={16} {...p} />} aria-label="Delete" onClick={action('onClick')} />
 );
 
+export const Highlight = () => (
+  <IconButton kind="highlight" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add" onClick={action('onClick')} />
+);
+
 // ─── Size stories ─────────────────────────────────────────────────────────────
 
 export const Sizes = () => (
@@ -170,7 +174,7 @@ Selected.storyName = 'Selected State (ghost / ghost-accent)';
 
 export const Disabled = () => (
   <div style={{ display: 'flex', gap: '8px' }}>
-    {['ghost', 'ghost-accent', 'primary', 'secondary', 'danger'].map((kind) => (
+    {['ghost', 'ghost-accent', 'primary', 'secondary', 'danger', 'highlight'].map((kind) => (
       <IconButton key={kind} kind={kind} disabled renderIcon={(p) => <Plus size={16} {...p} />} aria-label={`${kind} disabled`} />
     ))}
   </div>
@@ -178,7 +182,7 @@ export const Disabled = () => (
 
 // ─── All Variants matrix ──────────────────────────────────────────────────────
 
-const IB_KINDS = ['ghost', 'ghost-accent', 'primary', 'secondary', 'danger'];
+const IB_KINDS = ['ghost', 'ghost-accent', 'primary', 'secondary', 'danger', 'highlight'];
 const IB_SIZES = ['sm', 'md', 'lg'];
 
 export const AllVariants = () => (

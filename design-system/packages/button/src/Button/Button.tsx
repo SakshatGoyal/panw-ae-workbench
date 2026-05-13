@@ -25,6 +25,7 @@ export const ButtonKinds = [
   'ghost',
   'ghost-brand',
   'danger',
+  'highlight',
 ] as const;
 
 export type ButtonKind = (typeof ButtonKinds)[number];

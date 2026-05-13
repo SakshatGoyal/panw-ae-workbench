@@ -171,6 +171,29 @@
   }
 }
 
+// Highlight — alpha-blue filled, brand text. Sits between primary (solid brand)
+// and tertiary (ghost). Disabled is surface-led: the blue wash dims alongside
+// the text rather than going transparent, preserving the blueish read.
+.panw--btn--highlight {
+  background-color: var(--panw-button-highlight-bg);
+  color: var(--panw-button-highlight-text);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-button-highlight-bg-hover);
+    color: var(--panw-button-highlight-text-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-button-highlight-bg-active);
+    color: var(--panw-button-highlight-text-pressed);
+  }
+
+  &:disabled {
+    background-color: var(--panw-button-highlight-bg-disabled);
+    color: var(--panw-button-highlight-text-disabled);
+  }
+}
+
 // Danger — red filled, inverse text. Surface.danger.disabled (red30) is the
 // carve-out where the surface itself dims rather than content.
 .panw--btn--danger {

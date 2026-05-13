@@ -177,6 +177,27 @@
   }
 }
 
+// Highlight — alpha-blue filled, brand glyph. Mirrors text Button highlight.
+.panw--btn-icon--highlight {
+  background-color: var(--panw-icon-button-highlight-bg);
+  color: var(--panw-icon-button-highlight-color);
+
+  &:hover:not(:disabled) {
+    background-color: var(--panw-icon-button-highlight-bg-hover);
+    color: var(--panw-icon-button-highlight-color-hover);
+  }
+
+  &:active:not(:disabled) {
+    background-color: var(--panw-icon-button-highlight-bg-active);
+    color: var(--panw-icon-button-highlight-color-pressed);
+  }
+
+  &:disabled {
+    background-color: var(--panw-icon-button-highlight-bg-disabled);
+    color: var(--panw-icon-button-highlight-color-disabled);
+  }
+}
+
 // Danger — red filled, inverse glyph. Mirrors text Button danger.
 .panw--btn-icon--danger {
   background-color: var(--panw-button-danger-bg);

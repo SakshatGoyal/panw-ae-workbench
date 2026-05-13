@@ -19,6 +19,7 @@ export const IconButtonKinds = [
   'primary',
   'secondary',
   'danger',
+  'highlight',
 ] as const;
 
 export type IconButtonKind = (typeof IconButtonKinds)[number];

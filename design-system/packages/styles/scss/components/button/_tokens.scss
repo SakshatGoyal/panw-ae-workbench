@@ -76,6 +76,20 @@
   --panw-button-ghost-brand-text-pressed: var(--ds-text-brand-pressed);
   --panw-button-ghost-brand-text-disabled: var(--ds-text-brand-disabled);
 
+  // ── Highlight (filled alpha-blue, brand text) ─────────────────────────────
+  // Sits between primary (solid brand fill) and tertiary (ghost + brand text).
+  // Uses the highlight.* surface family — a blue wash that reads as engaged
+  // without the full weight of primary. Text stays in the brand family
+  // throughout so the blue ground + blue text read as a single brand signal.
+  --panw-button-highlight-bg:           var(--ds-highlight-rest);
+  --panw-button-highlight-bg-hover:     var(--ds-highlight-hover);
+  --panw-button-highlight-bg-active:    var(--ds-highlight-pressed);
+  --panw-button-highlight-bg-disabled:  var(--ds-highlight-disabled);
+  --panw-button-highlight-text:         var(--ds-text-brand-rest);
+  --panw-button-highlight-text-hover:   var(--ds-text-brand-hover);
+  --panw-button-highlight-text-pressed: var(--ds-text-brand-pressed);
+  --panw-button-highlight-text-disabled: var(--ds-text-brand-disabled);
+
   // ── Danger ────────────────────────────────────────────────────────────────
   --panw-button-danger-bg:           var(--ds-surface-danger-rest);
   --panw-button-danger-bg-hover:     var(--ds-surface-danger-hover);
@@ -91,6 +105,15 @@
   // Icon-button preserves a brand-vs-neutral split per kind because at icon
   // sizes the kind name doesn't carry color intent — the glyph does. See
   // _icon-button.scss for the resolved aesthetic.
+  --panw-icon-button-highlight-bg:              var(--ds-highlight-rest);
+  --panw-icon-button-highlight-bg-hover:        var(--ds-highlight-hover);
+  --panw-icon-button-highlight-bg-active:       var(--ds-highlight-pressed);
+  --panw-icon-button-highlight-bg-disabled:     var(--ds-highlight-disabled);
+  --panw-icon-button-highlight-color:           var(--ds-icons-brand-rest);
+  --panw-icon-button-highlight-color-hover:     var(--ds-icons-brand-hover);
+  --panw-icon-button-highlight-color-pressed:   var(--ds-icons-brand-pressed);
+  --panw-icon-button-highlight-color-disabled:  var(--ds-icons-brand-disabled);
+
   --panw-icon-button-ghost-color:                var(--ds-icons-secondary-rest);
   --panw-icon-button-ghost-color-hover:          var(--ds-icons-secondary-hover);
   --panw-icon-button-ghost-color-pressed:        var(--ds-icons-secondary-pressed);

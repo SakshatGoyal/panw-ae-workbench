@@ -52,6 +52,7 @@ import {
 const meta: Meta = {
   title: 'compositions/AE Account Panel',
   parameters: { layout: 'fullscreen' },
+  excludeStories: ['AccountPanel'],
 }
 export default meta
 
@@ -1200,7 +1201,12 @@ export interface AccountPanelProps {
 //     a browser-native tooltip; it's unreliable and not what the rest
 //     of the panel uses.)
 const PAST_MONTHS = 12
-const FUTURE_MONTHS = 10
+// Future months are generated generously so the row fills to the right
+// edge of the (white) Aggregated Health tile at any panel width — the
+// trend's overflow:hidden clips anything that overshoots. RENEWAL_FUTURE_INDEX
+// stays at 2 so the renewal dot remains the third future month and is
+// always within the visible range at this panel width.
+const FUTURE_MONTHS = 24
 const RENEWAL_FUTURE_INDEX = 2 // 3rd future month (0-indexed)
 const TREND_INNER_H = 60
 function HealthTrendSparkline({ trend }: { trend: HealthStatus[] }) {
@@ -1285,7 +1291,7 @@ function ProductHealthBlock({ row }: { row: ProductHealthRow }) {
   )
 }
 
-function AccountPanel({
+export function AccountPanel({
   data = DEFAULT_ACCOUNT_PANEL_DATA,
   initialOpenOppId,
 }: AccountPanelProps = {}) {
@@ -1400,13 +1406,22 @@ function AccountPanel({
           <div className="acc-id-row">
             <span className="acc-id-row__label">LTV</span>
             <div className="acc-id-row__value-row">
-              <span className="acc-id-row__value">{fmtMoneyShort(data.account.lifetimeValue)}</span>
+              <span className="acc-id-row__value acc-id-row__value--bold">{fmtMoneyShort(data.account.lifetimeValue)}</span>
+            </div>
+          </div>
+          <div className="acc-header-divider" aria-hidden="true" />
+          {/* ARR row — same identity-row grammar as LTV. Value derived from
+              the per-product ARR breakdown (sum across owned products), so
+              it stays in sync with the Account Health section's data. */}
+          <div className="acc-id-row">
+            <span className="acc-id-row__label">ARR</span>
+            <div className="acc-id-row__value-row">
+              <span className="acc-id-row__value acc-id-row__value--bold">
+                {fmtMoneyShort(data.productHealth.reduce((acc, p) => acc + p.arrUsd, 0))}
+              </span>
             </div>
           </div>
         </header>
-
-        {/* Header terminus — closes the identity plate before the section stack. */}
-        <div className="acc-panel__header-divider" aria-hidden="true" />
 
         {/* ── Section stack ─────────────────────────────────────────────
             Top-level sections are *not* tiles — they're section bands on
@@ -1423,7 +1438,7 @@ function AccountPanel({
         <div className="acc-section-stack">
 
         <Accordion
-          size="large" theme="gray00" orientation="right"
+          size="large" theme="gray10" orientation="right"
           title="Install Base" showIcon={false}
           showTag tagLabel="$25.8M" tagColor="cobalt" tagContrast="low" tagShape="rounded" tagSize="large"
           open={openSections.installBase}
@@ -1457,8 +1472,6 @@ function AccountPanel({
           </div>
         </Accordion>
 
-        <div className="acc-section-divider" aria-hidden="true" />
-
         {/*
          * Sales Play section — three-tier $value tag grammar per the
          * sales-play domain model:
@@ -1475,7 +1488,7 @@ function AccountPanel({
          * the POC stage.
          */}
         <Accordion
-          size="large" theme="gray00" orientation="right"
+          size="large" theme="gray10" orientation="right"
           /* Title renders as JSX so the rollup tag can carry the NotTouched
              icon (DS Accordion's `tagLabel` only accepts a string). The
              cast is at the prop-call boundary — runtime path is React's
@@ -1506,7 +1519,7 @@ function AccountPanel({
               return (
                 <Accordion
                   key={family.id}
-                  size="small" theme="gray10" orientation="right"
+                  size="small" theme="gray00" orientation="right"
                   title={(
                     <SectionTitleWithTag
                       text={family.name}
@@ -1537,8 +1550,6 @@ function AccountPanel({
           </div>
         </Accordion>
 
-        <div className="acc-section-divider" aria-hidden="true" />
-
         {/*
          * Opportunities in Next 4Q (Phase 3) — structural skeleton.
          * Section header tag is the section's TOTAL pipeline (not Not-Touched-
@@ -1553,7 +1564,7 @@ function AccountPanel({
          * critiqued in its at-rest shape before behavior layers on top.
          */}
         <Accordion
-          size="large" theme="gray00" orientation="right"
+          size="large" theme="gray10" orientation="right"
           title="Opportunities in Next 4Q" showIcon={false}
           showTag tagLabel={fmtMoneyShort(accOppsTotal)}
           tagColor="lime" tagContrast="low" tagShape="rounded" tagSize="large"
@@ -1584,7 +1595,7 @@ function AccountPanel({
               return (
                 <Accordion
                   key={opp.id}
-                  size="small" theme="gray10" orientation="right"
+                  size="small" theme="gray00" orientation="right"
                   title={opp.name}
                   description={summary as unknown as string}
                   showIcon={false}
@@ -1603,8 +1614,6 @@ function AccountPanel({
               per-opp "Open in SFDC" footer below already carries it. */}
         </Accordion>
 
-        <div className="acc-section-divider" aria-hidden="true" />
-
         {/*
          * Account Health (Phase 5) — single-level accordion (no nested
          * accordions inside, per spec §7). Section header tag carries the
@@ -1618,7 +1627,7 @@ function AccountPanel({
          *      sections that hand off to a deeper surface)
          */}
         <Accordion
-          size="large" theme="gray00" orientation="right"
+          size="large" theme="gray10" orientation="right"
           title="Account Health" showIcon={false}
           showTag
           tagLabel={HEALTH_LABELS[overallHealth]}
@@ -1638,6 +1647,7 @@ function AccountPanel({
               ground while the parent communicates status by color.
             */}
             <div className="acc-health-status-tile">
+              <h3 className="acc-health-status-tile__heading">Aggregated Health</h3>
               <div className="acc-health-trend">
                 <HealthTrendSparkline trend={data.healthTrend12} />
               </div>
@@ -1817,7 +1827,7 @@ const PANEL_CSS = `
     position: fixed;
     top: 0;
     right: 0;
-    width: 400px;
+    width: 348px;
     height: 100vh;
     background-color: var(--ds-surface-rest);
     /* Panel-shell elevation. --ds-shadow-flyout is the system's "panel
@@ -1942,6 +1952,13 @@ const PANEL_CSS = `
     line-height: 1.5;
     font-weight: var(--ds-type-font-weight-regular);
     color: var(--ds-text-secondary-rest);
+  }
+  /* Monetary value rows (LTV, ARR) carry semibold weight per directive
+     so the dollar magnitudes read as headline values rather than the
+     flat metadata-style treatment used for Account / Apex names. */
+  .acc-id-row__value--bold {
+    font-weight: var(--ds-type-font-weight-semibold);
+    color: var(--ds-text-primary);
     width: fit-content;
     max-width: 100%;
     overflow: hidden;
@@ -2064,7 +2081,9 @@ const PANEL_CSS = `
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    padding-top: var(--ds-spacing-05);
+    /* spacing-03 (8px) above the ghost-brand CTA — separates it from
+       the last row without making it feel detached. */
+    padding-top: var(--ds-spacing-03);
   }
   .acc-section-cta--full {
     /* Stretch the inner flex item to fill the row. Stretch isn't a
@@ -2109,24 +2128,39 @@ const PANEL_CSS = `
      sales-play family accordions). Internal padding handles the
      breathing room that was previously a horizontal section-inset. */
   .acc-data-tile {
-    background-color: var(--ds-surface-alt-rest);
-    /* --ds-radius-generous (12px) — system token, panel-wide gray
-       container family. */
-    border-radius: var(--ds-radius-generous);
+    /* Inner tile lives on a gray10 section ground — flip to surface.rest
+       (white) with the smaller --ds-radius-tight (4px) per directive. */
+    background-color: var(--ds-surface-rest);
+    border-radius: var(--ds-radius-tight);
     padding: var(--ds-spacing-03) var(--ds-spacing-04);
   }
 
   /* ── Account Health status tile ──────────────────────────────────────
-     Holds the trend graph + the two account-level axis rows. Bg is
-     status.info.subtle per directive — calm cobalt tint, not health-
-     driven. Uniform spacing-04 (12px) padding all four sides. */
+     "Aggregated Health" inner tile — white ground on the gray10 section
+     so it reads as a discrete inner block (matches the data-tile and
+     per-product tile grammar). Heading label sits at the top edge of
+     the tile, followed by the trend row and the two axis rows. */
   .acc-health-status-tile {
-    background-color: var(--ds-status-info-subtle);
-    border-radius: var(--ds-radius-generous);
-    padding: var(--ds-spacing-04);
+    background-color: var(--ds-surface-rest);
+    border-radius: var(--ds-radius-tight);
+    padding: var(--ds-spacing-03) var(--ds-spacing-04);
     display: flex;
     flex-direction: column;
     gap: var(--ds-spacing-03);
+  }
+  /* Heading sits in a 32px-tall band at the top of the Aggregated
+     Health tile, matching the row rhythm used elsewhere in the panel.
+     Flex centers the label vertically inside the band. */
+  .acc-health-status-tile__heading {
+    /* heading-compact-01 (14px / semibold / 1.28572), text.primary. */
+    font-size: 0.875rem;
+    line-height: 1.28572;
+    font-weight: var(--ds-type-font-weight-semibold);
+    color: var(--ds-text-primary);
+    margin: 0;
+    height: 32px;
+    display: flex;
+    align-items: center;
   }
 
   /* ── Trend bar row (HTML, not SVG) ───────────────────────────────────
@@ -2140,6 +2174,10 @@ const PANEL_CSS = `
     align-items: flex-end;
     gap: 4px;
     height: 60px;
+    /* Don't let the parent flex shrink the row — future months should
+       run past the visible edge and be clipped by acc-health-trend's
+       overflow:hidden, not collapsed by flex shrinking. */
+    flex-shrink: 0;
   }
   .acc-health-trend-bar {
     display: inline-block;
@@ -2190,27 +2228,26 @@ const PANEL_CSS = `
   }
 
   /* ── Top-level section stack ──────────────────────────────────────────
-     The four top-level sections are bands on the panel surface, not
-     elevated tiles. Override the DS Accordion's default 4px radius to
-     0 for direct-child accordions only — sub-accordions (nested inside
-     Sales Play in Phase 2) keep the DS radius. The open-state lift
-     (margin + tile-on-tile shadow that the DS adds when an accordion
-     opens) is also suppressed here: top-level separation is carried by
-     the divider element below, not by elevation. Per project rule:
-     dividers are their own 1px elements — never a border on the
-     accordion, never a hairline shadow standing in. */
+     Four top-level sections are now inset 12px from the panel edges and
+     sit as gray10 (surface.alt) tiles. 8px radius (--ds-radius-standard)
+     on each, 4px gap between, no dividers (visual separation is the gap
+     itself, not a line). The DS open-state lift (margin + tile-on-tile
+     shadow) is suppressed — the gap-based rhythm carries elevation. */
+  .acc-section-stack {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 0 var(--ds-spacing-04);
+  }
   .acc-section-stack > .panw--accordion {
-    border-radius: var(--ds-radius-square);
+    border-radius: var(--ds-radius-standard);
+    overflow: hidden;
   }
   .acc-section-stack > .panw--accordion.panw--accordion--open {
     margin: 0;
     box-shadow: none;
   }
-  .acc-section-divider {
-    height: 1px;
-    background-color: var(--ds-lines-neutral-tile-rest);
-    flex-shrink: 0;
-  }
+  .acc-section-divider { display: none; }
 
   /* ── Sales Play family list ───────────────────────────────────────────
      Stack of DS sub-accordions at size="small", theme="gray10". 2px gap
@@ -2234,12 +2271,41 @@ const PANEL_CSS = `
     /* 4px gap between family tiles per directive. */
     gap: 4px;
   }
-  /* 12px radius on nested DS accordions inside sales-play families
-     and opps — overrides the DS's default --ds-radius-tight (4px) so
-     all gray containers in the panel share the same shape language. */
+  /* Level-2 accordions (Sales Play families, Opportunity rows) use
+     --ds-radius-tight (4px) — smaller inner-tile radius per directive,
+     matches the data-tile / status-tile / per-product-tile family.
+
+     DS-cascade fix: the DS SCSS authors
+       .panw--accordion--theme-gray10 .panw--accordion__item { bg: gray10 }
+     as a descendant selector, so a NESTED theme-gray00 accordion's __item
+     still matches the gray10 ancestor rule. Both rules have equal
+     specificity (2 classes); gray10 is authored later in the DS file, so
+     it wins the cascade. Force the inner __item back to surface.rest with
+     a higher-specificity selector scoped to our two nested lists. */
   .acc-sp-family-list > .panw--accordion,
   .acc-opp-list > .panw--accordion {
-    border-radius: var(--ds-radius-generous);
+    border-radius: var(--ds-radius-tight);
+    overflow: hidden;
+  }
+  /* DS only emits panw--accordion--theme-gray10 for non-default themes —
+     theme="gray00" emits no class, so the parent gray10 descendant rule
+     wins for nested items. Force nested items back to surface.rest with a
+     selector specific to our two nested lists (no theme-class gate). */
+  .acc-sp-family-list > .panw--accordion > .panw--accordion__item,
+  .acc-opp-list > .panw--accordion > .panw--accordion__item {
+    background-color: var(--ds-surface-rest) !important;
+  }
+  /* Hover/pressed use the accordion package's canonical tokens
+     (--ds-ghost-hover / --ds-ghost-pressed = alpha overlays), not the
+     solid --ds-surface-hover/pressed. Matches @design-system/packages/
+     accordion behavior 1:1. */
+  .acc-sp-family-list > .panw--accordion > .panw--accordion__item:hover,
+  .acc-opp-list > .panw--accordion > .panw--accordion__item:hover {
+    background-color: var(--ds-ghost-hover) !important;
+  }
+  .acc-sp-family-list > .panw--accordion > .panw--accordion__item:active,
+  .acc-opp-list > .panw--accordion > .panw--accordion__item:active {
+    background-color: var(--ds-ghost-pressed) !important;
   }
   .acc-sp-family-list .panw--accordion--closed .panw--accordion__content-area {
     max-height: 0;
@@ -2541,16 +2607,13 @@ const PANEL_CSS = `
     gap: 4px;
   }
 
-  /* Trend lives inside a white sub-tile — 8px horizontal, 4px vertical
-     padding. Left-aligned so the bars start at the tile's left edge
-     with the future-month dots trailing toward the right. */
+  /* Trend row sits flush inside the (now white) Aggregated Health tile —
+     no inner background or padding. overflow:hidden clips any future-
+     month dots that exceed the tile's content width. */
   .acc-health-trend {
     display: flex;
     align-items: center;
     justify-content: flex-start;
-    background-color: var(--ds-surface-rest);
-    border-radius: var(--ds-radius-standard);
-    padding: 4px 8px;
     overflow: hidden;
   }
 
@@ -2601,9 +2664,9 @@ const PANEL_CSS = `
   .acc-product-health {
     display: flex;
     flex-direction: column;
-    background-color: var(--ds-surface-alt-rest);
-    /* --ds-radius-generous — panel-wide gray-container family. */
-    border-radius: var(--ds-radius-generous);
+    /* Inner tile on a gray10 section → flip to surface.rest (white). */
+    background-color: var(--ds-surface-rest);
+    border-radius: var(--ds-radius-tight);
     padding: var(--ds-spacing-03) var(--ds-spacing-04);
   }
   .acc-product-health__head {

@@ -167,7 +167,7 @@ export interface SalesPlayModalProps {
   onCancel?: () => void
 }
 
-function SalesPlayModal({
+export function SalesPlayModal({
   initialView = 'main',
   header = PLAY_HEADER,
   contacts = CONTACTS,
@@ -584,15 +584,17 @@ function LinkContactView({
           <div className="spm-table__th"><Header size="md">Email</Header></div>
         </div>
         <div className="spm-table__body">
-          {filtered.map((c) => {
+          <div className="spm-table__sep" />
+          {filtered.map((c, i) => {
             const checked = linkedSet.has(c.id)
             return (
-              <div
-                key={c.id}
-                className={
-                  'spm-table__row' +
-                  (checked ? ' spm-table__row--active' : '')
-                }>
+              <React.Fragment key={c.id}>
+                {i > 0 && <div className="spm-table__sep" />}
+                <div
+                  className={
+                    'spm-table__row' +
+                    (checked ? ' spm-table__row--active' : '')
+                  }>
                 <div className="spm-table__td spm-table__td--lead" aria-hidden />
                 <div className="spm-table__td spm-table__td--check">
                   <Checkbox
@@ -620,9 +622,11 @@ function LinkContactView({
                     <Copy size={16} />
                   </button>
                 </div>
-              </div>
+                </div>
+              </React.Fragment>
             )
           })}
+          <div className="spm-table__sep" />
         </div>
       </div>
 
@@ -708,16 +712,18 @@ function LinkOpportunityView({
           <div className="spm-table__th"><Header size="md">Close Date</Header></div>
         </div>
         <div className="spm-table__body">
-          {filtered.map((o) => {
+          <div className="spm-table__sep" />
+          {filtered.map((o, i) => {
             const checked = linkedSet.has(o.id)
             const isPrimary = primaryId === o.id
             return (
-              <div
-                key={o.id}
-                className={
-                  'spm-table__row' +
-                  (checked ? ' spm-table__row--active' : '')
-                }>
+              <React.Fragment key={o.id}>
+                {i > 0 && <div className="spm-table__sep" />}
+                <div
+                  className={
+                    'spm-table__row' +
+                    (checked ? ' spm-table__row--active' : '')
+                  }>
                 <div className="spm-table__td spm-table__td--lead" aria-hidden />
                 <div className="spm-table__td spm-table__td--check">
                   <Checkbox
@@ -755,9 +761,11 @@ function LinkOpportunityView({
                   {formatCurrency(o.amount)}
                 </div>
                 <div className="spm-table__td spm-table__cell-text">{formatCloseDate(o.closeDate)}</div>
-              </div>
+                </div>
+              </React.Fragment>
             )
           })}
+          <div className="spm-table__sep" />
         </div>
       </div>
 
@@ -940,18 +948,21 @@ const COMPOSITION_CSS = `
   gap: var(--ds-spacing-02);              /* 4 — chip-cloud rhythm */
 }
 .spm-status-tag {
+  /* Sized to match @ds/tags size="large" after its recent update:
+     padding 5/10, gap 8, 14px font with 16.8px (120%) line-height,
+     16x16 icon slot. Shape is rounded with 4px radius (radius-tight). */
   display: inline-flex;
   align-items: center;
-  gap: var(--ds-spacing-03);              /* 8 */
-  padding: var(--ds-spacing-03) var(--ds-spacing-04); /* 8 / 12 — matches tag size-large */
+  gap: 8px;
+  padding: 5px 10px;
   border: 0;
   border-radius: var(--ds-radius-tight);
   background-color: var(--ds-field-alt-rest);
   box-shadow: inset 0 0 0 1px var(--ds-lines-neutral-rest);
   color: var(--ds-text-primary);
   font-family: inherit;
-  font-size: 0.875rem;
-  line-height: 1.5;
+  font-size: 14px;
+  line-height: 16.8px;
   cursor: pointer;
   transition:
     background-color 110ms var(--ds-motion-easing-standard),
@@ -1146,28 +1157,46 @@ const COMPOSITION_CSS = `
 }
 .spm-table__head {
   min-height: 40px;
-  /* The full strip — including the 16px leading gutter — paves in the
-     DS Header background. Putting the bg on the head row (rather than
-     per-cell) means the gutter and any empty aria-hidden cells inherit
-     it without further rules. */
-  background: var(--panw-header-bg, var(--ds-surface-accent-rest));
+  /* Headers ground on surface.rest (white) — the colored strip is gone.
+     Override the DS Header element's own bg in this scope so each cell
+     stays white instead of painting surface-accent. */
+  background: var(--ds-surface-rest);
+}
+.spm-table__head .panw--header {
+  background-color: var(--ds-surface-rest);
 }
 .spm-table__row {
   min-height: 44px;
-  border-bottom: 1px solid var(--ds-lines-neutral-rest);
   color: var(--ds-text-secondary-rest);
   font-size: 14px;
   cursor: pointer;
+  border-radius: var(--ds-radius-tight);    /* 4 — each row reads as a tile */
   transition: background-color 110ms var(--ds-motion-easing-standard);
 }
-/* The last row keeps its bottom border so the table closes off
-   visually — without it the bottom row reads as orphaned, dangling
-   inside the body whitespace. */
+/* Row dividers are real elements between rows, not borders ON rows —
+   border-bottom on a radius'd row would crawl into the corner curves
+   and read ugly. The separator sits flush in the inter-row gap. */
+.spm-table__sep {
+  height: 1px;
+  background: var(--ds-lines-neutral-rest);
+  transition: opacity 110ms var(--ds-motion-easing-standard);
+}
+/* On row hover, the dividers immediately above and below the row fade
+   out — the hovered row reads as a single engaged tile with no lines
+   pressing into its top/bottom edge. Opacity (not display) preserves
+   the 1px slot so the row doesn't shift on hover.
+   - :hover + .spm-table__sep targets the sep after the hovered row.
+   - :has(+ .spm-table__row:hover) targets the sep before it. */
+.spm-table__row:hover + .spm-table__sep,
+.spm-table__sep:has(+ .spm-table__row:hover) {
+  opacity: 0;
+}
 
 /* Row interaction — mirrors CellsStandard. Non-active rows respond to
    hover and press through the ghost family (neutral) so the
    hover-vs-active hierarchy stays legible: ghost on hover/press,
-   highlight.rest on selected. */
+   highlight.rest on selected. The 4px radius is preserved through
+   every state. */
 .spm-table__row:not(.spm-table__row--active):hover {
   background-color: var(--ds-ghost-hover);
 }
@@ -1292,6 +1321,7 @@ const meta: Meta<typeof SalesPlayModal> = {
   title: 'compositions/Sales Play Modal',
   component: SalesPlayModal,
   parameters: { layout: 'fullscreen' },
+  excludeStories: ['SalesPlayModal'],
 }
 export default meta
 

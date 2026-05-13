@@ -1,3 +1,13 @@
 .tmp/
 storybook-static/
 storybook-static-*/
+
+# Scratch / debug scripts at the design-system root.
+# Anchored with a leading slash so real .mjs/.cjs files inside
+# packages/ and scripts/ are not affected.
+/_*.cjs
+/_*.mjs
+/action-shot.mjs
+/health-pop.mjs
+/popover-shots.mjs
+/popover-zoom.mjs

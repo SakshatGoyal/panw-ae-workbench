@@ -2,13 +2,14 @@
 /* Stage tokens come from .stage on document.body (see main.tsx).              */
 
 html, body, #root {
-  height: 100%;
+  height: 100vh;
   margin: 0;
   padding: 0;
+  overflow: hidden;
 }
 
 body.stage {
-  background: var(--ds-stage-base);
+  background: var(--ds-surface-alt-rest);
   color: var(--ds-text-primary);
   font-family: var(--ds-type-font-family-sans);
   font-size: 14px;
@@ -19,15 +20,19 @@ body.stage {
 /* ── Shell grid ───────────────────────────────────────────────────────────── */
 
 .cd-app {
+  /* App-shell pattern: the page IS the viewport. Rails are always visible
+     because the grid container is exactly 100vh tall. The main column is
+     the only scrollable region. stage-shadows.md "UI shell carries no
+     shadow. The shell is the page's frame." */
   display: grid;
   grid-template-columns: 64px 1fr var(--cd-right-rail-width, 430px);
-  min-height: 100vh;
-  background: var(--ds-stage-base);
+  height: 100vh;
+  background: var(--ds-surface-alt-rest);
 }
 
 .cd-app__rail-left {
   background: var(--ds-surface-inverse-rest);
-  border-right: 1px solid var(--ds-lines-neutral-rest);
+  /* Grid item stretches to row height (= 100vh). No fixed/sticky needed. */
 }
 
 /* ── SideNav (copied from poc side-nav.stories COMPOSITION_CSS, .snav-* only).
@@ -108,23 +113,29 @@ body.stage {
 .cd-app__column {
   display: flex;
   flex-direction: column;
-  min-width: 0; /* let tables overflow-scroll without bursting the grid */
+  min-width: 0;  /* let tables overflow-scroll without bursting the grid */
+  min-height: 0; /* let overflow-y take effect inside a grid row */
+  overflow-y: auto; /* the only scrollable region in the page */
 }
 
 .cd-app__main {
   flex: 1 0 auto;
-  padding: 32px;
+  /* stage-spacing.md page padding: top 32, right 32, bottom 64, left 32. */
+  padding: 32px 32px 64px 32px;
   display: flex;
   flex-direction: column;
   gap: 24px;
 }
 
 .cd-app__rail-right {
+  /* Right shell rail: stretches to grid row (= 100vh). The resize handle
+     is absolutely positioned inside, so this needs a positioning context. */
   position: relative;
   background: var(--ds-surface-rest);
   border-left: 1px solid var(--ds-lines-neutral-rest);
   min-width: 320px;
   max-width: 480px;
+  overflow-y: auto; /* if detail content exceeds viewport, scroll inside */
 }
 
 /* ── Page header ──────────────────────────────────────────────────────────── */
@@ -147,21 +158,31 @@ body.stage {
   margin: 0;
   font-size: 14px;
   line-height: 1.42857;
-  color: var(--ds-text-secondary-rest);
+  /* stage-text-and-icons.md: "description / footnote → text.tertiary". */
+  color: var(--ds-text-tertiary-rest);
 }
 
 /* ── Container tabs + table tile ──────────────────────────────────────────── */
 
+/* Container-tab semantics per the wireframe: the tab strip sits OUTSIDE the
+   tile, on stage.base (the page ground). The tile holds only the table. */
 .cd-tabs-host {
-  /* Tabs sit flush above the tile beneath. No gap. */
+  /* No surface, no shadow, no border — tabs render on stage.base. The
+     @ds/tabs container mode draws its own selected/unselected backgrounds
+     inside the strip. */
 }
-.cd-tabs-host .ds--tabs {
-  margin-bottom: 0;
+
+/* The active tab's bottom edge fuses with the tile top — collapse the
+   column gap between tabs and table to 0 so the tile starts immediately
+   below the tab strip. Other column siblings keep the 24px section gap. */
+.cd-tabs-host + .cd-table-tile {
+  margin-top: -24px;
 }
 
 /* PlanForecastSummary wraps itself in `.psum-page` which assumes it owns the
    viewport (min-height: 100vh, 32px padding). Inside our shell it is one tile
-   in a column, not the page. Neutralize the outer wrapper here. */
+   in a column, not the page. Neutralize the outer wrapper here. Same for the
+   table compositions. */
 .cd-app .psum-page,
 .cd-app .acc-page,
 .cd-app .opp-page {
@@ -170,12 +191,16 @@ body.stage {
   background: transparent;
 }
 
+/* The table sits in its own tile. stage-background-colors.md "default card →
+   surface.rest"; stage-radius.md "radius.standard — table containers";
+   stage-shadows.md "Cards, tiles, panels at default elevation → shadow.tiles";
+   stage-lines.md "lines.neutral-tile > 48px (cards, large tiles)". */
 .cd-table-tile {
-  /* Layout-only container; visual surface comes from the table composition.
-     Keeping this transparent avoids the tile-in-tile double, per Stage 1
-     fallback. If a real tile chrome is needed later, set background +
-     border + radius here. */
-  background: transparent;
+  background: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-standard);
+  box-shadow: var(--ds-shadow-tiles);
+  overflow: hidden;
   min-height: 0;
 }
 
@@ -197,19 +222,6 @@ body.stage {
   gap: 8px;
   color: var(--ds-text-secondary-rest);
 }
-.cd-footer__mark {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 20px;
-  height: 20px;
-  border: 1px solid var(--ds-lines-neutral-rest);
-  border-radius: var(--ds-radius-standard);
-  font-size: 8px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  letter-spacing: 0.04em;
-  color: var(--ds-text-primary);
-}
 .cd-footer__copy {
   color: var(--ds-text-tertiary-rest);
 }
@@ -226,17 +238,21 @@ body.stage {
   align-items: center;
   gap: 4px;
   padding: 4px 0;
-  border-radius: var(--ds-radius-standard);
+  border-radius: var(--ds-radius-tight);
+  transition: color 110ms var(--ds-motion-easing-standard, cubic-bezier(0.2, 0, 0.38, 0.9));
 }
 .cd-footer__link:hover {
-  color: var(--ds-text-primary);
+  /* stage-text-and-icons.md state propagation: text moves to its parent's
+     hover state within the same family. */
+  color: var(--ds-text-secondary-hover);
 }
 .cd-footer__link:focus-visible {
   outline: 2px solid var(--ds-brand-rest);
   outline-offset: 2px;
 }
 .cd-footer__sep {
-  color: var(--ds-lines-neutral-rest);
+  /* Separator is a text glyph (|), not a line. Tertiary text. */
+  color: var(--ds-text-tertiary-rest);
   user-select: none;
 }
 
@@ -265,9 +281,29 @@ body.stage {
   outline-offset: 0;
 }
 
+/* ── Right rail empty state ───────────────────────────────────────────────── */
+
 .cd-rail-empty {
-  padding: 32px 24px;
+  /* Sidebar-panel padding: stage-spacing.md "narrower contexts (sidebar
+     panels, embedded views) can reduce edges to 24px or 16px". Top-aligned
+     near the natural viewport reading line — centering inside a tall grid
+     track pushes the empty state far below the fold. */
+  padding: 64px 24px 24px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  text-align: center;
   color: var(--ds-text-tertiary-rest);
-  font-size: 12px;
+}
+.cd-rail-empty__icon {
+  /* stage-text-and-icons.md: icons mirror text. icons.tertiary for the
+     muted-helper read. */
+  color: var(--ds-icons-tertiary-rest, var(--ds-text-tertiary-rest));
+  opacity: 0.7;
+}
+.cd-rail-empty__text {
+  font-size: 14px;
   line-height: 1.42857;
+  max-width: 28ch;
 }

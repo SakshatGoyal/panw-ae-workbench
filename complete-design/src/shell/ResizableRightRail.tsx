@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { Informational } from '@ds/icons'
 
 const STORAGE_KEY = 'complete-design.right-rail-width'
 const MIN = 320
@@ -31,7 +32,6 @@ export default function ResizableRightRail({ children }: ResizableRightRailProps
   const [dragging, setDragging] = useState(false)
   const dragRef = useRef<{ startX: number; startWidth: number } | null>(null)
 
-  // Publish width to the shell grid via CSS variable on documentElement.
   useEffect(() => {
     document.documentElement.style.setProperty('--cd-right-rail-width', `${width}px`)
   }, [width])
@@ -45,7 +45,6 @@ export default function ResizableRightRail({ children }: ResizableRightRailProps
 
   const onPointerMove = useCallback((e: React.PointerEvent<HTMLButtonElement>) => {
     if (!dragRef.current) return
-    // Rail is on the right; dragging the handle leftward (negative dx) widens.
     const dx = e.clientX - dragRef.current.startX
     const next = Math.min(MAX, Math.max(MIN, dragRef.current.startWidth - dx))
     setWidth(next)
@@ -89,9 +88,16 @@ export default function ResizableRightRail({ children }: ResizableRightRailProps
         onPointerCancel={onPointerUp}
         onKeyDown={onKeyDown}
       />
-      <div className="cd-rail-empty">
-        {children ?? 'Select a row to see details.'}
-      </div>
+      {children ?? (
+        <div className="cd-rail-empty" role="status">
+          <span className="cd-rail-empty__icon" aria-hidden="true">
+            <Informational size={20} />
+          </span>
+          <span className="cd-rail-empty__text">
+            Select a row to see opportunity or account details here.
+          </span>
+        </div>
+      )}
     </aside>
   )
 }

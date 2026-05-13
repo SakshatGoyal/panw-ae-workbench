@@ -1,0 +1,15 @@
+id,name,familyId,targetProducts,description
+play-ngfw-refresh,PA-Series NGFW Hardware Refresh,FW-CDSS,PA-series;PA-series-attached,Refresh on-prem firewalls to current PA-Series; attach CDSS subscriptions.
+play-vmseries-cloud,VM-Series Cloud Workload Protection,FW-CDSS,VM-series,Extend NGFW protection into AWS/Azure/GCP.
+play-cdss-bundle-attach,CDSS Bundle Attach,FW-CDSS,PA-series-attached;PA-series-support;FW-data-lake,Attach full subscription stack to existing NGFW footprint.
+play-prisma-access-gp,GlobalProtect to Prisma Access,SASE,Prisma-access,Migrate legacy VPN to cloud-delivered SASE.
+play-sdwan-takeout,Prisma SD-WAN Branch Takeout,SASE,Prisma-SD-WAN,"Displace legacy SD-WAN (Cisco Viptela, Velocloud)."
+play-sase-platform,Full SASE Platform Adoption,SASE,Prisma-access;Prisma-SD-WAN,Combined Prisma Access + SD-WAN platform pitch.
+play-xsiam-splunk,XSIAM Splunk Takeout,Cortex-cloud,XSIAM;QRadar,Displace Splunk SIEM with XSIAM.
+play-xsiam-qradar,XSIAM QRadar Takeout,Cortex-cloud,XSIAM;QRadar,Displace QRadar with XSIAM.
+play-xdr-edr,Cortex XDR EDR Consolidation,Cortex-cloud,Cortex-XDR,Replace CrowdStrike or SentinelOne with Cortex XDR.
+play-cortex-cloud-cnapp,Cortex Cloud CNAPP Adoption,Cortex-cloud,Cortex-cloud-leaf,CNAPP for cloud-native security posture.
+play-xpanse-attack-surf,Xpanse Attack Surface Management,Cortex-cloud,Xpanse,Deploy Xpanse for external attack-surface monitoring.
+play-xsoar-soc-modern,Cortex XSOAR SOC Modernization,Cortex-cloud,Cortex-XSOAR,Modernize SOC with XSOAR orchestration.
+play-unit42-ir-retainer,Unit 42 Incident Response Retainer,Unit-42,Unit-42-reactive,Sell IR retainer for incident readiness.
+play-unit42-proactive,Unit 42 Proactive Services,Unit-42,Unit-42-proactive,"Tabletop, threat assessment, advisory."

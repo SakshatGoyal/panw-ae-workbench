@@ -8,34 +8,35 @@
  * Structure (vertical):
  *   ┌─ SummaryFilterBar      h=48, pad 0/16
  *   ├─ PlanRow               h=48, pad 0/16
- *   └─ SegmentContainer      pad 0 — cells handle their own pad
+ *   └─ SegmentContainer      cells handle their own pad
  *       └─ 6 × Cell          pad 16, gap 8
- *           ├─ Header (label LEFT, QoQ RIGHT EDGE)
- *           └─ SegmentContent (width 100%)
- *               ├─ ContentLeft  flex 1 (KPI value + supporting metric)
- *               └─ Spark        56 × 46 box, 1px gaps, bars fill
+ *           ├─ Header              label
+ *           └─ SegmentContent      vertical stack, gap 4:
+ *                                    "26% of plan" (supporting metric)
+ *                                    "$268.0M"     (KPI value)
+ *                                    "↓1% QoQ"     (trend)
  *
  * Vertical dividers between cells are 1px lines that span the FULL
  * cells-strip height — flush against the strip's top and bottom edges.
  *
- * Single-select pill trigger for both Quarter and Products uses the
- * DS `Sort` primitive (filter package). Sort is the system's
- * single-select sibling of Filter — same trigger chrome, no filter
- * text field, commits on click. Its direction glyph is suppressed in
- * the composition via a local className override (no edits to the DS
- * component itself).
+ * Card chrome: no shadow, hairline neutral-tile border, neutral-10
+ * background. The plan-progress strip carries surface.alt as the
+ * unfilled-track ground so the threshold-colored fill reads against
+ * the total proportion.
  *
- * Threshold ladder for the plan-attainment readout:
+ * Single-select pill trigger for both Quarter and Products uses the
+ * DS `Sort` primitive (filter package). Direction glyph suppressed
+ * via a local className override (no edits to the DS component).
+ *
+ * Threshold ladder for the plan-attainment readout (bar + tag):
  *     0–25%   red    (red-50 fill / Tags color="red")
  *    26–75%   yellow (yellow-30 fill / Tags color="yellow")
  *    76%+     green  (green-40 fill / Tags color="green")
  * Hex values for the bar fill match `HEALTH_BAR_FILL` in AE Account
  * Panel — keeping the primitive in lockstep across panels.
  *
- * Sparkline (per Sakshat): 7 bars per cell.
- *   pos 0, 1     past quarters     → neutral-30 (gray-30)
- *   pos 2        current quarter   → cobalt-60 (emphasized)
- *   pos 3–6      future quarters   → cobalt-30
+ * The on-track tag uses Tags shape="rounded" size="large" — large
+ * rounded variant per spec.
  */
 
 import React, { useState } from 'react'
@@ -80,20 +81,15 @@ interface CategoryDatum {
   qoqPercent: number
   percentOfPlan: number
   value: string
-  /**
-   * 7 bar heights (0–1 fractional). pos 0,1 past · pos 2 current ·
-   * pos 3–6 future.
-   */
-  spark: [number, number, number, number, number, number, number]
 }
 
 const CATEGORIES: CategoryDatum[] = [
-  { label: 'Closed',          qoqPercent: -1, percentOfPlan: 26, value: '$268.0M', spark: [0.55, 0.62, 1.00, 0.40, 0.45, 0.42, 0.48] },
-  { label: 'Commit',          qoqPercent:  2, percentOfPlan: 44, value: '$440.0M', spark: [0.70, 0.75, 1.00, 0.55, 0.60, 0.58, 0.62] },
-  { label: 'Best Case - In',  qoqPercent: -1, percentOfPlan: 12, value: '$175.0M', spark: [0.45, 0.55, 1.00, 0.50, 0.48, 0.52, 0.50] },
-  { label: 'Total Pipeline',  qoqPercent:  2, percentOfPlan: 12, value: '$120.0M', spark: [0.40, 0.50, 1.00, 0.45, 0.55, 0.50, 0.58] },
-  { label: 'Total - In',      qoqPercent:  3, percentOfPlan: 88, value: '$880.0M', spark: [0.65, 0.70, 1.00, 0.55, 0.62, 0.60, 0.66] },
-  { label: 'Total Forecast',  qoqPercent:  3, percentOfPlan: 88, value: '$995.0M', spark: [0.70, 0.75, 1.00, 0.62, 0.68, 0.65, 0.72] },
+  { label: 'Closed',          qoqPercent: -1, percentOfPlan: 26, value: '$268.0M' },
+  { label: 'Commit',          qoqPercent:  2, percentOfPlan: 44, value: '$440.0M' },
+  { label: 'Best Case - In',  qoqPercent: -1, percentOfPlan: 12, value: '$175.0M' },
+  { label: 'Total Pipeline',  qoqPercent:  2, percentOfPlan: 12, value: '$120.0M' },
+  { label: 'Total - In',      qoqPercent:  3, percentOfPlan: 88, value: '$880.0M' },
+  { label: 'Total Forecast',  qoqPercent:  3, percentOfPlan: 88, value: '$995.0M' },
 ]
 
 // Anchored to TODAY = 2026-05-11 in PANW's Aug→Jul fiscal calendar:
@@ -174,38 +170,6 @@ function PlanProgress({ percent }: { percent: number }) {
   )
 }
 
-/**
- * History sparkline — 56 × 46 box, 1px gaps, bars fill.
- *   pos 0,1   past     → neutral-30
- *   pos 2     current  → cobalt-60
- *   pos 3–6   future   → cobalt-30
- */
-function HistorySparkline({ spark }: { spark: CategoryDatum['spark'] }) {
-  const colors = [
-    'var(--ds-color-core-neutral-30)',
-    'var(--ds-color-core-neutral-30)',
-    'var(--ds-color-decorative-cobalt-60)',
-    'var(--ds-color-decorative-cobalt-30)',
-    'var(--ds-color-decorative-cobalt-30)',
-    'var(--ds-color-decorative-cobalt-30)',
-    'var(--ds-color-decorative-cobalt-30)',
-  ]
-  return (
-    <div className="psum-spark" aria-hidden>
-      {spark.map((h, i) => (
-        <span
-          key={i}
-          className="psum-spark__bar"
-          style={{
-            height: `${Math.max(0.08, h) * 100}%`,
-            backgroundColor: colors[i],
-          }}
-        />
-      ))}
-    </div>
-  )
-}
-
 /** Segment QoQ — arrow + percentage + literal "QoQ". */
 function SegmentQoQ({ percent }: { percent: number }) {
   const up = percent >= 0
@@ -225,16 +189,11 @@ function Cell({ datum }: { datum: CategoryDatum }) {
     <div className="psum-cell">
       <div className="psum-cell__header">
         <span className="psum-cell__label">{datum.label}</span>
-        <SegmentQoQ percent={datum.qoqPercent} />
       </div>
       <div className="psum-cell__content">
-        <div className="psum-cell__left">
-          <span className="psum-cell__share">{datum.percentOfPlan}% of plan</span>
-          <span className="psum-cell__value">{datum.value}</span>
-        </div>
-        <div className="psum-cell__right">
-          <HistorySparkline spark={datum.spark} />
-        </div>
+        <span className="psum-cell__share">{datum.percentOfPlan}% of plan</span>
+        <span className="psum-cell__value">{datum.value}</span>
+        <SegmentQoQ percent={datum.qoqPercent} />
       </div>
     </div>
   )
@@ -295,8 +254,8 @@ export function PlanForecastSummary({
           <Tags
             color={ATTAINMENT_TAG_COLOR[level]}
             contrast="low"
-            shape="pill"
-            size="default"
+            shape="rounded"
+            size="large"
             label={`${planPercent}% on track`}
           />
         </div>
@@ -304,13 +263,10 @@ export function PlanForecastSummary({
         {/* ── Cells strip (expanded only) ──────────────────────────── */}
         {open && (
           <div className="psum-cells" role="list">
-            {data.categories.map((c, i) => (
-              <React.Fragment key={c.label}>
-                {i > 0 && <span className="psum-cell-divider" aria-hidden />}
-                <div role="listitem" className="psum-cell-wrap">
-                  <Cell datum={c} />
-                </div>
-              </React.Fragment>
+            {data.categories.map((c) => (
+              <div role="listitem" key={c.label} className="psum-cell-wrap">
+                <Cell datum={c} />
+              </div>
             ))}
           </div>
         )}
@@ -329,26 +285,37 @@ const COMPOSITION_CSS = `
   font-family: var(--ds-type-font-family-sans);
 }
 
-/* ── Card — tile-tier elevation per stage-shadows.md:
- *   "Cards, tiles, panels at default elevation on a page" → --ds-shadow-tiles. */
+/* ── Card — no shadow, no border, neutral-10 ground.
+ * Separation from the page (stage.base) is carried by the surface
+ * delta alone — no elevation, no outline. */
 .psum-card {
-  background-color: var(--ds-surface-rest);
-  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  background-color: var(--ds-color-core-neutral-10);
   border-radius: var(--ds-radius-standard);
-  box-shadow: var(--ds-shadow-tiles);
   overflow: hidden;
   display: flex;
   flex-direction: column;
 }
 
-/* ── Filter bar (h=48) ────────────────────────────────────────────────── */
+/* ── Filter bar (h=48) ──────────────────────────────────────────────────
+ * Divider below the filter bar is inset 16px from each side — does not
+ * run edge to edge. Drawn as a ::after pseudo so the inset is intrinsic
+ * to the strip, not a separate JSX node. */
 .psum-filterbar {
+  position: relative;
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-03);             /* 8 */
   padding: 0 var(--ds-spacing-05);       /* 0 16 */
   min-height: 48px;
-  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+}
+.psum-filterbar::after {
+  content: '';
+  position: absolute;
+  left: var(--ds-spacing-05);            /* 16 from left */
+  right: var(--ds-spacing-05);           /* 16 from right */
+  bottom: 0;
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
 }
 .psum-title {
   flex: 1;
@@ -373,14 +340,18 @@ const COMPOSITION_CSS = `
   display: none !important;
 }
 
-/* ── Plan row (h=48) ──────────────────────────────────────────────────── */
+/* ── Plan row (h=48) ──────────────────────────────────────────────────────
+ * No border-bottom: in the collapsed state this is the last child and
+ * its bottom border would stack on top of the card's outer border,
+ * producing a visible 2px double-line on the straight bottom edge.
+ * The divider between plan row and cells (expanded) is carried by
+ * .psum-cells border-top instead. */
 .psum-planrow {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-03);             /* 8 */
   padding: 0 var(--ds-spacing-05);       /* 0 16 */
   min-height: 48px;
-  border-bottom: 1px solid var(--ds-lines-neutral-rest);
 }
 .psum-planrow__title {
   display: inline-flex;
@@ -412,7 +383,7 @@ const COMPOSITION_CSS = `
 .psum-progress__track {
   position: absolute;
   inset: 0;
-  background-color: var(--ds-field-alt-rest);
+  background-color: var(--ds-color-core-neutral-30);
   border-radius: var(--ds-radius-pill);
 }
 .psum-progress__fill {
@@ -424,24 +395,25 @@ const COMPOSITION_CSS = `
 }
 
 /* ── Cells strip (Segment Container) ─────────────────────────────────────
- * Container has 0 padding; cells handle their own padding (16 all sides).
- * This lets the vertical dividers span the FULL strip height — flush
- * against the strip's top and bottom edges. */
+ * Six cells render as independent tiles on the surface.alt card ground.
+ * No vertical dividers — the tile-on-tile elevation carries separation.
+ *   strip padding:  8 all sides
+ *   gap:            4
+ *   tile radius:    radius.tight (4)
+ *   tile ground:    surface.rest (one stop up from the card's surface.alt) */
 .psum-cells {
   display: flex;
   align-items: stretch;
-  padding: 0;
+  gap: var(--ds-spacing-02);             /* 4 */
+  /* No top padding — the cells drawer hugs the bottom of the plan row. */
+  padding: 0 var(--ds-spacing-03) var(--ds-spacing-03); /* 0 8 8 */
 }
 .psum-cell-wrap {
   flex: 1 1 0;
   min-width: 0;
-  padding: var(--ds-spacing-05);         /* 16 all sides — per redline */
-}
-.psum-cell-divider {
-  display: block;
-  flex: 0 0 1px;
-  align-self: stretch;
-  background-color: var(--ds-lines-neutral-rest);
+  padding: var(--ds-spacing-03);         /* 8 all sides */
+  background-color: var(--ds-surface-rest);
+  border-radius: var(--ds-radius-tight); /* 4 */
 }
 
 /* ── Cell ─────────────────────────────────────────────────────────────── */
@@ -452,12 +424,10 @@ const COMPOSITION_CSS = `
   height: 100%;
 }
 
-/* SegmentHeader — label LEFT, QoQ RIGHT EDGE. */
+/* SegmentHeader — just the cell label now (QoQ moved below value). */
 .psum-cell__header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: var(--ds-spacing-03);
 }
 .psum-cell__label {
   color: var(--ds-text-secondary-rest);
@@ -465,6 +435,28 @@ const COMPOSITION_CSS = `
   line-height: 1.42857;
   font-weight: var(--ds-type-font-weight-semibold);
   white-space: nowrap;
+}
+
+/* SegmentContent — vertical stack: share → value → QoQ.
+ * QoQ sits 4px below the KPI value per Sakshat. The share line keeps
+ * the 4px proximity it had with the value before. */
+.psum-cell__content {
+  display: flex;
+  flex-direction: column;
+  gap: var(--ds-spacing-02);             /* 4 */
+  width: 100%;
+}
+.psum-cell__share {
+  color: var(--ds-text-tertiary-rest);
+  font-size: 12px;
+  line-height: 1.33333;
+}
+.psum-cell__value {
+  color: var(--ds-text-primary);
+  font-size: 20px;
+  line-height: 1.4;
+  font-weight: var(--ds-type-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
 }
 
 /* Segment QoQ — arrow + % + "QoQ", gap 4. */
@@ -481,55 +473,6 @@ const COMPOSITION_CSS = `
 .psum-qoq--down { color: var(--ds-text-status-danger); }
 .psum-qoq--down svg { color: var(--ds-icons-status-danger); }
 .psum-qoq__suffix { color: var(--ds-text-tertiary-rest); }
-
-/* SegmentContent — 100% width.
- * ContentLeft fills (KPI value + supporting metric), chart pinned right. */
-.psum-cell__content {
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  gap: var(--ds-spacing-03);
-  width: 100%;
-}
-.psum-cell__left {
-  display: flex;
-  flex-direction: column;
-  gap: var(--ds-spacing-02);             /* 4 */
-  flex: 1 1 auto;
-  min-width: 0;
-}
-.psum-cell__share {
-  color: var(--ds-text-tertiary-rest);
-  font-size: 12px;
-  line-height: 1.33333;
-}
-.psum-cell__value {
-  color: var(--ds-text-primary);
-  font-size: 20px;
-  line-height: 1.4;
-  font-weight: var(--ds-type-font-weight-semibold);
-  font-variant-numeric: tabular-nums;
-}
-.psum-cell__right {
-  flex: 0 0 auto;
-  display: flex;
-  align-items: flex-end;
-}
-
-/* ── Sparkline — 56 × 46 box, 1px gaps, bars fill ────────────────────── */
-.psum-spark {
-  display: flex;
-  align-items: flex-end;
-  gap: 1px;
-  width: 56px;
-  height: 46px;
-}
-.psum-spark__bar {
-  flex: 1 1 0;                           /* width = fill */
-  min-width: 0;
-  border-radius: 1px;
-  min-height: 2px;
-}
 `
 
 // ── Storybook meta ──────────────────────────────────────────────────────────

@@ -77,7 +77,7 @@ $panw-prefix: 'panw';
   font-size: 14px;
   font-weight: 600;
   line-height: 18px;
-  letter-spacing: 0.25px;
+  letter-spacing: 0.10px;
   color: var(--panw-popover-heading);
   margin: 0;
 }
@@ -86,7 +86,7 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--popover__body {
   font-size: 12px;
   line-height: 16px;
-  letter-spacing: 0.25px;
+  letter-spacing: 0.10px;
   color: var(--panw-popover-body);
   margin: 0;
 }
@@ -110,7 +110,7 @@ $panw-prefix: 'panw';
   flex: 1 1 0;
   font-size: 12px;
   line-height: 16px;
-  letter-spacing: 0.25px;
+  letter-spacing: 0.10px;
   color: var(--panw-popover-secondary);
   margin: 0;
 }

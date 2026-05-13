@@ -19,9 +19,7 @@ $panw-prefix: 'panw';
   border-radius: var(--ds-radius-tight);
   overflow: hidden;
   // Smoothly animate the open-state lift when toggling.
-  transition:
-    margin 150ms var(--ds-motion-easing-standard),
-    box-shadow 150ms var(--ds-motion-easing-standard);
+  transition: box-shadow 150ms var(--ds-motion-easing-standard);
 }
 
 .#{$panw-prefix}--accordion--theme-gray10 {
@@ -29,12 +27,10 @@ $panw-prefix: 'panw';
 }
 
 // ─── Open-state lift ─────────────────────────────────────────────────────────
-// When open, the accordion floats slightly out of the row: 4px breathing room
-// above and below, tile-on-tile shadow so it reads as elevated next to its
-// closed siblings. Radius and overflow inherit from the root so the shape
-// stays consistent across closed and open — only the elevation changes.
+// When open, the accordion reads as elevated next to its closed siblings via
+// the tile-on-tile shadow. No margin — margin caused a 4px layout shift
+// (2px above, 2px below) when toggling, which is now removed.
 .#{$panw-prefix}--accordion--open {
-  margin: 4px 0;
   box-shadow: var(--ds-shadow-tile-on-tile);
 }
 
@@ -203,7 +199,7 @@ $panw-prefix: 'panw';
   font-weight: 700;
   font-size: 14px;
   line-height: 16px;
-  letter-spacing: 0.25px;
+  letter-spacing: 0.10px;
   color: var(--panw-accordion-title-color);
   flex: 1;
   min-width: 0;
@@ -217,7 +213,7 @@ $panw-prefix: 'panw';
   font-weight: 400;
   font-size: 14px;
   line-height: 18px;
-  letter-spacing: 0.25px;
+  letter-spacing: 0.10px;
   color: var(--panw-accordion-description-color);
 }
 

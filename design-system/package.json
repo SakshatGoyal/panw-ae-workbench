@@ -12,8 +12,8 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "serve": "python3 -m http.server 4173",
-    "storybook": "node ../scripts/storybook-prestart.mjs 6007 && storybook dev -p 6007 --ci",
-    "storybook:port-check": "node ../scripts/storybook-prestart.mjs 6007",
+    "storybook": "node ../scripts/storybook-prestart.mjs 6011 && storybook dev -p 6011 --ci",
+    "storybook:port-check": "node ../scripts/storybook-prestart.mjs 6011",
     "build-storybook": "storybook build"
   },
   "devDependencies": {

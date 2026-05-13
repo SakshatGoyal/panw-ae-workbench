@@ -51,7 +51,10 @@ $panw-prefix: 'panw';
     background-color 110ms var(--ds-motion-easing-standard),
     border-color 110ms var(--ds-motion-easing-standard);
 
-  &:hover:not(:disabled) {
+  // Hover suppressed when open — the cursor stays on the trigger after click,
+  // so without this the hover ground bleeds over the open/selected state and
+  // the user never sees a visual confirmation that the panel is active.
+  &:hover:not(:disabled):not(.#{$panw-prefix}--filter--open) {
     background-color: var(--panw-filter-bg-hover);
     border-color: var(--panw-filter-border-hover);
   }
@@ -66,7 +69,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--filter--open {
   background-color: var(--panw-filter-bg-open);
-  border-color: var(--panw-filter-border-open);
+  border-color: transparent;
 }
 
 .#{$panw-prefix}--filter--disabled,
@@ -123,6 +126,9 @@ $panw-prefix: 'panw';
   margin-top: 4px;
   min-width: 200px;
   padding: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
   background-color: var(--ds-surface-rest);
   border: 1px solid var(--ds-lines-neutral-rest);
   border-radius: 8px;
@@ -136,7 +142,8 @@ $panw-prefix: 'panw';
   align-items: center;
   justify-content: space-between;
   gap: 8px;
-  padding: 4px 4px 4px 12px;
+  height: 32px;
+  padding: 0 0 0 12px;
   border-radius: 4px;
   font-size: 14px;
   font-weight: 400;

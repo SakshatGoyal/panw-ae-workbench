@@ -376,7 +376,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '1',
     accountId: 'acc-tyrell',
     oppName: 'Prisma Access annual renewal with global bandwidth upgrade',
-    account: 'Titan Energy Solutions',
+    account: 'Tyrell Corporation',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
     closeDate: 'mar 7', quoteId: 'Q-00307',
     products: [
@@ -395,7 +395,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '2',
     accountId: 'acc-atlas-bank',
     oppName: 'Cortex XDR enterprise deployment for distributed workforce',
-    account: 'Meridian Capital Group',
+    account: 'Atlas Bank',
     type: 'net-new', forecast: 'commit', stage: 'active-pov',
     closeDate: 'mar 14', quoteId: 'Q-00891',
     products: [
@@ -414,7 +414,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '3',
     accountId: 'acc-frontier',
     oppName: 'Strata Cloud Manager upgrade with advanced threat prevention',
-    account: 'Nexus Financial Holdings',
+    account: 'Frontier Labs',
     type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
     closeDate: 'mar 18', quoteId: 'Q-00734',
     products: [
@@ -432,7 +432,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '4',
     accountId: 'acc-orion-shipping',
     oppName: 'Annual Prisma Access license renewal — full global employee base',
-    account: 'Vertex Manufacturing Co.',
+    account: 'Orion Shipping Services',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
     closeDate: 'mar 21', quoteId: 'Q-00622',
     products: [
@@ -453,7 +453,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '5',
     accountId: 'acc-cyberdyne',
     oppName: 'Cortex XDR additional endpoint coverage expansion',
-    account: 'Pacific Commerce Bank',
+    account: 'Cyberdyne Systems',
     type: 'upsell', forecast: 'best-case', stage: 'solutioning',
     closeDate: 'mar 28', quoteId: 'Q-00855',
     products: [
@@ -474,7 +474,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '6',
     accountId: 'acc-hooli',
     oppName: 'Cortex XSOAR automation platform initial deployment',
-    account: 'Axiom Technology Partners',
+    account: 'Hooli',
     type: 'net-new', forecast: 'pipeline', stage: 'solutioning',
     closeDate: 'apr 2', quoteId: 'Q-00956',
     products: [
@@ -492,7 +492,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '7',
     accountId: 'acc-summit',
     oppName: 'WildFire advanced malware protection add-on for all endpoints',
-    account: 'Summit Healthcare Systems',
+    account: 'Summit Technologies',
     type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
     closeDate: 'apr 8', quoteId: 'Q-00481',
     products: [
@@ -511,7 +511,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     id: '8',
     accountId: 'acc-prime-dynamics',
     oppName: 'Prisma Cloud enterprise security platform for cloud migration program',
-    account: 'Harbor Logistics Group',
+    account: 'Prime Dynamics',
     type: 'net-new', forecast: 'pipeline', stage: 'discovery',
     closeDate: 'apr 15', quoteId: 'Q-01012',
     products: [

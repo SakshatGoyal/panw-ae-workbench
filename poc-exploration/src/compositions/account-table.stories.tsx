@@ -394,7 +394,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     {
       id: '1',
       accountId: 'acc-tyrell',
-      name: 'Titan Energy Solutions',
+      name: 'Tyrell Corporation',
       apex: 'Titan Industrial Holdings',
       pipeline: mkPipeline(1_200_000, 800_000, 0, 450_000, [
         { q: 0, type: 'renewal', usd: 900_000 },
@@ -431,7 +431,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     {
       id: '2',
       accountId: 'acc-atlas-bank',
-      name: 'Meridian Capital Group',
+      name: 'Atlas Bank',
       apex: 'Meridian Financial Partners',
       pipeline: mkPipeline(450_000, 1_200_000, 700_000, 0, [
         { q: 0, type: 'upsell',  usd: 450_000 },
@@ -468,7 +468,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     {
       id: '3',
       accountId: 'acc-aperture',
-      name: 'Aperture Robotics',
+      name: 'Aperture Science',
       apex: null, // standalone (spec §2) — no parent
       pipeline: mkPipeline(0, 250_000, 0, 0, [
         { q: 1, type: 'net-new', usd: 250_000 },
@@ -493,7 +493,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     {
       id: '4',
       accountId: 'acc-orion-shipping',
-      name: 'Vertex Manufacturing Co.',
+      name: 'Orion Shipping Services',
       apex: 'Vertex Industrial Group',
       pipeline: mkPipeline(3_100_000, 1_400_000, 900_000, 600_000, [
         { q: 0, type: 'renewal', usd: 2_500_000 },
@@ -530,7 +530,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
       id: '5',
       accountId: 'acc-cyberdyne',
       // CQ-only pipeline — three placeholder ($—) quarters.
-      name: 'Pacific Commerce Bank',
+      name: 'Cyberdyne Systems',
       apex: 'Pacific Commerce Holdings',
       pipeline: mkPipeline(670_000, 0, 0, 0, [
         { q: 0, type: 'upsell', usd: 470_000 },
@@ -561,7 +561,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
       id: '6',
       accountId: 'acc-hooli',
       // No EBC on record — carries 🏛️ derived risk.
-      name: 'Axiom Technology Partners',
+      name: 'Hooli',
       apex: 'Axiom Group',
       pipeline: mkPipeline(0, 0, 1_200_000, 500_000, [
         { q: 2, type: 'net-new', usd: 1_200_000 },
@@ -589,7 +589,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
       id: '7',
       accountId: 'acc-summit',
       // All 7 sales-play statuses — overflow stress case.
-      name: 'Summit Healthcare Systems',
+      name: 'Summit Technologies',
       apex: 'Summit Health Holdings',
       pipeline: mkPipeline(445_000, 280_000, 0, 165_000, [
         // CQ — mixed-type pair (Upsell + Renewal in the same Q).
@@ -625,7 +625,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
       id: '8',
       accountId: 'acc-northstar',
       // Long name stress case.
-      name: 'Koninklijke Philips Electronics N.V. (Healthcare Division)',
+      name: 'NorthStar Transport',
       apex: 'Royal Philips Holdings International',
       pipeline: mkPipeline(1_800_000, 0, 2_400_000, 0, [
         { q: 0, type: 'renewal', usd: 1_800_000 },
@@ -653,7 +653,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
       id: '9',
       accountId: 'acc-beacon-corp',
       // Newcomer: high ARR, low LTV.
-      name: 'Helix Bio Therapeutics',
+      name: 'Beacon Corp',
       apex: 'Helix Holdings',
       pipeline: mkPipeline(400_000, 600_000, 0, 0, [
         { q: 0, type: 'net-new', usd: 400_000 },
@@ -679,7 +679,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
       id: '10',
       accountId: 'acc-prime-dynamics',
       // Shrinking: low ARR, high LTV.
-      name: 'Harbor Logistics Group',
+      name: 'Prime Dynamics',
       apex: 'Harbor Maritime Holdings',
       pipeline: mkPipeline(0, 150_000, 0, 0, [
         { q: 1, type: 'net-new', usd: 150_000 },

@@ -77,6 +77,13 @@ export type Severity = 'ok' | 'caution' | 'error';
 
 // ─── Records ────────────────────────────────────────────────────────────────
 
+export interface InstallBase {
+  tcv: number;
+  incrementalAcv: number;
+  margin: number;
+  rpo: number;
+}
+
 export interface Account {
   id: string;
   name: string;
@@ -92,7 +99,13 @@ export interface Account {
     deploymentAdoption: HealthStatus;
     valueRealization?: HealthStatus;
     customerEngagement?: HealthStatus;
+    /** 12 monthly readings oldest → newest; 0 = healthy, 1 = at-risk, 2 = critical */
+    trend12mo?: number[];
   };
+  /** Parent account name, or null for standalone accounts. */
+  apex?: string | null;
+  /** Install-base financials. Absent until Anna's CSV data is ingested. */
+  installBase?: InstallBase;
   riskIds: AccountRiskId[];
   platformizations: BrandId[];
   region?: string;

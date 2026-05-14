@@ -43,6 +43,7 @@ import {
   PRODUCTS,
   HEALTH_LABELS,
   type Account,
+  type InstallBase,
   type Opportunity,
   type ProductId,
   type RenewalOutcome,
@@ -216,6 +217,23 @@ function fmtMoneyShort(v: number) {
   if (v >= 1_000_000) return `$${(v / 1_000_000).toFixed(v >= 10_000_000 ? 0 : 2)}M`
   if (v >= 1_000)     return `$${Math.round(v / 1_000)}K`
   return `$${v}`
+}
+
+// Derive the display array the Panel renders from canonical InstallBase numbers.
+// margin is stored as a decimal (0.125 = 12.50%).
+function fmtInstallBase(ib: InstallBase): Array<{ label: string; value: string; tone?: 'success' }> {
+  return [
+    { label: 'TCV',             value: fmtMoneyShort(ib.tcv) },
+    { label: 'Incremental ACV', value: fmtMoneyShort(ib.incrementalAcv), ...(ib.incrementalAcv > 0 ? { tone: 'success' as const } : {}) },
+    { label: 'Margin',          value: `${(ib.margin * 100).toFixed(2)}%`,  ...(ib.margin > 0 ? { tone: 'success' as const } : {}) },
+    { label: 'RPO',             value: fmtMoneyShort(ib.rpo) },
+  ]
+}
+
+// Convert Account.health.trend12mo (0/1/2 integers) to the HealthStatus[] the Panel renders.
+const TREND_STATUS_MAP: HealthStatus[] = ['healthy', 'at-risk', 'critical']
+function healthTrend12FromAccount(trend: number[]): HealthStatus[] {
+  return trend.map(n => TREND_STATUS_MAP[n] ?? 'healthy')
 }
 
 function DataRow({ label, value, tone }: { label: string; value: string; tone?: 'success' }) {
@@ -1225,12 +1243,15 @@ function buildPanelDataForAccountId(id: string): AccountPanelData {
   return {
     account: foundAccount,
     opportunities: accountOpps.length > 0 ? accountOpps : DEFAULT_ACCOUNT_PANEL_DATA.opportunities,
-    apexName: '—',
+    apexName: foundAccount.apex ?? '—',
     renewalOpp,
-    // Fields not modeled per-account — fall back to fixture defaults.
-    installBase:   DEFAULT_ACCOUNT_PANEL_DATA.installBase,
+    installBase: foundAccount.installBase
+      ? fmtInstallBase(foundAccount.installBase)
+      : DEFAULT_ACCOUNT_PANEL_DATA.installBase,
     salesPlays:    DEFAULT_ACCOUNT_PANEL_DATA.salesPlays,
-    healthTrend12: DEFAULT_ACCOUNT_PANEL_DATA.healthTrend12,
+    healthTrend12: foundAccount.health.trend12mo
+      ? healthTrend12FromAccount(foundAccount.health.trend12mo)
+      : DEFAULT_ACCOUNT_PANEL_DATA.healthTrend12,
     techHealth:    foundAccount.health.technical,
     adoptHealth:   foundAccount.health.deploymentAdoption,
     productHealth: DEFAULT_ACCOUNT_PANEL_DATA.productHealth,

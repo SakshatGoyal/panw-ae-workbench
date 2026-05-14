@@ -7,21 +7,21 @@
  * `data-models/sales-play-modal-reference.md`.
  */
 
-import type { StageId } from './types'
+import type { SalesPlayStatusId, StageId } from './types'
 
-// ── 7-status enum (mirrors sales-play-reference.md) ───────────────────
+// ── 7-status enum — aligned with canonical SalesPlayStatusId ──────────
 
-export const SalesPlayStatuses = [
-  'not touched',
+export const SalesPlayStatuses: readonly SalesPlayStatusId[] = [
+  'not-touched',
   'pitched',
   'deferred',
   'declined',
   'pursuing',
-  'closed won',
-  'closed lost',
+  'closed-won',
+  'closed-lost',
 ] as const;
 
-export type SalesPlayStatus = (typeof SalesPlayStatuses)[number];
+export type SalesPlayStatus = SalesPlayStatusId;
 
 // ── Contact ───────────────────────────────────────────────────────────
 

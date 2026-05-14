@@ -99,13 +99,13 @@ type View = 'main' | 'linkContact' | 'linkOpportunity'
  * values remain lowercase (data layer).
  */
 const STATUS_LABELS: Record<SalesPlayStatus, string> = {
-  'not touched': 'Not touched',
+  'not-touched': 'Not touched',
   'pitched':     'Pitched',
   'deferred':    'Deferred',
   'declined':    'Declined',
   'pursuing':    'Pursuing',
-  'closed won':  'Closed won',
-  'closed lost': 'Closed lost',
+  'closed-won':  'Closed won',
+  'closed-lost': 'Closed lost',
 }
 
 /**
@@ -114,13 +114,13 @@ const STATUS_LABELS: Record<SalesPlayStatus, string> = {
  * every sales-play surface.
  */
 const STATUS_ICONS: Record<SalesPlayStatus, React.ElementType> = {
-  'not touched': NotTouched,
+  'not-touched': NotTouched,
   'pitched':     Pitched,
   'deferred':    HourglassEnd,
   'declined':    MinusCircleStroke,
   'pursuing':    ChessKnight,
-  'closed won':  ClosedWon,
-  'closed lost': DoNotEnter,
+  'closed-won':  ClosedWon,
+  'closed-lost': DoNotEnter,
 }
 
 

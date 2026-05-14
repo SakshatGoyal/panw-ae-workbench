@@ -596,7 +596,7 @@ function LinkContactView({
             size="sm"
             background="grey10"
             value={query}
-            onChange={(v) => setQuery(v)}
+            onChange={(e) => setQuery(e.target.value)}
             onClear={() => setQuery('')}
             placeholder="Search contacts"
           />
@@ -717,7 +717,7 @@ function LinkOpportunityView({
             size="sm"
             background="grey10"
             value={query}
-            onChange={(v) => setQuery(v)}
+            onChange={(e) => setQuery(e.target.value)}
             onClear={() => setQuery('')}
             placeholder="Search opportunities"
           />

@@ -35,6 +35,9 @@ import {
 import {
   ACCOUNTS,
   OPPORTUNITIES,
+  SALES_PLAYS,
+  SALES_PLAY_INSTANCES,
+  SALES_PLAY_FAMILIES,
   STAGES,
   FORECAST_CATEGORY_LABELS,
   OPPORTUNITY_TYPE_LABELS,
@@ -234,6 +237,25 @@ function fmtInstallBase(ib: InstallBase): Array<{ label: string; value: string; 
 const TREND_STATUS_MAP: HealthStatus[] = ['healthy', 'at-risk', 'critical']
 function healthTrend12FromAccount(trend: number[]): HealthStatus[] {
   return trend.map(n => TREND_STATUS_MAP[n] ?? 'healthy')
+}
+
+// Derive AccSalesPlayFamily[] from the flat SALES_PLAY_INSTANCES table for one account.
+// Falls back to DEFAULT_ACCOUNT_PANEL_DATA.salesPlays when no instances exist.
+function buildSalesPlays(accountId: string): AccSalesPlayFamily[] {
+  const instances = SALES_PLAY_INSTANCES.filter(i => i.accountId === accountId)
+  if (instances.length === 0) return DEFAULT_ACCOUNT_PANEL_DATA.salesPlays
+  return (Object.values(SALES_PLAY_FAMILIES) as typeof SALES_PLAY_FAMILIES[keyof typeof SALES_PLAY_FAMILIES][])
+    .map(family => ({
+      id: family.id as AccSalesPlayFamily['id'],
+      name: family.name,
+      plays: SALES_PLAYS
+        .filter(p => p.familyId === family.id)
+        .flatMap(p => {
+          const inst = instances.find(i => i.playId === p.id)
+          return inst ? [{ name: p.name, status: inst.status as AccSalesPlayStatus, amountUsd: inst.amountUsd }] : []
+        }),
+    }))
+    .filter(f => f.plays.length > 0)
 }
 
 function DataRow({ label, value, tone }: { label: string; value: string; tone?: 'success' }) {
@@ -1248,7 +1270,7 @@ function buildPanelDataForAccountId(id: string): AccountPanelData {
     installBase: foundAccount.installBase
       ? fmtInstallBase(foundAccount.installBase)
       : DEFAULT_ACCOUNT_PANEL_DATA.installBase,
-    salesPlays:    DEFAULT_ACCOUNT_PANEL_DATA.salesPlays,
+    salesPlays:    buildSalesPlays(foundAccount.id),
     healthTrend12: foundAccount.health.trend12mo
       ? healthTrend12FromAccount(foundAccount.health.trend12mo)
       : DEFAULT_ACCOUNT_PANEL_DATA.healthTrend12,

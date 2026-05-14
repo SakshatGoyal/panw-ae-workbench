@@ -147,6 +147,14 @@ export interface SalesPlay {
   description?: string;
 }
 
+/** Per-account binding of a catalog SalesPlay to a status and dollar value. */
+export interface SalesPlayInstance {
+  accountId: string;
+  playId: string;
+  status: SalesPlayStatusId;
+  amountUsd: number;
+}
+
 // ─── Taxonomy metadata interfaces ───────────────────────────────────────────
 
 export interface BrandMeta {

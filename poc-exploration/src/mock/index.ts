@@ -10,3 +10,4 @@ export { ACCOUNTS } from './data/accounts';
 export { OPPORTUNITIES } from './data/opportunities';
 export { CONTACTS } from './data/contacts';
 export { SALES_PLAYS } from './data/sales-plays';
+export { SALES_PLAY_INSTANCES } from './data/sales-play-instances';

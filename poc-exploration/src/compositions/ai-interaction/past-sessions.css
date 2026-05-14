@@ -34,7 +34,7 @@
   border: none;
   text-align: left;
   outline: none;
-  transition: background 70ms var(--ds-motion-easing-standard);
+  transition: background 70ms var(--ds-motion-easing-hover);
 }
 
 /* Nested interactive scope: parent hovers unless an interactive child (button)
@@ -44,8 +44,16 @@
   background: var(--ds-ghost-hover);
 }
 
+.ps-row:hover:not(:has(button:hover)) .ps-row__label {
+  color: var(--ds-text-secondary-hover);
+}
+
 .ps-row:active:not(:has(button:active)) {
   background: var(--ds-ghost-pressed);
+}
+
+.ps-row:active:not(:has(button:active)) .ps-row__label {
+  color: var(--ds-text-secondary-pressed);
 }
 
 /* Keep bg while the overflow flyout is open — visual engagement signal */
@@ -72,6 +80,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: none;
+  transition: color 70ms var(--ds-motion-easing-hover);
 }
 
 /* ─── Kebab action slot ──────────────────────────────────────────────────── */

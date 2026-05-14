@@ -112,7 +112,7 @@
   border-radius: var(--ds-radius-standard);
   position: relative;
   overflow: visible;
-  transition: background 80ms;
+  transition: background 70ms var(--ds-motion-easing-hover);
 }
 
 .dt__row:hover {

@@ -3055,10 +3055,10 @@ const LAYOUT_CSS = `
  * background would write a check the interaction can't cash. */
 .opp-table tbody tr {
   background-color: var(--ds-ghost-rest);
-  /* Productive standard curve — state change in place, not an entrance.
+  /* Hover easing — state change in place, not an entrance.
    * 100ms sits between fast-01 (70ms) and fast-02 (110ms), right at the
    * micro-interaction boundary for a row-sized surface area. */
-  transition: background-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: background-color 100ms var(--ds-motion-easing-hover);
 }
 /* Row hover — locally derived alpha-40 of neutral20 instead of
  * var(--ds-ghost-hover) (which is alpha-70). The rest state of
@@ -3430,7 +3430,7 @@ const LAYOUT_CSS = `
   cursor: pointer;
   background-color: var(--ds-ghost-field-rest);
   border-radius: var(--ds-radius-tight);
-  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  transition: background-color 110ms var(--ds-motion-easing-hover);
 }
 /* Label-left, value-right layout for every KV-style row: tag-bearing
  * health rows AND the numeric renewal rows (Subscription end /

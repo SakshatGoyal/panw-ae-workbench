@@ -112,6 +112,17 @@ export interface Account {
   scenarios: string[];
 }
 
+export interface ProductAllocation {
+  productId: ProductId;
+  amountUsd: number;
+}
+
+export interface OpportunityRenewal {
+  subEnd: string;
+  renewableTcvUsd: number;
+  arrUsd: number;
+}
+
 export interface Opportunity {
   id: string;
   accountId: string;
@@ -124,9 +135,19 @@ export interface Opportunity {
   forecastCategory: ForecastCategory;
   stageId: StageId;
   productIds: ProductId[];
+  /** Per-product USD allocation. Absent until Anna's CSV ingest. */
+  productAllocations?: ProductAllocation[];
   riskIds: OppRiskId[];
-  lastActivity: { type: ActivityType; daysAgo: number };
+  lastActivity: { type: ActivityType; daysAgo: number; description?: string };
   salesPlayIds?: string[];
+  /** Days the opportunity has been in its current stage. */
+  daysInStage?: number;
+  /** Days the opportunity has been in its current forecast category. */
+  daysInForecast?: number;
+  /** Renewal disposition. Only meaningful for renewal / renewal-and-upsell types. */
+  renewalOutcome?: RenewalOutcome;
+  /** Renewal financials for the hover popover. Only present on renewal-type opps. */
+  renewal?: OpportunityRenewal;
   scenarios: string[];
 }
 

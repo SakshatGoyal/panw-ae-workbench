@@ -533,8 +533,8 @@ const ACC_OPPS: AccOpp[] = [
   // layer.
   ...realCyberdyneOpps.map<AccOpp>(o => ({
     ...o,
-    daysInStage: 21,
-    daysInForecast: 42,
+    daysInStage: o.daysInStage ?? 21,
+    daysInForecast: o.daysInForecast ?? 42,
   })),
 ]
 
@@ -1258,7 +1258,7 @@ function buildPanelDataForAccountId(id: string): AccountPanelData {
   const foundAccount = ACCOUNTS.find(a => a.id === id) ?? ACCOUNTS[0]
   const accountOpps: AccOpp[] = OPPORTUNITIES
     .filter(o => o.accountId === foundAccount.id)
-    .map(o => ({ ...o, daysInStage: 21, daysInForecast: 42 }))
+    .map(o => ({ ...o, daysInStage: o.daysInStage ?? 21, daysInForecast: o.daysInForecast ?? 42 }))
   const renewalOpp: AccOpp =
     accountOpps.find(o => o.type === 'renewal' || o.type === 'renewal-and-upsell') ??
     { ...STUB_CYBERDYNE_RENEWAL, accountId: foundAccount.id }

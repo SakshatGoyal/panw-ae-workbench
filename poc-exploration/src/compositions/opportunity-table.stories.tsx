@@ -212,6 +212,8 @@ export interface OpportunityRow {
   id: string
   /** Canonical Account.id from poc-exploration/src/mock/data/accounts.ts */
   accountId: string
+  /** Canonical Opportunity.id from poc-exploration/src/mock/data/opportunities.ts */
+  oppId: string
   oppName: string
   account: string
   type: OppType
@@ -228,6 +230,12 @@ export interface OpportunityRow {
   renewal?: RenewalData
 }
 
+export interface ExpandIntent {
+  accountId: string
+  section: 'installBase' | 'salesPlay' | 'opportunities' | 'accountHealth'
+  oppId?: string
+}
+
 /**
  * Plumbing props. Defaults preserve the current Storybook surface
  * verbatim — `summaryLabel` and `totalItems` are literal strings/numbers
@@ -239,8 +247,10 @@ export interface OpportunityTableProps {
   rows?: OpportunityRow[]
   totalItems?: number
   summaryLabel?: string
-  /** Fired when the per-row Maximize (expand) button is clicked. */
-  onExpand?: (id: string) => void
+  /** Fired when a row's expand button or Account Health CTA is clicked. */
+  onExpand?: (intent: ExpandIntent) => void
+  /** Fired when Update (sales-play popover) or Modify (upsell popover) is clicked. */
+  onOpenSalesPlay?: (playId: string, sourceOppId?: string) => void
 }
 
 type SortKey = 'accountName' | 'oppName' | 'closeDate' | 'value' | 'riskCount'
@@ -375,6 +385,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '1',
     accountId: 'acc-tyrell',
+    oppId: 'opp-tyrell-sase-cloud',
     oppName: 'Prisma Access annual renewal with global bandwidth upgrade',
     account: 'Tyrell Corporation',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
@@ -394,6 +405,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '2',
     accountId: 'acc-atlas-bank',
+    oppId: 'opp-atlas-fw-remote',
     oppName: 'Cortex XDR enterprise deployment for distributed workforce',
     account: 'Atlas Bank',
     type: 'net-new', forecast: 'commit', stage: 'active-pov',
@@ -413,6 +425,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '3',
     accountId: 'acc-frontier',
+    oppId: 'opp-frontier-cortex-fw',
     oppName: 'Strata Cloud Manager upgrade with advanced threat prevention',
     account: 'Frontier Labs',
     type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
@@ -431,6 +444,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '4',
     accountId: 'acc-orion-shipping',
+    oppId: 'opp-orion-sase-renewal',
     oppName: 'Annual Prisma Access license renewal — full global employee base',
     account: 'Orion Shipping Services',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
@@ -452,6 +466,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '5',
     accountId: 'acc-cyberdyne',
+    oppId: 'opp-cyberdyne-cortex-edge',
     oppName: 'Cortex XDR additional endpoint coverage expansion',
     account: 'Cyberdyne Systems',
     type: 'upsell', forecast: 'best-case', stage: 'solutioning',
@@ -473,6 +488,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '6',
     accountId: 'acc-hooli',
+    oppId: 'opp-hooli-cortex-unit42',
     oppName: 'Cortex XSOAR automation platform initial deployment',
     account: 'Hooli',
     type: 'net-new', forecast: 'pipeline', stage: 'solutioning',
@@ -491,6 +507,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '7',
     accountId: 'acc-summit',
+    oppId: 'opp-summit-fw-replace',
     oppName: 'WildFire advanced malware protection add-on for all endpoints',
     account: 'Summit Technologies',
     type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
@@ -510,6 +527,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '8',
     accountId: 'acc-prime-dynamics',
+    oppId: 'opp-prime-cortex-fw',
     oppName: 'Prisma Cloud enterprise security platform for cloud migration program',
     account: 'Prime Dynamics',
     type: 'net-new', forecast: 'pipeline', stage: 'discovery',
@@ -1712,7 +1730,7 @@ function HealthTrendBars({ trend }: { trend: number[]; latest: Health }) {
 
 // ─── Panel content components ────────────────────────────────────────────────
 
-function AccountHealthPanel({ row }: { row: OpportunityRow }) {
+function AccountHealthPanel({ row, onViewHealth }: { row: OpportunityRow; onViewHealth?: () => void }) {
   const h = row.health
   return (
     <div className="opp-pop opp-pop--health">
@@ -1738,7 +1756,7 @@ function AccountHealthPanel({ row }: { row: OpportunityRow }) {
         </div>
       </div>
       <div className="opp-pop__cta">
-        <Button kind="ghost-brand" size="small">View account health</Button>
+        <Button kind="ghost-brand" size="small" onClick={onViewHealth}>View account health</Button>
       </div>
     </div>
   )
@@ -1806,7 +1824,7 @@ const SALES_PLAY_ICON: Record<SalesPlayStatus, React.ElementType> = {
 // Sales-play popover — status name left · value right · Update CTA bottom.
 // Follows the opp-pop grammar: 240px tier, kv-list for the data row,
 // opp-pop__cta for the full-width ghost-brand action.
-function SalesPlayPanel({ salesPlay }: { salesPlay: SalesPlay }) {
+function SalesPlayPanel({ salesPlay, onUpdate }: { salesPlay: SalesPlay; onUpdate?: () => void }) {
   return (
     <div className="opp-pop opp-pop--salesplay">
       <ul className="opp-pop__kv-list">
@@ -1816,7 +1834,7 @@ function SalesPlayPanel({ salesPlay }: { salesPlay: SalesPlay }) {
         </li>
       </ul>
       <div className="opp-pop__cta">
-        <Button kind="ghost-brand" size="small">Update</Button>
+        <Button kind="ghost-brand" size="small" onClick={onUpdate}>Update</Button>
       </div>
     </div>
   )
@@ -1892,8 +1910,8 @@ function ActionButtonPanel({ label, onClick }: { label: string; onClick: () => v
   )
 }
 
-function UpsellModifyPanel({ row, onClose }: { row: OpportunityRow; onClose: () => void }) {
-  return <ActionButtonPanel label="Modify" onClick={() => { /* hook */ onClose() }} />
+function UpsellModifyPanel({ row, onClose, onModify }: { row: OpportunityRow; onClose: () => void; onModify?: () => void }) {
+  return <ActionButtonPanel label="Modify" onClick={() => { onModify?.(); onClose() }} />
 }
 
 // ─── Renewal Outcome editor (spec §4.2) ──────────────────────────────────────
@@ -2099,9 +2117,10 @@ interface TypeTagCellProps {
   row: OpportunityRow
   renewalOutcome: RenewalOutcome
   onOutcomeChange: (v: RenewalOutcome) => void
+  onModify?: () => void
 }
 
-function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps) {
+function TypeTagCell({ row, renewalOutcome, onOutcomeChange, onModify }: TypeTagCellProps) {
   // net-new has no popover; upsell/renewal each anchor their own
   // HoverShell. Static class is only applied in the no-popover case
   // so the tag doesn't pick up a hover state it doesn't deliver on.
@@ -2127,7 +2146,7 @@ function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps)
         interactive
         openDelayMs={1000}
         panelClassName="opp-hover-panel--upsell"
-        render={({ close }) => <UpsellModifyPanel row={row} onClose={close} />}>
+        render={({ close }) => <UpsellModifyPanel row={row} onClose={close} onModify={onModify} />}>
         {plain}
       </HoverShell>
     )
@@ -2162,12 +2181,14 @@ function OppRow({
   onOutcomeChange,
   density,
   onExpand,
+  onOpenSalesPlay,
 }: {
   row: OpportunityRow
   renewalOutcome: RenewalOutcome
   onOutcomeChange: (v: RenewalOutcome) => void
   density: DensityKey[]
-  onExpand?: (id: string) => void
+  onExpand?: (intent: ExpandIntent) => void
+  onOpenSalesPlay?: (playId: string, sourceOppId?: string) => void
 }) {
   const showTag = (k: DensityKey) => density.includes(k)
   const dayLabel =
@@ -2227,6 +2248,7 @@ function OppRow({
               row={row}
               renewalOutcome={renewalOutcome}
               onOutcomeChange={onOutcomeChange}
+              onModify={() => onOpenSalesPlay?.(row.salesPlay.name, row.oppId)}
             />
           )}
           {showTag('stage')    && <Tags {...TAG_BASE} className="opp-tag--static" label={STAGE_LABEL[row.stage]} />}
@@ -2277,7 +2299,7 @@ function OppRow({
           {showTag('accountHealth') && (
             <HoverShell
               interactive
-              render={() => <AccountHealthPanel row={row} />}>
+              render={() => <AccountHealthPanel row={row} onViewHealth={() => onExpand?.({ accountId: row.accountId, section: 'accountHealth' })} />}>
               <Tags
                 shape={TAG_BASE.shape}
                 size={TAG_BASE.size}
@@ -2305,7 +2327,7 @@ function OppRow({
             <HoverShell
               interactive
               render={() => (
-                <SalesPlayPanel salesPlay={row.salesPlay} />
+                <SalesPlayPanel salesPlay={row.salesPlay} onUpdate={() => onOpenSalesPlay?.(row.salesPlay.name, row.oppId)} />
               )}>
               <Tags
                 {...TAG_BASE}
@@ -2339,7 +2361,7 @@ function OppRow({
               <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask question" />
             </HoverShell>
             <HoverShell side="top" align="center" openDelayMs={400} panelClassName="opp-btn-tooltip" render={() => 'Open on right'}>
-              <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.accountId)} />
+              <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.({ accountId: row.accountId, section: 'opportunities', oppId: row.oppId })} />
             </HoverShell>
           </div>
         </div>
@@ -2414,6 +2436,7 @@ export function AEOpportunityTable({
   totalItems = 47,
   summaryLabel = '47 deals · $12.4M',
   onExpand,
+  onOpenSalesPlay,
 }: OpportunityTableProps = {}) {
   const [search, setSearch] = useState('')
   const [single, setSingle] = useState<Record<string, string | null>>(INITIAL_SINGLE)
@@ -2705,6 +2728,7 @@ export function AEOpportunityTable({
                       onOutcomeChange={(v) => setRenewalOutcome(row.id, v)}
                       density={density}
                       onExpand={onExpand}
+                      onOpenSalesPlay={onOpenSalesPlay}
                     />
                     {i < sortedRows.length - 1 && (
                       <tr className="opp-divider-row" aria-hidden="true">

@@ -1673,7 +1673,7 @@ function HealthTrendBars({ trend }: { trend: number[] }) {
 
 // ─── Account Health hover popover ────────────────────────────────────────
 
-function AccountHealthPanel({ row }: { row: AccountRow }) {
+function AccountHealthPanel({ row, onViewHealth }: { row: AccountRow; onViewHealth?: () => void }) {
   const h = row.health
   return (
     <div className="acc-pop acc-pop--health">
@@ -1699,7 +1699,7 @@ function AccountHealthPanel({ row }: { row: AccountRow }) {
         </div>
       </div>
       <div className="acc-pop__cta">
-        <Button kind="ghost-brand" size="small">View account health</Button>
+        <Button kind="ghost-brand" size="small" onClick={onViewHealth}>View account health</Button>
       </div>
     </div>
   )
@@ -1797,7 +1797,7 @@ function EBCPanel({ ebc }: { ebc: EBC }) {
 // uses the row height that column 3's 4-sub-cell stack already
 // reserves, so truncation hides information for no visual gain.
 
-function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
+function SalesPlayBucketPanel({ bucket, onPlayClick }: { bucket: SalesPlayBucket; onPlayClick?: (playName: string) => void }) {
   return (
     <div className="acc-pop acc-pop--play-bucket">
       <div className="acc-pop__heading">
@@ -1805,7 +1805,11 @@ function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
       </div>
       <ul className="acc-pop__kv-list">
         {bucket.plays.map(p => (
-          <li key={p.name} className="acc-pop__kv">
+          <li
+            key={p.name}
+            className="acc-pop__kv"
+            onClick={onPlayClick ? () => onPlayClick(p.name) : undefined}
+            style={onPlayClick ? { cursor: 'pointer' } : undefined}>
             <span className="acc-pop__kv-label">{p.name}</span>
             <span className="acc-pop__kv-value">{formatUsdCompact(p.usd)}</span>
           </li>
@@ -1815,13 +1819,13 @@ function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
   )
 }
 
-function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
+function SalesPlayTag({ bucket, onPlayClick }: { bucket: SalesPlayBucket; onPlayClick?: (playName: string) => void }) {
   const IconCmp = SALES_PLAY_ICON[bucket.status]
   // Icon carries the status signal; label is dollar-value only so the
   // chip stays narrow enough that multi-bucket rows don't collapse to +N.
   const label = formatUsdCompact(bucket.usd)
   return (
-    <HoverShell interactive render={() => <SalesPlayBucketPanel bucket={bucket} />}>
+    <HoverShell interactive render={() => <SalesPlayBucketPanel bucket={bucket} onPlayClick={onPlayClick} />}>
       <Tags
         shape="rounded"
         size="large"
@@ -1838,6 +1842,7 @@ function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
 
 interface SalesPlayClusterProps {
   buckets: SalesPlayBucket[]   // may be in any order; cluster handles ordering
+  onPlayClick?: (playName: string) => void
 }
 
 // Account-table sales plays wrap vertically rather than collapsing to
@@ -1849,7 +1854,7 @@ interface SalesPlayClusterProps {
 // concern, not a per-tag concern), so the cluster always renders every
 // bucket present on the row.
 
-function SalesPlayCluster({ buckets }: SalesPlayClusterProps) {
+function SalesPlayCluster({ buckets, onPlayClick }: SalesPlayClusterProps) {
   if (buckets.length === 0) return null
   const lifecycleOrdered = [...buckets].sort(
     (a, b) => SALES_PLAY_LIFECYCLE.indexOf(a.status) - SALES_PLAY_LIFECYCLE.indexOf(b.status)
@@ -1857,7 +1862,7 @@ function SalesPlayCluster({ buckets }: SalesPlayClusterProps) {
   return (
     <div className="acc-tag-cluster">
       {lifecycleOrdered.map(b => (
-        <SalesPlayTag key={b.status} bucket={b} />
+        <SalesPlayTag key={b.status} bucket={b} onPlayClick={onPlayClick} />
       ))}
     </div>
   )
@@ -2029,12 +2034,19 @@ function SortFlyout({ sortKey, sortDir: _sortDir, onChange }: SortFlyoutProps) {
  * counts (`accountCount`, `totalArr`, `totalPipeline4q`) keep deriving
  * from `rows` per spec §3.3.
  */
+export interface AccountExpandIntent {
+  accountId: string
+  section: 'installBase' | 'salesPlay' | 'opportunities' | 'accountHealth'
+}
+
 export interface AccountTableProps {
   rows?: AccountRow[]
   /** Pagination footer override; not currently consumed (no pagination rendered). */
   totalItems?: number
-  /** Fired when the per-row Maximize (expand) button is clicked. */
-  onExpand?: (id: string) => void
+  /** Fired when the per-row expand button or Account Health CTA is clicked. */
+  onExpand?: (intent: AccountExpandIntent) => void
+  /** Fired when a sales-play status popover row is clicked. */
+  onOpenSalesPlay?: (playId: string) => void
 }
 
 // ─── Column resize hook ──────────────────────────────────────────────────────
@@ -2095,7 +2107,7 @@ function useColumnResize(columnCount: number, minPx: number = 80) {
   return { tableRef, widths, handle }
 }
 
-export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTableProps = {}) {
+export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand, onOpenSalesPlay }: AccountTableProps = {}) {
   const [search, setSearch] = useState('')
   // 5 columns: Account · Opportunities · Activities & Risks · Products · Sales Plays.
   // Last column has no handle (drags only rebalance pairs of adjacent
@@ -2421,7 +2433,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
                             {density.includes('accountHealth') && (
                               <HoverShell
                                 interactive
-                                render={() => <AccountHealthPanel row={row} />}>
+                                render={() => <AccountHealthPanel row={row} onViewHealth={() => onExpand?.({ accountId: row.accountId, section: 'accountHealth' })} />}>
                                 <Tags
                                   shape={TAG_BASE.shape}
                                   size={TAG_BASE.size}
@@ -2474,7 +2486,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
                           Closed Lost). Overflow collapses by
                           deemphasized priority, NOT rightmost
                           (spec §4.5 + cr-failure §2). */}
-                      <SalesPlayCluster buckets={row.salesPlays} />
+                      <SalesPlayCluster buckets={row.salesPlays} onPlayClick={onOpenSalesPlay} />
                       {/* Row-level floating actions — absolutely positioned
                           to bottom-right of the <tr>. Same inverse-pill
                           pattern as opp-table: dark ground, ghost buttons
@@ -2486,7 +2498,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
                             <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask question" />
                           </HoverShell>
                           <HoverShell side="top" align="center" openDelayMs={400} panelClassName="acc-btn-tooltip" render={() => 'Open on right'}>
-                            <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.accountId)} />
+                            <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.({ accountId: row.accountId, section: 'installBase' })} />
                           </HoverShell>
                         </div>
                       </div>
@@ -3106,6 +3118,7 @@ const LAYOUT_CSS = `
   padding: 8px;
   vertical-align: top;
   color: var(--ds-text-secondary-rest);
+  transition: color 70ms var(--ds-motion-easing-hover);
 }
 .acc-table tbody td:first-child {
   padding: 8px 8px 8px 10px;
@@ -3151,6 +3164,9 @@ const LAYOUT_CSS = `
  * adapts-to-bg promise and giving room to row-nested hovers.
  * Primitive resolves to neutral20 = #E4E8EB = rgb(228, 232, 235). */
 .acc-table tbody tr:hover  { background-color: rgb(228 232 235 / 40%); }
+.acc-table tbody tr:hover td {
+  color: var(--ds-text-secondary-hover);
+}
 
 /* Standalone divider rows — an independent element between rows, not
  * a border that belongs to either adjacent row. */

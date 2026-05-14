@@ -8,6 +8,8 @@ import { ACCOUNTS } from '../../poc-exploration/src/mock/data/accounts'
 
 type View = 'Opportunities' | 'Account Workbench'
 type ModalState = { type: 'salesPlay'; playId: string; sourceOppId?: string } | null
+type PanelSection = 'installBase' | 'salesPlay' | 'opportunities' | 'accountHealth'
+type PanelIntent = { accountId: string; section?: PanelSection; oppId?: string } | null
 
 const VIEW_TITLE: Record<View, string> = {
   'Opportunities': 'Opportunity Workbench',
@@ -16,18 +18,24 @@ const VIEW_TITLE: Record<View, string> = {
 
 export default function App() {
   const [activeView, setActiveView] = useState<View>('Opportunities')
-  const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [panelIntent, setPanelIntent] = useState<PanelIntent>(null)
   const [modal, setModal] = useState<ModalState>(null)
 
   const closeModal = () => setModal(null)
 
-  const selectedAccount = selectedId ? ACCOUNTS.find(a => a.id === selectedId) : null
+  const selectedAccount = panelIntent ? ACCOUNTS.find(a => a.id === panelIntent.accountId) : null
 
-  const rightRailContent = selectedId
+  const panelKey = panelIntent
+    ? `${panelIntent.accountId}:${panelIntent.section ?? ''}:${panelIntent.oppId ?? ''}`
+    : undefined
+
+  const rightRailContent = panelIntent
     ? (
       <AccountPanel
-        key={selectedId}
-        accountId={selectedId}
+        key={panelKey}
+        accountId={panelIntent.accountId}
+        initialOpenSection={panelIntent.section}
+        initialOpenOppId={panelIntent.oppId}
         onSalesPlayRowClick={(playId, sourceOppId) =>
           setModal({ type: 'salesPlay', playId, sourceOppId })
         }
@@ -35,9 +43,17 @@ export default function App() {
     )
     : undefined
 
+  function handleExpand(intent: { accountId: string; section: PanelSection; oppId?: string }) {
+    setPanelIntent(intent)
+  }
+
+  function handleOpenSalesPlay(playId: string, sourceOppId?: string) {
+    setModal({ type: 'salesPlay', playId, sourceOppId })
+  }
+
   function handleNavClick(label: string) {
     setActiveView(label as View)
-    setSelectedId(null)
+    setPanelIntent(null)
   }
 
   return (
@@ -56,11 +72,11 @@ export default function App() {
         <div className="cd-app__body">
           {activeView === 'Opportunities' ? (
             <main className="cd-app__main" aria-label="Opportunity Workbench">
-              <AEOpportunityTable onExpand={setSelectedId} />
+              <AEOpportunityTable onExpand={handleExpand} onOpenSalesPlay={handleOpenSalesPlay} />
             </main>
           ) : (
             <main className="cd-app__main" aria-label="Account Workbench">
-              <AEAccountTable onExpand={setSelectedId} />
+              <AEAccountTable onExpand={handleExpand} onOpenSalesPlay={handleOpenSalesPlay} />
             </main>
           )}
         </div>

@@ -1056,8 +1056,14 @@ const COMPOSITION_CSS = `
 .spl-row:hover:not(:has(button:hover)) {
   background: var(--ds-ghost-hover);
 }
+.spl-row:hover:not(:has(button:hover)) .spl-row__label {
+  color: var(--ds-text-secondary-hover);
+}
 .spl-row:active:not(:has(button:active)) {
   background: var(--ds-ghost-pressed);
+}
+.spl-row:active:not(:has(button:active)) .spl-row__label {
+  color: var(--ds-text-secondary-pressed);
 }
 .spl-row:focus-visible {
   outline: 2px solid var(--ds-lines-brand-rest);
@@ -1079,6 +1085,7 @@ const COMPOSITION_CSS = `
   overflow: hidden;
   text-overflow: ellipsis;
   user-select: none;
+  transition: color 70ms var(--ds-motion-easing-hover);
 }
 .spl-row__actions {
   flex-shrink: 0;

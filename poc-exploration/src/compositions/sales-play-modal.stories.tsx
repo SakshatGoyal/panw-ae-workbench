@@ -164,6 +164,15 @@ export interface SalesPlayModalProps {
    * internal reset (pending → loaded). Default: no-op.
    */
   onCancel?: () => void
+  /**
+   * Fired when the modal should close (X button, backdrop click, or Cancel).
+   * Consumer is responsible for unmounting the modal.
+   */
+  onClose?: () => void
+  /** The play identifier — play name string from the account panel row. */
+  playId?: string
+  /** Reserved for future data resolution (Goal 3). */
+  sourceOppId?: string
 }
 
 export function SalesPlayModal({
@@ -174,7 +183,11 @@ export function SalesPlayModal({
   initialEdits = INITIAL_EDITS,
   onSave,
   onCancel: onCancelProp,
+  onClose,
+  playId,
+  sourceOppId: _sourceOppId,
 }: SalesPlayModalProps = {}) {
+  const effectiveHeader: PlayHeader = playId ? { ...header, name: playId } : header
   const [view, setView] = useState<View>(initialView)
   const [loaded] = useState<SalesPlayEdits>(initialEdits)
   const [pending, setPending] = useState<SalesPlayEdits>(initialEdits)
@@ -239,6 +252,7 @@ export function SalesPlayModal({
   const onCancel = () => {
     setPending(loaded)
     onCancelProp?.()
+    onClose?.()
   }
   const onUpdate = () => {
     if (onSave) {
@@ -255,7 +269,7 @@ export function SalesPlayModal({
   return (
     <div className="spm-page">
       <style>{COMPOSITION_CSS}</style>
-      <div className="spm-scrim" />
+      <div className="spm-scrim" onClick={onClose} aria-hidden="true" />
       <div
         className="spm-modal"
         role="dialog"
@@ -265,10 +279,10 @@ export function SalesPlayModal({
         <div className="spm-header">
           <div className="spm-header__titles">
             <h2 id="spm-title" className="spm-title">
-              {header.family} | {header.name}
+              {effectiveHeader.family} | {effectiveHeader.name}
             </h2>
             <Link href="#" size="14px" color="blue" className="spm-account-link">
-              {header.accountName}
+              {effectiveHeader.accountName}
             </Link>
           </div>
           <IconButton
@@ -277,6 +291,7 @@ export function SalesPlayModal({
             size="sm"
             renderIcon={Close}
             className="spm-close"
+            onClick={onClose}
           />
         </div>
 
@@ -796,23 +811,29 @@ function LinkOpportunityView({
 
 const COMPOSITION_CSS = `
 /* ── Page backdrop + scrim ───────────────────────────────────────── */
+/* position: fixed + z-index 1000 ensures the modal layer covers the
+   full viewport and sits above the right rail and all other shell
+   chrome regardless of where in the React tree it is rendered. The
+   stage-base background is removed — the scrim provides the darkening
+   wash so the underlying app surface shows through correctly. */
 .spm-page {
-  position: relative;
-  min-height: 100vh;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
   display: flex;
   align-items: center;
   justify-content: center;
   padding: var(--ds-spacing-07);          /* 32 */
-  background: var(--ds-stage-base);
 }
 .spm-scrim {
-  position: fixed;
+  position: absolute;
   inset: 0;
   /* No defined modal-scrim token yet — using a black 50% wash via
      rgb-notation (no raw hex). Flag for tokenization if this pattern
      recurs across modals, drawers, sheets. */
   background: rgb(0 0 0 / 0.5);
   z-index: 0;
+  cursor: default;
 }
 
 /* ── Modal shell ─────────────────────────────────────────────────── */

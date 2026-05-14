@@ -20,7 +20,7 @@
   min-width: 0;
   flex: 1 1 0;
   cursor: default;
-  transition: border-color 0.3s ease-out, background-color 0.3s ease-out;
+  transition: border-color 70ms var(--ds-motion-easing-hover), background-color 70ms var(--ds-motion-easing-hover);
 
   &[role='button'] { cursor: pointer; }
 }

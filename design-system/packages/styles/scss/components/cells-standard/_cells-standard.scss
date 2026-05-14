@@ -16,7 +16,7 @@ $panw-prefix: 'panw';
   cursor: default;
   font-family: var(--ds-type-font-family-sans);
   position: relative;
-  transition: background-color 0.15s ease;
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 }
 
 .#{$panw-prefix}--cells-std--small   { height: 32px; }

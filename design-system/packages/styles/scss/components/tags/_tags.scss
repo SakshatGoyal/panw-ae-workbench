@@ -16,8 +16,8 @@
   // primitive-60. Transition covers both axes. 110ms/entrance curve
   // matches button and flyout-item motion.
   transition:
-    background-color 110ms var(--ds-motion-easing-standard),
-    box-shadow       110ms var(--ds-motion-easing-standard);
+    background-color 70ms var(--ds-motion-easing-hover),
+    box-shadow       70ms var(--ds-motion-easing-hover);
 }
 
 // ─── Shapes ──────────────────────────────────────────────────────────────────
@@ -102,7 +102,7 @@
   flex-shrink: 0;
   // Color is set per color × contrast in the matrix below; transition lives
   // here so every variant inherits the same productive easing.
-  transition: color 110ms var(--ds-motion-easing-standard);
+  transition: color 70ms var(--ds-motion-easing-hover);
 
   svg { display: block; color: currentColor; fill: currentColor; }
 }
@@ -119,7 +119,7 @@
   cursor: pointer;
   // Same per-variant icon tokens as the leading icon — set in the matrix
   // below. Transition matches the icon slot.
-  transition: color 110ms var(--ds-motion-easing-standard);
+  transition: color 70ms var(--ds-motion-easing-hover);
   border-radius: var(--ds-radius-pill);
 
   &:focus-visible {

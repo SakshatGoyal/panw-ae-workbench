@@ -41,9 +41,9 @@ $panw-prefix: 'panw';
   box-sizing: border-box;
   background-color: var(--panw-te-bg);
   transition:
-    background-color 110ms var(--ds-motion-easing-standard),
-    border-color 110ms var(--ds-motion-easing-standard),
-    box-shadow 110ms var(--ds-motion-easing-standard);
+    background-color 70ms var(--ds-motion-easing-hover),
+    border-color     70ms var(--ds-motion-easing-hover),
+    box-shadow       70ms var(--ds-motion-easing-hover);
 }
 
 .#{$panw-prefix}--text-entry__input {

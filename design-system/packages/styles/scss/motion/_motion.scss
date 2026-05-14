@@ -9,23 +9,30 @@
 //   standard   — cubic-bezier(0.2, 0, 0.38, 0.9)
 //                Symmetric ease-in-out; the default for state changes
 //                (hover, press, color shifts, small layout moves).
+//   hover      — cubic-bezier(0.2, 0.2, 0.38, 0.9)
+//                Hover-specific curve. Slightly softer on the initial
+//                departure (y1=0.2 vs y1=0 in standard). Applied at
+//                70ms for all rest → hover transitions system-wide.
 //   entrance   — cubic-bezier(0, 0, 0.38, 0.9)
 //                Ease-out only; for elements coming INTO view (panels
 //                opening, content revealing, drawers expanding).
 //
 // Usage:
-//   transition: background-color 110ms var(--ds-motion-easing-standard);
-//   transition: max-height 240ms var(--ds-motion-easing-entrance);
+//   transition: background-color 70ms var(--ds-motion-easing-hover);   // hover state change
+//   transition: background-color 110ms var(--ds-motion-easing-standard); // other state changes
+//   transition: max-height 240ms var(--ds-motion-easing-entrance);     // panel open
 
 @use 'sass:map';
 
 :root {
   --ds-motion-easing-standard: cubic-bezier(0.2, 0, 0.38, 0.9);
+  --ds-motion-easing-hover:    cubic-bezier(0.2, 0.2, 0.38, 0.9);
   --ds-motion-easing-entrance: cubic-bezier(0, 0, 0.38, 0.9);
 }
 
 $_easings: (
   'standard': var(--ds-motion-easing-standard),
+  'hover':    var(--ds-motion-easing-hover),
   'entrance': var(--ds-motion-easing-entrance),
 );
 

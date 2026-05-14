@@ -351,9 +351,9 @@ function SalesPlayValueTag({
 // is the metric. Dividers between leaves render outside this component
 // (leaves are table rows; per project rule lines as dividers are
 // reserved for table rows within an accordion).
-function PlayRow({ play }: { play: AccSalesPlayInstance }) {
+function PlayRow({ play, onClick }: { play: AccSalesPlayInstance; onClick?: () => void }) {
   return (
-    <div className="acc-sp-play-row">
+    <div className="acc-sp-play-row" onClick={onClick} role={onClick ? 'button' : undefined} tabIndex={onClick ? 0 : undefined}>
       <span className="acc-sp-play-row__name">{play.name}</span>
       <PanelHover
         openDelayMs={100}
@@ -1193,6 +1193,22 @@ export interface AccountPanelProps {
    * to open with the clicked opp's snapshot expanded, not the renewal's.
    */
   initialOpenOppId?: string
+  /**
+   * When provided, only the named section opens on mount and the panel
+   * auto-scrolls to it. When omitted, all four sections open (default).
+   *
+   * If `initialOpenSection === 'opportunities'` and `initialOpenOppId` is
+   * also set, the named opp's L2 accordion is expanded inside the section.
+   * If only `initialOpenSection === 'opportunities'` (no `initialOpenOppId`),
+   * the renewal opp opens as usual.
+   */
+  initialOpenSection?: 'installBase' | 'salesPlay' | 'opportunities' | 'accountHealth'
+  /**
+   * Fired when an L2 sales-play leaf row is clicked.
+   * `playId` is the play name; `sourceOppId` is reserved for future
+   * caller-side wiring and is always `undefined` from within this component.
+   */
+  onSalesPlayRowClick?: (playId: string, sourceOppId?: string) => void
 }
 
 // Build AccountPanelData from a canonical Account.id (e.g. 'acc-tyrell').
@@ -1329,6 +1345,8 @@ export function AccountPanel({
   data: dataProp,
   accountId,
   initialOpenOppId,
+  initialOpenSection,
+  onSalesPlayRowClick,
 }: AccountPanelProps = {}) {
   const data = accountId
     ? buildPanelDataForAccountId(accountId)
@@ -1350,17 +1368,38 @@ export function AccountPanel({
       'healthy'
     )
 
-  // Spec default is all sections open. As each phase lands its real content,
-  // the default flips. Phase 2 → Sales Play opens. Opportunities and Account
-  // Health stay closed until their phases land.
-  const [openSections, setOpenSections] = useState({
-    installBase:    true,
-    salesPlay:      true,
-    opportunities:  true,
-    accountHealth:  true,
-  })
+  // When initialOpenSection is provided, only that section opens on mount.
+  // Otherwise all four sections open (spec default).
+  const [openSections, setOpenSections] = useState(() =>
+    initialOpenSection
+      ? {
+          installBase:   initialOpenSection === 'installBase',
+          salesPlay:     initialOpenSection === 'salesPlay',
+          opportunities: initialOpenSection === 'opportunities',
+          accountHealth: initialOpenSection === 'accountHealth',
+        }
+      : { installBase: true, salesPlay: true, opportunities: true, accountHealth: true }
+  )
   const toggle = (id: keyof typeof openSections) =>
     setOpenSections(p => ({ ...p, [id]: !p[id] }))
+
+  // Refs for the invisible anchor elements that precede each top-level
+  // accordion — used for smooth-scrolling to the active section on mount.
+  const installBaseAnchorRef  = useRef<HTMLDivElement>(null)
+  const salesPlayAnchorRef    = useRef<HTMLDivElement>(null)
+  const opportunitiesAnchorRef = useRef<HTMLDivElement>(null)
+  const accountHealthAnchorRef = useRef<HTMLDivElement>(null)
+
+  useEffect(() => {
+    if (!initialOpenSection) return
+    const refMap: Record<string, React.RefObject<HTMLDivElement | null>> = {
+      installBase:   installBaseAnchorRef,
+      salesPlay:     salesPlayAnchorRef,
+      opportunities: opportunitiesAnchorRef,
+      accountHealth: accountHealthAnchorRef,
+    }
+    refMap[initialOpenSection]?.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps — mount-only
 
   // Family-row open state. Cortex Cloud opens by default in Phase 2 so
   // the leaf-row pattern (status icon + $value tag) is visible in the
@@ -1475,6 +1514,7 @@ export function AccountPanel({
             DS's tile radius — the no-radius rule applies only here. */}
         <div className="acc-section-stack">
 
+        <div ref={installBaseAnchorRef} className="acc-section-anchor" aria-hidden="true" />
         <Accordion
           size="large" theme="gray10" orientation="right"
           title="Install Base" showIcon={false}
@@ -1525,6 +1565,7 @@ export function AccountPanel({
          * Widening the DS Accordion public surface is out of scope for
          * the POC stage.
          */}
+        <div ref={salesPlayAnchorRef} className="acc-section-anchor" aria-hidden="true" />
         <Accordion
           size="large" theme="gray10" orientation="right"
           /* Title renders as JSX so the rollup tag can carry the NotTouched
@@ -1571,11 +1612,12 @@ export function AccountPanel({
                   onToggle={() => toggleFamily(family.id)}
                 >
                   <div className="acc-sp-play-list">
-                    {family.plays.map((play, i) => (
-                      <React.Fragment key={play.name}>
-                        {i > 0 && <div className="acc-divider" aria-hidden="true" />}
-                        <PlayRow play={play} />
-                      </React.Fragment>
+                    {family.plays.map(play => (
+                      <PlayRow
+                        key={play.name}
+                        play={play}
+                        onClick={onSalesPlayRowClick ? () => onSalesPlayRowClick(play.name) : undefined}
+                      />
                     ))}
                   </div>
                 </Accordion>
@@ -1601,6 +1643,7 @@ export function AccountPanel({
          * fields). Phase 3 ships static markup so the surface can be
          * critiqued in its at-rest shape before behavior layers on top.
          */}
+        <div ref={opportunitiesAnchorRef} className="acc-section-anchor" aria-hidden="true" />
         <Accordion
           size="large" theme="gray10" orientation="right"
           title="Opportunities in Next 4Q" showIcon={false}
@@ -1664,6 +1707,7 @@ export function AccountPanel({
          *   4. "Open Account Health" deep link (CTA parity with other
          *      sections that hand off to a deeper surface)
          */}
+        <div ref={accountHealthAnchorRef} className="acc-section-anchor" aria-hidden="true" />
         <Accordion
           size="large" theme="gray10" orientation="right"
           title="Account Health" showIcon={false}
@@ -2379,20 +2423,105 @@ const PANEL_CSS = `
     white-space: nowrap;
   }
 
+  /* ── Invisible section-scroll anchor ────────────────────────────────────
+     Zero-height element preceding each top-level accordion so that the
+     auto-scroll on mount lands the section header at the panel's top
+     edge rather than scrolling past it. scroll-margin-top adds a small
+     visual gap so the accordion header doesn't hard-kiss the topbar. */
+  .acc-section-anchor {
+    height: 0;
+    overflow: hidden;
+    pointer-events: none;
+    scroll-margin-top: 4px;
+  }
+
   /* ── Per-play leaf row ────────────────────────────────────────────────
-     Layout: play name (left, plain text) + value tag (icon + $, right).
-     These ARE table rows inside the family accordion's drawer, so
-     dividers between them are correct. Min-height 40px gives the tag
-     room to breathe vertically inside the row. */
+     Mirrors the acc-pop__rows hover pattern from account-table exactly:
+       - List has negative horizontal margin that pulls it 8px wider on
+         each side of the drawer's 16px padding, so row backgrounds can
+         extend to 8px from the accordion edge.
+       - List ::before / ::after are the top / bottom hairlines.
+       - Inter-row hairlines are ::before pseudo-elements on non-first
+         rows (position: absolute, top: -1px).
+       - On hover: row background lifts to ghost.field-hover; the row's
+         own top hairline and the next row's top hairline fade to
+         transparent; first-row hover hides the list ::before; last-row
+         hover hides the list ::after.
+     Standalone <div class="acc-divider"> elements are NOT rendered
+     inside this list — they are replaced by the ::before approach. */
   .acc-sp-play-list {
     display: flex;
     flex-direction: column;
+    gap: 0;
+    position: relative;
+    /* Pull rows 8px out on each side — the row padding re-imposes the
+       text at the same column the rest of the drawer uses. */
+    margin: 0 calc(-1 * var(--ds-spacing-03));
+    padding: 0;
+  }
+  /* List top hairline — inset 8px each side to align with text rail. */
+  .acc-sp-play-list::before {
+    content: '';
+    display: block;
+    height: 1px;
+    margin: 0 var(--ds-spacing-03);
+    background-color: var(--ds-lines-neutral-tile-rest);
+    transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  }
+  /* List bottom hairline. */
+  .acc-sp-play-list::after {
+    content: '';
+    display: block;
+    height: 1px;
+    margin: 0 var(--ds-spacing-03);
+    background-color: var(--ds-lines-neutral-tile-rest);
+    transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
   }
   .acc-sp-play-row {
+    position: relative;
     display: flex;
     align-items: center;
     gap: var(--ds-spacing-03);
     min-height: 40px;
+    /* 8px L/R padding re-imposes the text column after the negative margin. */
+    padding: 0 var(--ds-spacing-03);
+    background-color: transparent;
+    border-radius: var(--ds-radius-tight);
+    transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+    cursor: pointer;
+  }
+  /* Inter-row hairlines as ::before pseudo on non-first rows.
+     Positioned absolute at top: -1px so they sit between rows. */
+  .acc-sp-play-list > .acc-sp-play-row + .acc-sp-play-row::before {
+    content: '';
+    position: absolute;
+    top: -1px;
+    left: var(--ds-spacing-03);
+    right: var(--ds-spacing-03);
+    height: 1px;
+    background-color: var(--ds-lines-neutral-tile-rest);
+    transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  }
+  /* Row hover / pressed — ghost.field tokens (alpha overlay, not solid). */
+  .acc-sp-play-row:hover {
+    background-color: var(--ds-ghost-field-hover);
+  }
+  .acc-sp-play-row:active {
+    background-color: var(--ds-ghost-field-pressed);
+  }
+  /* Hide hovered row's own top hairline and the next row's top hairline
+     so the hover pill reads as a single uninterrupted rounded shape. */
+  .acc-sp-play-list > .acc-sp-play-row:hover::before,
+  .acc-sp-play-list > .acc-sp-play-row:hover + .acc-sp-play-row::before {
+    background-color: transparent;
+  }
+  /* Hide list's top hairline when the first row is hovered. */
+  .acc-sp-play-list:has(> .acc-sp-play-row:first-child:hover)::before {
+    background-color: transparent;
+  }
+  /* Hide list's bottom hairline when the last row is hovered. */
+  .acc-sp-play-list:has(> .acc-sp-play-row:last-child:hover)::after {
+    background-color: transparent;
   }
   .acc-sp-play-row__name {
     flex: 1;

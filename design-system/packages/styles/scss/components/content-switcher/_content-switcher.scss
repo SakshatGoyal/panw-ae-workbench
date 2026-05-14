@@ -25,8 +25,8 @@
   @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   white-space: nowrap;
   outline: none;
-  transition: background-color 100ms var(--ds-motion-easing-standard),
-              color 100ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover),
+              color           70ms var(--ds-motion-easing-hover);
 
   &:focus-visible {
     outline: 2px solid var(--panw-cs-focus);

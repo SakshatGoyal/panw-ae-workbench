@@ -24,9 +24,9 @@ $panw-prefix: 'panw';
   outline: none;
   background: none;
   box-sizing: border-box;
-  transition: background-color 110ms var(--ds-motion-easing-standard),
-              color 110ms var(--ds-motion-easing-standard),
-              border-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover),
+              color           70ms var(--ds-motion-easing-hover),
+              border-color    70ms var(--ds-motion-easing-hover);
 }
 
 // Container variant

@@ -62,9 +62,9 @@ $panw-prefix: 'panw';
   cursor: pointer;
   box-sizing: border-box;
   transition:
-    background-color 110ms var(--ds-motion-easing-standard),
-    border-color 110ms var(--ds-motion-easing-standard),
-    box-shadow 110ms var(--ds-motion-easing-standard);
+    background-color 70ms var(--ds-motion-easing-hover),
+    border-color     70ms var(--ds-motion-easing-hover),
+    box-shadow       70ms var(--ds-motion-easing-hover);
 }
 
 .#{$panw-prefix}--multi-select__placeholder {
@@ -189,7 +189,7 @@ $panw-prefix: 'panw';
   @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-ms-text);
   cursor: pointer;
-  transition: background-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover  { background-color: var(--panw-ms-menu-item-hover); }
   &:active { background-color: var(--panw-ms-menu-item-pressed); }
@@ -241,6 +241,7 @@ $panw-prefix: 'panw';
   border-radius: var(--ds-radius-tight);
   @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-ms-text);
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover {
     background-color: var(--panw-ms-menu-item-hover);

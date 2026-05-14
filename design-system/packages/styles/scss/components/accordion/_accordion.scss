@@ -44,7 +44,7 @@ $panw-prefix: 'panw';
   cursor: pointer;
   user-select: none;
   background-color: var(--panw-accordion-bg-gray00);
-  transition: background-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover { background-color: var(--panw-accordion-bg-hover-gray00); }
   &:active { background-color: var(--panw-accordion-bg-pressing-gray00); }

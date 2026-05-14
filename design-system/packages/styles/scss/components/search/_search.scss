@@ -29,9 +29,9 @@ $panw-prefix: 'panw';
   // the row height on the right (matches number-input's stepper pattern).
   padding: 0 0 0 16px;
   transition:
-    background-color 110ms var(--ds-motion-easing-standard),
-    border-color 110ms var(--ds-motion-easing-standard),
-    box-shadow 110ms var(--ds-motion-easing-standard);
+    background-color 70ms var(--ds-motion-easing-hover),
+    border-color     70ms var(--ds-motion-easing-hover),
+    box-shadow       70ms var(--ds-motion-easing-hover);
 }
 
 .#{$panw-prefix}--search__icon {

@@ -117,8 +117,8 @@
   cursor: pointer;
   color: var(--panw-flyout-icon);
   transition:
-    background-color 110ms var(--ds-motion-easing-standard),
-    color 110ms var(--ds-motion-easing-standard);
+    background-color 70ms var(--ds-motion-easing-hover),
+    color            70ms var(--ds-motion-easing-hover);
 
   &:hover  { background-color: var(--panw-flyout-item-hover); color: var(--ds-icons-secondary-hover); }
   &:active { background-color: var(--panw-flyout-item-pressed); color: var(--ds-icons-secondary-pressed); }
@@ -165,7 +165,7 @@
   @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-flyout-text);
   cursor: pointer;
-  transition: background-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover  { background-color: var(--panw-flyout-item-hover); }
   &:active { background-color: var(--panw-flyout-item-pressed); }
@@ -228,7 +228,7 @@
   cursor: pointer;
   @include type.type-style('heading-compact-01'); // 14px / 1.286 / semibold — group header
   color: var(--panw-flyout-text);
-  transition: background-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover  { background-color: var(--panw-flyout-item-hover); }
   &:active { background-color: var(--panw-flyout-item-pressed); }

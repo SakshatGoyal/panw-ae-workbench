@@ -566,21 +566,18 @@ function LinkContactView({
 
   return (
     <div className="spm-subview">
-      <div className="spm-back">
-        <Button
-          kind="ghost-brand"
-          size="small"
-          renderIcon={ArrowLeft}
-          iconPosition="left"
-          onClick={onBack}>
-          Back to Sales Play Details
-        </Button>
-      </div>
-
       <div className="spm-subtoolbar">
+        <IconButton
+          kind="ghost"
+          size="sm"
+          renderIcon={ArrowLeft}
+          aria-label="Back to Sales Play Details"
+          onClick={onBack}
+        />
+        <span className="spm-subtoolbar__divider" aria-hidden />
         <div className="spm-subtoolbar__search">
           <Search
-            size="md"
+            size="sm"
             background="grey10"
             value={query}
             onChange={(v) => setQuery(v)}
@@ -588,7 +585,7 @@ function LinkContactView({
             placeholder="Search contacts"
           />
         </div>
-        <Button kind="secondary" size="default">
+        <Button kind="secondary" size="small">
           New Contact +
         </Button>
       </div>
@@ -690,21 +687,18 @@ function LinkOpportunityView({
 
   return (
     <div className="spm-subview">
-      <div className="spm-back">
-        <Button
-          kind="ghost-brand"
-          size="small"
-          renderIcon={ArrowLeft}
-          iconPosition="left"
-          onClick={onBack}>
-          Back to Sales Play Details
-        </Button>
-      </div>
-
       <div className="spm-subtoolbar">
+        <IconButton
+          kind="ghost"
+          size="sm"
+          renderIcon={ArrowLeft}
+          aria-label="Back to Sales Play Details"
+          onClick={onBack}
+        />
+        <span className="spm-subtoolbar__divider" aria-hidden />
         <div className="spm-subtoolbar__search">
           <Search
-            size="md"
+            size="sm"
             background="grey10"
             value={query}
             onChange={(v) => setQuery(v)}
@@ -1165,32 +1159,32 @@ const COMPOSITION_CSS = `
    of the modal regardless of how many rows the table renders. The
    table flexes; pagination is anchored last. */
 .spm-subview {
-  /* No flex-gap — rhythm is set with explicit margins per element so
-     the back button can sit 4px from the divider above and 4px from
-     the search bar below, while other blocks keep the standard 16px. */
   display: flex;
   flex-direction: column;
-  padding: 4px 0 var(--ds-spacing-05);    /* 4 top → 4px below the header divider, 16 bottom */
+  gap: var(--ds-spacing-05);              /* 16 — rhythm between subview blocks */
+  padding: var(--ds-spacing-05) 0;        /* 16 top + bottom — sits 16px below the header divider */
   min-height: 100%;
   box-sizing: border-box;
 }
-.spm-back { margin: 0 0 4px; }            /* 4px between back button and toolbar */
-.spm-back .panw--btn {
-  /* Pull the button flush-left with the subview's content edge by
-     trimming the small-size button's leading inline padding, so the
-     ArrowLeft glyph lands at the same x as the search icon below. */
-  padding-left: 0;
-}
-.spm-subtoolbar { margin-bottom: var(--ds-spacing-05); }  /* 16 — separates toolbar from table */
 .spm-subtoolbar {
   display: flex;
   align-items: center;
   gap: var(--ds-spacing-03);              /* 8 */
+  height: 32px;                            /* IconButton sm + Search sm + Button small all 32 */
 }
 /* Search defaults to 240px; override to fill the toolbar so the search
-   surface spans the full content width. */
+   surface spans the toolbar's flexible space. */
 .spm-subtoolbar__search { flex: 1 1 auto; min-width: 0; }
 .spm-subtoolbar__search .panw--search { width: 100%; }
+/* 1px vertical line between the back IconButton and the search bar. The
+   divider is 16px tall — centered in the 32px toolbar row — so it
+   reads as a quiet break, not a full-row split. */
+.spm-subtoolbar__divider {
+  flex-shrink: 0;
+  width: 1px;
+  height: 16px;
+  background: var(--ds-lines-neutral-rest);
+}
 
 /* ── Sub-view table ──────────────────────────────────────────────── */
 /* Flex grows so pagination, marked with margin-top:auto, anchors to

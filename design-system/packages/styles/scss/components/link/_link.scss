@@ -22,7 +22,7 @@
   border: none;
   background: none;
   padding: 0;
-  transition: color 110ms var(--ds-motion-easing-standard), text-decoration-color 110ms var(--ds-motion-easing-standard);
+  transition: color 70ms var(--ds-motion-easing-hover), text-decoration-color 70ms var(--ds-motion-easing-hover);
 
   &:hover,
   &.panw--link--hover {

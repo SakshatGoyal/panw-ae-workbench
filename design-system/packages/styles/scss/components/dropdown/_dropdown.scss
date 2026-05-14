@@ -65,9 +65,9 @@ $panw-prefix: 'panw';
   box-sizing: border-box;
   cursor: pointer;
   transition:
-    background-color 110ms var(--ds-motion-easing-standard),
-    border-color 110ms var(--ds-motion-easing-standard),
-    box-shadow 110ms var(--ds-motion-easing-standard);
+    background-color 70ms var(--ds-motion-easing-hover),
+    border-color     70ms var(--ds-motion-easing-hover),
+    box-shadow       70ms var(--ds-motion-easing-hover);
 
   &:focus-visible {
     outline: 2px solid var(--ds-lines-brand-rest);
@@ -214,7 +214,7 @@ $panw-prefix: 'panw';
   @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-dropdown-text);
   cursor: pointer;
-  transition: background-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover  { background-color: var(--panw-dropdown-menu-item-hover); }
   &:active { background-color: var(--panw-dropdown-menu-item-pressed); }

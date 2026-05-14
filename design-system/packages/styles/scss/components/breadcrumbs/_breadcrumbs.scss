@@ -55,7 +55,7 @@
   font: inherit;
   letter-spacing: inherit;
   line-height: inherit;
-  transition: color 110ms var(--ds-motion-easing-standard);
+  transition: color 70ms var(--ds-motion-easing-hover);
 
   &:hover {
     color: var(--panw-breadcrumb-link-hover);
@@ -89,7 +89,7 @@
   font: inherit;
   letter-spacing: inherit;
   line-height: inherit;
-  transition: color 110ms var(--ds-motion-easing-standard);
+  transition: color 70ms var(--ds-motion-easing-hover);
 
   &:hover  { color: var(--panw-breadcrumb-link-hover); text-decoration: underline; text-decoration-skip-ink: none; }
   &:active { color: var(--panw-breadcrumb-link-pressed); text-decoration: underline; text-decoration-skip-ink: none; }

@@ -40,8 +40,8 @@ $panw-prefix: 'panw';
   @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-filter-label);
   cursor: pointer;
-  transition: background-color 110ms var(--ds-motion-easing-standard),
-              border-color     110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover),
+              border-color     70ms var(--ds-motion-easing-hover);
 
   // Hover suppressed when open. Border drops to transparent so the ground
   // shift carries the engaged signal without a double-decoration.
@@ -194,8 +194,8 @@ $panw-prefix: 'panw';
   border-radius: var(--ds-radius-tight);
   cursor: pointer;
   color: var(--ds-icons-secondary-rest);
-  transition: background-color 110ms var(--ds-motion-easing-standard),
-              color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 70ms var(--ds-motion-easing-hover),
+              color            70ms var(--ds-motion-easing-hover);
 
   &:hover {
     background-color: var(--ds-ghost-hover);
@@ -246,6 +246,7 @@ $panw-prefix: 'panw';
   user-select: none;
   color: var(--ds-text-secondary-rest);
   @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover { background-color: var(--ds-ghost-hover); }
 }
@@ -290,6 +291,7 @@ $panw-prefix: 'panw';
   cursor: pointer;
   color: var(--ds-icons-secondary-rest);
   border-radius: var(--ds-radius-tight);
+  transition: background-color 70ms var(--ds-motion-easing-hover);
 
   &:hover { background-color: var(--ds-ghost-hover); }
 }

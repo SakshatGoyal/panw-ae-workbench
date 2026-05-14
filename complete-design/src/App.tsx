@@ -15,7 +15,9 @@ export default function App() {
   const [activeView, setActiveView] = useState<View>('Opportunities')
   const [selectedId, setSelectedId] = useState<string | null>(null)
 
-  const rightRailContent = selectedId ? <AccountPanel /> : undefined
+  const rightRailContent = selectedId
+    ? <AccountPanel key={selectedId} accountId={selectedId} />
+    : undefined
 
   function handleNavClick(label: string) {
     setActiveView(label as View)

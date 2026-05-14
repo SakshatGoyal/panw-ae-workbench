@@ -1175,6 +1175,14 @@ export interface AccountPanelProps {
   /** Override the panel's data. Defaults to the Cyberdyne fixture. */
   data?: AccountPanelData
   /**
+   * Row id from AEOpportunityTable / AEAccountTable (e.g. `'1'`, `'3'`).
+   * When provided, the panel looks up the corresponding Account from the
+   * mock and renders that account's data. Takes precedence over `data`.
+   * Fields not modeled per-account in the mock fall back to fixture defaults
+   * (see complete-design/WIRING_INVENTORY.md §Mock data gaps).
+   */
+  accountId?: string
+  /**
    * Open this opp's snapshot accordion by default. Falls back to
    * `data.renewalOpp.id`. Multiple opps can still toggle open via user
    * click; this prop only seeds the initial state. Unknown ids are
@@ -1185,6 +1193,35 @@ export interface AccountPanelProps {
    * to open with the clicked opp's snapshot expanded, not the renewal's.
    */
   initialOpenOppId?: string
+}
+
+// Build AccountPanelData from a row id string ('1', '2', …). The table
+// fixtures use sequential numeric ids that are not foreign keys into
+// Account.id, so we map by index (cycling with modulo). Fields absent
+// from the Account mock fall back to DEFAULT_ACCOUNT_PANEL_DATA.
+// See complete-design/WIRING_INVENTORY.md §Mock data gaps for the full list.
+function buildPanelDataForAccountId(id: string): AccountPanelData {
+  const idx = (parseInt(id, 10) - 1) % ACCOUNTS.length
+  const foundAccount = ACCOUNTS[Math.max(0, idx)]
+  const accountOpps: AccOpp[] = OPPORTUNITIES
+    .filter(o => o.accountId === foundAccount.id)
+    .map(o => ({ ...o, daysInStage: 21, daysInForecast: 42 }))
+  const renewalOpp: AccOpp =
+    accountOpps.find(o => o.type === 'renewal' || o.type === 'renewal-and-upsell') ??
+    { ...STUB_CYBERDYNE_RENEWAL, accountId: foundAccount.id }
+  return {
+    account: foundAccount,
+    opportunities: accountOpps.length > 0 ? accountOpps : DEFAULT_ACCOUNT_PANEL_DATA.opportunities,
+    apexName: '—',
+    renewalOpp,
+    // Fields not modeled per-account — fall back to fixture defaults.
+    installBase:   DEFAULT_ACCOUNT_PANEL_DATA.installBase,
+    salesPlays:    DEFAULT_ACCOUNT_PANEL_DATA.salesPlays,
+    healthTrend12: DEFAULT_ACCOUNT_PANEL_DATA.healthTrend12,
+    techHealth:    foundAccount.health.technical,
+    adoptHealth:   foundAccount.health.deploymentAdoption,
+    productHealth: DEFAULT_ACCOUNT_PANEL_DATA.productHealth,
+  }
 }
 
 // Health-trend visualization. 12 past-month bars + 10 future-month
@@ -1292,9 +1329,13 @@ function ProductHealthBlock({ row }: { row: ProductHealthRow }) {
 }
 
 export function AccountPanel({
-  data = DEFAULT_ACCOUNT_PANEL_DATA,
+  data: dataProp,
+  accountId,
   initialOpenOppId,
 }: AccountPanelProps = {}) {
+  const data = accountId
+    ? buildPanelDataForAccountId(accountId)
+    : (dataProp ?? DEFAULT_ACCOUNT_PANEL_DATA)
   // Derived rollups — recomputed per render from whatever data was passed
   // in. These were module-scope constants before plumbing; pulling them
   // inside the component is what lets a caller pass a different `data`

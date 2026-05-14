@@ -36,6 +36,13 @@
       "port": 38274,
       "autoPort": false,
       "cwd": "poc-exploration"
+    },
+    {
+      "name": "complete-design",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "5274"],
+      "port": 5274,
+      "cwd": "complete-design"
     }
   ]
 }

@@ -3828,9 +3828,11 @@ const LAYOUT_CSS = `
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-04);
-  /* No margin-top — the hairline is the separator. Padding-top provides
-   * breathing room on the form side of the hairline; a second gap above
-   * would double-space the break. */
+  /* Negative margin cancels the parent .opp-pop gap-8 that would otherwise
+   * stack above this element. The border-top hairline is the separator;
+   * padding-top provides breathing room on the form side of it. No
+   * double-gap between the outcome row and the first field. */
+  margin-top: calc(-1 * var(--ds-spacing-03));
   padding-top: var(--ds-spacing-04);
   border-top: 1px solid var(--ds-lines-neutral-rest);
 }

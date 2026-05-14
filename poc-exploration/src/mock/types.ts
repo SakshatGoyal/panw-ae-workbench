@@ -36,8 +36,8 @@ export type RenewalOutcome =
   | 'churn' | 'displacement' | 'duplicate';
 
 export type SalesPlayStatusId =
-  | 'not-touched' | 'pitched' | 'interested' | 'open-pipeline'
-  | 'closed-won' | 'deferred' | 'closed-lost';
+  | 'not-touched' | 'pitched' | 'deferred' | 'declined'
+  | 'pursuing' | 'closed-won' | 'closed-lost';
 
 export type OppRiskId =
   | 'no-risks'
@@ -53,15 +53,12 @@ export type OppRiskId =
 
 export type AccountRiskId =
   | 'no-risks'
-  | 'no-pipeline-cq-next-4q'
-  | 'no-ebcs-last-year'
+  | 'no-pipeline'
+  | 'no-ebc'
   | 'not-platformized'
-  | 'povs-without-progression'
-  | 'no-or-stale-asr'
-  | 'no-customer-success-plan'
-  // CSV legacy values — reachable via your earlier CSV; kept until SME consolidates
-  | 'low-adoption-deployment'
-  | 'critical-technical-health';
+  | 'derailed-povs'
+  | 'no-asr'
+  | 'no-csp';
 
 export type ActivityType =
   | 'technical-deep-dive'

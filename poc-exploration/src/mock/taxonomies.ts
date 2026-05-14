@@ -113,13 +113,13 @@ export const HEALTH_LABELS: Record<HealthStatus, string> = {
 // ─── Sales Play Status pill (7 categories) ──────────────────────────────────
 
 export const SALES_PLAY_STATUSES: Record<SalesPlayStatusId, { label: string; iconName: string }> = {
-  'not-touched':   { label: 'Not Touched',   iconName: 'alert-circle' },
-  'pitched':       { label: 'Pitched',       iconName: 'headphones' },
-  'interested':    { label: 'Interested',    iconName: 'thumbs-up' },
-  'open-pipeline': { label: 'Open Pipeline', iconName: 'lightbulb' },
-  'closed-won':    { label: 'Closed Won',    iconName: 'check-circle' },
-  'deferred':      { label: 'Deferred',      iconName: 'calendar' },
-  'closed-lost':   { label: 'Closed Lost',   iconName: 'x-circle' },
+  'not-touched':  { label: 'Not Touched',  iconName: 'alert-circle' },
+  'pitched':      { label: 'Pitched',      iconName: 'headphones' },
+  'deferred':     { label: 'Deferred',     iconName: 'calendar' },
+  'declined':     { label: 'Declined',     iconName: 'minus-circle' },
+  'pursuing':     { label: 'Pursuing',     iconName: 'chess-knight' },
+  'closed-won':   { label: 'Closed Won',   iconName: 'check-circle' },
+  'closed-lost':  { label: 'Closed Lost',  iconName: 'x-circle' },
 };
 
 // ─── Risk taxonomies (deal-level + account-level) ───────────────────────────
@@ -139,15 +139,13 @@ export const OPP_RISKS: Record<OppRiskId, RiskMeta<OppRiskId>> = {
 };
 
 export const ACCOUNT_RISKS: Record<AccountRiskId, RiskMeta<AccountRiskId>> = {
-  'no-risks':                  { id: 'no-risks',                  emoji: '✅', label: 'No Risks' },
-  'no-pipeline-cq-next-4q':    { id: 'no-pipeline-cq-next-4q',    emoji: '📭', label: 'No Pipeline in CQ + Next 4Q' },
-  'no-ebcs-last-year':         { id: 'no-ebcs-last-year',         emoji: '🏛️', label: 'No EBCs in last year' },
-  'not-platformized':          { id: 'not-platformized',          emoji: '🏗️', label: 'Not Platformized' },
-  'povs-without-progression':  { id: 'povs-without-progression',  emoji: '🧪', label: 'POVs without progression' },
-  'no-or-stale-asr':           { id: 'no-or-stale-asr',           emoji: '🌀', label: 'No ASR / Stale ASR' },
-  'no-customer-success-plan':  { id: 'no-customer-success-plan',  emoji: '🚧', label: 'No customer success plan' },
-  'low-adoption-deployment':   { id: 'low-adoption-deployment',   emoji: '🛑', label: 'Customer adoption/deployment rate is low' },
-  'critical-technical-health': { id: 'critical-technical-health', emoji: '🩺', label: 'Customer technical health is critical' },
+  'no-risks':         { id: 'no-risks',         emoji: '✅', label: 'No Risks' },
+  'no-pipeline':      { id: 'no-pipeline',      emoji: '📭', label: 'No Pipeline in CQ + Next 4Q' },
+  'no-ebc':           { id: 'no-ebc',           emoji: '🏛️', label: 'No EBCs in last year' },
+  'not-platformized': { id: 'not-platformized', emoji: '🏗️', label: 'Not Platformized' },
+  'derailed-povs':    { id: 'derailed-povs',    emoji: '🧪', label: 'POVs without progression' },
+  'no-asr':           { id: 'no-asr',           emoji: '🌀', label: 'No ASR / Stale ASR' },
+  'no-csp':           { id: 'no-csp',           emoji: '🚧', label: 'No customer success plan' },
 };
 
 // ─── Activity types (drives lastActivity.type in opportunities) ─────────────

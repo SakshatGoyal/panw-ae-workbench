@@ -86,6 +86,7 @@ import {
   type SalesPlayEdits,
   type SalesPlayStatus,
 } from '../mock/sales-play-modal'
+import { STAGES } from '../mock/taxonomies'
 
 // ── View routing ──────────────────────────────────────────────────────
 
@@ -780,7 +781,7 @@ function LinkOpportunityView({
                 <div className="spm-table__td spm-table__td--name">
                   <a href="#" className="spm-email-link">{o.name}</a>
                 </div>
-                <div className="spm-table__td spm-table__cell-text">{o.stage}</div>
+                <div className="spm-table__td spm-table__cell-text">{STAGES[o.stage].name}</div>
                 <div className="spm-table__td spm-table__td--right spm-num spm-table__cell-text">
                   {formatCurrency(o.amount)}
                 </div>
@@ -1051,7 +1052,7 @@ const COMPOSITION_CSS = `
   gap: 4px;
   text-align: left;
   outline: none;
-  transition: background 70ms var(--ds-motion-easing-standard);
+  transition: background 70ms var(--ds-motion-easing-hover);
 }
 .spl-row:hover:not(:has(button:hover)) {
   background: var(--ds-ghost-hover);

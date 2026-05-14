@@ -7,6 +7,8 @@
  * `data-models/sales-play-modal-reference.md`.
  */
 
+import type { StageId } from './types'
+
 // ── 7-status enum (mirrors sales-play-reference.md) ───────────────────
 
 export const SalesPlayStatuses = [
@@ -81,7 +83,7 @@ export const CONTACTS: PlayContact[] = [
 export interface PlayOpportunity {
   id: string;
   name: string;        // full display name (Account – Family – Play)
-  stage: string;       // SFDC stage string
+  stage: StageId;
   amount: number;      // USD
   closeDate: string;   // ISO yyyy-mm-dd
 }
@@ -90,35 +92,35 @@ export const OPPORTUNITIES: PlayOpportunity[] = [
   {
     id: 'op-aurora',
     name: 'Aurora Enterprises – Firewall – Compliance Hardening',
-    stage: '1 - Qualify',
+    stage: 'discovery',
     amount: 5_678_901,
     closeDate: '2027-07-30',
   },
   {
     id: 'op-beacon-corp',
     name: 'Beacon Corp – Unit 42 – SOC Modernization',
-    stage: '1 - Qualify',
+    stage: 'discovery',
     amount: 4_567_890,
     closeDate: '2027-06-20',
   },
   {
     id: 'op-beacon-sol',
     name: 'Beacon Solutions – Cortex & Cloud – Secure Access Revamp',
-    stage: '1 - Qualify',
+    stage: 'discovery',
     amount: 3_456_789,
     closeDate: '2027-08-10',
   },
   {
     id: 'op-blue-horizon',
     name: 'Blue Horizon – Firewall – Edge Protection Program',
-    stage: '1 - Qualify',
+    stage: 'discovery',
     amount: 2_345_678,
     closeDate: '2027-09-25',
   },
   {
     id: 'op-bluesun',
     name: 'BlueSun Corp – Firewall – Edge Protection Program',
-    stage: '1 - Qualify',
+    stage: 'discovery',
     amount: 1_567_890,
     closeDate: '2027-05-15',
   },

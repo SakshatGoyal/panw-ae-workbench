@@ -1195,14 +1195,11 @@ export interface AccountPanelProps {
   initialOpenOppId?: string
 }
 
-// Build AccountPanelData from a row id string ('1', '2', …). The table
-// fixtures use sequential numeric ids that are not foreign keys into
-// Account.id, so we map by index (cycling with modulo). Fields absent
-// from the Account mock fall back to DEFAULT_ACCOUNT_PANEL_DATA.
+// Build AccountPanelData from a canonical Account.id (e.g. 'acc-tyrell').
+// Fields absent from the Account mock fall back to DEFAULT_ACCOUNT_PANEL_DATA.
 // See complete-design/WIRING_INVENTORY.md §Mock data gaps for the full list.
 function buildPanelDataForAccountId(id: string): AccountPanelData {
-  const idx = (parseInt(id, 10) - 1) % ACCOUNTS.length
-  const foundAccount = ACCOUNTS[Math.max(0, idx)]
+  const foundAccount = ACCOUNTS.find(a => a.id === id) ?? ACCOUNTS[0]
   const accountOpps: AccOpp[] = OPPORTUNITIES
     .filter(o => o.accountId === foundAccount.id)
     .map(o => ({ ...o, daysInStage: 21, daysInForecast: 42 }))

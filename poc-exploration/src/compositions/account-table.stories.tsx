@@ -178,6 +178,8 @@ interface SalesPlayBucket {
 
 export interface AccountRow {
   id: string
+  /** Canonical Account.id from poc-exploration/src/mock/data/accounts.ts */
+  accountId: string
   name: string
   apex: string | null
   /** 4 entries — CQ + next three named quarters, always in order. */
@@ -391,6 +393,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
   const rows: Omit<AccountRow, 'totalPipelineUsd' | 'hasUpsellPipeline'>[] = [
     {
       id: '1',
+      accountId: 'acc-tyrell',
       name: 'Titan Energy Solutions',
       apex: 'Titan Industrial Holdings',
       pipeline: mkPipeline(1_200_000, 800_000, 0, 450_000, [
@@ -427,6 +430,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '2',
+      accountId: 'acc-atlas-bank',
       name: 'Meridian Capital Group',
       apex: 'Meridian Financial Partners',
       pipeline: mkPipeline(450_000, 1_200_000, 700_000, 0, [
@@ -463,6 +467,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '3',
+      accountId: 'acc-aperture',
       name: 'Aperture Robotics',
       apex: null, // standalone (spec §2) — no parent
       pipeline: mkPipeline(0, 250_000, 0, 0, [
@@ -487,6 +492,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '4',
+      accountId: 'acc-orion-shipping',
       name: 'Vertex Manufacturing Co.',
       apex: 'Vertex Industrial Group',
       pipeline: mkPipeline(3_100_000, 1_400_000, 900_000, 600_000, [
@@ -522,6 +528,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '5',
+      accountId: 'acc-cyberdyne',
       // CQ-only pipeline — three placeholder ($—) quarters.
       name: 'Pacific Commerce Bank',
       apex: 'Pacific Commerce Holdings',
@@ -552,6 +559,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '6',
+      accountId: 'acc-hooli',
       // No EBC on record — carries 🏛️ derived risk.
       name: 'Axiom Technology Partners',
       apex: 'Axiom Group',
@@ -579,6 +587,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '7',
+      accountId: 'acc-summit',
       // All 7 sales-play statuses — overflow stress case.
       name: 'Summit Healthcare Systems',
       apex: 'Summit Health Holdings',
@@ -614,6 +623,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '8',
+      accountId: 'acc-northstar',
       // Long name stress case.
       name: 'Koninklijke Philips Electronics N.V. (Healthcare Division)',
       apex: 'Royal Philips Holdings International',
@@ -641,6 +651,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '9',
+      accountId: 'acc-beacon-corp',
       // Newcomer: high ARR, low LTV.
       name: 'Helix Bio Therapeutics',
       apex: 'Helix Holdings',
@@ -666,6 +677,7 @@ export const DEFAULT_ROWS: AccountRow[] = (() => {
     },
     {
       id: '10',
+      accountId: 'acc-prime-dynamics',
       // Shrinking: low ARR, high LTV.
       name: 'Harbor Logistics Group',
       apex: 'Harbor Maritime Holdings',
@@ -2474,7 +2486,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
                             <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask question" />
                           </HoverShell>
                           <HoverShell side="top" align="center" openDelayMs={400} panelClassName="acc-btn-tooltip" render={() => 'Open on right'}>
-                            <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.id)} />
+                            <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.accountId)} />
                           </HoverShell>
                         </div>
                       </div>

@@ -210,6 +210,8 @@ interface RenewalData {
 
 export interface OpportunityRow {
   id: string
+  /** Canonical Account.id from poc-exploration/src/mock/data/accounts.ts */
+  accountId: string
   oppName: string
   account: string
   type: OppType
@@ -372,6 +374,7 @@ const mkProduct = (name: string, valueUsd: number): Product => ({
 export const DEFAULT_ROWS: OpportunityRow[] = [
   {
     id: '1',
+    accountId: 'acc-tyrell',
     oppName: 'Prisma Access annual renewal with global bandwidth upgrade',
     account: 'Titan Energy Solutions',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
@@ -390,6 +393,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   },
   {
     id: '2',
+    accountId: 'acc-atlas-bank',
     oppName: 'Cortex XDR enterprise deployment for distributed workforce',
     account: 'Meridian Capital Group',
     type: 'net-new', forecast: 'commit', stage: 'active-pov',
@@ -408,6 +412,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   },
   {
     id: '3',
+    accountId: 'acc-frontier',
     oppName: 'Strata Cloud Manager upgrade with advanced threat prevention',
     account: 'Nexus Financial Holdings',
     type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
@@ -425,6 +430,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   },
   {
     id: '4',
+    accountId: 'acc-orion-shipping',
     oppName: 'Annual Prisma Access license renewal — full global employee base',
     account: 'Vertex Manufacturing Co.',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
@@ -445,6 +451,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   },
   {
     id: '5',
+    accountId: 'acc-cyberdyne',
     oppName: 'Cortex XDR additional endpoint coverage expansion',
     account: 'Pacific Commerce Bank',
     type: 'upsell', forecast: 'best-case', stage: 'solutioning',
@@ -465,6 +472,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   },
   {
     id: '6',
+    accountId: 'acc-hooli',
     oppName: 'Cortex XSOAR automation platform initial deployment',
     account: 'Axiom Technology Partners',
     type: 'net-new', forecast: 'pipeline', stage: 'solutioning',
@@ -482,6 +490,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   },
   {
     id: '7',
+    accountId: 'acc-summit',
     oppName: 'WildFire advanced malware protection add-on for all endpoints',
     account: 'Summit Healthcare Systems',
     type: 'upsell', forecast: 'best-case', stage: 'tech-validation',
@@ -500,6 +509,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
   },
   {
     id: '8',
+    accountId: 'acc-prime-dynamics',
     oppName: 'Prisma Cloud enterprise security platform for cloud migration program',
     account: 'Harbor Logistics Group',
     type: 'net-new', forecast: 'pipeline', stage: 'discovery',
@@ -2329,7 +2339,7 @@ function OppRow({
               <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask question" />
             </HoverShell>
             <HoverShell side="top" align="center" openDelayMs={400} panelClassName="opp-btn-tooltip" render={() => 'Open on right'}>
-              <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.id)} />
+              <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.accountId)} />
             </HoverShell>
           </div>
         </div>

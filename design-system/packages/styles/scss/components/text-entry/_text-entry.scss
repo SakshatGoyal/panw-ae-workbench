@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -23,9 +24,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--text-entry__title {
   flex: 1;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-te-title);
   margin: 0;
 }
@@ -34,7 +33,7 @@ $panw-prefix: 'panw';
   display: flex;
   align-items: center;
   border: 1px solid var(--panw-te-border);
-  border-radius: 4px;
+  border-radius: var(--ds-radius-tight);
   // Left-only padding — clear IconButton fills the row height on the right
   // per the in-field affordance pattern (number-input is the source of truth).
   padding: 0 0 0 16px;
@@ -52,10 +51,7 @@ $panw-prefix: 'panw';
   border: none;
   outline: none;
   background: transparent;
-  font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-te-text);
   padding: 0;
   margin: 0;
@@ -74,9 +70,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--text-entry__description {
   flex: 1;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.333;
+  @include type.type-style('label-01'); // 12px / 1.333 / regular
   color: var(--panw-te-description);
 }
 
@@ -142,6 +136,12 @@ $panw-prefix: 'panw';
   background-color: var(--panw-te-bg-active);
   border-color: var(--panw-te-border-focus);
   box-shadow: inset 0 0 0 1px var(--panw-te-border-focus);
+}
+
+// Hide placeholder once the field is active — the cursor and caret signal
+// the field is ready; the label copy is no longer needed.
+.#{$panw-prefix}--text-entry--state-active .#{$panw-prefix}--text-entry__input::placeholder {
+  color: transparent;
 }
 
 .#{$panw-prefix}--text-entry--state-error .#{$panw-prefix}--text-entry__field {

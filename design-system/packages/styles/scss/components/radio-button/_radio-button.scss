@@ -1,3 +1,5 @@
+@use '@ds/type/scss' as type;
+
 // =============================================================================
 // RadioButton
 // =============================================================================
@@ -44,11 +46,7 @@
 .panw--radio-button--disabled .panw--rb-dot  { fill: var(--panw-radio-dot-disabled); }
 
 .panw--radio-button__label {
-  font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.10px;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-radio-label);
 }
 

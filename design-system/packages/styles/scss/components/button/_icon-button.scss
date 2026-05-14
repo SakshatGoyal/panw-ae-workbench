@@ -28,7 +28,7 @@
   @include button-reset;
   padding: 0;                  // size comes from width/height, not padding
   border: none;
-  border-radius: 4px;          // radius.tight — Stage's single icon-button corner
+  border-radius: var(--ds-radius-tight);          // radius.tight — Stage's single icon-button corner
   line-height: 0;
   color: var(--panw-icon-button-ghost-color);
 

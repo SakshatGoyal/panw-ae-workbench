@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import { Plus, Minus, ArrowUp, ArrowDown, ArrowsDouble as ArrowUpDown, Filter } from '@ds/icons';
+import { Plus, Minus, ArrowUp, ArrowDown, Filter } from '@ds/icons';
 import { usePrefix } from '@ds/button/src/internal/usePrefix';
 
 export const HeaderAlignments = ['left', 'right'] as const;
@@ -56,22 +56,20 @@ export const Header = React.forwardRef<HTMLDivElement, HeaderProps>(
   ) {
     const prefix = usePrefix();
 
-    // Sort affordance pins to ONE slot — the trailing edge of the header,
-    // alongside the optional filter glyph. Sortable columns show a muted
-    // up-down indicator at rest; sorted columns swap that indicator for a
-    // single up or down arrow at full opacity in the same slot.
+    // Sort indicator only renders when the column is actively sorted.
+    // No indicator at rest — the original design does not pre-announce
+    // sortability with a muted icon; the directional arrow appears only
+    // after the user clicks.
     //
     // condensed/lengthened are PANW-specific column-density indicators (not
-    // sort-related). Their glyphs render in the leading slot; `basic` is
-    // the only type that participates in sorting.
+    // sort-related). Their glyphs render in the leading slot.
     const isSorted = type === 'ascending' || type === 'descending';
     const isDensityType = type === 'condensed' || type === 'lengthened';
     const TypeIcon = isDensityType ? TYPE_ICON[type] : null;
     const SortIcon =
       type === 'ascending' ? ArrowUp :
-      type === 'descending' ? ArrowDown :
-      ArrowUpDown;
-    const showSortIndicator = !isDensityType;
+      ArrowDown;
+    const showSortIndicator = isSorted;
 
     const rootClass = classNames(
       `${prefix}--header`,

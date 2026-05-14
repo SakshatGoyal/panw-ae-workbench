@@ -37,92 +37,85 @@
 import React from 'react'
 import type { Meta, StoryObj } from '@storybook/react'
 
-import { BrandPanw, Dashboard, ChevronRight } from '@ds/icons'
+import { BrandPanw, SfdcOpportunity, SfdcAccount, SfdcTargetMode, SfdcPeopleScore, SfdcGraph } from '@ds/icons'
+import { Tooltip } from '@ds/tooltip'
 
 // ── Row ─────────────────────────────────────────────────────────────────────
 
 interface SideNavRowProps {
   active?: boolean
-  ariaLabel?: string
+  label?: string
   children?: React.ReactNode
+  onClick?: () => void
 }
 
-function SideNavRow({ active, ariaLabel, children }: SideNavRowProps) {
+function SideNavRow({ active, label, children, onClick }: SideNavRowProps) {
+  const [hovered, setHovered] = React.useState(false)
+
   return (
     <div
-      className="snav-row"
-      data-active={active ? 'true' : undefined}
-      role="button"
-      tabIndex={0}
-      aria-label={ariaLabel}
-      aria-current={active ? 'page' : undefined}
+      className="snav-row-wrap"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
     >
-      <span className="snav-row__bar" aria-hidden="true" />
-      <span className="snav-row__slot">{children}</span>
+      <div
+        className="snav-row"
+        data-active={active ? 'true' : undefined}
+        role="button"
+        tabIndex={0}
+        aria-label={label}
+        aria-current={active ? 'page' : undefined}
+        onClick={onClick}
+        onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onClick?.() } }}
+      >
+        <span className="snav-row__bar" aria-hidden="true" />
+        <span className="snav-row__slot">{children}</span>
+      </div>
+      {hovered && label && (
+        <div className="snav-row__tooltip" role="tooltip">
+          <Tooltip content={label} pointerDirection="right" />
+        </div>
+      )}
     </div>
   )
 }
 
 // ── Component ───────────────────────────────────────────────────────────────
 
-export function SideNav() {
+export interface SideNavProps {
+  /** Which item label is currently active. Defaults to first item when omitted. */
+  activeItem?: string
+  /** Called with the label of the clicked item. */
+  onItemClick?: (label: string) => void
+}
+
+export function SideNav({ activeItem, onItemClick }: SideNavProps = {}) {
+  // Default the active item to the first nav item when uncontrolled.
+  const resolved = activeItem ?? 'Opportunities'
+
+  const row = (label: string, icon: React.ReactNode) => (
+    <SideNavRow
+      active={resolved === label}
+      label={label}
+      onClick={() => onItemClick?.(label)}
+    >
+      {icon}
+    </SideNavRow>
+  )
+
   return (
     <nav className="snav" aria-label="Primary">
-      {/* Brand block — product logo slot. StyledBrandIcon is 40×40 in
-          the reference; matching that size here. */}
+      {/* Brand block */}
       <div className="snav__brand" aria-label="Palo Alto Networks">
         <BrandPanw size={40} />
       </div>
 
-      {/* Primary menu — matches reference: rows 1, 2, 3, 5 carry the
-          dashboard glyph plus a right-chevron expansion indicator. Row 4
-          carries the dashboard glyph only (no chevron). Row 1 is the
-          active selection. */}
       <div className="snav__primary">
-        <SideNavRow active ariaLabel="Dashboard">
-          <Dashboard size={20} />
-          <span className="snav-row__caret" aria-hidden="true">
-            <ChevronRight size={12} />
-          </span>
-        </SideNavRow>
-        <SideNavRow>
-          <Dashboard size={20} />
-          <span className="snav-row__caret" aria-hidden="true">
-            <ChevronRight size={12} />
-          </span>
-        </SideNavRow>
-        <SideNavRow>
-          <Dashboard size={20} />
-          <span className="snav-row__caret" aria-hidden="true">
-            <ChevronRight size={12} />
-          </span>
-        </SideNavRow>
-        <SideNavRow>
-          <Dashboard size={20} />
-        </SideNavRow>
-        <SideNavRow>
-          <Dashboard size={20} />
-          <span className="snav-row__caret" aria-hidden="true">
-            <ChevronRight size={12} />
-          </span>
-        </SideNavRow>
-      </div>
-
-      {/* Global common area — rows 1-4 are empty in the reference
-          (`<StyledIcon11/12/13/14 />` are content-less divs). Leaving
-          them as empty rows here. */}
-      <div className="snav__global">
-        <div className="snav__divider" role="separator" />
-        <SideNavRow />
-        <SideNavRow />
-        <SideNavRow />
-        <SideNavRow />
-        <div className="snav__expand">
-          <div className="snav__divider" role="separator" />
-          <SideNavRow ariaLabel="Expand navigation">
-            <ChevronRight size={20} />
-          </SideNavRow>
-        </div>
+        {row('Opportunities',        <SfdcOpportunity size={20} />)}
+        {row('Account Workbench',    <SfdcAccount size={20} />)}
+        {row('Sales Play Workbench', <SfdcTargetMode size={20} />)}
+        {row('Account Health',       <SfdcPeopleScore size={20} />)}
+        {row('Analytics',            <SfdcGraph size={20} />)}
       </div>
     </nav>
   )
@@ -164,7 +157,6 @@ const COMPOSITION_CSS = `
   width: 64px;
   flex-shrink: 0;
   background: var(--ds-surface-inverse-rest);
-  color: var(--ds-icons-inverse-rest);
 }
 
 /* ── Brand block — empty placeholder per reference ────────────────────── */
@@ -189,24 +181,22 @@ const COMPOSITION_CSS = `
   min-height: 0;
 }
 
-.snav__global {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-  flex-shrink: 0;
+/* ── Row wrapper — provides positioning context for the tooltip ───────── */
+
+.snav-row-wrap {
+  position: relative;
 }
 
-.snav__expand {
-  display: flex;
-  flex-direction: column;
-  align-items: stretch;
-}
+/* ── Tooltip — floats to the right of the 64px column ────────────────── */
 
-/* ── Divider ──────────────────────────────────────────────────────────── */
-
-.snav__divider {
-  height: 1px;
-  background: var(--ds-surface-inverse-hover);
+.snav-row__tooltip {
+  position: absolute;
+  left: 68px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
 /* ── Row ──────────────────────────────────────────────────────────────── */
@@ -253,28 +243,21 @@ const COMPOSITION_CSS = `
   align-items: center;
   padding-left: 18px;
   padding-right: 2px;
-  opacity: 0.65;
-  transition: opacity 110ms var(--ds-motion-easing-standard, cubic-bezier(0.2, 0, 0.38, 0.9));
 }
 
-.snav-row:hover .snav-row__slot,
-.snav-row[data-active='true'] .snav-row__slot {
-  opacity: 1;
+/* Icons use hardcoded fill attributes — CSS overrides presentation attributes. */
+.snav-row__slot svg path {
+  fill: #B8C1CC;
+  transition: fill 110ms var(--ds-motion-easing-standard, cubic-bezier(0.2, 0, 0.38, 0.9));
 }
 
-/* Active-row caret indicator (chevron-right). The reference places it
-   to the right of the primary glyph inside the same 40px content area. */
-.snav-row__caret {
-  display: inline-flex;
-  align-items: center;
-  margin-left: var(--ds-spacing-02); /* 4 */
+.snav-row:hover .snav-row__slot svg path,
+.snav-row[data-active='true'] .snav-row__slot svg path {
+  fill: #FFFFFF;
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .snav-row,
-  .snav-row__slot {
-    transition: none;
-  }
+  .snav-row, .snav-row__slot { transition: none; }
 }
 `
 

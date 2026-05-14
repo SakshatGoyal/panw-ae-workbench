@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -24,32 +25,33 @@ $panw-prefix: 'panw';
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  // 40px tall, 12px horizontal inset, borderless.
-  // Pin height with min/max so the trigger can't grow when an inner Tags chip
-  // carries an intrinsic height.
+  // 40px tall, 12px horizontal inset. Border is 1px neutral10 at rest only —
+  // drops transparent on hover/active/open so the ground shift is the sole
+  // engaged signal. Pin height with min/max so the trigger can't grow when an
+  // inner Tags chip carries an intrinsic height.
   box-sizing: border-box;
   height: 40px;
   min-height: 40px;
   max-height: 40px;
   padding: 0 12px;
   background-color: var(--panw-filter-bg);
-  border: none;
-  border-radius: 4px;
-  font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  border: 1px solid var(--panw-filter-border);
+  border-radius: var(--ds-radius-tight);
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-filter-label);
   cursor: pointer;
-  transition: background-color 110ms var(--ds-motion-easing-standard);
+  transition: background-color 110ms var(--ds-motion-easing-standard),
+              border-color     110ms var(--ds-motion-easing-standard);
 
-  // Hover suppressed when open — the cursor stays on the trigger after click,
-  // so without this the hover ground bleeds over the open/selected state.
+  // Hover suppressed when open. Border drops to transparent so the ground
+  // shift carries the engaged signal without a double-decoration.
   &:hover:not(:disabled):not(.#{$panw-prefix}--filter--open) {
     background-color: var(--panw-filter-bg-hover);
+    border-color: transparent;
   }
   &:active:not(:disabled) {
     background-color: var(--panw-filter-bg-pressed);
+    border-color: transparent;
   }
   &:focus-visible {
     outline: 2px solid var(--ds-lines-brand-rest);
@@ -59,6 +61,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--filter--open {
   background-color: var(--panw-filter-bg-open);
+  border-color: transparent;
 }
 
 .#{$panw-prefix}--filter--disabled,
@@ -73,7 +76,7 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--filter__label {
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   white-space: nowrap;
 }
 
@@ -119,7 +122,7 @@ $panw-prefix: 'panw';
   gap: 2px;
   background-color: var(--ds-surface-rest);
   border: 1px solid var(--ds-lines-neutral-rest);
-  border-radius: 8px;
+  border-radius: var(--ds-radius-standard);
   box-shadow: var(--ds-shadow-flyout);
   z-index: 11;
   animation: panw-flyout-enter 90ms var(--ds-motion-easing-entrance);
@@ -132,10 +135,8 @@ $panw-prefix: 'panw';
   gap: 8px;
   height: 32px;
   padding: 0 0 0 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  border-radius: var(--ds-radius-tight);
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--ds-text-primary);
 
   &:hover {
@@ -168,7 +169,7 @@ $panw-prefix: 'panw';
 // =============================================================================
 
 .#{$panw-prefix}--sort__label {
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   white-space: nowrap;
   // Slightly muted vs primary so the focus is on the chosen key + direction
   // rather than the static "sort:" prefix.
@@ -244,19 +245,18 @@ $panw-prefix: 'panw';
   cursor: pointer;
   user-select: none;
   color: var(--ds-text-secondary-rest);
-  font-size: 14px;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
 
   &:hover { background-color: var(--ds-ghost-hover); }
 }
 
 .#{$panw-prefix}--tree-filter__row--root {
-  font-weight: 600;
+  font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
 
 .#{$panw-prefix}--tree-filter__row--group {
-  font-weight: 600;
+  font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
   padding-left: 4px;
   // The chevron + checkbox + folder + label all live in the row; the row
@@ -273,7 +273,7 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--tree-filter__row--leaf {
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-secondary-rest);
   padding-left: 28px; // align leaves under the group's checkbox column
 }
@@ -319,7 +319,7 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--tree-filter__label--bold {
-  font-weight: 600;
+  font-weight: var(--ds-type-font-weight-semibold);
 }
 
 .#{$panw-prefix}--tree-filter__children {

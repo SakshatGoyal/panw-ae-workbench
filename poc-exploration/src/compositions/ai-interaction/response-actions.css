@@ -1,0 +1,292 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   ResponseActions — ai-interactions/Response Actions
+   All values resolve to var(--ds-*) tokens. No raw hex, no raw px except
+   where the value IS the token convention.
+   Spacing on the 4px grid throughout.
+
+   Layout: full-width flex, space-between.
+     Left:  .raf__panel-slot (feedback panel or nothing when idle)
+     Right: .raf__buttons   (dislike | like | copy, reading right-to-left = copy | like | dislike)
+
+   Content crossfade (feedback ↔ thanks):
+     Both .raf__feedback and .raf__thanks live in a CSS-grid overlay inside the panel.
+     [data-phase] attribute on .raf__panel drives simultaneous fade-out / fade-in
+     via @keyframes — no JS timing needed for the crossfade.
+     Curves: Carbon entrance cubic-bezier(0,0,0.38,0.9) / exit cubic-bezier(0.2,0,1,0.9).
+
+   Timer: 7 s drain (stroke-dashoffset 0 → 31.42 over 7000ms, CSS animation restarted
+   by re-keying FeedbackTimer from the parent).
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Outer row ──────────────────────────────────────────────────────────── */
+
+/* Full-width so space-between pushes panel left and buttons right */
+.raf {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─── Left slot — panel anchor ───────────────────────────────────────────── */
+
+/* flex:1 lets the panel grow to fill available space without displacing buttons */
+.raf__panel-slot {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Right slot — icon buttons ──────────────────────────────────────────── */
+
+/* DOM order: dislike → like → copy (reads right-to-left: copy, like, dislike) */
+.raf__buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+/* ─── Feedback panel ─────────────────────────────────────────────────────── */
+
+.raf__panel {
+  display: flex;
+  align-items: center;
+  animation: raf-panel-enter 150ms var(--ds-motion-easing-standard) both;
+}
+
+.raf__panel--exiting {
+  animation: raf-panel-exit 110ms cubic-bezier(0.2, 0, 1, 0.9) both;
+}
+
+/* Panel entrance: pure opacity, no position movement — stays in compact region */
+@keyframes raf-panel-enter {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes raf-panel-exit {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ─── Panel content grid (feedback + thanks overlaid in same cell) ────────── */
+
+/* CSS grid places both content elements in the same cell so they can
+   crossfade without layout shift. The taller element sets the grid row height. */
+.raf__panel-grid {
+  display: grid;
+  align-items: center;
+}
+
+/* Both content blocks occupy cell 1/1 — stacked atop each other */
+.raf__feedback,
+.raf__thanks {
+  grid-area: 1 / 1;
+  display: flex;
+  align-items: center;
+  opacity: 0;           /* hidden by default; data-phase drives the animation */
+  pointer-events: none;
+}
+
+/* ─── Content crossfade via data-phase ───────────────────────────────────── */
+
+/* When phase is 'feedback': fade feedback in, thanks stays hidden */
+.raf__panel[data-phase='feedback'] .raf__feedback {
+  animation: raf-fade-in 120ms cubic-bezier(0, 0, 0.38, 0.9) both;
+  pointer-events: auto;
+}
+
+/* When phase transitions to 'thanks': sequenced fade.
+   1. Feedback fades out:  100ms
+   2. Pause:               100ms  (covered by animation-delay below)
+   3. Thanks fades in:     100ms  (delay = 200ms = fade-out + pause)
+   animation-fill-mode: both holds thanks at opacity:0 during the delay,
+   preventing any flash between steps. */
+.raf__panel[data-phase='thanks'] .raf__feedback {
+  animation: raf-fade-out 100ms cubic-bezier(0.2, 0, 1, 0.9) both;
+}
+
+.raf__panel[data-phase='thanks'] .raf__thanks {
+  animation: raf-fade-in 100ms cubic-bezier(0, 0, 0.38, 0.9) 200ms both;
+  pointer-events: auto;
+}
+
+/* Content crossfade keyframes — pure opacity, no position movement */
+@keyframes raf-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes raf-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+/* ─── Timer donut (SVG) ──────────────────────────────────────────────────── */
+
+/* 14×14 SVG, r=5, stroke-width=2.5.
+   Circumference = 2π × 5 ≈ 31.42 px.
+   Animation drains from stroke-dashoffset:0 (full) to 31.42 (empty) over 7 s. */
+
+.raf__timer {
+  flex-shrink: 0;
+  display: block;
+}
+
+.raf__timer-progress {
+  transform-box: fill-box;
+  transform-origin: center;
+  transform: rotate(-90deg);   /* start arc at 12 o'clock */
+  animation: raf-timer-drain 7000ms linear forwards;
+}
+
+@keyframes raf-timer-drain {
+  from { stroke-dashoffset: 0; }
+  to   { stroke-dashoffset: 31.42; }
+}
+
+/* ─── Feedback content (timer + label + Yes/No) ──────────────────────────── */
+
+.raf__feedback {
+  gap: 4px;
+}
+
+/* "Give Feedback" label — quiet tertiary, 16px total gap to Yes button:
+   4px flex-gap + 12px margin-right = 16px */
+.raf__feedback-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  white-space: nowrap;
+  user-select: none;
+  margin-right: 12px;
+}
+
+/* Yes / No pair */
+.raf__feedback-btns {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* ─── Thanks message ─────────────────────────────────────────────────────── */
+
+.raf__thanks {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
+}
+
+/* ─── Story canvas ───────────────────────────────────────────────────────── */
+
+.raf-canvas {
+  min-height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.raf-demo {
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.raf-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 8px;
+}
+
+.raf-demo__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Simulated message card (story context) ─────────────────────────────── */
+
+.raf-message {
+  padding: 12px 16px;
+  background: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-standard);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.raf-message__text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--ds-text-primary);
+}
+
+.raf-message__actions {
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Event log (story-only) ─────────────────────────────────────────────── */
+
+.raf-event-log {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.raf-event-log__entry {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  padding: 4px 8px;
+  border-radius: var(--ds-radius-tight);
+  background: var(--ds-surface-alt);
+  letter-spacing: 0.01em;
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  /* Panel: render immediately in final state */
+  .raf__panel {
+    animation: none;
+    opacity: 1;
+  }
+
+  .raf__panel--exiting {
+    animation: none;
+    opacity: 0;
+  }
+
+  /* Content: snap to final opacity — no fade, no delay */
+  .raf__panel[data-phase='feedback'] .raf__feedback,
+  .raf__panel[data-phase='thanks'] .raf__thanks {
+    animation: none;
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .raf__panel[data-phase='thanks'] .raf__feedback {
+    animation: none;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Timer drain is functional — preserve it */
+}

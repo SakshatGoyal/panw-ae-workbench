@@ -1,14 +1,16 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
 // =============================================================================
 // Header — table column header.
-// Ground sits on surface.accent (standalone element, not a tile-on-tile).
-// No border-bottom — the accent fill defines the strip's edge.
+// Ground sits on ghost.rest at rest.
 //
-// Sort indicator and filter button both render at 16x16 inline at the right
-// end of the container, so they share the same vertical baseline on hover.
+// Sort indicator only mounts when the column is actively sorted (ascending /
+// descending). No placeholder icon at rest — the directional arrow appears
+// only after the user sorts. Filter button renders at 16x16 in the trailing
+// slot independently of sort state.
 // =============================================================================
 
 .#{$panw-prefix}--header {
@@ -56,11 +58,8 @@ $panw-prefix: 'panw';
   // 600 weight + text.secondary keeps the column header one tier above cells
   // (400 + secondary) without competing with section titles.
   color: var(--panw-header-text);
-  font-family: var(--ds-type-font-family-sans);
-  font-weight: 600;
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.10px;
+  @include type.type-style('label-01'); // 12px / 1.333 / regular
+  font-weight: var(--ds-type-font-weight-semibold); // column header sits one tier above cells
   flex: 1;
   min-width: 0;
   overflow: hidden;
@@ -80,9 +79,9 @@ $panw-prefix: 'panw';
   svg { width: 16px; height: 16px; }
 }
 
-// Sort indicator and filter share the right-end slot. Both 16x16 inline
-// glyphs aligned to the container's center axis. Sort fades in on hover;
-// filter is controlled by the filter prop.
+// Sort indicator and filter share the trailing slot. Both 16x16 inline
+// glyphs aligned to the container's center axis.
+// Sort indicator is only mounted when actively sorted — no opacity tricks needed.
 .#{$panw-prefix}--header__sort-indicator,
 .#{$panw-prefix}--header__filter {
   display: flex;
@@ -92,30 +91,11 @@ $panw-prefix: 'panw';
   height: 16px;
   flex-shrink: 0;
   color: var(--panw-header-icon);
-  transition: opacity 110ms var(--ds-motion-easing-standard);
 
   svg { width: 16px; height: 16px; }
 }
 
-// Sort indicator is muted at rest so a sortable column is discoverable
-// without trial-and-error hover, then comes to full presence on hover or
-// active. Hover-to-reveal alone failed the affordance contract: a user
-// looking at the table at rest couldn't tell which columns were sortable.
-//
-// When the column is actively sorted (--active modifier), the indicator
-// stays at full opacity and full color regardless of hover state — the
-// active sort direction (ArrowUp/ArrowDown) replaces the muted ArrowsDouble
-// glyph in the same trailing slot. No teleport between left and right.
 .#{$panw-prefix}--header__sort-indicator {
-  opacity: 0.4;
-  color: var(--panw-header-icon-muted);
-}
-.#{$panw-prefix}--header:hover .#{$panw-prefix}--header__sort-indicator,
-.#{$panw-prefix}--header--force-hover .#{$panw-prefix}--header__sort-indicator,
-.#{$panw-prefix}--header:active .#{$panw-prefix}--header__sort-indicator,
-.#{$panw-prefix}--header--force-onclick .#{$panw-prefix}--header__sort-indicator,
-.#{$panw-prefix}--header__sort-indicator--active {
-  opacity: 1;
   color: var(--panw-header-icon);
 }
 

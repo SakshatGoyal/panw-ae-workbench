@@ -14,7 +14,7 @@
 .panw--btn {
   @include button-reset;
   @include button-typography;
-  border-radius: 4px; // radius.tight — Stage's single button corner.
+  border-radius: var(--ds-radius-tight); // radius.tight — Stage's single button corner.
   gap: 4px;
 }
 
@@ -77,7 +77,8 @@
   }
 }
 
-// Secondary — neutral bordered, primary text.
+// Secondary — neutral bordered at rest only. Border drops on hover/active so
+// the ground shift is the sole signal; no double-decorating the engaged state.
 .panw--btn--secondary {
   background-color: var(--panw-button-secondary-bg);
   border-color: var(--panw-button-secondary-border);
@@ -85,12 +86,12 @@
 
   &:hover:not(:disabled) {
     background-color: var(--panw-button-secondary-bg-hover);
-    border-color: var(--panw-button-secondary-border-hover);
+    border-color: transparent;
   }
 
   &:active:not(:disabled) {
     background-color: var(--panw-button-secondary-bg-active);
-    border-color: var(--panw-button-secondary-border-pressed);
+    border-color: transparent;
   }
 
   &:disabled {
@@ -100,9 +101,8 @@
   }
 }
 
-// Tertiary — bordered with brand text. Hover lifts to highlight.* (alpha-brand
-// engaged ground) so the bordered chip reads as "soft brand commit" without
-// crossing into primary territory.
+// Tertiary — bordered with brand text at rest only. Border drops on hover/active;
+// the highlight ground swap carries the engaged signal on its own.
 .panw--btn--tertiary {
   background-color: var(--panw-button-tertiary-bg);
   border-color: var(--panw-button-tertiary-border);
@@ -110,13 +110,13 @@
 
   &:hover:not(:disabled) {
     background-color: var(--panw-button-tertiary-bg-hover);
-    border-color: var(--panw-button-tertiary-border-hover);
+    border-color: transparent;
     color: var(--panw-button-tertiary-text-hover);
   }
 
   &:active:not(:disabled) {
     background-color: var(--panw-button-tertiary-bg-active);
-    border-color: var(--panw-button-tertiary-border-pressed);
+    border-color: transparent;
     color: var(--panw-button-tertiary-text-pressed);
   }
 

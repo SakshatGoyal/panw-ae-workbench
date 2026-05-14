@@ -1,17 +1,34 @@
 <!--
-  Load the design system's sans-serif (Lato) so component styles that resolve
-  var(--ds-type-font-family-sans) render with the intended typeface in Storybook.
-  Lato is the only sans loaded — no Inter, no other foreign fonts.
+  Load TT Hoves (self-hosted woff2) as the design system's sans-serif so component
+  styles that resolve var(--ds-type-font-family-sans) render with the intended
+  typeface in Storybook. Served from packages/type/fonts/tt-hoves/ via staticDirs.
+  Three static files for weights 300 / 400 / 600 (no variable font available).
 -->
-<link rel="preconnect" href="https://fonts.googleapis.com" />
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link
-  href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&display=swap"
-  rel="stylesheet"
-/>
 <style>
+  @font-face {
+    font-family: 'TT Hoves';
+    src: url('/tt-hoves/TTHoves-Light.woff2') format('woff2');
+    font-weight: 300;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'TT Hoves';
+    src: url('/tt-hoves/TTHoves-Regular.woff2') format('woff2');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'TT Hoves';
+    src: url('/tt-hoves/TTHoves-DemiBold.woff2') format('woff2');
+    font-weight: 600;
+    font-style: normal;
+    font-display: swap;
+  }
+
   :root {
-    --ds-type-font-family-sans: Lato, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    --ds-type-font-family-sans: 'TT Hoves', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
   body {
     font-family: var(--ds-type-font-family-sans);

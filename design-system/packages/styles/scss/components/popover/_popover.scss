@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -74,19 +75,14 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--popover__heading {
-  font-size: 14px;
-  font-weight: 600;
-  line-height: 18px;
-  letter-spacing: 0.10px;
+  @include type.type-style('heading-compact-01'); // 14px / 1.286 / semibold
   color: var(--panw-popover-heading);
   margin: 0;
 }
 
 .#{$panw-prefix}--popover__description,
 .#{$panw-prefix}--popover__body {
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.10px;
+  @include type.type-style('label-01'); // 12px / 1.333 / regular
   color: var(--panw-popover-body);
   margin: 0;
 }
@@ -108,9 +104,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--popover__page-info {
   flex: 1 1 0;
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.10px;
+  @include type.type-style('label-01'); // 12px / 1.333 / regular
   color: var(--panw-popover-secondary);
   margin: 0;
 }

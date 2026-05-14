@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -195,11 +196,7 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--accordion__title {
-  font-family: var(--ds-type-font-family-sans);
-  font-weight: 700;
-  font-size: 14px;
-  line-height: 16px;
-  letter-spacing: 0.10px;
+  @include type.type-style('heading-compact-01'); // 14px / 1.286 / semibold
   color: var(--panw-accordion-title-color);
   flex: 1;
   min-width: 0;
@@ -209,11 +206,7 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--accordion__description {
-  font-family: var(--ds-type-font-family-sans);
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 18px;
-  letter-spacing: 0.10px;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-accordion-description-color);
 }
 

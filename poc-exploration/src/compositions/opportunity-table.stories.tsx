@@ -144,6 +144,9 @@ import {
   BrandStrata, BrandPrisma, BrandCortex,
   Close,
   CommentAdd, Maximize,
+  // Sales-play status icons (same set as acc-table)
+  NotTouched, Pitched, HourglassEnd, MinusCircleStroke,
+  ChessKnight, ClosedWon, DoNotEnter,
 } from '@ds/icons'
 import { Search } from '@ds/search'
 import { Filter, type FilterOption } from '@ds/filter'
@@ -197,7 +200,7 @@ interface AccountHealth {
   trend12mo: number[]
 }
 interface Activity { daysAgo: number; description: string }
-interface SalesPlay { name: string; status: SalesPlayStatus }
+interface SalesPlay { name: string; status: SalesPlayStatus; valueUsd: number }
 interface RenewalData {
   subEnd: string
   renewableTcvUsd: number
@@ -242,26 +245,26 @@ type SortKey = 'accountName' | 'oppName' | 'closeDate' | 'value' | 'riskCount'
 type SortDir = 'asc' | 'desc'
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: 'accountName', label: 'account name' },
-  { key: 'oppName',     label: 'opportunity name' },
-  { key: 'closeDate',   label: 'close date' },
-  { key: 'value',       label: 'value' },
-  { key: 'riskCount',   label: 'risk factor count' },
+  { key: 'accountName', label: 'Account name' },
+  { key: 'oppName',     label: 'Opportunity name' },
+  { key: 'closeDate',   label: 'Close date' },
+  { key: 'value',       label: 'Value' },
+  { key: 'riskCount',   label: 'Risk factor count' },
 ]
 
 // ─── Display label maps ──────────────────────────────────────────────────────
 
 const STAGE_LABEL: Record<DealStage, string> = {
-  'discovery':       'discovery',
-  'solutioning':     'solutioning',
-  'tech-validation': 'tech validation',
-  'active-pov':      'active POV',
-  'negotiation':     'negotiation',
+  'discovery':       'Discovery',
+  'solutioning':     'Solutioning',
+  'tech-validation': 'Tech validation',
+  'active-pov':      'Active POV',
+  'negotiation':     'Negotiation',
 }
 const FORECAST_LABEL: Record<Forecast, string> = {
-  'pipeline':  'pipeline',
-  'best-case': 'best case',
-  'commit':    'commit',
+  'pipeline':  'Pipeline',
+  'best-case': 'Best case',
+  'commit':    'Commit',
 }
 // Designer call: distinguish forecast confidence at a glance via
 // categorical tag color. Earliest stage = bronze (warm, low-saturation,
@@ -273,14 +276,14 @@ const FORECAST_COLOR: Record<Forecast, TagColor> = {
   'commit':    'olive',
 }
 const TYPE_LABEL: Record<OppType, string> = {
-  'net-new': 'net new',
-  'upsell':  'upsell',
-  'renewal': 'renewal',
+  'net-new': 'Net new',
+  'upsell':  'Upsell',
+  'renewal': 'Renewal',
 }
 const HEALTH_LABEL: Record<Health, string> = {
-  'healthy':  'healthy',
-  'at-risk':  'at risk',
-  'critical': 'critical',
+  'healthy':  'Healthy',
+  'at-risk':  'At risk',
+  'critical': 'Critical',
 }
 
 // Spec §4.3: healthy → green, at-risk → yellow, critical → red. Low-contrast
@@ -326,8 +329,8 @@ const BRAND_ICON: Record<Brand, React.ElementType | undefined> = {
 const RISK_LIBRARY: Record<RiskId, { emoji: string; label: string }> = {
   'exec':           { emoji: '🧍', label: 'Lacking exec engagement or support' },
   'design':         { emoji: '📜', label: 'No design-of-record' },
-  'tech-win':       { emoji: '🏅', label: 'No Secured technical win' },
-  'partner':        { emoji: '🤝', label: 'No Partner selected or finalized' },
+  'tech-win':       { emoji: '🏅', label: 'No secured technical win' },
+  'partner':        { emoji: '🤝', label: 'No partner selected or finalized' },
   'mandatory-ps':   { emoji: '🧑‍💻', label: 'Mandatory PS was removed' },
   'quote-approval': { emoji: '⌛', label: 'Quotes pending approval' },
   'budget':         { emoji: '💲', label: 'Budget conversation not scheduled or complete' },
@@ -382,7 +385,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
       trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
     risks: [],
-    salesPlay: { name: 'SASE Acceleration', status: 'pursuing' },
+    salesPlay: { name: 'SASE Acceleration', status: 'pursuing', valueUsd: 1_200_000 },
     renewal: { subEnd: 'Sept 1, 2025', renewableTcvUsd: 1_200_000, arrUsd: 600_000, outcome: 'full' },
   },
   {
@@ -401,7 +404,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     health: { overall: 'at-risk', technical: 'healthy', adoption: 'at-risk',
       trend12mo: [0,0,0,0,0,1,0,0,0,0,0,1] },
     risks: [mkRisk('budget'), mkRisk('partner')],
-    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pursuing' },
+    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pursuing', valueUsd: 2_400_000 },
   },
   {
     id: '3',
@@ -418,7 +421,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
       trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
     risks: [mkRisk('design')],
-    salesPlay: { name: 'Hardware Refresh', status: 'pursuing' },
+    salesPlay: { name: 'Hardware Refresh', status: 'pursuing', valueUsd: 890_000 },
   },
   {
     id: '4',
@@ -437,7 +440,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     health: { overall: 'critical', technical: 'critical', adoption: 'at-risk',
       trend12mo: [0,0,1,1,1,1,2,2,2,2,2,2] },
     risks: [mkRisk('exec'), mkRisk('partner'), mkRisk('budget'), mkRisk('quote-approval')],
-    salesPlay: { name: 'SASE Acceleration', status: 'pursuing' },
+    salesPlay: { name: 'SASE Acceleration', status: 'pursuing', valueUsd: 3_100_000 },
     renewal: { subEnd: 'Apr 30, 2025', renewableTcvUsd: 3_100_000, arrUsd: 1_550_000, outcome: 'unknown' },
   },
   {
@@ -458,7 +461,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
       mkRisk('exec'), mkRisk('design'), mkRisk('tech-win'),
       mkRisk('mandatory-ps'), mkRisk('term-length'), mkRisk('no-activity'),
     ],
-    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pursuing' },
+    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pursuing', valueUsd: 670_000 },
   },
   {
     id: '6',
@@ -475,7 +478,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
       trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
     risks: [],
-    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pitched' },
+    salesPlay: { name: 'XSIAM Splunk Takeout', status: 'pitched', valueUsd: 1_700_000 },
   },
   {
     id: '7',
@@ -493,7 +496,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
       trend12mo: [0,0,0,0,0,0,0,1,1,1,1,1] },
     risks: [mkRisk('design'), mkRisk('partner'), mkRisk('quote-approval'),
             mkRisk('term-length'), mkRisk('budget')],
-    salesPlay: { name: 'Hardware Refresh', status: 'pursuing' },
+    salesPlay: { name: 'Hardware Refresh', status: 'pursuing', valueUsd: 445_000 },
   },
   {
     id: '8',
@@ -513,40 +516,40 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     health: { overall: 'at-risk', technical: 'at-risk', adoption: 'healthy',
       trend12mo: [0,0,0,0,0,0,1,1,1,1,1,1] },
     risks: [mkRisk('exec'), mkRisk('design'), mkRisk('tech-win')],
-    salesPlay: { name: 'SASE Acceleration', status: 'pitched' },
+    salesPlay: { name: 'SASE Acceleration', status: 'pitched', valueUsd: 5_200_000 },
   },
 ]
 
 // ─── Filter option sets ──────────────────────────────────────────────────────
 
 const FORECAST_OPTIONS: { value: string; label: string }[] = [
-  { value: 'pipeline',  label: 'pipeline' },
-  { value: 'best-case', label: 'best case' },
-  { value: 'commit',    label: 'commit' },
+  { value: 'pipeline',  label: 'Pipeline' },
+  { value: 'best-case', label: 'Best case' },
+  { value: 'commit',    label: 'Commit' },
 ]
 
 const STAGE_OPTIONS: { value: string; label: string }[] = [
-  { value: 'discovery',       label: 'discovery' },
-  { value: 'solutioning',     label: 'solutioning' },
-  { value: 'tech-validation', label: 'tech validation' },
-  { value: 'active-pov',      label: 'active POV' },
-  { value: 'negotiation',     label: 'negotiation' },
+  { value: 'discovery',       label: 'Discovery' },
+  { value: 'solutioning',     label: 'Solutioning' },
+  { value: 'tech-validation', label: 'Tech validation' },
+  { value: 'active-pov',      label: 'Active POV' },
+  { value: 'negotiation',     label: 'Negotiation' },
 ]
 
 const TYPE_OPTIONS: { value: string; label: string }[] = [
-  { value: 'net-new', label: 'net new' },
-  { value: 'upsell',  label: 'upsell' },
-  { value: 'renewal', label: 'renewal' },
+  { value: 'net-new', label: 'Net new' },
+  { value: 'upsell',  label: 'Upsell' },
+  { value: 'renewal', label: 'Renewal' },
 ]
 
 const LAST_ACTIVITY_OPTIONS: { value: string; label: string }[] = [
-  { value: 'lt-7',  label: 'last 7 days' },
+  { value: 'lt-7',  label: 'Last 7 days' },
   { value: '7-21',  label: '7–21 days' },
-  { value: 'gt-21', label: 'over 21 days' },
+  { value: 'gt-21', label: 'Over 21 days' },
 ]
 
 const CLOSE_DATE_OPTIONS: FilterOption[] = [
-  { value: 'this-q', label: 'This Quarter' },
+  { value: 'this-q', label: 'This quarter' },
   { value: 'q4fy26', label: 'Q4FY26' },
   { value: 'q1fy27', label: 'Q1FY27' },
   { value: 'q2fy27', label: 'Q2FY27' },
@@ -565,13 +568,13 @@ interface GroupedHealthSelection {
   adoption: Health[]
 }
 const HEALTH_AXES: { key: HealthAxis; label: string }[] = [
-  { key: 'overall',   label: 'Overall Health' },
-  { key: 'technical', label: 'Technical Health' },
-  { key: 'adoption',  label: 'Adoption & Deployment Health' },
+  { key: 'overall',   label: 'Overall health' },
+  { key: 'technical', label: 'Technical health' },
+  { key: 'adoption',  label: 'Adoption & deployment health' },
 ]
 const HEALTH_LEVELS: { value: Health; label: string }[] = [
   { value: 'healthy',  label: 'Healthy' },
-  { value: 'at-risk',  label: 'At Risk' },
+  { value: 'at-risk',  label: 'At risk' },
   { value: 'critical', label: 'Critical' },
 ]
 // Defaults per spec §3.10: Overall = At Risk + Critical (Healthy off);
@@ -594,16 +597,16 @@ type DensityKey =
   | 'products'                                                     // col 4
 
 const DENSITY_OPTIONS: { value: DensityKey; label: string }[] = [
-  { value: 'quoteId',       label: 'quote number' },
-  { value: 'oppType',       label: 'opportunity type' },
-  { value: 'stage',         label: 'stage' },
-  { value: 'forecast',      label: 'forecast' },
-  { value: 'closeDate',     label: 'close date' },
-  { value: 'lastActivity',  label: 'last activity' },
-  { value: 'accountHealth', label: 'account health' },
-  { value: 'riskCount',     label: 'risk factors' },
-  { value: 'salesPlay',     label: 'sales play' },
-  { value: 'products',      label: 'products' },
+  { value: 'quoteId',       label: 'Quote number' },
+  { value: 'oppType',       label: 'Opportunity type' },
+  { value: 'stage',         label: 'Stage' },
+  { value: 'forecast',      label: 'Forecast' },
+  { value: 'closeDate',     label: 'Close date' },
+  { value: 'lastActivity',  label: 'Last activity' },
+  { value: 'accountHealth', label: 'Account health' },
+  { value: 'riskCount',     label: 'Risk factors' },
+  { value: 'salesPlay',     label: 'Sales play' },
+  { value: 'products',      label: 'Products' },
 ]
 const ALL_DENSITY_KEYS: DensityKey[] = DENSITY_OPTIONS.map(o => o.value)
 
@@ -667,6 +670,12 @@ const PRODUCT_TREE: ProductNode[] = [
 
 const ALL_PRODUCT_LEAVES = PRODUCT_TREE.flatMap(g => g.children?.map(c => c.value) ?? [])
 
+// value→label lookup for product leaves — used by the Filters-toggle
+// applied-filters popover to render readable labels per leaf.
+const PRODUCT_LEAF_LABEL = new Map<string, string>(
+  PRODUCT_TREE.flatMap(g => (g.children ?? []).map(c => [c.value, c.label]))
+)
+
 // ─── Tag presets ─────────────────────────────────────────────────────────────
 
 const TAG_BASE = {
@@ -707,24 +716,30 @@ interface SortFlyoutProps {
   onChange: (key: SortKey) => void
 }
 
-function SortFlyout({ sortKey, sortDir, onChange }: SortFlyoutProps) {
+function SortFlyout({ sortKey, sortDir: _sortDir, onChange }: SortFlyoutProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
 
   const currentLabel = SORT_OPTIONS.find(o => o.key === sortKey)?.label ?? 'close date'
 
+  // The trigger is a DS secondary button at size=small (32px). The old
+  // up/down direction arrow next to the label is gone — the asc/desc
+  // toggle has no surface today (interaction not wired), so showing the
+  // glyph wrote a check the row couldn't cash. The dropdown chevron
+  // remains as the popover-state indicator.
   return (
     <>
-      <button
+      <Button
         ref={triggerRef}
-        type="button"
-        className="opp-sort-trigger"
+        kind="secondary"
+        size="default"
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => setOpen(v => !v)}>
-        <span>sort: {currentLabel} {sortDir === 'asc' ? '↑' : '↓'}</span>
-        {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-      </button>
+        onClick={() => setOpen(v => !v)}
+        renderIcon={open ? ChevronUp : ChevronDown}
+        iconPosition="right">
+        Sort: {currentLabel}
+      </Button>
 
       <Flyout
         open={open}
@@ -744,6 +759,84 @@ function SortFlyout({ sortKey, sortDir, onChange }: SortFlyoutProps) {
         </FlyoutList>
       </Flyout>
     </>
+  )
+}
+
+// ─── Filters toggle button + applied-filters hover popover ─────────────────
+// Sits in the search row to the right of the Tags filter. Two jobs:
+//   1. Show/hide the expanded filter row below the search row.
+//   2. Carry a trailing high-contrast neutral Tag with the total count
+//      of applied filters; on hover, the tag opens a popover listing
+//      every applied filter across every dimension, with a per-item
+//      remove control. Same DS chip-popover pattern + 180ms close grace
+//      as the existing per-filter chip hovers.
+//
+// The popover anchors off .panw--filter__wrapper (position:relative).
+// The button itself is a DS secondary button at size=small (32px).
+
+interface AppliedFilterItem {
+  value: string
+  label: string
+  onRemove: () => void
+}
+
+interface FiltersToggleProps {
+  open: boolean
+  onToggle: () => void
+  applied: AppliedFilterItem[]
+}
+
+function FiltersToggle({ open, onToggle, applied }: FiltersToggleProps) {
+  const chipHover = useChipPopoverHover()
+  // Index by value for FilterChipPopover's onRemove(value) signature.
+  const removeByValue = (v: string) => {
+    const it = applied.find(a => a.value === v)
+    if (it) it.onRemove()
+    if (applied.length - 1 === 0) chipHover.setChipPopoverOpen(false)
+  }
+
+  return (
+    <span className="panw--filter__wrapper opp-filters-toggle">
+      <Button
+        kind="secondary"
+        size="default"
+        aria-expanded={open}
+        aria-controls="opp-filter-row"
+        onClick={onToggle}
+        renderIcon={open ? ChevronUp : ChevronDown}
+        iconPosition="right">
+        <span className="opp-filters-toggle__inner">
+          Filters
+          {applied.length > 0 && (
+            <span
+              className="panw--filter__chip-target opp-filters-toggle__count"
+              onMouseEnter={chipHover.openOnEnter}
+              onMouseLeave={chipHover.scheduleClose}>
+              {/* size="default" matches every other in-system filter
+               *  chip-target tag (account health, close date,
+               *  products…). The earlier size="small" picked up a
+               *  stretched-glyph treatment that didn't sit cleanly
+               *  inside a 32px button. */}
+              <Tags
+                label={String(applied.length)}
+                color="neutral"
+                contrast="high"
+                size="default"
+                shape="rounded"
+              />
+            </span>
+          )}
+        </span>
+      </Button>
+      {applied.length > 0 && chipHover.chipPopoverOpen && (
+        <FilterChipPopover
+          items={applied.map(({ value, label }) => ({ value, label }))}
+          onRemove={removeByValue}
+          onMouseEnter={chipHover.cancelClose}
+          onMouseLeave={chipHover.scheduleClose}
+        />
+      )}
+    </span>
   )
 }
 
@@ -1504,6 +1597,7 @@ function HoverShell({
       <span
         ref={triggerRef}
         className="opp-hover-trigger"
+        data-popover-open={open ? 'true' : 'false'}
         onMouseEnter={handleTriggerEnter}
         onMouseLeave={handleTriggerLeave}>
         {children}
@@ -1617,7 +1711,7 @@ function AccountHealthPanel({ row }: { row: OpportunityRow }) {
       <div className="opp-pop__chart"><HealthTrendBars trend={h.trend12mo} latest={h.overall} /></div>
       <div className="opp-pop__rows">
         <div className="opp-pop__kv">
-          <span className="opp-pop__kv-label">Technical Health</span>
+          <span className="opp-pop__kv-label">Technical health</span>
           <Tags
             shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.technical]}
@@ -1625,7 +1719,7 @@ function AccountHealthPanel({ row }: { row: OpportunityRow }) {
             className="opp-tag--static" />
         </div>
         <div className="opp-pop__kv">
-          <span className="opp-pop__kv-label">Adoption &amp; Deployment</span>
+          <span className="opp-pop__kv-label">Adoption &amp; deployment</span>
           <Tags
             shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.adoption]}
@@ -1634,7 +1728,7 @@ function AccountHealthPanel({ row }: { row: OpportunityRow }) {
         </div>
       </div>
       <div className="opp-pop__cta">
-        <Button kind="ghost-brand" size="small">View Account Health</Button>
+        <Button kind="ghost-brand" size="small">View account health</Button>
       </div>
     </div>
   )
@@ -1676,13 +1770,46 @@ function RiskFactorsPanel({ risks }: { risks: RiskFactor[] }) {
 
 // Sales-play status display labels (spec §3.4 of sales-play-reference)
 const SALES_PLAY_STATUS_LABEL: Record<SalesPlayStatus, string> = {
-  'not-touched': 'Not Touched',
+  'not-touched': 'Not touched',
   'pitched':     'Pitched',
   'deferred':    'Deferred',
   'declined':    'Declined',
   'pursuing':    'Pursuing',
-  'closed-won':  'Closed Won',
-  'closed-lost': 'Closed Lost',
+  'closed-won':  'Closed won',
+  'closed-lost': 'Closed lost',
+}
+
+// Sales-play status → icon component. Mirrors acc-table's map exactly —
+// both tables use the same 7 DS icons to represent the same 7 statuses.
+// Icon color per status is handled in CSS (.opp-sp-tag--*) so the icon
+// slot carries semantic signal without touching @ds/icons internals.
+const SALES_PLAY_ICON: Record<SalesPlayStatus, React.ElementType> = {
+  'not-touched': NotTouched,
+  'pitched':     Pitched,
+  'deferred':    HourglassEnd,
+  'declined':    MinusCircleStroke,
+  'pursuing':    ChessKnight,
+  'closed-won':  ClosedWon,
+  'closed-lost': DoNotEnter,
+}
+
+// Sales-play popover — status name left · value right · Update CTA bottom.
+// Follows the opp-pop grammar: 240px tier, kv-list for the data row,
+// opp-pop__cta for the full-width ghost-brand action.
+function SalesPlayPanel({ salesPlay }: { salesPlay: SalesPlay }) {
+  return (
+    <div className="opp-pop opp-pop--salesplay">
+      <ul className="opp-pop__kv-list">
+        <li>
+          <span className="opp-pop__kv-label">{SALES_PLAY_STATUS_LABEL[salesPlay.status]}</span>
+          <span className="opp-pop__kv-value">{formatUsdCompact(salesPlay.valueUsd)}</span>
+        </li>
+      </ul>
+      <div className="opp-pop__cta">
+        <Button kind="ghost-brand" size="small">Update</Button>
+      </div>
+    </div>
+  )
 }
 
 // Single-product popover. Mirrors the acc-table's ProductARRPanel — one
@@ -1715,7 +1842,7 @@ function ProductPanel({ product }: { product: Product; totalUsd?: number }) {
 
 const RENEWAL_OUTCOMES: { value: RenewalOutcome; label: string; color: TagColor }[] = [
   { value: 'unknown',      label: 'Unknown',      color: 'neutral' },
-  { value: 'full',         label: 'Full Renewal', color: 'green'   },
+  { value: 'full',         label: 'Full renewal', color: 'green'   },
   { value: 'upsell',       label: 'Upsell',       color: 'green'   },  // same positive family as `full`
   { value: 'downsell',     label: 'Downsell',     color: 'orange'  },
   { value: 'churn',        label: 'Churn',        color: 'red'     },
@@ -1804,7 +1931,7 @@ function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalO
   return (
     <>
       <div className="opp-renewal-outcome">
-        <span className="opp-renewal-outcome__label">Renewal Outcome</span>
+        <span className="opp-renewal-outcome__label">Renewal outcome</span>
         <div className="opp-outcome-wrapper">
           <button
             ref={triggerRef}
@@ -1842,7 +1969,7 @@ function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalO
           {churnVisible && (
             <>
               <Dropdown
-                title="Churn / Dismissal Reason"
+                title="Churn / dismissal reason"
                 placeholder="Select"
                 showDescription={false}
                 background="grey10"
@@ -1851,7 +1978,7 @@ function RenewalOutcomeEditor({ value, onChange, onConfirm, onCancel }: RenewalO
                 options={CHURN_REASONS}
               />
               <Dropdown
-                title="Competitor Replacement"
+                title="Competitor replacement"
                 placeholder="Select"
                 showDescription={false}
                 background="grey10"
@@ -1971,7 +2098,18 @@ function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps)
   if (row.type === 'net-new') {
     return <Tags {...TAG_BASE} label={TYPE_LABEL[row.type]} className="opp-tag--static" />
   }
-  const plain = <Tags {...TAG_BASE} label={TYPE_LABEL[row.type]} />
+  // For renewal opps, surface the chosen disposition inline on the
+  // tag itself (e.g. "Renewal: Churn", "Renewal: Upsell"). The
+  // disposition's full label is stripped of a trailing " Renewal"
+  // word so 'full' ("Full Renewal") renders as "Renewal: Full"
+  // rather than the redundant "Renewal: Full Renewal". When the
+  // disposition is still 'unknown' the tag falls back to the plain
+  // "Renewal" label — no suffix until the AE has made a call.
+  const tagLabel =
+    row.type === 'renewal' && renewalOutcome !== 'unknown'
+      ? `Renewal: ${outcomeMeta(renewalOutcome).label.replace(/\s*Renewal\s*$/i, '')}`
+      : TYPE_LABEL[row.type]
+  const plain = <Tags {...TAG_BASE} label={tagLabel} />
 
   if (row.type === 'upsell') {
     return (
@@ -1985,11 +2123,15 @@ function TypeTagCell({ row, renewalOutcome, onOutcomeChange }: TypeTagCellProps)
     )
   }
 
-  // renewal
+  // renewal — same close-on-cursor-leave behavior as the health
+  // popover. The interactive flag keeps content fully usable while
+  // the cursor is over the panel (180ms grace to bridge the trigger
+  // → panel gap). The persist flag is gone: the popover dismisses
+  // when the cursor moves elsewhere, matching every other hover
+  // popover in the table.
   return (
     <HoverShell
       interactive
-      persist
       panelClassName="opp-hover-panel--renewal"
       render={({ close }) => (
         <RenewalPanel
@@ -2064,7 +2206,7 @@ function OppRow({
               panelClassName="opp-hover-panel--button"
               render={({ close }) => (
                 <ActionButtonPanel
-                  label="View Quote"
+                  label="View quote"
                   onClick={() => { /* hook */ close() }} />
               )}>
               <Tags {...TAG_BASE} label={row.quoteId} />
@@ -2103,7 +2245,10 @@ function OppRow({
           {showTag('lastActivity') && (
             <HoverShell
               render={() => (
-                <div className="opp-pop opp-pop--simple">{row.activity.description} — {dayLabel}</div>
+                <div className="opp-pop opp-pop--simple opp-pop--two-line">
+                  <div className="opp-pop__heading">{row.activity.description}</div>
+                  <div className="opp-pop__sub">{dayLabel}</div>
+                </div>
               )}>
               <Tags
                 shape={TAG_BASE.shape}
@@ -2144,13 +2289,21 @@ function OppRow({
             </HoverShell>
           )}
 
-          {/* Sales Play — DS Tooltip with current status */}
+          {/* Sales Play — icon tag + KV popover with status name, value, Update CTA.
+              Interactive so the cursor can move into the panel and click Update. */}
           {showTag('salesPlay') && (
             <HoverShell
+              interactive
               render={() => (
-                <div className="opp-pop opp-pop--simple">{SALES_PLAY_STATUS_LABEL[row.salesPlay.status]}</div>
+                <SalesPlayPanel salesPlay={row.salesPlay} />
               )}>
-              <Tags {...TAG_BASE} label={row.salesPlay.name} />
+              <Tags
+                {...TAG_BASE}
+                icon
+                renderIcon={SALES_PLAY_ICON[row.salesPlay.status]}
+                label={row.salesPlay.name}
+                className={`opp-sp-tag opp-sp-tag--${row.salesPlay.status}`}
+              />
             </HoverShell>
           )}
         </div>
@@ -2165,16 +2318,83 @@ function OppRow({
         {showTag('products') && (
           <ProductCluster products={row.products} />
         )}
-        {/* Row-level action buttons — absolutely positioned to top-right
-            of the <tr> (which carries position:relative). Ghost at rest,
-            promoted to secondary when the row is hovered via CSS. */}
+        {/* Row-level action buttons — absolutely positioned to bottom-right
+            of the <tr>. Two ghost icon-buttons nested inside an inverse-
+            surface pill. Pill bg is surface.inverse.rest; buttons are
+            transparent at rest and shift through surface.inverse hover/pressed.
+            Icons carry icons.inverse for contrast on the dark ground. */}
         <div className="opp-row-actions">
-          <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask" />
-          <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Expand" onClick={() => onExpand?.(row.id)} />
+          <div className="opp-row-actions__pill">
+            <HoverShell side="top" align="center" openDelayMs={400} panelClassName="opp-btn-tooltip" render={() => 'Ask question'}>
+              <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask question" />
+            </HoverShell>
+            <HoverShell side="top" align="center" openDelayMs={400} panelClassName="opp-btn-tooltip" render={() => 'Open on right'}>
+              <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.id)} />
+            </HoverShell>
+          </div>
         </div>
       </td>
     </tr>
   )
+}
+
+// ─── Column resize hook ──────────────────────────────────────────────────────
+// Pointer-driven column resize for table-layout:fixed tables. Mount-time
+// useLayoutEffect measures the rendered <th> widths and seeds them into
+// state; subsequent drags adjust widths in pixels. Each drag shifts space
+// between the dragged column and the IMMEDIATE NEXT column so the table's
+// total width never changes — last column gets no handle. Min width
+// guard prevents either side of the drag from collapsing.
+function useColumnResize(columnCount: number, minPx: number = 80) {
+  const tableRef = useRef<HTMLTableElement | null>(null)
+  const [widths, setWidths] = useState<number[] | null>(null)
+  const dragRef = useRef<{ i: number; startX: number; a: number; b: number } | null>(null)
+
+  useLayoutEffect(() => {
+    if (widths !== null) return
+    const t = tableRef.current
+    if (!t) return
+    const ths = t.querySelectorAll('thead > tr > th')
+    if (ths.length !== columnCount) return
+    const measured: number[] = []
+    ths.forEach((el) => measured.push((el as HTMLElement).getBoundingClientRect().width))
+    setWidths(measured)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnCount])
+
+  const handle = (i: number) => ({
+    onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!widths || i >= columnCount - 1) return
+      e.preventDefault()
+      e.stopPropagation()
+      try { (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId) } catch {}
+      dragRef.current = { i, startX: e.clientX, a: widths[i], b: widths[i + 1] }
+      document.body.style.cursor = 'col-resize'
+    },
+    onPointerMove: (e: React.PointerEvent<HTMLDivElement>) => {
+      const d = dragRef.current
+      if (!d || !widths) return
+      const raw = e.clientX - d.startX
+      const maxRight = d.b - minPx
+      const maxLeft = -(d.a - minPx)
+      const delta = Math.max(maxLeft, Math.min(maxRight, raw))
+      const next = widths.slice()
+      next[d.i] = d.a + delta
+      next[d.i + 1] = d.b - delta
+      setWidths(next)
+    },
+    onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => {
+      dragRef.current = null
+      document.body.style.cursor = ''
+      try { (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId) } catch {}
+    },
+    onPointerCancel: () => {
+      dragRef.current = null
+      document.body.style.cursor = ''
+    },
+  })
+
+  return { tableRef, widths, handle }
 }
 
 // ─── Main composition ────────────────────────────────────────────────────────
@@ -2188,6 +2408,10 @@ export function AEOpportunityTable({
   const [search, setSearch] = useState('')
   const [single, setSingle] = useState<Record<string, string | null>>(INITIAL_SINGLE)
   const [multi, setMulti] = useState<Record<string, string[]>>(INITIAL_MULTI)
+  // 4 columns: Opportunity · Deal State · Activity & Blockers · Products.
+  // Last column has no resize handle (it absorbs no extra space — every
+  // drag rebalances between two adjacent columns, total width fixed).
+  const colResize = useColumnResize(4)
   // Default: every leaf selected (all 15). Spec §3.12 says "All
   // (default)"; we encode that as the explicit full list so the trigger
   // chip reports the count and the SelectAll header shows checked.
@@ -2196,6 +2420,13 @@ export function AEOpportunityTable({
   const [rowsPerPage, setRowsPerPage] = useState(10)
   const [sortKey, setSortKey] = useState<SortKey>('closeDate') // spec §5 default
   const [sortDir, setSortDir] = useState<SortDir>('asc')        // spec §5 default
+
+  // Filter row is collapsed by default — search + sort + tags +
+  // Filters-toggle in the search row are enough to recognize the
+  // current slice; the expanded chip-row only opens when the AE wants
+  // to change something. Applied filters stay visible as a count tag
+  // on the Filters button + a hover popover listing each one.
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   // Spec §3.4 — all tags on by default.
   const [density, setDensity] = useState<DensityKey[]>([...ALL_DENSITY_KEYS])
@@ -2221,6 +2452,72 @@ export function AEOpportunityTable({
     setSingle(prev => ({ ...prev, [id]: v }))
   const setMultiFacet = (id: string, values: string[]) =>
     setMulti(prev => ({ ...prev, [id]: values }))
+
+  // ── Applied filters aggregator (Filters-toggle button + popover) ──
+  // Flattens every dimension's current selection into one list keyed by
+  // a stable `${dim}:${value}` token. Each item carries an idempotent
+  // onRemove that clears that one value from the right state slice.
+  // Products are only counted when partially selected — the default
+  // "all 15" state is treated as no narrowing.
+  const appliedFilters = useMemo<AppliedFilterItem[]>(() => {
+    const out: AppliedFilterItem[] = []
+    const singleDims: { key: string; dim: string; opts: { value: string; label: string }[] }[] = [
+      { key: 'forecast',     dim: 'Forecast',         opts: FORECAST_OPTIONS },
+      { key: 'stage',        dim: 'Stage',            opts: STAGE_OPTIONS },
+      { key: 'oppType',      dim: 'Opportunity type', opts: TYPE_OPTIONS },
+      { key: 'lastActivity', dim: 'Last activity',    opts: LAST_ACTIVITY_OPTIONS },
+    ]
+    for (const { key, dim, opts } of singleDims) {
+      const v = single[key]
+      if (v) {
+        const lbl = opts.find(o => o.value === v)?.label ?? v
+        out.push({
+          value: `single:${key}:${v}`,
+          label: `${dim}: ${lbl}`,
+          onRemove: () => setSingleFacet(key, null),
+        })
+      }
+    }
+    for (const v of multi.closeDate ?? []) {
+      const lbl = CLOSE_DATE_OPTIONS.find(o => o.value === v)?.label ?? v
+      out.push({
+        value: `closeDate:${v}`,
+        label: `Close date: ${lbl}`,
+        onRemove: () => setMultiFacet('closeDate', (multi.closeDate ?? []).filter(x => x !== v)),
+      })
+    }
+    for (const v of multi.risk ?? []) {
+      const lbl = RISK_FILTER_OPTIONS.find(o => o.value === v)?.label ?? v
+      out.push({
+        value: `risk:${v}`,
+        label: `Risk: ${lbl}`,
+        onRemove: () => setMultiFacet('risk', (multi.risk ?? []).filter(x => x !== v)),
+      })
+    }
+    for (const axis of ['overall', 'technical', 'adoption'] as const) {
+      for (const lvl of groupedHealth[axis]) {
+        out.push({
+          value: `health:${axis}:${lvl}`,
+          label: `${axis === 'overall' ? 'Overall' : axis === 'technical' ? 'Technical' : 'Adoption'}: ${HEALTH_LABEL[lvl]}`,
+          onRemove: () => setGroupedHealth({
+            ...groupedHealth,
+            [axis]: groupedHealth[axis].filter(x => x !== lvl),
+          }),
+        })
+      }
+    }
+    // Products always contribute to the count — every selected leaf
+    // is a filter option the AE has chosen, even if all are selected.
+    for (const v of products) {
+      const lbl = PRODUCT_LEAF_LABEL.get(v) ?? v
+      out.push({
+        value: `product:${v}`,
+        label: `Product: ${lbl}`,
+        onRemove: () => setProducts(products.filter(x => x !== v)),
+      })
+    }
+    return out
+  }, [single, multi, groupedHealth, products])
 
   const toggleSort = (key: SortKey) => {
     if (sortKey === key) {
@@ -2259,16 +2556,19 @@ export function AEOpportunityTable({
       <style>{LAYOUT_CSS}</style>
       <div className="opp-page">
         <div className="opp-page__shell">
-          {/* ── Search row: counts left, search centered, sort right ────
-               Counts moved out of the filter row; they belong to the
-               search context (the slice the AE is looking at), not the
-               filter affordances. Search expands to fill the middle so
-               the bar reads as a single line of search context. */}
+          {/* ── Search row ──────────────────────────────────────────────
+               Left-to-right: search · sort · tags · filters-toggle. All
+               controls are 32px tall. The row carries 8px top/bottom
+               padding (the row is its own band, not the filter row's
+               cap). Filters-toggle on the right collapses/expands the
+               wider filter row below; its trailing count tag carries
+               an applied-filters popover on hover, so the AE knows
+               what's narrowing the table even when the filter row is
+               collapsed. */}
           <div className="opp-search-row">
             <div className="opp-search-row__search">
               <Search
-                size="md"
-                background="grey0"
+                background="grey10"
                 placeholder="account, quote id, opportunity name, product…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -2283,61 +2583,66 @@ export function AEOpportunityTable({
                 setSortDir(k === 'closeDate' ? 'asc' : 'desc')
               }}
             />
+            <TagDensityFilter selected={density} onChange={setDensity} />
+            <FiltersToggle
+              open={filtersOpen}
+              onToggle={() => setFiltersOpen(v => !v)}
+              applied={appliedFilters}
+            />
           </div>
 
-          {/* ── Filter row ─────────────────────────────────────────────
-               Tag-density now sits inline with the data filters as
-               "tags", set off by a vertical divider. The visual
-               distinction between "density" and "row filter" is
-               carried by the divider + the label "tags" rather than a
-               separate row. */}
-          <div className="opp-filter-row">
-            <div className="opp-filter-group">
-              <TagDensityFilter selected={density} onChange={setDensity} />
-              <div className="opp-filter-divider" role="presentation" />
-              <SingleSelectFilter
-                label="forecast"
-                options={FORECAST_OPTIONS}
-                value={single.forecast}
-                onChange={(v) => setSingleFacet('forecast', v)}
-              />
-              <SingleSelectFilter
-                label="stage"
-                options={STAGE_OPTIONS}
-                value={single.stage}
-                onChange={(v) => setSingleFacet('stage', v)}
-              />
-              <SingleSelectFilter
-                label="opportunity type"
-                options={TYPE_OPTIONS}
-                value={single.oppType}
-                onChange={(v) => setSingleFacet('oppType', v)}
-              />
-              <SingleSelectFilter
-                label="last activity"
-                options={LAST_ACTIVITY_OPTIONS}
-                value={single.lastActivity}
-                onChange={(v) => setSingleFacet('lastActivity', v)}
-              />
-              <Filter
-                label="close date"
-                options={CLOSE_DATE_OPTIONS}
-                selected={multi.closeDate ?? []}
-                onApply={values => setMultiFacet('closeDate', values)}
-              />
-              <GroupedHealthFilter
-                value={groupedHealth}
-                onApply={setGroupedHealth}
-              />
-              <Filter
-                label="risk factors"
-                options={RISK_FILTER_OPTIONS}
-                selected={multi.risk ?? []}
-                onApply={values => setMultiFacet('risk', values)}
-              />
-              <ProductFilter selected={products} onApply={setProducts} />
+          {/* ── Filter row (collapsible) ───────────────────────────────
+               Bordered band above and below; 12px top/bottom padding;
+               every filter chip clamped to 32px height. Density moved
+               out (it lives in the search row now), so no leading
+               divider is needed. */}
+          {filtersOpen && (
+            <div className="opp-filter-row" id="opp-filter-row">
+              <div className="opp-filter-group">
+                <SingleSelectFilter
+                  label="Forecast"
+                  options={FORECAST_OPTIONS}
+                  value={single.forecast}
+                  onChange={(v) => setSingleFacet('forecast', v)}
+                />
+                <SingleSelectFilter
+                  label="Stage"
+                  options={STAGE_OPTIONS}
+                  value={single.stage}
+                  onChange={(v) => setSingleFacet('stage', v)}
+                />
+                <SingleSelectFilter
+                  label="Opportunity type"
+                  options={TYPE_OPTIONS}
+                  value={single.oppType}
+                  onChange={(v) => setSingleFacet('oppType', v)}
+                />
+                <SingleSelectFilter
+                  label="Last activity"
+                  options={LAST_ACTIVITY_OPTIONS}
+                  value={single.lastActivity}
+                  onChange={(v) => setSingleFacet('lastActivity', v)}
+                />
+                <Filter
+                  label="Close date"
+                  options={CLOSE_DATE_OPTIONS}
+                  selected={multi.closeDate ?? []}
+                  onApply={values => setMultiFacet('closeDate', values)}
+                />
+                <GroupedHealthFilter
+                  value={groupedHealth}
+                  onApply={setGroupedHealth}
+                />
+                <Filter
+                  label="Risk factors"
+                  options={RISK_FILTER_OPTIONS}
+                  selected={multi.risk ?? []}
+                  onApply={values => setMultiFacet('risk', values)}
+                />
+                <ProductFilter selected={products} onApply={setProducts} />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* ── Table ───────────────────────────────────────────────────
                Headers are Title Case. The four content columns
@@ -2346,13 +2651,33 @@ export function AEOpportunityTable({
                need. Header icons removed — the sort arrow on the two
                sortable headers is sufficient affordance. */}
           <div className="opp-table-shell">
-            <table className="opp-table">
+            <table className="opp-table" ref={colResize.tableRef}>
+              {/* colgroup drives column widths once useLayoutEffect has
+                * seeded them from the rendered 25% layout. Before seed
+                * the cols carry no inline width, so the .opp-c-equal
+                * 25% rule on each th governs the first paint. */}
+              <colgroup>
+                {[0, 1, 2, 3].map((i) => (
+                  <col key={i} style={colResize.widths ? { width: colResize.widths[i] } : undefined} />
+                ))}
+              </colgroup>
               <thead>
                 <tr>
-                  <th className="opp-c-equal"><Header size="md" type={headerType('oppName')} onHeaderClick={() => toggleSort('oppName')}>Opportunity</Header></th>
-                  <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Deal State</Header></th>
-                  <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Activity &amp; Blockers</Header></th>
-                  <th className="opp-c-equal opp-no-sort"><Header size="md" type="basic">Products</Header></th>
+                  <th className="opp-c-equal">
+                    <Header size="md" type={headerType('oppName')} onHeaderClick={() => toggleSort('oppName')}>Opportunity</Header>
+                    <div className="opp-th-resizer" aria-hidden="true" {...colResize.handle(0)} />
+                  </th>
+                  <th className="opp-c-equal opp-no-sort">
+                    <Header size="md" type="basic">Deal state</Header>
+                    <div className="opp-th-resizer" aria-hidden="true" {...colResize.handle(1)} />
+                  </th>
+                  <th className="opp-c-equal opp-no-sort">
+                    <Header size="md" type="basic">Activity &amp; blockers</Header>
+                    <div className="opp-th-resizer" aria-hidden="true" {...colResize.handle(2)} />
+                  </th>
+                  <th className="opp-c-equal opp-no-sort">
+                    <Header size="md" type="basic">Products</Header>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -2418,12 +2743,13 @@ const LAYOUT_CSS = `
   --panw-flyout-filter-text: var(--ds-text-primary);
   --panw-flyout-filter-placeholder: var(--ds-text-placeholder-rest);
   --panw-flyout-filter-border: var(--ds-lines-neutral-rest);
-  /* Column headers ride the ghost surface — transparent at rest so the
-   * page ground reads through, ghost.hover / pressed for interaction.
-   * No paint of its own; the band is built by hover, not by fill. */
+  /* Column headers ride the ghost surface — transparent at rest. Hover
+   * and onclick deliberately match rest so the header band carries no
+   * visible interaction state. Sort is still functional; the active
+   * sort indicator is the only affordance needed. */
   --panw-header-bg:         var(--ds-ghost-rest);
-  --panw-header-bg-hover:   var(--ds-ghost-hover);
-  --panw-header-bg-onclick: var(--ds-ghost-pressed);
+  --panw-header-bg-hover:   var(--ds-ghost-rest);
+  --panw-header-bg-onclick: var(--ds-ghost-rest);
 }
 
 .opp-page {
@@ -2446,14 +2772,24 @@ const LAYOUT_CSS = `
 }
 
 /* ── Search row ─────────────────────────────────────────────────────────── *
- * Counts left, search center (flex:1), sort right. The whole row is a
- * single line; the bar reads as the AE's search-context surface. */
+ * Left-to-right: search (flex:1) · sort · tags · filters-toggle. All
+ * controls are 32px tall, so the row reads as one even band. 8px top
+ * and bottom padding gives the row its own breathing space; 16px
+ * left/right padding pulls the row's outer edges inward to land
+ * exactly where the data-row divider sits (the divider's inner
+ * margin is 16px on each side of the table). Net effect: the search
+ * row's left and right edges line up with the first/last data
+ * cell's tag rail. */
 .opp-search-row {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-04); /* 12 — proximity between distinct regions */
-  /* Owns the 8px gap to the filter row below it. */
-  margin-bottom: var(--ds-spacing-03); /* 8 */
+  gap: 6px;
+  /* 8 top/bottom · 16 right · 10 LEFT — left-inset matches the table's
+   * first-cell padding-left so the search input, hairlines, divider,
+   * header text, and cell content all share one vertical at x = 10px
+   * from the shell's inner edge. */
+  padding: var(--ds-spacing-03) var(--ds-spacing-05) var(--ds-spacing-03) 10px;
+  margin-bottom: 0;
 }
 .opp-search-row__search {
   flex: 1;
@@ -2463,36 +2799,83 @@ const LAYOUT_CSS = `
   width: 100%;
 }
 
-/* Sort trigger — ghost-button shape, opens a single-select Flyout.
+/* ── Search-row inline filters (tag-density + filters-toggle) ──────────
+ * Filters in the search row match the DS Filter default height (40px)
+ * and the Search input height so the row reads as one even band.
  *
- * Padding follows the DS Button default (0.75rem 1rem = 12 16) for
- * horizontal padding so the trigger reads as a peer of the system's
- * default-size buttons. Vertical padding is removed because the
- * trigger stretches to fill the search row's height (the search bar
- * is the tallest child), keeping the button vertically aligned with
- * the search input regardless of which size DS Search renders at. */
-.opp-sort-trigger {
+ * The DS .panw--filter trigger ships without a border. In the search
+ * row it has to read as a peer of the DS secondary button next to it
+ * (Sort, Filters), so we paint the secondary-button chrome on it:
+ * 1px border in the secondary border token at rest, drops to
+ * transparent on hover / open — matching Button's own convention.
+ * Text color routes through the secondary text token. */
+.opp-search-row .panw--filter,
+.opp-search-row .panw--filter__wrapper > .panw--filter {
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding: 0 var(--ds-spacing-04); /* 12 */
+  border: 1px solid var(--panw-button-secondary-border);
+  border-radius: var(--ds-radius-tight); /* 4 */
+  background-color: var(--panw-button-secondary-bg);
+  color: var(--panw-button-secondary-text);
+  transition:
+    background-color 110ms var(--ds-motion-easing-standard),
+    border-color 110ms var(--ds-motion-easing-standard);
+}
+.opp-search-row .panw--filter:hover:not(.panw--filter--open),
+.opp-search-row .panw--filter__wrapper > .panw--filter:hover:not(.panw--filter--open) {
+  background-color: var(--ds-surface-hover);
+  border-color: transparent;
+}
+.opp-search-row .panw--filter.panw--filter--open,
+.opp-search-row .panw--filter__wrapper > .panw--filter.panw--filter--open {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+/* Sort and Filters-toggle are DS Buttons — give them the same open-state
+ * treatment as the filter triggers: surface-selected bg, border drops. */
+.opp-search-row .panw--btn--secondary[aria-expanded="true"] {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+.opp-search-row .panw--btn--secondary[aria-expanded="true"]:hover {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+
+/* Right-align the applied-filters popover off the Filters-toggle.
+ * The toggle is the rightmost element in the search row, so the
+ * default left:0 anchoring runs the popover off-screen on narrow
+ * viewports. Pinning right:0 (and overriding the DS default left:0)
+ * keeps the popover within the row's bounds. Only scoped to the
+ * filters-toggle wrapper — the per-filter chip-popovers inside the
+ * expanded filter row keep their DS default left-aligned anchoring. */
+.opp-filters-toggle .panw--filter__chip-popover {
+  left: auto;
+  right: 0;
+}
+
+/* Filters-toggle button — wraps the DS secondary button so the count
+ * tag inside the button can host the applied-filters popover via the
+ * DS .panw--filter__wrapper anchoring pattern (position:relative on
+ * the wrapper; popover positions absolute below). */
+.opp-filters-toggle {
+  display: inline-flex;
+}
+.opp-filters-toggle__inner {
   display: inline-flex;
   align-items: center;
-  align-self: stretch;
-  gap: var(--ds-spacing-02); /* 4 */
-  padding: 0 var(--ds-spacing-05); /* 0 16 — matches DS Button default horizontal padding */
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--ds-text-secondary-rest);
-  border-radius: var(--ds-radius-tight);
-  white-space: nowrap;
-  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
+  gap: var(--ds-spacing-02); /* 4 — label to count tag */
 }
-.opp-sort-trigger:hover {
-  background-color: var(--ds-ghost-hover);
-  color: var(--ds-text-primary);
-}
-.opp-sort-trigger[aria-expanded="true"] {
-  background-color: var(--ds-ghost-pressed);
-  color: var(--ds-text-primary);
+/* Count tag inside the button — sized small so it fits the 32px
+ * button cleanly. The chip-target wrapper is what the hover handler
+ * lives on, so the tag (visual) and the target (interaction) line
+ * up exactly. */
+.opp-filters-toggle__count {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 /* ── Filter row ───────────────────────────────────────────────────────────
@@ -2500,28 +2883,66 @@ const LAYOUT_CSS = `
  * divider, followed by the data-row filters. The two control families
  * share a row but the divider keeps the mental model — density
  * controls how much each row shows; the others narrow the row set. */
+/* ── Expanded filter row ─────────────────────────────────────────────
+ * Collapsible band below the search row. 1px hairlines top + bottom
+ * frame it as its own section; 12px top/bottom padding gives the
+ * chips room without the band feeling heavy. Filter chips use the DS
+ * default 40px height — consistent with the search row above.
+ * The 6px chip-to-chip gap matches the in-row tag cluster's rhythm. */
 .opp-filter-row {
   display: flex;
   align-items: flex-start;
-  /* 6px matches .opp-tag-cluster — the filter row reads with the
-   * same rhythm as a tag cluster inside a row, so the eye crosses
-   * both clusters at the same density. Not a --ds-spacing step
-   * (4/8/12), so a literal here. */
   gap: 6px;
   flex-wrap: wrap;
-  /* Owns the 20px gap to the table header below it. 20 isn't a
-   * native --ds-spacing step, so it's a literal here. */
-  margin-bottom: 20px;
+  /* 12 top/bottom · 16 right · 10 LEFT — left-inset matches the
+   * table's first-cell padding-left so this row's chips, hairlines,
+   * search input above, and divider below all land at the same x. */
+  padding: var(--ds-spacing-04) var(--ds-spacing-05) var(--ds-spacing-04) 10px;
+  margin: 0;
+  position: relative;
 }
+/* Top + bottom hairlines drawn as pseudo-elements so they respect the
+ * row's horizontal inset — using border-top/border-bottom would paint
+ * the lines edge-to-edge and break alignment. Left = 10 (column-1
+ * content anchor); right = 16 (matches the toolbar's right edge). */
+.opp-filter-row::before,
+.opp-filter-row::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: var(--ds-spacing-05); /* 16 */
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
+  pointer-events: none;
+}
+.opp-filter-row::before { top: 0; }
+.opp-filter-row::after  { bottom: 0; }
 .opp-filter-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  /* Matches .opp-tag-cluster — see note above. */
   gap: 6px;
   row-gap: 6px;
   flex: 1;
   min-width: 0;
+}
+/* Filter triggers in the expanded row use the DS default 40px height.
+ * Padding matches the search-row filter override above (12px h). */
+.opp-filter-row .panw--filter {
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding: 0 var(--ds-spacing-04); /* 12 */
+}
+.opp-filter-row .panw--filter.panw--filter--open,
+.opp-filter-row .panw--filter__wrapper > .panw--filter.panw--filter--open {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+.opp-filter-row .panw--filter:hover:not(.panw--filter--open),
+.opp-filter-row .panw--filter__wrapper > .panw--filter:hover:not(.panw--filter--open) {
+  background-color: var(--ds-surface-hover);
+  border-color: transparent;
 }
 .opp-filter-divider {
   width: 1px;
@@ -2544,6 +2965,43 @@ const LAYOUT_CSS = `
   text-align: left;
   padding: 0; /* Header owns its own padding */
   vertical-align: middle;
+  /* Anchor for the absolute-positioned resize handle below. */
+  position: relative;
+}
+
+/* ── Column resize handle ──────────────────────────────────────────────
+ * 6px-wide hot zone straddling the column boundary on the right edge of
+ * each header (last column omits it). Transparent at rest, fades a 1px
+ * vertical line in neutral-rest on hover, swaps to brand while dragging.
+ * The handle sits above the Header content (z-index:1) and uses col-resize
+ * cursor + touch-action:none so pointer drags don't trigger scroll. */
+.opp-th-resizer {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: -3px;
+  width: 6px;
+  z-index: 1;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+.opp-th-resizer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  margin-left: -0.5px;
+  background-color: transparent;
+  transition: background-color 110ms var(--ds-motion-easing-standard);
+}
+.opp-th-resizer:hover::before {
+  background-color: var(--ds-lines-neutral-rest);
+}
+.opp-th-resizer:active::before {
+  background-color: var(--ds-lines-brand-rest);
 }
 /* Header icon removal — kill the resting up-down indicator on every
  * header. The active up/down arrow on the currently-sorted column
@@ -2561,8 +3019,24 @@ const LAYOUT_CSS = `
  * Hover lifts the band so row-level floating actions read as engaged;
  * no :active state — clicking a row does nothing, so a pressed
  * background would write a check the interaction can't cash. */
-.opp-table tbody tr { background-color: var(--ds-ghost-rest); }
-.opp-table tbody tr:hover  { background-color: var(--ds-ghost-hover); }
+.opp-table tbody tr {
+  background-color: var(--ds-ghost-rest);
+  /* Productive standard curve — state change in place, not an entrance.
+   * 100ms sits between fast-01 (70ms) and fast-02 (110ms), right at the
+   * micro-interaction boundary for a row-sized surface area. */
+  transition: background-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+/* Row hover — locally derived alpha-40 of neutral20 instead of
+ * var(--ds-ghost-hover) (which is alpha-70). The rest state of
+ * data rows is ghost.rest (transparent) so the row adapts to
+ * whichever page background sits behind the table; at alpha-70
+ * the hover composited into a near-solid band that masked the
+ * row-internal hover affordances (icon-button highlights, tag
+ * chip hovers, link hovers). Alpha-40 keeps the row legible as
+ * the engaged band without overwhelming the hovers nested
+ * inside it, and still composites cleanly over any page bg.
+ * Primitive resolves to neutral20 = #E4E8EB = rgb(228, 232, 235). */
+.opp-table tbody tr:hover  { background-color: rgb(228 232 235 / 40%); }
 
 /* Standalone divider rows — an independent element between rows, not
  * a border that belongs to either adjacent row. The <div> is the line;
@@ -2580,7 +3054,7 @@ const LAYOUT_CSS = `
   line-height: 0;
   font-size: 0;
 }
-.opp-divider { height: 1px; background-color: var(--ds-lines-neutral-rest); transition: opacity 110ms ease; margin: 0 16px; }
+.opp-divider { height: 1px; background-color: var(--ds-lines-neutral-rest); transition: opacity 110ms ease; margin: 0 16px 0 10px; }
 /* Hide the divider below the hovered row */
 .opp-row:hover + .opp-divider-row .opp-divider { opacity: 0; }
 /* Hide the divider above the hovered row — :has() (Chrome 105+, Safari 15.4+, FF 121+) */
@@ -2590,19 +3064,32 @@ const LAYOUT_CSS = `
  * Last cell:   t:12  r:8   b:16  l:8
  * Other cells: t:12  r:8   b:12  l:8
  * Row corners: 12px radius clipped on first/last td. */
+/* Per-cell padding — 8px top/bottom for a compact row. First cell
+ * gets 10px left padding (tightens column-1 to the row's leading
+ * rail); last cell keeps the uniform 8px. The header padding
+ * overrides below mirror these values so header text and row
+ * content line up vertically column by column. */
 .opp-table td {
-  padding: 12px 8px;
+  padding: 8px;
   vertical-align: top;
   color: var(--ds-text-secondary-rest);
 }
 .opp-table tbody td:first-child {
-  padding: 12px 8px 12px 16px;
+  padding: 8px 8px 8px 10px;
   border-radius: 8px 0 0 8px;
 }
 .opp-table tbody td:last-child {
-  padding: 12px 8px 16px 8px;
+  padding: 8px;
   border-radius: 0 8px 8px 0;
 }
+/* Header alignment with row content — neutralize the DS Header's
+ * default 16px padding-left and replace with values that match each
+ * column's cell padding-left, so header text starts at the same x
+ * as the first tag (or text element) in the column below it.
+ *   th:first-child → 10 (matches first cell)
+ *   th:not(:first-child) → 8 (matches every other cell) */
+.opp-table th .panw--header { padding-left: 8px; }
+.opp-table th:first-child .panw--header { padding-left: 10px; }
 
 /* Column 1 — name · account · value stacked.
  * Gaps are explicit margins (not flex gap) so each inter-element
@@ -2613,35 +3100,70 @@ const LAYOUT_CSS = `
   gap: 0;
   align-items: flex-start;
 }
+/* Opportunity name — body-01 (14/20), regular weight, text.primary.
+ * Now that the sub (account name) reads at tertiary, the name climbs
+ * back to primary so the column-1 hierarchy is unambiguous:
+ *   primary  → opportunity name (the row's headline)
+ *   tertiary → account name (the context)
+ *   primary, heading-02 → value (the row's mass). */
 .opp-multiline__name {
-  font-weight: var(--ds-type-font-weight-semibold);
+  font-weight: var(--ds-type-font-weight-regular);
   font-size: 14px;
   line-height: 20px;
-  color: var(--ds-text-secondary-rest);
+  color: var(--ds-text-primary);
+  /* Truncate with ellipsis instead of wrapping when the name exceeds
+   * the column width. The table runs table-layout:fixed, so the td
+   * sets a hard width and the block-level link can clip inside it.
+   * min-width:0 lets the link shrink below its intrinsic content
+   * width (required for ellipsis to fire inside a flex column). */
+  display: block;
+  width: 100%;
+  min-width: 0;
+  max-width: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+/* Account sub — label-02 (14/18, +0.01px tracking), text.tertiary.
+ * One step down from the name in weight-of-presence; 13px was an
+ * off-token size and is gone. */
 .opp-multiline__sub {
-  margin-top: 4px;
+  /* 2px under the opportunity name — tight pairing because the
+   * account is the name's direct supporting context, not a separate
+   * tier of information. */
+  margin-top: 2px;
   font-weight: var(--ds-type-font-weight-regular);
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 1.28572;
+  letter-spacing: 0.01px;
   color: var(--ds-text-tertiary-rest);
 }
+/* Value — heading-02 (16/24 semibold). Down from heading-03's
+ * 20/28: the table is moving to a more compact, more precise
+ * rhythm; the value still leads the column in mass, just at
+ * 16px instead of 20px. */
 .opp-multiline__value {
-  margin-top: 12px;
-  font-size: 20px;
-  line-height: 28px;
+  /* 4px under the account name — keeps the column-1 stack tight so
+   * the value reads as part of the same cluster (name · account ·
+   * value), not a separate block. */
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 24px;
   font-weight: var(--ds-type-font-weight-semibold);
+  letter-spacing: -0.15px;
   color: var(--ds-text-primary);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-/* DS "black" Link palette — text.link-neutral family.
- * rest:  --ds-text-link-neutral-rest  (resolved by stage to neutral text)
- * hover: --ds-text-link-neutral-hover (shifts to brand on hover, with underline)
- * See @ds/styles/scss/components/link/_link.scss (.panw--link--black). */
+/* Anchor affordance for the multiline links. The rest color is
+ * inherited from the paired role class (.opp-multiline__name →
+ * text.secondary, .opp-multiline__sub → text.tertiary), so this
+ * class only carries link-specific behavior: no underline at rest,
+ * pointer cursor, and the brand hover state below. Setting an
+ * explicit rest color here would mask the role's tier in the
+ * column-1 hierarchy. */
 .opp-multiline__link {
-  color: var(--ds-text-link-neutral-rest);
   text-decoration: none;
   cursor: pointer;
   border-radius: var(--ds-radius-tight);
@@ -2660,7 +3182,10 @@ const LAYOUT_CSS = `
 .opp-tag-cluster {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  /* 4px on both axes — tighter chip-to-chip rhythm so the cluster
+   * reads as one cluster rather than a string of separate chips.
+   * Single gap shorthand covers row-gap + column-gap together. */
+  gap: 4px;
   align-items: center;
 }
 
@@ -2747,16 +3272,28 @@ const LAYOUT_CSS = `
 .opp-pop--health,
 .opp-pop--risks,
 .opp-pop--renewal { width: 320px; }
-/* 240 — single-concept surfaces (activity-simple). */
-.opp-pop--simple { width: 240px; }
-/* 160 — atomic surfaces (single button, no copy). */
-.opp-pop--action { width: 160px; }
-/* Empty-state risks — 2px breathing room between heading and sub
- * (default is 0 because the sub's negative top margin cancels the
- * parent gap-8; for the empty branch we want the sub to read as
- * "directly related to" the heading rather than collapsed onto it). */
-.opp-pop--empty .opp-pop__sub {
-  margin-top: calc(-1 * var(--ds-spacing-03) + 2px);
+/* 240 — single-concept surfaces (activity-simple, sales-play). */
+.opp-pop--simple,
+.opp-pop--salesplay { width: 240px; }
+/* Sales-play panel always has exactly one KV row — no dividers needed,
+ * and no gap between the row and the CTA (the row and button sit flush). */
+.opp-pop--salesplay { gap: 0; }
+.opp-pop--salesplay .opp-pop__kv-list::before,
+.opp-pop--salesplay .opp-pop__kv-list::after { display: none; }
+/* Single-button popover — no tier width. The popover is a halo
+ * around exactly one button, so it sizes to fit that button rather
+ * than committing to one of the 160 / 240 / 320 tiers. The
+ * action block further down sets the 8px halo padding. */
+.opp-pop--action { width: fit-content; }
+/* Two-line popovers — 4px between heading and sub. Default is 0
+ * because the sub's negative top margin (-8px) cancels the parent
+ * gap-8; here we restore +4 so the sub reads as a tight subtitle
+ * directly under the heading. Shared by:
+ *   • .opp-pop--empty       — no-risk empty state (heading + body)
+ *   • .opp-pop--two-line    — activity hover (description + days-ago) */
+.opp-pop--empty .opp-pop__sub,
+.opp-pop--two-line .opp-pop__sub {
+  margin-top: calc(-1 * var(--ds-spacing-03) + 4px);
 }
 .opp-pop__heading {
   font-size: 14px;
@@ -2831,8 +3368,20 @@ const LAYOUT_CSS = `
   margin: 0 var(--ds-spacing-03);
   background-color: var(--ds-lines-neutral-rest);
 }
-/* Each row. Click target is the row itself; no-op until a destination
- * is wired in, but the hover ground signals affordance. */
+/* Each row. The row extends 8px past the popover content edge (via
+ * the list's negative horizontal margin) so its hover pill reads as
+ * a generous shape; text sits inside the row with 8px horizontal
+ * padding so it never touches the row's own edge and lands on the
+ * same 16px rail as the popover heading. position:relative anchors
+ * the inter-row line pseudo (::before below). Mirrors .acc-pop's
+ * row contract exactly.
+ *
+ * Default justify: flex-start. Earlier this was space-between, which
+ * left numeric values floating against the right edge of the row,
+ * separated from their labels by a stretch of empty band. flex-start
+ * keeps label and value adjacent so the pair reads as one unit.
+ * Tag-bearing rows (.opp-pop__rows — health KV with chips on the
+ * right) override back to space-between below. */
 .opp-pop__rows > *,
 .opp-pop__kv-list > *,
 .opp-pop__risk-list > *,
@@ -2840,14 +3389,34 @@ const LAYOUT_CSS = `
   position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
   gap: var(--ds-spacing-04);
   margin: 0;
   padding: 0 var(--ds-spacing-03); /* 0 vertical / 8 horizontal — height comes from the fixed row-height tier alone */
+  cursor: pointer;
   background-color: var(--ds-ghost-field-rest);
   border-radius: var(--ds-radius-tight);
   transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
+/* Label-left, value-right layout for every KV-style row: tag-bearing
+ * health rows AND the numeric renewal rows (Subscription end /
+ * Renewable TCV / ARR) both push the right column to the trailing
+ * edge so dates and figures right-align in a clean column instead of
+ * floating mid-row next to the label.
+ *
+ * NOTE — overflow risk to harden if labels or values ever grow:
+ * these rows use space-between with no flex-shrink rules on either
+ * side. With short labels (e.g. "ARR") and short values (e.g. "$1.2M")
+ * everything fits inside the popover's content rail today. If a
+ * future label/value pair would exceed the rail, content will bleed
+ * past the popover's right edge (the panel defaults to overflow:
+ * visible). Fix when needed: give the label flex:1 1 0, min-width:0,
+ * overflow:hidden, text-overflow:ellipsis; and the value
+ * flex-shrink:0 — same pattern used in .opp-pop-row__name /
+ * .opp-pop-row__value where the same overflow bug was already
+ * surfaced and fixed. */
+.opp-pop__rows > *,
+.opp-pop__kv-list > * { justify-content: space-between; }
 /* Row-height convention (matches the live table cells):
  *   if the row carries a tag    → 40px fixed
  *   else (text-only / emoji)    → 32px fixed
@@ -2870,14 +3439,48 @@ const LAYOUT_CSS = `
   height: 1px;
   background-color: var(--ds-lines-neutral-rest);
 }
-/* No hover affordance — these rows are display-only; no click destination.
- * Cursor stays default so the popover doesn't promise interactivity it
- * can't deliver. */
-.opp-pop__rows > *,
-.opp-pop__kv-list > *,
-.opp-pop__risk-list > *,
-.opp-pop__product-list > * {
-  cursor: default;
+/* Row hover/press states — ghost.field family, matching .acc-pop. */
+.opp-pop__rows > *:hover,
+.opp-pop__kv-list > *:hover,
+.opp-pop__risk-list > *:hover,
+.opp-pop__product-list > *:hover {
+  background-color: var(--ds-ghost-field-hover);
+}
+.opp-pop__rows > *:active,
+.opp-pop__kv-list > *:active,
+.opp-pop__risk-list > *:active,
+.opp-pop__product-list > *:active {
+  background-color: var(--ds-ghost-field-pressed);
+}
+/* When a row is hovered, hide:
+ *   (a) its own ::before (top inter-row divider)
+ *   (b) the next sibling's ::before (which is THIS row's bottom
+ *       inter-row divider when there's a row below)
+ * so the pill reads as one clean rounded shape. */
+.opp-pop__rows > *:hover::before,
+.opp-pop__kv-list > *:hover::before,
+.opp-pop__risk-list > *:hover::before,
+.opp-pop__product-list > *:hover::before,
+.opp-pop__rows > *:hover + *::before,
+.opp-pop__kv-list > *:hover + *::before,
+.opp-pop__risk-list > *:hover + *::before,
+.opp-pop__product-list > *:hover + *::before {
+  background-color: transparent;
+}
+/* And when the first / last row is hovered, hide the list's own
+ * top / bottom hairline respectively. :has() is required because
+ * we need to reach the list pseudo from the hovered row. */
+.opp-pop__rows:has(> *:first-child:hover)::before,
+.opp-pop__kv-list:has(> *:first-child:hover)::before,
+.opp-pop__risk-list:has(> *:first-child:hover)::before,
+.opp-pop__product-list:has(> *:first-child:hover)::before {
+  background-color: transparent;
+}
+.opp-pop__rows:has(> *:last-child:hover)::after,
+.opp-pop__kv-list:has(> *:last-child:hover)::after,
+.opp-pop__risk-list:has(> *:last-child:hover)::after,
+.opp-pop__product-list:has(> *:last-child:hover)::after {
+  background-color: transparent;
 }
 
 /* KV row — label left, value right. */
@@ -2959,30 +3562,44 @@ const LAYOUT_CSS = `
 .opp-pop-row__name {
   font-size: 14px;
   line-height: 20px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-secondary-rest);
+  /* Name yields width when the icon+name+value triplet would exceed
+   * the popover's 208px content rail. flex:1 1 0 makes it the
+   * flex item that absorbs/releases space; min-width:0 unlocks
+   * shrink-below-content for text inside a flex item; overflow +
+   * text-overflow render the ellipsis. Without these, longer
+   * product names pushed the trailing value out past the popover's
+   * right edge (the panel has overflow:visible by default). */
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .opp-pop-row__value {
   font-size: 14px;
   line-height: 20px;
-  color: var(--ds-text-secondary-rest);
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
   margin-left: var(--ds-spacing-06); /* 24 — clear separation from name */
+  /* Never shrink the dollar value — when the row runs tight the
+   * name truncates instead. The figure is the row's payload. */
+  flex-shrink: 0;
 }
 
 /* ── Row-level floating actions ──────────────────────────────────────────
  * Absolutely positioned relative to the <tr> (position:relative).
- * Two highlight-kind buttons that surface only on row hover. The
- * highlight kind ships its own rest / hover / pressed treatment, so
- * no per-state CSS swap is needed here. */
+ * Two ghost icon-buttons sit inside an inverse-surface pill. The pill
+ * carries the dark ground; buttons are transparent at rest and shift
+ * through surface.inverse hover/pressed so the dark pill reads as a
+ * single interactive unit, not two disconnected chips. */
 .opp-row { position: relative; }
 .opp-row-actions {
   position: absolute;
   bottom: 6px;
   right: 6px;
-  display: flex;
-  gap: var(--ds-spacing-02);
   z-index: 1;
   pointer-events: none; /* invisible at rest — row hover enables them */
   opacity: 0;
@@ -2992,8 +3609,57 @@ const LAYOUT_CSS = `
   opacity: 1;
   pointer-events: auto;
 }
-/* DS IconButton ships 4px (radius.tight) natively — no local
- * override needed. */
+/* Pill wrapper — dark inverse ground with 2px padding and 2px inter-button
+ * gap. Outer radius = inner button radius (4px) + padding (2px) = 6px,
+ * keeping the compound-radius relationship exact. */
+.opp-row-actions__pill {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background-color: var(--ds-surface-inverse-rest);
+  border-radius: var(--ds-radius-tight);
+}
+/* Buttons on the inverse ground: transparent rest, surface.inverse shift
+ * on hover/pressed, icons.inverse white family throughout. */
+.opp-row-actions__pill .panw--btn-icon {
+  background-color: transparent;
+  color: var(--ds-icons-inverse-rest);
+}
+/* DS sm+16 = 32px; lock these action buttons to 24px */
+.opp-row-actions__pill .panw--btn-icon--sm.panw--btn-icon--icon-16 {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.opp-row-actions__pill .panw--btn-icon:hover:not(:disabled) {
+  background-color: var(--ds-surface-inverse-hover);
+  color: var(--ds-icons-inverse-hover);
+}
+.opp-row-actions__pill .panw--btn-icon:active:not(:disabled) {
+  background-color: var(--ds-surface-inverse-pressed);
+  color: var(--ds-icons-inverse-pressed);
+}
+
+/* Button tooltip — overrides the popover chrome on the HoverShell panel
+ * with tooltip chrome: inverse surface, label-01 text, no border, tight radius.
+ * Tooltip slides up from the button; animation-name replaces the popover
+ * slide-down (opp-hover-in). white-space:nowrap prevents the label from
+ * wrapping inside the compact inverse pill. */
+@keyframes opp-tooltip-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.opp-hover-panel.opp-btn-tooltip {
+  background-color: var(--ds-surface-inverse-rest);
+  border: none;
+  border-radius: var(--ds-radius-tight);
+  padding: 8px 12px;
+  animation: opp-tooltip-up 70ms var(--ds-motion-easing-entrance);
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-inverse-rest);
+  white-space: nowrap;
+}
 
 /* ── Pagination ─────────────────────────────────────────────────────────── */
 .opp-table-footer {
@@ -3083,17 +3749,15 @@ const LAYOUT_CSS = `
 /* ── Button-only action popover (spec §4.2 + design call) ─────────────────
  * Single ghost-brand button on a surface.rest ground. No copy, no
  * heading. Used for Upsell type tag (Modify) and Quote ID tag
- * (View Quote). Width tier = 160.
+ * (View Quote).
  *
- * Padding exception: when the popover holds ONE button and nothing
- * else, the system's 16px inner padding doubles up with the button's
- * own internal padding and the popover reads as a button trapped in
- * a frame. Drop to 4px on all four sides so the popover becomes a
- * tight halo around the button — the affordance, not the frame, is
- * what the user sees. Applies only to single-button popovers; any
- * popover with copy or multiple controls returns to the 16px floor. */
+ * No tier width — the wrapper sizes to fit the button (set in the
+ * tier block above as width: fit-content). Inner padding is 8px
+ * all sides: the 16px system padding doubles up with the button's
+ * own padding and reads as a button trapped in a frame, while 4px
+ * is too tight to register as a halo. 8 is the comfortable middle. */
 .opp-pop--action {
-  padding: var(--ds-spacing-02); /* 4 — tight halo around the lone button */
+  padding: var(--ds-spacing-03); /* 8 — halo around the lone button */
   gap: 0;
 }
 .opp-pop--action .panw--btn { width: 100%; justify-content: center; }
@@ -3119,6 +3783,15 @@ const LAYOUT_CSS = `
   /* Tag-bearing row (outcome chip with trailing chevron) → 40px,
    * matching the convention used by .opp-pop__rows. */
   height: 40px;
+  /* Cancel the parent .opp-pop gap-8 above this row. The kv-list
+   * directly above already paints its own bottom hairline (::after);
+   * the parent gap-8 was stacking a second visual rest between the
+   * ARR row and this outcome row that read as wasted whitespace.
+   * Pulling -8px brings this row flush against the kv-list's bottom
+   * hairline, so the hairline now reads as the "divider between
+   * data rows and the interactive editor row" rather than as the
+   * table's bottom border with an unmotivated gap below it. */
+  margin-top: calc(-1 * var(--ds-spacing-03));
 }
 .opp-renewal-outcome__label {
   font-size: 14px;
@@ -3155,7 +3828,9 @@ const LAYOUT_CSS = `
   display: flex;
   flex-direction: column;
   gap: var(--ds-spacing-04);
-  margin-top: var(--ds-spacing-04);
+  /* No margin-top — the hairline is the separator. Padding-top provides
+   * breathing room on the form side of the hairline; a second gap above
+   * would double-space the break. */
   padding-top: var(--ds-spacing-04);
   border-top: 1px solid var(--ds-lines-neutral-rest);
 }
@@ -3198,6 +3873,35 @@ const LAYOUT_CSS = `
   color: var(--ds-icons-status-danger);
 }
 
+/* ── Sales-play status icon colors (.opp-sp-tag--*) ─────────────────────────
+ * Color is reserved for the icon; the chip ground stays neutral-low across
+ * all statuses so the column reads as quiet at scan-distance and the icon
+ * alone carries the state signal.
+ *
+ * Specificity reference: DS ships
+ *   .panw--tag.panw--tag--low.panw--tag--neutral .panw--tag__icon { color: ... }
+ * at (0,4,0). Our rules must beat that — each carries the full neutral chain
+ * plus the status modifier: (0,5,0). SVG fill override ensures path-level
+ * 'fill' attributes on the named DS icons are recolored cleanly.
+ *
+ * Color semantics (matches acc-table):
+ *   not-touched → danger red   (action item — only urgent status)
+ *   pursuing    → success green (in-flight)
+ *   closed-won  → mint-50      (positive completion, distinct from pursuing)
+ *   all others  → icons.secondary.rest (neutral / informational)
+ */
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag .panw--tag__icon svg,
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag .panw--tag__icon svg path {
+  fill: currentColor;
+}
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag--not-touched .panw--tag__icon { color: var(--ds-icons-status-danger); }
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag--pursuing    .panw--tag__icon { color: var(--ds-icons-success); }
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag--closed-won  .panw--tag__icon { color: var(--ds-color-core-mint-50); }
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag--pitched     .panw--tag__icon,
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag--deferred    .panw--tag__icon,
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag--declined    .panw--tag__icon,
+.panw--tag.panw--tag--low.panw--tag--neutral.opp-sp-tag--closed-lost .panw--tag__icon { color: var(--ds-icons-secondary-rest); }
+
 /* Filter-chip hover popover lives entirely in the DS — see
  * @ds/styles/scss/components/filter/_filter.scss for the
  * .panw--filter__chip-popover ruleset. No local override needed. */
@@ -3206,20 +3910,51 @@ const LAYOUT_CSS = `
  * @ds/tags (size-large: 5/10, shape-rounded+size-large: 4px radius).
  * Inline .stage overrides removed — let the DS rules take effect. */
 
-/* ── Neutral-low tag reskin ───────────────────────────────────────────────
- * Neutral-low tags ride the surface family: rest = surface.rest (the
- * canonical card-white token, not a literal hex), hover = surface.hover.
- * Removes the DS default 1px inset box-shadow — the surface family
- * carries the affordance, not a border. The previous row-hover override
- * that forced #ffffff is gone: rest already IS surface.rest (white), so
- * the tag stays legible against the ghost-hover row band without a
- * separate rule fighting the tag's own :hover. */
-.stage .panw--tag.panw--tag--low.panw--tag--neutral {
-  background-color: var(--ds-surface-rest);
+/* Neutral-low tag styling is now shipped natively by @ds/tags:
+ *   rest: surface.rest with a 1px inset border (--ds-base = neutral10)
+ *   hover/active: field.hover / field.pressed, border drops
+ * Local overrides removed — let the DS rules take effect. */
+
+/* ── Tag-as-trigger forced hover state ────────────────────────────
+ * When a tag opens a hover popover, the cursor moves off the tag
+ * onto the panel — at which point the tag's :hover CSS releases
+ * and the tag visually pops back to rest, even though the popover
+ * it spawned is still on screen. That breaks the relationship: the
+ * AE loses the visual link between "this tag" and "this popover".
+ *
+ * HoverShell sets data-popover-open="true" on its trigger span
+ * while the panel is open; the rules below paint each tag color's
+ * hover surface for the duration of the popover, matching the
+ * tokens the DS uses on the native :hover state. Categorical
+ * colors source from --ds-tag-{color}-low-bg-hover; neutral
+ * follows the DS neutral path (field.hover + box-shadow:none). */
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--neutral {
+  background-color: var(--ds-field-hover);
   box-shadow: none;
 }
-.stage .panw--tag.panw--tag--low.panw--tag--neutral:hover {
-  background-color: var(--ds-surface-hover);
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--green {
+  background-color: var(--ds-tag-green-low-bg-hover);
+}
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--yellow {
+  background-color: var(--ds-tag-yellow-low-bg-hover);
+}
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--orange {
+  background-color: var(--ds-tag-orange-low-bg-hover);
+}
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--red {
+  background-color: var(--ds-tag-red-low-bg-hover);
+}
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--grey {
+  background-color: var(--ds-tag-grey-low-bg-hover);
+}
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--olive {
+  background-color: var(--ds-tag-olive-low-bg-hover);
+}
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--lime {
+  background-color: var(--ds-tag-lime-low-bg-hover);
+}
+.opp-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--jade {
+  background-color: var(--ds-tag-jade-low-bg-hover);
 }
 
 /* ── Static-tag override ─────────────────────────────────────────────────

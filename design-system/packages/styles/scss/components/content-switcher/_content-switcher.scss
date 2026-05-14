@@ -1,3 +1,5 @@
+@use '@ds/type/scss' as type;
+
 // =============================================================================
 // ContentSwitcher — segmented control / tablist
 // =============================================================================
@@ -7,7 +9,7 @@
   flex-direction: row;
   flex-wrap: nowrap;
   border: 1px solid var(--panw-cs-border);
-  border-radius: 4px; // radius.tight on the group; items square inside.
+  border-radius: var(--ds-radius-tight); // radius.tight on the group; items square inside.
   overflow: hidden;
   background-color: var(--panw-cs-unselected-bg);
 }
@@ -20,11 +22,7 @@
   padding: 8px 16px;
   border: none;
   cursor: pointer;
-  font-family: var(--ds-type-font-family-sans);
-  font-weight: 400;
-  font-size: 14px;
-  line-height: 18px;
-  letter-spacing: 0.10px;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   white-space: nowrap;
   outline: none;
   transition: background-color 100ms var(--ds-motion-easing-standard),

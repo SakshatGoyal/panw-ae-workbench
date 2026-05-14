@@ -1,0 +1,206 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   PromptEntryField — ai-interactions/Prompt Entry Field
+   All values resolve to var(--ds-*) tokens. No raw hex, no raw px except
+   where the value IS the token (e.g. border-width is always 1px by convention).
+   Spacing on the 4px grid throughout.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Container ─────────────────────────────────────────────────────────── */
+
+.pef {
+  background: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-generous);
+
+  /* 12px on all sides */
+  padding: 12px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* spacing-03 — textarea sits near actions but distinct */
+
+  box-shadow: var(--ds-shadow-modals);
+  width: 100%;
+}
+
+/* Elevated modifier kept for semantic clarity; shadow is now uniform */
+.pef--elevated {
+  box-shadow: var(--ds-shadow-modals);
+}
+
+/* Border stays neutral across all states — no brand highlight on focus/active */
+
+/* ─── Textarea ──────────────────────────────────────────────────────────── */
+
+.pef__textarea {
+  width: 100%;
+  min-height: 20px; /* one line — grows via JS scrollHeight */
+  max-height: 200px; /* cap before scroll kicks in */
+  overflow-y: auto;
+
+  background: transparent;
+  border: none;
+  outline: none;
+  resize: none;
+
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 20px;
+  letter-spacing: 0.25px;
+  color: var(--ds-text-primary);
+
+  /* text-entry active = text.primary, following Stage convention */
+}
+
+.pef__textarea::placeholder {
+  color: var(--ds-text-placeholder-rest);
+}
+
+/* Disabled textarea during generation keeps placeholder readable */
+.pef__textarea:disabled {
+  color: var(--ds-text-placeholder-rest);
+  cursor: default;
+}
+
+/* ─── Actions row ───────────────────────────────────────────────────────── */
+
+.pef__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+/* ─── Story canvas ─────────────────────────────────────────────────────── */
+
+.pef-canvas {
+  min-height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.pef-demo {
+  width: 100%;
+  max-width: 480px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px; /* spacing-07 — section-level gap between showcased states */
+}
+
+.pef-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 8px; /* spacing-03 */
+}
+
+.pef-demo__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Attachments cluster (inside card, above textarea) ─────────────────── */
+
+.pef__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Wrapper: constrains tag to max-width 160px and anchors tooltip */
+.pef__attachment-wrap {
+  position: relative;
+  display: inline-flex;
+  max-width: 160px;
+}
+
+/* Let tag obey wrapper max-width */
+.pef__attachment-wrap .panw--tag {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Truncate the label inside the constrained tag */
+.pef__attachment-wrap .panw--tag__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Tooltip: positioned above the tag, centered */
+.pef__attachment-tooltip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ─── Table reference block (inside card, above textarea) ────────────────── */
+
+.pef__table-ref {
+  background: var(--ds-surface-alt-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-tight);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+  gap: 8px;
+  box-sizing: border-box;
+}
+
+/* Content column — takes remaining width */
+.pef__table-ref-body {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
+/* Row/Column tag row */
+.pef__table-ref-header {
+  display: flex;
+  align-items: center;
+}
+
+/* CSV values line — truncates on long rows */
+.pef__table-ref-values {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* First value — key anchor, bold */
+.pef__table-ref-first {
+  font-weight: 600;
+  color: var(--ds-text-primary);
+}
+
+/* Close button — flush right, top-aligned with the body.
+   Block padding is 8px top / 12px right. Both margins pull the button
+   inward by the same net amount (4px from each edge):
+     top:   8px padding − 4px margin = 4px visual gap
+     right: 12px padding − 8px margin = 4px visual gap          */
+.pef__table-ref-close {
+  flex-shrink: 0;
+  margin-top: -4px;
+  margin-right: -8px;
+}
+

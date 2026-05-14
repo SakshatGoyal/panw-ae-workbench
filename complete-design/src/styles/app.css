@@ -9,7 +9,7 @@ html, body, #root {
 }
 
 body.stage {
-  background: var(--ds-surface-alt-rest);
+  background: var(--ds-surface-rest);
   color: var(--ds-text-primary);
   font-family: var(--ds-type-font-family-sans);
   font-size: 14px;
@@ -22,12 +22,11 @@ body.stage {
 .cd-app {
   /* App-shell pattern: the page IS the viewport. Rails are always visible
      because the grid container is exactly 100vh tall. The main column is
-     the only scrollable region. stage-shadows.md "UI shell carries no
-     shadow. The shell is the page's frame." */
+     the only scrollable region. */
   display: grid;
   grid-template-columns: 64px 1fr var(--cd-right-rail-width, 430px);
   height: 100vh;
-  background: var(--ds-surface-alt-rest);
+  background: var(--ds-surface-rest);
 }
 
 .cd-app__rail-left {
@@ -35,9 +34,9 @@ body.stage {
   /* Grid item stretches to row height (= 100vh). No fixed/sticky needed. */
 }
 
-/* ── SideNav (copied from poc side-nav.stories COMPOSITION_CSS, .snav-* only).
-   The story file injects this CSS via a <style> tag only inside the wrapper
-   SideNavComposition. We render bare SideNav, so we own the rules here. */
+/* ── SideNav (kept in sync with poc side-nav.stories COMPOSITION_CSS).
+   The story injects its CSS via a <style> tag inside SideNavComposition.
+   We render bare SideNav, so we own all .snav-* rules here.             */
 
 .snav {
   display: flex;
@@ -80,6 +79,12 @@ body.stage {
   height: 1px;
   background: var(--ds-surface-inverse-hover);
 }
+
+/* Row wrapper: positioning context for the absolutely-placed tooltip. */
+.snav-row-wrap {
+  position: relative;
+}
+
 .snav-row {
   width: 64px;
   height: 40px;
@@ -100,28 +105,85 @@ body.stage {
   align-items: center;
   padding-left: 18px;
   padding-right: 2px;
+  /* No opacity here — dimming is applied per icon path below so it doesn't
+     bleed onto the selection bar or slot background. */
+}
+/* Icons: DS icon components use presentation-attribute fills. CSS fill on
+   svg path overrides those. Inactive → icons.inverse.rest at 0.65;
+   active/hover → icons.inverse.rest at full opacity. */
+.snav-row__slot svg path {
+  fill: var(--ds-icons-inverse-rest);
   opacity: 0.65;
   transition: opacity 110ms var(--ds-motion-easing-standard, cubic-bezier(0.2, 0, 0.38, 0.9));
 }
-.snav-row:hover .snav-row__slot,
-.snav-row[data-active='true'] .snav-row__slot { opacity: 1; }
-.snav-row__caret { display: inline-flex; align-items: center; margin-left: var(--ds-spacing-02); }
-@media (prefers-reduced-motion: reduce) {
-  .snav-row, .snav-row__slot { transition: none; }
+.snav-row:hover .snav-row__slot svg path,
+.snav-row[data-active='true'] .snav-row__slot svg path {
+  opacity: 1;
 }
+.snav-row__caret { display: inline-flex; align-items: center; margin-left: var(--ds-spacing-02); }
+
+/* Tooltip: floats to the right of the 64px column; positioned via the
+   .snav-row-wrap context, never in flow (zero layout impact). */
+.snav-row__tooltip {
+  position: absolute;
+  left: 68px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 9999;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snav-row { transition: none; }
+  .snav-row__slot svg path { transition: none; }
+}
+
+/* ── Main column ─────────────────────────────────────────────────────────── */
 
 .cd-app__column {
   display: flex;
   flex-direction: column;
   min-width: 0;  /* let tables overflow-scroll without bursting the grid */
   min-height: 0; /* let overflow-y take effect inside a grid row */
-  overflow-y: auto; /* the only scrollable region in the page */
+  overflow: hidden; /* topbar is pinned; only .cd-app__body scrolls */
+}
+
+/* ── Page top-bar ─────────────────────────────────────────────────────────── */
+/* Fixed 48px strip running edge-to-edge across the column (no side padding
+   from .cd-app__main — the strip owns its own 24px inset). */
+
+.cd-page-topbar {
+  flex-shrink: 0;
+  height: 48px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  border-bottom: 1px solid var(--ds-lines-neutral-rest);
+  background: var(--ds-surface-rest);
+}
+
+.cd-page-topbar__title {
+  /* @ds/type heading-02 — 16px / 1.375 / semibold. */
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.375;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+}
+
+/* ── Scrollable body ──────────────────────────────────────────────────────── */
+/* This is the only scrollable region. The topbar above it stays pinned. */
+
+.cd-app__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
 }
 
 .cd-app__main {
   flex: 1 0 auto;
-  /* stage-spacing.md page padding: top 32, right 32, bottom 64, left 32. */
-  padding: 32px 32px 64px 32px;
+  padding: 16px 16px 64px 16px;
   display: flex;
   flex-direction: column;
   gap: 24px;
@@ -138,90 +200,20 @@ body.stage {
   overflow-y: auto; /* if detail content exceeds viewport, scroll inside */
 }
 
-/* ── Page header ──────────────────────────────────────────────────────────── */
+/* ── Page header (legacy — no longer rendered; topbar owns the heading) ────── */
+/* .cd-page-header rules removed; heading now lives in .cd-page-topbar__title. */
 
-.cd-page-header {
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  padding-bottom: 8px;
-  /* Title + subtitle sit 16px inset from the section's content edge —
-     a deliberate offset so the page-tier label hangs to the right of
-     the tiles' left edge. */
-  padding-left: 16px;
-}
-.cd-page-header__title {
-  /* @ds/type heading-03 — 20px / 1.4 / -0.15px letter-spacing. Weight
-     overridden to semibold per design call ("keep it bold"). */
-  margin: 0;
-  font-size: 1.25rem;
-  line-height: 1.4;
-  font-weight: var(--ds-type-font-weight-semibold);
-  letter-spacing: -0.15px;
-  color: var(--ds-text-primary);
-}
-.cd-page-header__subtitle {
-  margin: 0;
-  font-size: 14px;
-  line-height: 1.42857;
-  /* stage-text-and-icons.md: "description / footnote → text.tertiary". */
-  color: var(--ds-text-tertiary-rest);
-}
+/* ── Table composition wrapper neutralizers ──────────────────────────────── */
 
-/* ── Top section (header · plan summary · switcher) ───────────────────────
- *
- * Edge-to-edge white band on the grey page. The page header, plan summary
- * tile, and switcher live together inside this single container so they
- * read as one structural unit, separated from the table below by a single
- * bottom hairline. The section breaks out of the main's 32px horizontal
- * padding with a negative margin so its background spans the full column
- * width, then re-establishes the same 32px inset internally so content
- * positions exactly where it sat before. */
-.cd-top-section {
-  /* Cancel main's 32px top + horizontal padding so the white band sits
-     flush against the column edges. */
-  margin: -32px -32px 0 -32px;
-  padding: 32px 32px 0 32px;
-  background: var(--ds-surface-rest);
-  /* 2px inner hairline at the bottom edge — painted inside the box so it
-     doesn't add to the section's height the way a real border-bottom would. */
-  box-shadow: inset 0 -2px 0 var(--ds-lines-neutral-rest);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-/* ── Switcher + untiled tables ────────────────────────────────────────────── */
-
-/* The Switcher composition replaces container tabs. Its swcr-page wrapper
-   assumes full-viewport ownership (min-height: 100vh + padding); neutralize
-   that the same way we do for the other composition wrappers below. */
-.cd-switcher-host .swcr-page {
+/* The poc opportunity-table composition wraps itself in `.opp-page` which
+   assumes it owns the viewport (min-height: 100vh, 32px padding). Inside
+   our shell it is one block in a column, not the page. */
+.cd-app .opp-page,
+.cd-app .acc-page {
   min-height: 0;
   padding: 0;
   background: transparent;
 }
-.cd-switcher-host {
-  /* Switcher tile strip hangs 12px inset from the section's content
-     edge — pulls the tablist off the column rule without breaking the
-     32px page gutter on the outer surface. */
-  padding-left: 12px;
-}
-
-/* PlanForecastSummary wraps itself in `.psum-page` which assumes it owns the
-   viewport (min-height: 100vh, 32px padding). Inside our shell it is one tile
-   in a column, not the page. Neutralize the outer wrapper here. Same for the
-   table compositions. */
-.cd-app .psum-page,
-.cd-app .acc-page,
-.cd-app .opp-page {
-  min-height: 0;
-  padding: 0;
-  background: transparent;
-}
-
-/* Tables now sit directly on the page background — no tile chrome. The
-   table composition draws its own internal rows/dividers on surface.rest. */
 
 /* Row hover — the poc tables flip the row background to ghost.hover but
    apply it instantly. Per stage-motion.md hover micro-interactions are
@@ -243,58 +235,6 @@ body.stage {
   .cd-app .acc-divider {
     transition: none;
   }
-}
-
-/* ── Footer ───────────────────────────────────────────────────────────────── */
-
-.cd-footer {
-  margin-top: 32px;
-  padding: 24px 0;
-  border-top: 1px solid var(--ds-lines-neutral-rest);
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  font-size: 12px;
-  color: var(--ds-text-tertiary-rest);
-}
-.cd-footer__brand {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--ds-text-secondary-rest);
-}
-.cd-footer__copy {
-  color: var(--ds-text-tertiary-rest);
-}
-.cd-footer__links {
-  display: inline-flex;
-  align-items: center;
-  gap: 16px;
-  margin-left: auto;
-}
-.cd-footer__link {
-  color: var(--ds-text-secondary-rest);
-  text-decoration: none;
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 4px 0;
-  border-radius: var(--ds-radius-tight);
-  transition: color 110ms var(--ds-motion-easing-standard, cubic-bezier(0.2, 0, 0.38, 0.9));
-}
-.cd-footer__link:hover {
-  /* stage-text-and-icons.md state propagation: text moves to its parent's
-     hover state within the same family. */
-  color: var(--ds-text-secondary-hover);
-}
-.cd-footer__link:focus-visible {
-  outline: 2px solid var(--ds-brand-rest);
-  outline-offset: 2px;
-}
-.cd-footer__sep {
-  /* Separator is a text glyph (|), not a line. Tertiary text. */
-  color: var(--ds-text-tertiary-rest);
-  user-select: none;
 }
 
 /* ── Resize handle (right rail) ──────────────────────────────────────────── */

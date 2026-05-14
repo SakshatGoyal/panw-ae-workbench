@@ -70,7 +70,6 @@ import {
 import { Link } from '@ds/link'
 import { Pagination } from '@ds/pagination'
 import { Search } from '@ds/search'
-import { Tags } from '@ds/tags'
 import { TextEntry } from '@ds/text-entry'
 
 import {
@@ -427,17 +426,23 @@ function MainView({
           <ul className="spm-lateral-list">
             {linkedContacts.map((c) => (
               <li key={c.id}>
-                <Tags
-                  className="spm-lateral-tag"
-                  shape="rounded"
-                  size="large"
-                  color="neutral"
-                  contrast="low"
-                  close
-                  renderCloseIcon={Delete}
-                  onClose={() => onRemoveContact(c.id)}
-                  label={`${c.name} · ${c.title} · ${c.phone} · ${c.email}`}
-                />
+                <div className="spl-row" role="group" aria-label={c.name}>
+                  <span className="spl-row__label">
+                    {c.name} · {c.title} · {c.phone} · {c.email}
+                  </span>
+                  <span
+                    className="spl-row__actions"
+                    onClick={(e) => e.stopPropagation()}>
+                    <IconButton
+                      kind="ghost"
+                      size="sm"
+                      iconSize={16}
+                      renderIcon={Delete}
+                      aria-label={`Remove ${c.name}`}
+                      onClick={() => onRemoveContact(c.id)}
+                    />
+                  </span>
+                </div>
               </li>
             ))}
           </ul>
@@ -462,24 +467,42 @@ function MainView({
           <ul className="spm-lateral-list">
             {linkedOpps.map((o) => {
               const isPrimary = pending.primaryOpportunityId === o.id
+              const StarGlyph = isPrimary ? Star : StarEmpty
               return (
                 <li key={o.id}>
-                  <Tags
-                    className={
-                      'spm-lateral-tag' +
-                      (isPrimary ? ' spm-lateral-tag--primary' : '')
-                    }
-                    shape="rounded"
-                    size="large"
-                    color="neutral"
-                    contrast="low"
-                    icon
-                    renderIcon={isPrimary ? Star : StarEmpty}
-                    close
-                    renderCloseIcon={Delete}
-                    onClose={() => onUnlinkOpportunity(o.id)}
-                    label={o.name}
-                  />
+                  <div className="spl-row spl-row--has-lead" role="group" aria-label={o.name}>
+                    <button
+                      type="button"
+                      className={
+                        'spl-row__lead' +
+                        (isPrimary ? ' spl-row__lead--primary' : '')
+                      }
+                      aria-label={
+                        isPrimary
+                          ? 'Unset as primary opportunity'
+                          : 'Set as primary opportunity'
+                      }
+                      aria-pressed={isPrimary}
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onTogglePrimary(o.id)
+                      }}>
+                      <StarGlyph size={16} />
+                    </button>
+                    <span className="spl-row__label">{o.name}</span>
+                    <span
+                      className="spl-row__actions"
+                      onClick={(e) => e.stopPropagation()}>
+                      <IconButton
+                        kind="ghost"
+                        size="sm"
+                        iconSize={16}
+                        renderIcon={Delete}
+                        aria-label={`Unlink ${o.name}`}
+                        onClick={() => onUnlinkOpportunity(o.id)}
+                      />
+                    </span>
+                  </div>
                 </li>
               )
             })}
@@ -544,18 +567,14 @@ function LinkContactView({
   return (
     <div className="spm-subview">
       <div className="spm-back">
-        <Link
-          href="#"
-          size="14px"
-          color="blue"
-          leftIcon
-          renderLeftIcon={ArrowLeft as React.ElementType}
-          onClick={(e) => {
-            e.preventDefault()
-            onBack()
-          }}>
+        <Button
+          kind="ghost-brand"
+          size="small"
+          renderIcon={ArrowLeft}
+          iconPosition="left"
+          onClick={onBack}>
           Back to Sales Play Details
-        </Link>
+        </Button>
       </div>
 
       <div className="spm-subtoolbar">
@@ -672,18 +691,14 @@ function LinkOpportunityView({
   return (
     <div className="spm-subview">
       <div className="spm-back">
-        <Link
-          href="#"
-          size="14px"
-          color="blue"
-          leftIcon
-          renderLeftIcon={ArrowLeft as React.ElementType}
-          onClick={(e) => {
-            e.preventDefault()
-            onBack()
-          }}>
+        <Button
+          kind="ghost-brand"
+          size="small"
+          renderIcon={ArrowLeft}
+          iconPosition="left"
+          onClick={onBack}>
           Back to Sales Play Details
-        </Link>
+        </Button>
       </div>
 
       <div className="spm-subtoolbar">
@@ -993,48 +1008,99 @@ const COMPOSITION_CSS = `
   color: var(--ds-icons-brand-rest);
 }
 
-/* ── Large lateral tag (DS Tags, full-width override) ────────────── */
+/* ── Lateral row (pitch contact / opportunity) ───────────────────── */
+/* Pattern matches the Past Sessions row in
+   compositions/ai-interaction/past-sessions.css: 32px tall, 4px radius,
+   ghost.rest at rest, ghost.hover on hover, ghost.pressed on press,
+   with a trailing IconButton for delete. Opportunities additionally
+   carry a leading primary-marker star button. The :not(:has(button:*))
+   guard keeps the row bg from swapping when an inner button is the
+   active hover/press target — child button states win over parent. */
 .spm-lateral-list {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-02);              /* 4 — chip-cloud rhythm */
+  gap: 2px;                               /* matches ps-list flyout row gap */
 }
-/* Tags is inline-flex by default; stretch to fill the body's content
-   column and push the close icon to the trailing edge. */
-.spm-lateral-tag {
+.spl-row {
   display: flex;
+  align-items: center;
+  height: 32px;
   width: 100%;
-  box-sizing: border-box;
+  border: none;
+  border-radius: var(--ds-radius-tight);
+  background: var(--ds-ghost-rest);
+  padding: 0 0 0 8px;
+  gap: 4px;
+  text-align: left;
+  outline: none;
+  transition: background 70ms var(--ds-motion-easing-standard);
 }
-.spm-lateral-tag .panw--tag__label {
-  flex: 1 1 auto;
+.spl-row:hover:not(:has(button:hover)) {
+  background: var(--ds-ghost-hover);
+}
+.spl-row:active:not(:has(button:active)) {
+  background: var(--ds-ghost-pressed);
+}
+.spl-row:focus-visible {
+  outline: 2px solid var(--ds-lines-brand-rest);
+  outline-offset: -2px;
+}
+/* Rows with a leading star: drop the 8px label padding since the
+   button slot lives there instead, and tighten the gap to 4px so the
+   star reads as attached to the label. */
+.spl-row--has-lead { padding-left: 4px; }
+
+.spl-row__label {
+  flex: 1;
   min-width: 0;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  white-space: nowrap;
-  /* Default DS label line-height clips descenders (g, p, y) at this
-     font size. 1.5 gives the bottom of the glyph the room it needs. */
-  line-height: 1.5;
-  padding-block: 2px;
+  user-select: none;
 }
-.spm-lateral-tag .panw--tag__close-btn {
-  margin-left: auto;
-  /* Default close-icon color reads as background noise on a low-contrast
-     grey ground. Lift to icons.secondary so the trash affordance is
-     visibly interactive. */
-  color: var(--ds-icons-secondary-rest);
+.spl-row__actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
 }
-.spm-lateral-tag .panw--tag__close-btn:hover {
-  color: var(--ds-icons-danger-rest);
+/* Leading star button — 24x24 hit target inside the 32px row, glyph 16. */
+.spl-row__lead {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--ds-radius-tight);
+  cursor: pointer;
+  color: var(--ds-icons-tertiary-rest);
+  transition: color 110ms var(--ds-motion-easing-standard);
 }
-/* Primary opportunity — paint the leading Star glyph gold30. The Star
+.spl-row__lead:hover  { color: var(--ds-icons-secondary-hover); }
+.spl-row__lead:active { color: var(--ds-icons-secondary-pressed); }
+.spl-row__lead:focus-visible {
+  outline: 2px solid var(--ds-lines-brand-rest);
+  outline-offset: 1px;
+}
+/* Primary opportunity — paint the filled Star glyph gold30. The Star
    icon uses currentColor; routing through the decorative gold-30
    palette token keeps the value tokenised. */
-.spm-lateral-tag.spm-lateral-tag--primary .panw--tag__icon {
-  color: var(--ds-color-decorative-gold-30) !important;
+.spl-row__lead--primary { color: var(--ds-color-decorative-gold-30); }
+.spl-row__lead--primary:hover,
+.spl-row__lead--primary:active { color: var(--ds-color-decorative-gold-30); }
+
+@media (prefers-reduced-motion: reduce) {
+  .spl-row { transition: none; }
 }
 
 /* ── Note input ──────────────────────────────────────────────────── */
@@ -1099,15 +1165,23 @@ const COMPOSITION_CSS = `
    of the modal regardless of how many rows the table renders. The
    table flexes; pagination is anchored last. */
 .spm-subview {
+  /* No flex-gap — rhythm is set with explicit margins per element so
+     the back button can sit 4px from the divider above and 4px from
+     the search bar below, while other blocks keep the standard 16px. */
   display: flex;
   flex-direction: column;
-  gap: var(--ds-spacing-05);              /* 16 */
-  /* Horizontal padding lives on .spm-body; only vertical here. */
-  padding: var(--ds-spacing-05) 0;        /* 16 — matches main view density */
+  padding: 4px 0 var(--ds-spacing-05);    /* 4 top → 4px below the header divider, 16 bottom */
   min-height: 100%;
   box-sizing: border-box;
 }
-.spm-back { margin-bottom: 0; }
+.spm-back { margin: 0 0 4px; }            /* 4px between back button and toolbar */
+.spm-back .panw--btn {
+  /* Pull the button flush-left with the subview's content edge by
+     trimming the small-size button's leading inline padding, so the
+     ArrowLeft glyph lands at the same x as the search icon below. */
+  padding-left: 0;
+}
+.spm-subtoolbar { margin-bottom: var(--ds-spacing-05); }  /* 16 — separates toolbar from table */
 .spm-subtoolbar {
   display: flex;
   align-items: center;
@@ -1171,7 +1245,12 @@ const COMPOSITION_CSS = `
   font-size: 14px;
   cursor: pointer;
   border-radius: var(--ds-radius-tight);    /* 4 — each row reads as a tile */
-  transition: background-color 110ms var(--ds-motion-easing-standard);
+  /* Text color tracks state alongside bg — the row routes through the
+     text.secondary family per rule: rest -> hover -> pressed on transient
+     state, and the selected (active) row holds at the hover step. */
+  transition:
+    background-color 110ms var(--ds-motion-easing-standard),
+    color            110ms var(--ds-motion-easing-standard);
 }
 /* Row dividers are real elements between rows, not borders ON rows —
    border-bottom on a radius'd row would crawl into the corner curves
@@ -1188,7 +1267,9 @@ const COMPOSITION_CSS = `
    - :hover + .spm-table__sep targets the sep after the hovered row.
    - :has(+ .spm-table__row:hover) targets the sep before it. */
 .spm-table__row:hover + .spm-table__sep,
-.spm-table__sep:has(+ .spm-table__row:hover) {
+.spm-table__sep:has(+ .spm-table__row:hover),
+.spm-table__row--active + .spm-table__sep,
+.spm-table__sep:has(+ .spm-table__row--active) {
   opacity: 0;
 }
 
@@ -1199,15 +1280,19 @@ const COMPOSITION_CSS = `
    every state. */
 .spm-table__row:not(.spm-table__row--active):hover {
   background-color: var(--ds-ghost-hover);
+  color: var(--ds-text-secondary-hover);
 }
 .spm-table__row:not(.spm-table__row--active):active {
   background-color: var(--ds-ghost-pressed);
+  color: var(--ds-text-secondary-pressed);
 }
 /* Selected row — mirrors CellsStandard active state: ground takes
    highlight.rest (alpha-brand wash) and the checkbox routes into the
-   brand icon family per the matching-family rule. */
+   brand icon family per the matching-family rule. Text holds at the
+   hover step of the secondary family so the row reads engaged. */
 .spm-table__row--active {
   background-color: var(--ds-highlight-rest);
+  color: var(--ds-text-secondary-hover);
 }
 .spm-table__row--active .panw--checkbox-icon--checked,
 .spm-table__row--active .panw--checkbox-icon--indeterminate {

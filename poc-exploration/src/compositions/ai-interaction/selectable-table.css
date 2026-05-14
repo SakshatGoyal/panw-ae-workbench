@@ -1,0 +1,224 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   SelectableTable — ai-interactions/Selectable Table
+   Data table using @ds/header for column headers and @ds/cell-contents for
+   cell content. Row and column selector buttons appear on hover.
+
+   Hover mechanics
+   ───────────────
+   Row selector:   Appears to the right of the row, 4px offset, vertically
+                   centred. A transparent ::after pseudo bridges the 4px gap
+                   so the button stays visible while the cursor crosses it.
+
+   Column selector: Appears above the header cell, 4px offset, horizontally
+                    centred. A transparent ::before pseudo bridges upward.
+
+   Both buttons use the inverse surface (dark bg, white icon).
+   Note: --ds-text-inverse falls back to #ff00ff in this theme context — use
+   --ds-stage-text-inverse-rest (#ffffff) directly for the icon colour.
+
+   Row border-radius: var(--ds-radius-standard) — 8px per token.
+
+   Dividers: 1px rules between rows (not borders on the row). Pure CSS hiding
+             via :hover + adjacent sibling combinator and :has().
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Column template (shared by header + body rows) ─────────────────────── */
+
+.dt {
+  --dt-cols: 1fr 100px 100px 100px 120px;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Header row ─────────────────────────────────────────────────────────── */
+
+.dt__head {
+  display: grid;
+  grid-template-columns: var(--dt-cols);
+}
+
+/*
+  Wrapper around each @ds/header Header instance.
+  Provides position: relative for the absolute-positioned column button,
+  and overflow: visible so the button can sit above without clipping.
+  No extra padding — Header handles its own internal spacing.
+*/
+.dt__header-cell {
+  position: relative;
+  overflow: visible;
+}
+
+/* Transparent bridge above header: keeps :hover alive as cursor moves up */
+.dt__header-cell::before {
+  content: '';
+  position: absolute;
+  bottom: 100%;
+  left: 0;
+  right: 0;
+  height: 40px; /* 4px gap + 32px button + 4px extra */
+}
+
+/* Column select button — absolute, above header, centred */
+.dt__col-btn {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms;
+  z-index: 20;
+}
+
+.dt__header-cell:hover .dt__col-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─── Body ───────────────────────────────────────────────────────────────── */
+
+.dt__body {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Divider between rows ───────────────────────────────────────────────── */
+
+.dt__divider {
+  height: 1px;
+  background: var(--ds-lines-neutral-tile-rest);
+  transition: opacity 80ms;
+  margin: 0 12px;
+}
+
+/*
+  Pure CSS divider hiding. DOM order: row, divider, row, divider, …
+  Below hovered row:  .dt__row:hover + .dt__divider
+  Above hovered row:  .dt__divider:has(+ .dt__row:hover)
+*/
+.dt__row:hover + .dt__divider,
+.dt__divider:has(+ .dt__row:hover) {
+  opacity: 0;
+}
+
+/* ─── Row ─────────────────────────────────────────────────────────────────── */
+
+.dt__row {
+  display: grid;
+  grid-template-columns: var(--dt-cols);
+  align-items: center;
+  border-radius: var(--ds-radius-standard);
+  position: relative;
+  overflow: visible;
+  transition: background 80ms;
+}
+
+.dt__row:hover {
+  /* --ds-stage-surface-hover = #ECEFF1 — clearly visible on white */
+  background: var(--ds-surface-hover);
+  /* Cascade-override the cell text token so CellContents picks up hover colour */
+  --panw-cell-text-color: var(--ds-text-secondary-hover);
+}
+
+.dt__row:active {
+  --panw-cell-text-color: var(--ds-text-secondary-pressed);
+}
+
+/*
+   Transparent bridge to the LEFT — keeps :hover on .dt__row active while
+   cursor crosses the 4px gap to the row-select button.
+   Width: 4px gap + 32px button + 4px extra.
+*/
+.dt__row::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 100%;
+  width: 40px;
+  height: 100%;
+}
+
+/* ─── Cell ────────────────────────────────────────────────────────────────── */
+
+.dt__cell {
+  padding: 8px 12px;
+  min-width: 0;
+}
+
+/* ─── Row select button — outside table, left side ───────────────────────── */
+
+.dt__row-btn {
+  position: absolute;
+  right: calc(100% + 4px);
+  top: 50%;
+  transform: translateY(-50%);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 80ms;
+  z-index: 20;
+}
+
+.dt__row:hover .dt__row-btn {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* ─── Inverse select button style ────────────────────────────────────────── */
+
+.dt__select-btn.panw--btn-icon {
+  background: var(--ds-surface-inverse-rest);
+}
+
+.dt__select-btn.panw--btn-icon:hover {
+  background: var(--ds-surface-inverse-hover);
+}
+
+.dt__select-btn.panw--btn-icon:active {
+  background: var(--ds-surface-inverse-pressed);
+}
+
+/*
+  --ds-text-inverse falls back to #ff00ff in this theme context (the global
+  token is a placeholder). Use the stage-specific token directly.
+*/
+.dt__select-btn.panw--btn-icon .panw--btn-icon__icon {
+  color: var(--ds-stage-text-inverse-rest);
+}
+
+/* ─── Story canvas ───────────────────────────────────────────────────────── */
+
+.dt-canvas {
+  min-height: 100vh;
+  background: var(--ds-surface-rest); /* white */
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  /* Extra top/left clearance for the floating buttons */
+  padding: 72px 40px 48px 80px;
+}
+
+.dt-demo {
+  width: 100%;
+  max-width: 860px;
+  display: flex;
+  flex-direction: column;
+  gap: 48px;
+}
+
+.dt-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 16px;
+}
+
+.dt-demo__group {
+  display: flex;
+  flex-direction: column;
+}

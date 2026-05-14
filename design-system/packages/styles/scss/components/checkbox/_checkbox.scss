@@ -1,3 +1,5 @@
+@use '@ds/type/scss' as type;
+
 // =============================================================================
 // Checkbox — labeled checkbox with checked / unchecked / indeterminate states
 // =============================================================================
@@ -46,11 +48,7 @@
 .panw--checkbox-icon--disabled { color: var(--panw-checkbox-disabled); }
 
 .panw--checkbox-label {
-  font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.10px;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-checkbox-label);
 }
 

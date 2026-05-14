@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -27,9 +28,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--dropdown__title {
   flex: 1;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-dropdown-title);
 }
 
@@ -42,9 +41,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--dropdown__description {
   flex: 1;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.333;
+  @include type.type-style('label-01'); // 12px / 1.333 / regular
   color: var(--panw-dropdown-description);
 }
 
@@ -63,7 +60,7 @@ $panw-prefix: 'panw';
   height: 40px;
   padding: 0 16px;
   border: 1px solid var(--panw-dropdown-border);
-  border-radius: 4px;
+  border-radius: var(--ds-radius-tight);
   background-color: var(--panw-dropdown-bg);
   box-sizing: border-box;
   cursor: pointer;
@@ -81,9 +78,7 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--dropdown__placeholder,
 .#{$panw-prefix}--dropdown__value {
   flex: 1;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -113,10 +108,10 @@ $panw-prefix: 'panw';
 .#{$panw-prefix}--dropdown--size-small .#{$panw-prefix}--dropdown__text-container {
   height: 32px;
   padding: 0 12px;
-  font-size: 13px;
+  font-size: 0.75rem; // label-01 size — closest token step below 14px
 }
 .#{$panw-prefix}--dropdown--size-small .#{$panw-prefix}--dropdown__placeholder,
-.#{$panw-prefix}--dropdown--size-small .#{$panw-prefix}--dropdown__value { font-size: 13px; }
+.#{$panw-prefix}--dropdown--size-small .#{$panw-prefix}--dropdown__value { font-size: 0.75rem; }
 .#{$panw-prefix}--dropdown--size-large .#{$panw-prefix}--dropdown__text-container { height: 48px; }
 
 // ─── States ──────────────────────────────────────────────────────────────────
@@ -203,7 +198,7 @@ $panw-prefix: 'panw';
   gap: 2px;
   background-color: var(--panw-dropdown-menu-bg);
   border: 1px solid var(--panw-dropdown-border);
-  border-radius: 8px;
+  border-radius: var(--ds-radius-standard);
   box-shadow: var(--ds-shadow-flyout);
   z-index: 10;
   max-height: 200px;
@@ -215,10 +210,8 @@ $panw-prefix: 'panw';
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  border-radius: var(--ds-radius-tight);
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-dropdown-text);
   cursor: pointer;
   transition: background-color 110ms var(--ds-motion-easing-standard);

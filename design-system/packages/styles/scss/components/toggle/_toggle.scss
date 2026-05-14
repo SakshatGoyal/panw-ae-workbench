@@ -1,3 +1,5 @@
+@use '@ds/type/scss' as type;
+
 // =============================================================================
 // Toggle — switch with optional label / info icon / status text
 // =============================================================================
@@ -44,7 +46,7 @@
   align-items: center;
   width: 48px;
   height: 24px;
-  border-radius: 24px;
+  border-radius: var(--ds-radius-pill);
   padding: 3px;
   flex-shrink: 0;
   box-sizing: border-box;
@@ -68,7 +70,7 @@
 .panw--toggle-knob {
   width: 18px;
   height: 18px;
-  border-radius: 18px;
+  border-radius: var(--ds-radius-pill);
   background-color: var(--panw-toggle-knob);
   flex-shrink: 0;
   transition: transform 110ms var(--ds-motion-easing-standard);
@@ -78,7 +80,7 @@
   transform: translateX(24px);
 }
 
-.panw--toggle-knob--small { width: 10px; height: 10px; border-radius: 10px; }
+.panw--toggle-knob--small { width: 10px; height: 10px; border-radius: var(--ds-radius-pill); }
 
 .panw--toggle-track--small:not(.panw--toggle-track--off) .panw--toggle-knob {
   transform: translateX(16px);
@@ -86,11 +88,7 @@
 
 .panw--toggle-label,
 .panw--toggle-status {
-  font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.10px;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-toggle-label);
 }
 

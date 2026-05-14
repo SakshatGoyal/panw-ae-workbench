@@ -14,11 +14,9 @@
   white-space: nowrap;
 }
 
-@mixin tag-typography($size: 12px, $line-height: 16px) {
-  // packages/type yet (sans-serif tokens use Inter), so values are hardcoded.
+@mixin tag-typography($size: 0.75rem, $line-height: 1.33333) {
   font-family: var(--ds-type-font-family-sans);
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   font-size: $size;
   line-height: $line-height;
-  letter-spacing: 0.10px;
 }

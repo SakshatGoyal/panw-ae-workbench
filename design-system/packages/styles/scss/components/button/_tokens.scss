@@ -30,7 +30,7 @@
   --panw-button-secondary-bg:           var(--ds-surface-rest);
   --panw-button-secondary-bg-hover:     var(--ds-surface-hover);
   --panw-button-secondary-bg-active:    var(--ds-surface-pressed);
-  --panw-button-secondary-border:       var(--ds-lines-neutral-rest);
+  --panw-button-secondary-border:       var(--ds-base); // neutral10
   --panw-button-secondary-border-hover: var(--ds-lines-neutral-hover);
   --panw-button-secondary-border-pressed: var(--ds-lines-neutral-pressed);
   --panw-button-secondary-text:         var(--ds-text-primary);
@@ -46,7 +46,7 @@
   --panw-button-tertiary-bg:           var(--ds-surface-rest);
   --panw-button-tertiary-bg-hover:     var(--ds-ghost-highlight-hover);
   --panw-button-tertiary-bg-active:    var(--ds-ghost-highlight-pressed);
-  --panw-button-tertiary-border:       var(--ds-lines-neutral-rest);
+  --panw-button-tertiary-border:       var(--ds-base); // neutral10
   --panw-button-tertiary-border-hover: var(--ds-lines-brand-rest);
   --panw-button-tertiary-border-pressed: var(--ds-lines-brand-pressed);
   --panw-button-tertiary-text:         var(--ds-text-brand-rest);

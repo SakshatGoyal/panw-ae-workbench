@@ -84,28 +84,28 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '0.75rem',
     lineHeight: '1.33333',
     fontWeight: regularWeight,
-    letterSpacing: '0.17px',
+    letterSpacing: '0',
   },
   'code-02': {
     fontFamily: monoFamily,
     fontSize: '0.875rem',
     lineHeight: '1.42857',
     fontWeight: regularWeight,
-    letterSpacing: '0.17px',
+    letterSpacing: '0',
   },
   'label-01': {
     fontFamily: sansFamily,
     fontSize: '0.75rem',
     lineHeight: '1.33333',
     fontWeight: regularWeight,
-    letterSpacing: '0.17px',
+    letterSpacing: '0',
   },
   'label-02': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '0.01px',
+    letterSpacing: '0',
   },
   // Helper-text and legal step down one tracking tier from Carbon's
   // defaults (12px: 0.32 → 0.16, 14px: 0.16 → 0). The original tracking
@@ -119,28 +119,28 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '0.75rem',
     lineHeight: '1.33333',
     fontWeight: regularWeight,
-    letterSpacing: '0.01px',
+    letterSpacing: '0',
   },
   'helper-text-02': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'legal-01': {
     fontFamily: sansFamily,
     fontSize: '0.75rem',
     lineHeight: '1.33333',
     fontWeight: regularWeight,
-    letterSpacing: '0.01px',
+    letterSpacing: '0',
   },
   'legal-02': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   // Body family runs at metric zero across the board. The previous
   // 0.16 on the 14px tier was the dominant "feels wide" complaint —
@@ -151,28 +151,28 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'body-compact-02': {
     fontFamily: sansFamily,
     fontSize: '1rem',
     lineHeight: '1.375',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'body-01': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.42857',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'body-02': {
     fontFamily: sansFamily,
     fontSize: '1rem',
     lineHeight: '1.5',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   // body-03 fills the 18px gap between body-02 (16px) and heading-03
   // (20px). Used wherever paragraph text needs to read a notch larger than
@@ -189,70 +189,70 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '1.125rem',
     lineHeight: '1.44444',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'heading-compact-01': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.28572',
     fontWeight: semiboldWeight,
-    letterSpacing: '0.01px',
+    letterSpacing: '0',
   },
   'heading-compact-02': {
     fontFamily: sansFamily,
     fontSize: '1rem',
     lineHeight: '1.375',
     fontWeight: semiboldWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'heading-01': {
     fontFamily: sansFamily,
     fontSize: '0.875rem',
     lineHeight: '1.42857',
     fontWeight: semiboldWeight,
-    letterSpacing: '0.01px',
+    letterSpacing: '0',
   },
   'heading-02': {
     fontFamily: sansFamily,
     fontSize: '1rem',
     lineHeight: '1.5',
     fontWeight: semiboldWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'heading-03': {
     fontFamily: sansFamily,
     fontSize: '1.25rem',
     lineHeight: '1.4',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'heading-04': {
     fontFamily: sansFamily,
     fontSize: '1.75rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'heading-05': {
     fontFamily: sansFamily,
     fontSize: '2rem',
     lineHeight: '1.25',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'heading-06': {
     fontFamily: sansFamily,
     fontSize: '2.625rem',
     lineHeight: '1.199',
     fontWeight: lightWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
   'heading-07': {
     fontFamily: sansFamily,
     fontSize: '3.375rem',
     lineHeight: '1.199',
     fontWeight: lightWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
   },
 
   // Fluid styles are defined as breakpoint-stepped rules in the upstream reference.
@@ -265,7 +265,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '1.25rem',
     lineHeight: '1.4',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       xlg: {
         fontSize: '1.25rem',
@@ -282,7 +282,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '1.75rem',
     lineHeight: '1.28572',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       xlg: {
         fontSize: '2rem',
@@ -300,27 +300,27 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '2rem',
     lineHeight: '1.25',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '2.25rem',
         fontWeight: lightWeight,
         lineHeight: '1.22',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       lg: {
         fontSize: '2.625rem',
         lineHeight: '1.19',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       xlg: {
         fontSize: '3rem',
         lineHeight: '1.17',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       max: {
         fontSize: '3.75rem',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
     },
   },
@@ -329,30 +329,30 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '2rem',
     lineHeight: '1.25',
     fontWeight: semiboldWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '2.25rem',
         fontWeight: semiboldWeight,
         lineHeight: '1.22',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       lg: {
         fontSize: '2.625rem',
         fontWeight: semiboldWeight,
         lineHeight: '1.19',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       xlg: {
         fontSize: '3rem',
         fontWeight: semiboldWeight,
         lineHeight: '1.17',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       max: {
         fontSize: '3.75rem',
         fontWeight: semiboldWeight,
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
     },
   },
@@ -361,7 +361,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '1.5rem',
     lineHeight: '1.334',
     fontWeight: lightWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       lg: {
         fontSize: '1.75rem',
@@ -378,30 +378,30 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '1.25rem',
     lineHeight: '1.3',
     fontWeight: regularWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '1.25rem',
         fontWeight: regularWeight,
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       lg: {
         fontSize: '1.5rem',
         fontWeight: regularWeight,
         lineHeight: '1.334',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       xlg: {
         fontSize: '1.75rem',
         fontWeight: regularWeight,
         lineHeight: '1.28572',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
       max: {
         fontSize: '2rem',
         fontWeight: regularWeight,
         lineHeight: '1.25',
-        letterSpacing: '-0.15px',
+        letterSpacing: '0',
       },
     },
   },
@@ -410,7 +410,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '2rem',
     lineHeight: '1.25',
     fontWeight: lightWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '2.25rem',
@@ -434,7 +434,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '2.625rem',
     lineHeight: '1.19',
     fontWeight: lightWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '2.625rem',
@@ -457,7 +457,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '2.625rem',
     lineHeight: '1.19',
     fontWeight: semiboldWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '2.625rem',
@@ -480,7 +480,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '2.625rem',
     lineHeight: '1.19',
     fontWeight: lightWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '3.375rem',
@@ -489,7 +489,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
       lg: {
         fontSize: '3.75rem',
         lineHeight: '1.16',
-        letterSpacing: '-0.79px',
+        letterSpacing: '0',
       },
       xlg: {
         fontSize: '4.75rem',
@@ -498,7 +498,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
       max: {
         fontSize: '5.25rem',
         lineHeight: '1.11',
-        letterSpacing: '-1.11px',
+        letterSpacing: '0',
       },
     },
   },
@@ -507,7 +507,7 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
     fontSize: '2.625rem',
     lineHeight: '1.19',
     fontWeight: lightWeight,
-    letterSpacing: '-0.15px',
+    letterSpacing: '0',
     breakpoints: {
       md: {
         fontSize: '4.25rem',
@@ -516,17 +516,17 @@ export const styles: Record<TypeStyleName, TypeStyle> = {
       lg: {
         fontSize: '5.75rem',
         lineHeight: '1.11',
-        letterSpacing: '-0.79px',
+        letterSpacing: '0',
       },
       xlg: {
         fontSize: '7rem',
         lineHeight: '1.07',
-        letterSpacing: '-0.79px',
+        letterSpacing: '0',
       },
       max: {
         fontSize: '9.75rem',
         lineHeight: '1.05',
-        letterSpacing: '-1.11px',
+        letterSpacing: '0',
       },
     },
   },

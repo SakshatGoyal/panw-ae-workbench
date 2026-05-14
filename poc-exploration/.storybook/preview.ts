@@ -19,9 +19,73 @@ const StageDecorator: NonNullable<Preview['decorators']>[number] = (Story) => {
   return React.createElement(Story)
 }
 
+// StoryErrorBoundary — catches render/effect errors so one broken story
+// doesn't crash the entire Storybook session. Especially important for
+// AI-interaction components that may throw during async state transitions.
+class StoryErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { error: Error | null }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props)
+    this.state = { error: null }
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { error }
+  }
+
+  override componentDidCatch(error: Error, info: React.ErrorInfo) {
+    console.error('[StoryErrorBoundary]', error, info.componentStack)
+  }
+
+  override render() {
+    if (this.state.error) {
+      return React.createElement(
+        'div',
+        {
+          style: {
+            padding: '24px',
+            fontFamily: 'monospace',
+            fontSize: '13px',
+            color: '#e54646',
+            background: '#1a1a1a',
+            borderRadius: '6px',
+            margin: '16px',
+            whiteSpace: 'pre-wrap',
+          }
+        },
+        `Story threw:\n\n${this.state.error.message}\n\n${this.state.error.stack ?? ''}`
+      )
+    }
+    return this.props.children
+  }
+}
+
+// SafeStoryDecorator wraps every story in:
+//   1. Suspense — needed for React 19 use() and any async/streaming patterns
+//   2. StoryErrorBoundary — isolates render failures to the story, not Storybook
+const SafeStoryDecorator: NonNullable<Preview['decorators']>[number] = (Story) => {
+  return React.createElement(
+    StoryErrorBoundary,
+    null,
+    React.createElement(
+      React.Suspense,
+      {
+        fallback: React.createElement(
+          'div',
+          { style: { padding: '24px', color: 'var(--ds-text-secondary, #888)', fontSize: '13px' } },
+          'Loading…'
+        )
+      },
+      React.createElement(Story)
+    )
+  )
+}
+
 const preview: Preview = {
   parameters: { layout: 'fullscreen' },
-  decorators: [StageDecorator]
+  decorators: [StageDecorator, SafeStoryDecorator]
 }
 
 export default preview

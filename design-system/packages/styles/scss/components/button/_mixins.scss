@@ -1,3 +1,5 @@
+@use '@ds/type/scss' as type;
+
 // =============================================================================
 // Button — shared SCSS mixins
 // =============================================================================
@@ -40,8 +42,5 @@
 /// (radius, border, fill) does the affordance work; the label sits at body
 /// weight. No decorative letter-spacing.
 @mixin button-typography {
-  font-family: var(--ds-type-font-family-sans, 'Inter', sans-serif);
-  font-weight: 400;
-  font-size: 0.875rem;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
 }

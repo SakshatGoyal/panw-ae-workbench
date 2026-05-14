@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -9,7 +10,7 @@ $panw-prefix: 'panw';
   width: 100%;
   font-family: var(--ds-type-font-family-sans);
   box-sizing: border-box;
-  border-radius: 8px; // radius.standard — banners hold prose with a defined edge.
+  border-radius: var(--ds-radius-standard); // radius.standard — banners hold prose with a defined edge.
 }
 
 .#{$panw-prefix}--inline-notification__icon-container {
@@ -38,11 +39,7 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--inline-notification__text {
-  font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 18px;
-  letter-spacing: 0.10px;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   flex: 1 1 0;
   min-width: 0;
 }

@@ -1,0 +1,75 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   Suggestions — ai-interactions/Suggestions
+   Row styling is owned by Button kind="secondary" with five inline overrides:
+     height: auto             — removes the size-class fixed height
+     white-space: normal      — overrides button-reset nowrap, allows wrap
+     align-items: flex-start  — icon tracks first line on multi-line text
+     justify-content: flex-start — left-aligns group (mixin default: center)
+     text-align: left         — wrapped lines left-align within the text node
+     width: 100%              — fills the list container
+
+   This file covers only the list container and story canvas.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Suggestion list container ─────────────────────────────────────────── */
+
+.sg-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+/* ─── Story canvas ───────────────────────────────────────────────────────── */
+
+.sg-canvas {
+  min-height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.sg-demo {
+  width: 100%;
+  max-width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.sg-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 8px;
+}
+
+.sg-demo__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Event log (story-only) ─────────────────────────────────────────────── */
+
+.sg-event-log {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.sg-event-log__entry {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  padding: 4px 8px;
+  border-radius: var(--ds-radius-tight);
+  background: var(--ds-surface-alt);
+  letter-spacing: 0.01em;
+}

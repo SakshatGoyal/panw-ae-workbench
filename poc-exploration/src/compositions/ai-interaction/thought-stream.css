@@ -1,0 +1,474 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   Thought Stream — ai-interactions/Thought Stream
+   A timeline of AI reasoning blocks stacked vertically and joined by a
+   left-side connector line. Three block types:
+
+     ThinkStep   — internal prose reasoning. Small neutral dot tracks the
+                   thought; text sits at text.secondary (quiet, not primary).
+                   Active state: brand dot with pulse + streaming cursor.
+
+     ActionStep  — a concrete tool call or data pull. Tool-type icon replaces
+                   the dot in the track. Content: label + description + result
+                   + source chips. Active state shows skeleton while fetching.
+
+     FindingStep — a synthesised conclusion. Permanent brand dot (stays brand
+                   even after complete — this is the deliverable, not a step).
+                   Text uses text.primary at weight 500.
+
+   Timeline anatomy:
+     [20px track column]  12px gap  [content column flex:1]
+
+     Track column:
+       marker (8–10px dot or 14px icon, centered)
+       connector line (1px neutral-tile, flex:1, hidden on last step)
+
+   All values via var(--ds-*). No raw hex. Spacing on the 4px grid.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Timeline wrapper ───────────────────────────────────────────────────── */
+
+.ts {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+}
+
+/* ─── Single step row ────────────────────────────────────────────────────── */
+
+.ts__step {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+}
+
+/* ─── Left track column ──────────────────────────────────────────────────── */
+
+.ts__track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 20px;
+  flex-shrink: 0;
+}
+
+/* The marker: dot (ThinkStep/FindingStep) or icon wrapper (ActionStep).
+   margin-top aligns the marker center with the first baseline of adjacent text. */
+.ts__track-marker {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;           /* consistent marker height aligns all step types */
+  margin-top: 0px;
+}
+
+/* Connector line — 1px neutral-tile, fills remaining track space */
+.ts__track-line {
+  flex: 1;
+  width: 1px;
+  background: var(--ds-lines-neutral-tile-rest);
+  margin-top: 4px;
+  margin-bottom: 0;
+  min-height: 8px;        /* always show some line between steps */
+}
+
+/* Hide line on last step — nothing to connect to */
+.ts__step:last-child .ts__track-line {
+  display: none;
+}
+
+/* ─── Content column ─────────────────────────────────────────────────────── */
+
+.ts__content {
+  flex: 1;
+  min-width: 0;
+  padding-bottom: 16px;
+}
+
+.ts__step:last-child .ts__content {
+  padding-bottom: 0;
+}
+
+/* ─── Dot marker — ThinkStep and FindingStep ─────────────────────────────── */
+
+.ts__dot {
+  border-radius: 50%;
+  flex-shrink: 0;
+  position: relative;  /* anchor for ::after ping ring */
+}
+
+/* ThinkStep dots */
+.ts__dot--think {
+  width: 8px;
+  height: 8px;
+}
+
+.ts__dot--think.ts__dot--pending {
+  background: var(--ds-surface-accent-rest);
+}
+
+.ts__dot--think.ts__dot--active {
+  background: var(--ds-brand-rest);
+  animation: ts-pulse 1.8s ease-in-out infinite;
+}
+
+.ts__dot--think.ts__dot--complete {
+  background: transparent;
+  border: 1.5px solid var(--ds-icons-tertiary-rest);
+  /* hollow ring: "this step passed through" — doesn't compete with brand dot */
+  width: 7px;
+  height: 7px;
+}
+
+.ts__dot--think.ts__dot--error {
+  background: var(--ds-icons-danger-rest);
+}
+
+/* FindingStep dots — slightly larger, stays brand on complete */
+.ts__dot--finding {
+  width: 10px;
+  height: 10px;
+}
+
+.ts__dot--finding.ts__dot--pending {
+  background: var(--ds-surface-accent-rest);
+}
+
+.ts__dot--finding.ts__dot--active {
+  background: var(--ds-brand-rest);
+  animation: ts-pulse 1.8s ease-in-out infinite;
+}
+
+.ts__dot--finding.ts__dot--complete {
+  background: var(--ds-brand-rest);   /* brand permanently — this is the deliverable */
+}
+
+.ts__dot--finding.ts__dot--error {
+  background: var(--ds-icons-danger-rest);
+}
+
+/* Radial pulse ring for active dots */
+.ts__dot--active::after {
+  content: '';
+  position: absolute;
+  inset: -4px;
+  border-radius: 50%;
+  background: var(--ds-brand-rest);
+  animation: ts-ping 1.8s cubic-bezier(0, 0, 0.2, 1) infinite;
+  pointer-events: none;
+}
+
+@keyframes ts-ping {
+  0%   { transform: scale(1); opacity: 0.6; }
+  75%, 100% { transform: scale(2.2); opacity: 0; }
+}
+
+@keyframes ts-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.55; }
+}
+
+/* ─── Icon marker — ActionStep ───────────────────────────────────────────── */
+
+.ts__action-icon {
+  display: block;
+  flex-shrink: 0;
+}
+
+.ts__action-icon--pending {
+  color: var(--ds-icons-tertiary-rest);
+}
+
+.ts__action-icon--active {
+  color: var(--ds-icons-secondary-rest);
+}
+
+.ts__action-icon--complete {
+  color: var(--ds-icons-secondary-rest);
+}
+
+.ts__action-icon--error {
+  color: var(--ds-icons-danger-rest);
+}
+
+/* ─── ThinkStep content ──────────────────────────────────────────────────── */
+
+.ts__think-text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+  margin: 0;
+}
+
+/* Blinking cursor appended during active streaming */
+.ts__think-text--active::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 12px;
+  background: var(--ds-brand-rest);
+  border-radius: 1px;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  animation: ts-cursor-blink 0.9s step-end infinite;
+}
+
+@keyframes ts-cursor-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0; }
+}
+
+/* ─── ActionStep content ─────────────────────────────────────────────────── */
+
+/* Header row: label (left) + status indicator (right) */
+.ts__action-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.ts__action-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 18px;
+  font-weight: 500;
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* Status indicator — right side of action header */
+.ts__action-status {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+/* Spinner (active) */
+.ts__spinner {
+  color: var(--ds-icons-secondary-rest);
+  animation: ts-spin 1s linear infinite;
+}
+
+@keyframes ts-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Check (complete) */
+.ts__check {
+  color: var(--ds-icons-secondary-rest);
+}
+
+/* Exclamation (error) */
+.ts__error-icon {
+  color: var(--ds-icons-danger-rest);
+}
+
+/* Description row */
+.ts__action-description {
+  margin: 2px 0 0;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* Result row — shown when complete */
+.ts__action-result {
+  margin: 4px 0 0;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 18px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+}
+
+/* Skeleton loading bars — shown when active, instead of result */
+.ts__action-skeleton {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 8px;   /* 4px grid — was 6px (off-grid) */
+}
+
+.ts__skeleton-bar {
+  height: 8px;
+  border-radius: var(--ds-radius-tight);
+  /* surface.accent-rest = neutral20 — visible on surface.rest (neutral0) panel */
+  background: var(--ds-surface-accent-rest);
+  animation: ts-shimmer 1.4s ease-in-out infinite;
+}
+
+.ts__skeleton-bar--long  { width: 65%; }
+.ts__skeleton-bar--short { width: 40%; }
+
+@keyframes ts-shimmer {
+  0%, 100% { opacity: 0.6; }
+  50%       { opacity: 1; }
+}
+
+/* ─── Source chips — inside ActionStep when complete ─────────────────────── */
+
+.ts__sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-top: 8px;
+}
+
+.ts__source-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: var(--ds-radius-pill);
+  border: 1px solid var(--ds-lines-neutral-rest);
+  background: var(--ds-surface-alt);
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  font-weight: 400;
+  color: var(--ds-text-tertiary-rest);
+  letter-spacing: 0.01em;
+  white-space: nowrap;
+  user-select: none;
+}
+
+.ts__source-chip-icon {
+  display: flex;
+  align-items: center;
+  color: var(--ds-icons-tertiary-rest);
+  flex-shrink: 0;
+}
+
+/* ─── FindingStep content ────────────────────────────────────────────────── */
+
+.ts__finding-text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 500;
+  color: var(--ds-text-primary);
+  margin: 0;
+}
+
+/* Streaming cursor for active finding */
+.ts__finding-text--active::after {
+  content: '';
+  display: inline-block;
+  width: 2px;
+  height: 12px;
+  background: var(--ds-brand-rest);
+  border-radius: 1px;
+  vertical-align: text-bottom;
+  margin-left: 2px;
+  animation: ts-cursor-blink 0.9s step-end infinite;
+}
+
+/* ─── Story canvas ───────────────────────────────────────────────────────── */
+
+.ts-canvas {
+  min-height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 40px;
+}
+
+.ts-demo {
+  width: 100%;
+  max-width: 520px;
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+}
+
+/* Wider canvas for the BlockShowcase multi-column layout */
+.ts-demo--wide {
+  max-width: 780px;
+}
+
+.ts-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 16px;
+}
+
+.ts-demo__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Stream panel — thin border container to give the stream context */
+.ts-panel {
+  background: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-standard);
+  padding: 16px;
+}
+
+/* ─── Showcase: multi-column state grid ──────────────────────────────────── */
+
+.ts-showcase {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 16px;
+}
+
+.ts-showcase__col {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.ts-showcase__col-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 10px;
+  line-height: 16px;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 12px;
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .ts__dot--active,
+  .ts__dot--active::after {
+    animation: none;
+  }
+
+  .ts__dot--active::after {
+    display: none;
+  }
+
+  .ts__think-text--active::after,
+  .ts__finding-text--active::after {
+    animation: none;
+    opacity: 1;
+  }
+
+  .ts__spinner {
+    animation: none;
+  }
+
+  .ts__skeleton-bar {
+    animation: none;
+    opacity: 0.6;
+  }
+}

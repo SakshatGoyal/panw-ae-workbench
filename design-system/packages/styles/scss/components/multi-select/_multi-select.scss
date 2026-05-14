@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -26,9 +27,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--multi-select__title {
   flex: 1;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-ms-title);
 }
 
@@ -39,9 +38,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--multi-select__description {
   flex: 1;
-  font-size: 12px;
-  font-weight: 400;
-  line-height: 1.333;
+  @include type.type-style('label-01'); // 12px / 1.333 / regular
   color: var(--panw-ms-description);
 }
 
@@ -60,7 +57,7 @@ $panw-prefix: 'panw';
   height: 40px;
   padding: 0 16px;
   border: 1px solid var(--panw-ms-border);
-  border-radius: 4px;
+  border-radius: var(--ds-radius-tight);
   background-color: var(--panw-ms-bg);
   cursor: pointer;
   box-sizing: border-box;
@@ -72,9 +69,7 @@ $panw-prefix: 'panw';
 
 .#{$panw-prefix}--multi-select__placeholder {
   flex: 1;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-ms-placeholder);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -177,7 +172,7 @@ $panw-prefix: 'panw';
   gap: 2px;
   background-color: var(--panw-ms-menu-bg);
   border: 1px solid var(--panw-ms-border);
-  border-radius: 8px;
+  border-radius: var(--ds-radius-standard);
   box-shadow: var(--ds-shadow-flyout);
   z-index: 10;
   max-height: 200px;
@@ -190,10 +185,8 @@ $panw-prefix: 'panw';
   align-items: center;
   gap: 8px;
   padding: 8px 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  border-radius: var(--ds-radius-tight);
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-ms-text);
   cursor: pointer;
   transition: background-color 110ms var(--ds-motion-easing-standard);
@@ -232,7 +225,7 @@ $panw-prefix: 'panw';
   gap: 2px;
   background-color: var(--panw-ms-menu-bg);
   border: 1px solid var(--panw-ms-border);
-  border-radius: 8px;
+  border-radius: var(--ds-radius-standard);
   box-shadow: var(--ds-shadow-flyout);
   z-index: 11; // sits above the field; menu (z:10) is mutually exclusive.
   animation: panw-flyout-enter 90ms var(--ds-motion-easing-entrance);
@@ -245,10 +238,8 @@ $panw-prefix: 'panw';
   gap: 8px;
   height: 32px;
   padding: 0 0 0 12px;
-  border-radius: 4px;
-  font-size: 14px;
-  font-weight: 400;
-  line-height: 1.286;
+  border-radius: var(--ds-radius-tight);
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
   color: var(--panw-ms-text);
 
   &:hover {

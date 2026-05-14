@@ -26,6 +26,7 @@ const jsxInJsPlugin = {
 
 /** @type {import('@storybook/react-vite').StorybookConfig} */
 const config = {
+  staticDirs: ['../packages/type/fonts'],
   stories: [
     '../packages/*/src/**/*.stories.@(js|jsx|ts|tsx)',
     '../packages/*/src/**/*.mdx',

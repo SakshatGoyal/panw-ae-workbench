@@ -1856,7 +1856,7 @@ const PANEL_CSS = `
      room top and bottom. */
   .acc-panel__topbar {
     position: relative;
-    height: 40px;
+    height: 48px;
     flex-shrink: 0;
     display: flex;
     align-items: center;
@@ -1870,8 +1870,10 @@ const PANEL_CSS = `
   }
   .acc-panel__close {
     position: absolute;
-    top: 4px;
-    right: 4px;
+    /* (topbar 48 − button 32) / 2 = 8 — vertically centers the close
+       button inside the topbar. */
+    top: 8px;
+    right: 8px;
     /* Square the small ghost button — DS small button defaults to a
        rectangle with horizontal padding. Override to a fixed 32×32. */
     width: 32px;
@@ -2107,19 +2109,14 @@ const PANEL_CSS = `
     justify-content: center;
   }
 
-  /* Section content inset was dropped: Install Base and Account Health
-     now achieve their content/CTA differentiation by placing data into
-     a tile container (.acc-data-tile / .acc-health-status-tile),
-     mirroring the per-product tile grammar used elsewhere. The CTA
-     buttons live outside any tile and stretch full-width.
-
-     Drawer top-padding override — accordions across the panel get a
-     4px top inset on their content-inner per directive, so the
-     drawer's first row sits tight to the header without DS's 12/16px
-     default padding pulling it down. Bottom + horizontal padding stay
-     at the DS defaults. */
-  .panw--accordion__content-inner {
-    padding-top: 4px !important;
+  /* Level-1 and level-2 accordion drawers share the same content-inner
+     padding: 0 top / 8 sides + bottom. Level-1 is scoped via
+     .acc-section-stack > direct child; level-2 is scoped via the two
+     nested lists (.acc-sp-family-list, .acc-opp-list). */
+  .acc-section-stack > .panw--accordion > .panw--accordion__content-area > .panw--accordion__content-inner,
+  .acc-sp-family-list > .panw--accordion > .panw--accordion__content-area > .panw--accordion__content-inner,
+  .acc-opp-list > .panw--accordion > .panw--accordion__content-area > .panw--accordion__content-inner {
+    padding: 0 16px 8px !important;
   }
 
   /* ── Data tile (Install Base body) ───────────────────────────────────
@@ -2193,7 +2190,7 @@ const PANEL_CSS = `
     width: 8px;
     height: 8px;
     background-color: var(--ds-surface-accent-rest);
-    border-radius: 50%;
+    border-radius: var(--ds-radius-pill);
     flex-shrink: 0;
   }
   .acc-health-trend-dot--renewal {
@@ -2615,6 +2612,8 @@ const PANEL_CSS = `
     align-items: center;
     justify-content: flex-start;
     overflow: hidden;
+    padding-left: 6px;
+    padding-right: 6px;
   }
 
   /* ── Sub-axis rows ───────────────────────────────────────────────────────

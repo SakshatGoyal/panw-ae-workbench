@@ -1,3 +1,5 @@
+@use '@ds/type/scss' as type;
+
 // =============================================================================
 // Link — inline text link
 // CSS class prefix: .panw--link
@@ -9,8 +11,7 @@
   align-items: center;
   gap: 8px;
   font-family: var(--ds-type-font-family-sans);
-  font-weight: 400;
-  letter-spacing: 0.10px;
+  font-weight: var(--ds-type-font-weight-regular);
   // Underline is reserved for hover/pressed. At rest the link reads as a
   // colored text token — the underline is reveal-on-interaction, matching
   // current PANW conventions and keeping body copy quieter when dense.
@@ -42,8 +43,7 @@
 // ─── Sizes ───────────────────────────────────────────────────────────────────
 
 .panw--link--14px {
-  font-size: 14px;
-  line-height: 18px;
+  @include type.type-style('body-compact-01'); // 14px / 1.286 / regular
 
   .panw--link__icon-wrap svg {
     width: 16px;
@@ -52,8 +52,7 @@
 }
 
 .panw--link--18px {
-  font-size: 18px;
-  line-height: 22px;
+  @include type.type-style('heading-03'); // 18px / 1.444 / regular — closest to 18px size
 
   .panw--link__icon-wrap svg {
     width: 24px;

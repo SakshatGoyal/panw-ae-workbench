@@ -1,0 +1,164 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   ChatWindowHeader — ai-interactions/Chat Window Header
+   Fixed 48px height. Bottom border separates header from chat body.
+
+   Layout (Active):
+     [←]  12px  [session name — truncating, flex:1]  [⋮][4px][+]
+     8px padding left/right, buttons vertically centered.
+
+   Layout (Empty):
+     Placeholder text centered in the 48px bar.
+
+   Token contract:
+     border-bottom    var(--ds-lines-neutral-tile-rest)
+     session name     var(--ds-text-primary)            heading-01 (14px/600)
+     placeholder      var(--ds-text-tertiary-rest)      heading-01 scale, dimmed
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Container ──────────────────────────────────────────────────────────── */
+
+.cwh {
+  display: flex;
+  align-items: center;
+  height: 48px;
+  padding: 0 8px;
+  border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
+  /* overflow hidden so session name never bleeds outside the header */
+  overflow: hidden;
+}
+
+/* ─── Empty state ─────────────────────────────────────────────────────────── */
+
+.cwh__placeholder {
+  flex: 1;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 400;
+  letter-spacing: 0.1px;
+  color: var(--ds-text-tertiary-rest);
+  /* centered within the bar */
+  text-align: center;
+}
+
+/* ─── Active: back button ─────────────────────────────────────────────────── */
+
+/* flex-shrink: 0 prevents the button from squishing when name is long */
+.cwh__back {
+  flex-shrink: 0;
+}
+
+/* ─── Active: session name ────────────────────────────────────────────────── */
+
+.cwh__title {
+  flex: 1;
+  min-width: 0;           /* required for text-overflow to fire in flex child */
+  margin-left: 12px;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 18px;
+  font-weight: 600;
+  letter-spacing: 0.1px;
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+/* ─── Active: right button cluster ───────────────────────────────────────── */
+
+.cwh__actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+  margin-left: 8px;       /* breathing room between title and cluster */
+}
+
+/* ─── Flyout danger item ─────────────────────────────────────────────────── */
+
+.panw--flyout__item.cwh-flyout-item--danger {
+  color: var(--ds-text-danger-rest);
+}
+
+.panw--flyout__item.cwh-flyout-item--danger:hover {
+  background: var(--ds-ghost-danger-hover);
+  color: var(--ds-text-danger-hover);
+}
+
+.panw--flyout__item.cwh-flyout-item--danger:active {
+  background: var(--ds-ghost-danger-pressed);
+  color: var(--ds-text-danger-pressed);
+}
+
+/* ─── Story canvas ───────────────────────────────────────────────────────── */
+
+.cwh-canvas {
+  min-height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.cwh-demo {
+  width: 100%;
+  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.cwh-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 8px;
+}
+
+.cwh-demo__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* Simulated panel shell — gives the header context against a surface tile */
+.cwh-panel {
+  background: var(--ds-surface-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-standard);
+  overflow: hidden;
+}
+
+/* Simulated panel body below the header */
+.cwh-panel__body {
+  padding: 16px;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* ─── Event log (story-only) ─────────────────────────────────────────────── */
+
+.cwh-event-log {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.cwh-event-log__entry {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  padding: 4px 8px;
+  border-radius: var(--ds-radius-tight);
+  background: var(--ds-surface-alt);
+  letter-spacing: 0.01em;
+}

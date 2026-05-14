@@ -31,6 +31,7 @@ import { BrandCortex } from './components/BrandCortex';
 import { BrandPanw } from './components/BrandPanw';
 import { BrandPrisma } from './components/BrandPrisma';
 import { BrandStrata } from './components/BrandStrata';
+import { BrandUnit42 } from './components/BrandUnit42';
 import { BroadcastTower } from './components/BroadcastTower';
 import { Browser } from './components/Browser';
 import { Bug } from './components/Bug';
@@ -281,6 +282,11 @@ import { Sensor } from './components/Sensor';
 import { Server } from './components/Server';
 import { Settings } from './components/Settings';
 import { SeverityLow } from './components/SeverityLow';
+import { SfdcAccount } from './components/SfdcAccount';
+import { SfdcGraph } from './components/SfdcGraph';
+import { SfdcOpportunity } from './components/SfdcOpportunity';
+import { SfdcPeopleScore } from './components/SfdcPeopleScore';
+import { SfdcTargetMode } from './components/SfdcTargetMode';
 import { Share } from './components/Share';
 import { ShieldAlt } from './components/ShieldAlt';
 import { ShieldEmpty } from './components/ShieldEmpty';
@@ -371,6 +377,7 @@ export const ICON_MANIFEST: Record<string, IconComponent> = {
   'brand-panw': BrandPanw as IconComponent,
   'brand-prisma': BrandPrisma as IconComponent,
   'brand-strata': BrandStrata as IconComponent,
+  'brand-unit-42': BrandUnit42 as IconComponent,
   'broadcast-tower': BroadcastTower as IconComponent,
   'browser': Browser as IconComponent,
   'bug': Bug as IconComponent,
@@ -621,6 +628,11 @@ export const ICON_MANIFEST: Record<string, IconComponent> = {
   'server': Server as IconComponent,
   'settings': Settings as IconComponent,
   'severity-low': SeverityLow as IconComponent,
+  'sfdc-account': SfdcAccount as IconComponent,
+  'sfdc-graph': SfdcGraph as IconComponent,
+  'sfdc-opportunity': SfdcOpportunity as IconComponent,
+  'sfdc-people-score': SfdcPeopleScore as IconComponent,
+  'sfdc-target-mode': SfdcTargetMode as IconComponent,
   'share': Share as IconComponent,
   'shield-alt': ShieldAlt as IconComponent,
   'shield-empty': ShieldEmpty as IconComponent,

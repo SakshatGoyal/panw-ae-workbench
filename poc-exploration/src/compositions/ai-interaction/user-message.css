@@ -1,0 +1,167 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   UserMessage — ai-interactions/User Message
+   The user's own chat bubble. Full container width; the parent column sets
+   max-width.
+
+   Layout: a flex-column group with 8px gap between each region:
+
+     [Attachments cluster]   — Tags (large, Paperclip icon) with hover Tooltip.
+                               Floats above the bubble. flex-wrap, 4px gap.
+
+     [Table reference block] — Selected table row/column snippet. surface.alt-rest
+                               with a 1px neutral border. Floats above the bubble.
+
+     [Message bubble]        — highlight.rest pill with body-01 text only.
+
+   Token contract:
+     group gap           4px                                    unit-cohesion step
+     bubble bg           var(--ds-highlight-rest)               brand-tinted
+     bubble radius       var(--ds-radius-standard)              8px
+     bubble padding      12px (v) 16px (h)
+     table ref bg        var(--ds-surface-alt-rest)
+     table ref border    var(--ds-lines-neutral-tile-rest)       1px — definition on base
+     table ref radius    var(--ds-radius-tight)                 4px
+     body text           var(--ds-text-primary)                 14px/400/20px
+     first CSV value     font-weight 600                        visual emphasis
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Outer flex group — stacks all regions with consistent gap ──────────── */
+
+.um-message-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+/* ─── Message bubble — text only ─────────────────────────────────────────── */
+
+.um {
+  width: 100%;
+  background: var(--ds-highlight-rest);
+  border-radius: var(--ds-radius-standard);
+  padding: 12px 16px;
+  box-sizing: border-box;
+}
+
+/* ─── Attachments cluster ────────────────────────────────────────────────── */
+
+.um__attachments {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* Wrapper: constrains tag to max-width 160px and anchors tooltip */
+.um__attachment-wrap {
+  position: relative;
+  display: inline-flex;
+  max-width: 160px;
+}
+
+/* Allow the tag span itself to obey its wrapper's max-width */
+.um__attachment-wrap .panw--tag {
+  max-width: 100%;
+  overflow: hidden;
+}
+
+/* Truncate the label within the constrained tag */
+.um__attachment-wrap .panw--tag__label {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+}
+
+/* Tooltip: positioned above the tag, centered on it */
+.um__attachment-tooltip {
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  z-index: 10;
+  pointer-events: none;
+}
+
+/* ─── Table reference block ──────────────────────────────────────────────── */
+
+.um__table-ref {
+  background: var(--ds-surface-alt-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-tight);
+  padding: 8px 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  box-sizing: border-box;
+}
+
+/* The row/column label tag */
+.um__table-ref-header {
+  display: flex;
+  align-items: center;
+}
+
+/* CSV value line */
+.um__table-ref-values {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+  margin: 0;
+}
+
+/* First value in the CSV row — key anchor, rendered bold */
+.um__table-ref-first {
+  font-weight: 600;
+  color: var(--ds-text-primary);
+}
+
+/* ─── Body text ──────────────────────────────────────────────────────────── */
+
+.um__text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--ds-text-primary);
+  margin: 0;
+  text-align: left;
+}
+
+/* ─── Story canvas ───────────────────────────────────────────────────────── */
+
+.um-canvas {
+  min-height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 40px;
+}
+
+.um-demo {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.um-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 12px;
+}
+
+.um-demo__group {
+  display: flex;
+  flex-direction: column;
+}

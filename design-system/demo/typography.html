@@ -4,9 +4,29 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <title>Typography Specimen</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700;900&family=JetBrains+Mono:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+      @font-face {
+        font-family: 'TT Hoves';
+        src: url('../packages/type/fonts/tt-hoves/TTHoves-Light.woff2') format('woff2');
+        font-weight: 300;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'TT Hoves';
+        src: url('../packages/type/fonts/tt-hoves/TTHoves-Regular.woff2') format('woff2');
+        font-weight: 400;
+        font-style: normal;
+        font-display: swap;
+      }
+      @font-face {
+        font-family: 'TT Hoves';
+        src: url('../packages/type/fonts/tt-hoves/TTHoves-DemiBold.woff2') format('woff2');
+        font-weight: 600;
+        font-style: normal;
+        font-display: swap;
+      }
+    </style>
     <link rel="stylesheet" href="../packages/styles/css/styles.css" />
     <style>
       :root {
@@ -21,7 +41,7 @@
 
         --sans: var(
           --ds-type-font-family-sans,
-          Lato,
+          'TT Hoves',
           ui-sans-serif,
           system-ui,
           -apple-system,
@@ -331,7 +351,7 @@
       </header>
 
       <section>
-        <h2>Lato (sans) — headings</h2>
+        <h2>TT Hoves (sans) — headings</h2>
         <div class="row">
           <div class="kicker">
             Display
@@ -363,7 +383,7 @@
       </section>
 
       <section>
-        <h2>Lato (sans) — body + UI</h2>
+        <h2>TT Hoves (sans) — body + UI</h2>
         <div class="row">
           <div class="kicker">
             Body large

@@ -1,0 +1,179 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   PastSessions — ai-interactions/Past Sessions
+   All values resolve to var(--ds-*) tokens. No raw hex, no raw px except
+   where the value IS the token convention (border-width = 1px).
+   Spacing on the 4px grid throughout.
+
+   Spec note: hover bg was requested as neutral20@40%. Stage's ghost.hover
+   token is neutral20@70% — the named token is used here. Update
+   var(--ds-ghost-hover) to a literal if a softer hover is required.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Session list container ────────────────────────────────────────────── */
+
+.ps-list {
+  display: flex;
+  flex-direction: column;
+  gap: 2px; /* Stage flyout row gap — footprint distinction without card feel */
+  width: 100%;
+}
+
+/* ─── Single session row ─────────────────────────────────────────────────── */
+
+.ps-row {
+  display: flex;
+  align-items: center;
+  height: 32px; /* fixed — pairs with IconButton sm (32×32) */
+  border-radius: var(--ds-radius-tight); /* 4px — small interactive < 48px */
+  background: var(--ds-ghost-rest);
+  cursor: pointer;
+  /* 8px left pad for label breathing room; right side flush — kebab fills */
+  padding: 0 0 0 8px;
+  gap: 4px;
+  width: 100%;
+  border: none;
+  text-align: left;
+  outline: none;
+  transition: background 70ms var(--ds-motion-easing-standard);
+}
+
+/* Nested interactive scope: parent hovers unless an interactive child (button)
+   is hovered. Using :has(button:hover) — not :has(*:hover) — so that hovering
+   the non-interactive label span doesn't cancel the parent bg. */
+.ps-row:hover:not(:has(button:hover)) {
+  background: var(--ds-ghost-hover);
+}
+
+.ps-row:active:not(:has(button:active)) {
+  background: var(--ds-ghost-pressed);
+}
+
+/* Keep bg while the overflow flyout is open — visual engagement signal */
+.ps-row--menu-open {
+  background: var(--ds-ghost-hover);
+}
+
+/* Focus ring: inset on the row itself */
+.ps-row:focus-visible {
+  outline: 2px solid var(--ds-lines-brand-rest);
+  outline-offset: -2px;
+}
+
+/* ─── Label ──────────────────────────────────────────────────────────────── */
+
+.ps-row__label {
+  flex: 1;
+  min-width: 0; /* allow shrink past intrinsic width for truncation */
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  user-select: none;
+}
+
+/* ─── Kebab action slot ──────────────────────────────────────────────────── */
+
+.ps-row__actions {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+}
+
+/* ─── Flyout danger item override ────────────────────────────────────────── */
+
+/* Specificity matches flyout item BEM class — declared after system.scss so
+   the cascade wins without !important on non-hover states. */
+
+.panw--flyout__item.ps-flyout-item--danger {
+  color: var(--ds-text-danger-rest);
+}
+
+.panw--flyout__item.ps-flyout-item--danger:hover {
+  background: var(--ds-ghost-danger-hover);
+  color: var(--ds-text-danger-hover);
+}
+
+.panw--flyout__item.ps-flyout-item--danger:active {
+  background: var(--ds-ghost-danger-pressed);
+  color: var(--ds-text-danger-pressed);
+}
+
+/* Selected state override — action menus never persist selection, but guard
+   against any residual selected bg bleeding through. */
+.panw--flyout__item.ps-flyout-item--danger[aria-selected='true'] {
+  background: var(--ds-ghost-danger-hover);
+  color: var(--ds-text-danger-rest);
+}
+
+/* ─── View more row ──────────────────────────────────────────────────────── */
+
+.ps-view-more {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 2px; /* aligns with the inter-row gap */
+}
+
+/* ─── Story canvas ───────────────────────────────────────────────────────── */
+
+.ps-canvas {
+  min-height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+}
+
+.ps-demo {
+  width: 100%;
+  max-width: 320px; /* sidebar-representative width */
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.ps-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 8px;
+}
+
+.ps-demo__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Event log (story-only) ─────────────────────────────────────────────── */
+
+.ps-event-log {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ps-event-log__entry {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  padding: 4px 8px;
+  border-radius: var(--ds-radius-tight);
+  background: var(--ds-surface-alt);
+  letter-spacing: 0.01em;
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .ps-row {
+    transition: none;
+  }
+}

@@ -211,12 +211,12 @@ type SortKey =
 type SortDir = 'asc' | 'desc'
 
 const SORT_OPTIONS: { key: SortKey; label: string }[] = [
-  { key: 'name',              label: 'account name' },
-  { key: 'totalPipeline',     label: 'total pipeline' },
+  { key: 'name',              label: 'Account name' },
+  { key: 'totalPipeline',     label: 'Total pipeline' },
   { key: 'ltv',               label: 'ARR' },
-  { key: 'riskCount',         label: 'risk factor count' },
-  { key: 'daysSinceEbc',      label: 'days since EBC' },
-  { key: 'daysSinceActivity', label: 'days since last activity' },
+  { key: 'riskCount',         label: 'Risk factor count' },
+  { key: 'daysSinceEbc',      label: 'Days since EBC' },
+  { key: 'daysSinceActivity', label: 'Days since last activity' },
 ]
 
 // ─── Demo clock (spec was authored 2026-05-11) ───────────────────────────
@@ -231,9 +231,9 @@ const QUARTER_LABELS: [string, string, string, string] =
 // ─── Display label maps ──────────────────────────────────────────────────
 
 const HEALTH_LABEL: Record<Health, string> = {
-  'healthy':  'healthy',
-  'at-risk':  'at risk',
-  'critical': 'critical',
+  'healthy':  'Healthy',
+  'at-risk':  'At risk',
+  'critical': 'Critical',
 }
 
 type SeverityTagColor = 'green' | 'yellow' | 'orange' | 'red' | 'neutral'
@@ -303,13 +303,13 @@ const SALES_PLAY_ICON: Record<SalesPlayStatus, React.ElementType> = {
   'closed-lost': DoNotEnter,
 }
 const SALES_PLAY_LABEL: Record<SalesPlayStatus, string> = {
-  'not-touched': 'Not Touched',
+  'not-touched': 'Not touched',
   'pitched':     'Pitched',
   'deferred':    'Deferred',
   'declined':    'Declined',
   'pursuing':    'Pursuing',
-  'closed-won':  'Closed Won',
-  'closed-lost': 'Closed Lost',
+  'closed-won':  'Closed won',
+  'closed-lost': 'Closed lost',
 }
 // Brand icons (forked from opp-table; BrandUnit42 still not exported).
 const BRAND_ICON: Record<Brand, React.ElementType | undefined> = {
@@ -787,13 +787,13 @@ interface GroupedHealthSelection {
   adoption: Health[]
 }
 const HEALTH_AXES: { key: HealthAxis; label: string }[] = [
-  { key: 'overall',   label: 'Overall Health' },
-  { key: 'technical', label: 'Technical Health' },
-  { key: 'adoption',  label: 'Adoption & Deployment Health' },
+  { key: 'overall',   label: 'Overall health' },
+  { key: 'technical', label: 'Technical health' },
+  { key: 'adoption',  label: 'Adoption & deployment health' },
 ]
 const HEALTH_LEVELS: { value: Health; label: string }[] = [
   { value: 'healthy',  label: 'Healthy' },
-  { value: 'at-risk',  label: 'At Risk' },
+  { value: 'at-risk',  label: 'At risk' },
   { value: 'critical', label: 'Critical' },
 ]
 // Per spec §5: Overall = At Risk + Critical (Healthy off);
@@ -839,12 +839,12 @@ const DENSITY_OPTIONS: { value: DensityKey; label: string }[] = [
   { value: 'q2', label: `${QUARTER_LABELS[2]} pipeline` },
   { value: 'q3', label: `${QUARTER_LABELS[3]} pipeline` },
   // Activities & risks (col 3)
-  { value: 'lastActivity',  label: 'last activity' },
-  { value: 'accountHealth', label: 'account health' },
-  { value: 'riskCount',     label: 'risk factor count' },
+  { value: 'lastActivity',  label: 'Last activity' },
+  { value: 'accountHealth', label: 'Account health' },
+  { value: 'riskCount',     label: 'Risk factor count' },
   { value: 'ebc',           label: 'EBC' },
   // Products (col 4)
-  { value: 'products', label: 'products' },
+  { value: 'products', label: 'Products' },
 ]
 const ALL_DENSITY_KEYS: DensityKey[] = DENSITY_OPTIONS.map(o => o.value)
 
@@ -884,6 +884,12 @@ const PRODUCT_TREE: ProductNode[] = [
   ]},
 ]
 const ALL_PRODUCT_LEAVES = PRODUCT_TREE.flatMap(g => g.children?.map(c => c.value) ?? [])
+
+// value→label lookup for product leaves — used by the Filters-toggle
+// applied-filters popover to render readable labels per leaf.
+const PRODUCT_LEAF_LABEL = new Map<string, string>(
+  PRODUCT_TREE.flatMap(g => (g.children ?? []).map(c => [c.value, c.label]))
+)
 
 // ─── Tag presets ─────────────────────────────────────────────────────────
 const TAG_BASE = {
@@ -1014,6 +1020,7 @@ function HoverShell({
       <span
         ref={triggerRef}
         className="acc-hover-trigger"
+        data-popover-open={open ? 'true' : 'false'}
         onMouseEnter={handleTriggerEnter}
         onMouseLeave={handleTriggerLeave}>
         {children}
@@ -1165,6 +1172,73 @@ function SingleSelectFilter({ label, options, value, onChange, allLabel = 'All' 
           ))}
         </FlyoutList>
       </Flyout>
+    </span>
+  )
+}
+
+// ─── Filters toggle button + applied-filters hover popover ─────────────────
+// Same shape as the opp-table FiltersToggle: secondary 32px button in
+// the search row, with a left chevron (down at rest, up when open)
+// for the expand/collapse affordance, label "Filters", and a trailing
+// high-contrast neutral count tag (only when applied > 0). The tag
+// hosts a 180ms-grace chip-popover listing every applied filter
+// across every dimension with per-item remove.
+
+interface AppliedFilterItem {
+  value: string
+  label: string
+  onRemove: () => void
+}
+
+interface FiltersToggleProps {
+  open: boolean
+  onToggle: () => void
+  applied: AppliedFilterItem[]
+}
+
+function FiltersToggle({ open, onToggle, applied }: FiltersToggleProps) {
+  const chipHover = useChipPopoverHover()
+  const removeByValue = (v: string) => {
+    const it = applied.find(a => a.value === v)
+    if (it) it.onRemove()
+    if (applied.length - 1 === 0) chipHover.setChipPopoverOpen(false)
+  }
+  return (
+    <span className="panw--filter__wrapper acc-filters-toggle">
+      <Button
+        kind="secondary"
+        size="default"
+        aria-expanded={open}
+        aria-controls="acc-filter-row"
+        onClick={onToggle}
+        renderIcon={open ? ChevronUp : ChevronDown}
+        iconPosition="right">
+        <span className="acc-filters-toggle__inner">
+          Filters
+          {applied.length > 0 && (
+            <span
+              className="panw--filter__chip-target acc-filters-toggle__count"
+              onMouseEnter={chipHover.openOnEnter}
+              onMouseLeave={chipHover.scheduleClose}>
+              <Tags
+                label={String(applied.length)}
+                color="neutral"
+                contrast="high"
+                size="default"
+                shape="rounded"
+              />
+            </span>
+          )}
+        </span>
+      </Button>
+      {applied.length > 0 && chipHover.chipPopoverOpen && (
+        <FilterChipPopover
+          items={applied.map(({ value, label }) => ({ value, label }))}
+          onRemove={removeByValue}
+          onMouseEnter={chipHover.cancelClose}
+          onMouseLeave={chipHover.scheduleClose}
+        />
+      )}
     </span>
   )
 }
@@ -1596,7 +1670,7 @@ function AccountHealthPanel({ row }: { row: AccountRow }) {
       <div className="acc-pop__chart"><HealthTrendBars trend={h.trend12mo} /></div>
       <div className="acc-pop__rows">
         <div className="acc-pop__kv">
-          <span className="acc-pop__kv-label">Technical Health</span>
+          <span className="acc-pop__kv-label">Technical health</span>
           <Tags
             shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.technical]}
@@ -1604,7 +1678,7 @@ function AccountHealthPanel({ row }: { row: AccountRow }) {
             className="acc-tag--static" />
         </div>
         <div className="acc-pop__kv">
-          <span className="acc-pop__kv-label">Adoption &amp; Deployment</span>
+          <span className="acc-pop__kv-label">Adoption &amp; deployment</span>
           <Tags
             shape="rounded" size="large" contrast="low"
             color={HEALTH_COLOR[h.adoption]}
@@ -1613,7 +1687,7 @@ function AccountHealthPanel({ row }: { row: AccountRow }) {
         </div>
       </div>
       <div className="acc-pop__cta">
-        <Button kind="ghost-brand" size="small">View Account Health</Button>
+        <Button kind="ghost-brand" size="small">View account health</Button>
       </div>
     </div>
   )
@@ -1670,9 +1744,14 @@ function EBCPanel({ ebc }: { ebc: EBC }) {
     )
   }
   return (
-    <div className="acc-pop acc-pop--ebc">
-      <div className="acc-pop__heading">EBC — {formatEbcDate(ebc.date)}</div>
-      <div className="acc-pop__sub">{ebc.topic}</div>
+    <div className="acc-pop acc-pop--ebc acc-pop--two-line">
+      {/* Event on line 1 (primary), date on line 2 (tertiary, 4px below)
+       * — matches the activity hover pattern and the no-risk empty
+       * popover. The topic sits below as a separate tertiary block,
+       * 8px under the date via the .acc-pop parent gap. */}
+      <div className="acc-pop__heading">EBC</div>
+      <div className="acc-pop__sub">{formatEbcDate(ebc.date)}</div>
+      {ebc.topic && <div className="acc-pop__desc">{ebc.topic}</div>}
       {/* Attendees as rows with hairline dividers — same pattern as
        *  every other multi-row block in the popovers. The leading
        *  cell "PANW attendees" is a label-only row that anchors the
@@ -1726,11 +1805,9 @@ function SalesPlayBucketPanel({ bucket }: { bucket: SalesPlayBucket }) {
 
 function SalesPlayTag({ bucket }: { bucket: SalesPlayBucket }) {
   const IconCmp = SALES_PLAY_ICON[bucket.status]
-  // Drop the colon-space to save ~6–8px per tag — at account-column
-  // widths the colon push makes single-bucket rows collapse to +N
-  // even when they have room for the bucket itself. Status label +
-  // dollar reads cleanly without it.
-  const label = `${SALES_PLAY_LABEL[bucket.status]} ${formatUsdCompact(bucket.usd)}`
+  // Icon carries the status signal; label is dollar-value only so the
+  // chip stays narrow enough that multi-bucket rows don't collapse to +N.
+  const label = formatUsdCompact(bucket.usd)
   return (
     <HoverShell interactive render={() => <SalesPlayBucketPanel bucket={bucket} />}>
       <Tags
@@ -1836,7 +1913,7 @@ function ProductCluster({ products }: { products: Product[] }) {
 // not picking a deal.
 
 const OPP_TYPE_LABEL: Record<'net-new'|'upsell'|'renewal', string> = {
-  'net-new': 'Net New',
+  'net-new': 'Net new',
   'upsell':  'Upsell',
   'renewal': 'Renewal',
 }
@@ -1886,22 +1963,26 @@ interface SortFlyoutProps {
   onChange: (key: SortKey) => void
 }
 
-function SortFlyout({ sortKey, sortDir, onChange }: SortFlyoutProps) {
+function SortFlyout({ sortKey, sortDir: _sortDir, onChange }: SortFlyoutProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
   const currentLabel = SORT_OPTIONS.find(o => o.key === sortKey)?.label ?? 'risk factor count'
+  // Secondary button at size=small (32px). The old asc/desc glyph
+  // wasn't wired and is gone; the chevron remains as popover-state
+  // indicator only.
   return (
     <>
-      <button
+      <Button
         ref={triggerRef}
-        type="button"
-        className="acc-sort-trigger"
+        kind="secondary"
+        size="default"
         aria-haspopup="listbox"
         aria-expanded={open}
-        onClick={() => setOpen(v => !v)}>
-        <span>sort: {currentLabel} {sortDir === 'asc' ? '↑' : '↓'}</span>
-        {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
-      </button>
+        onClick={() => setOpen(v => !v)}
+        renderIcon={open ? ChevronUp : ChevronDown}
+        iconPosition="right">
+        Sort: {currentLabel}
+      </Button>
       <Flyout
         open={open}
         onOpenChange={setOpen}
@@ -1944,11 +2025,78 @@ export interface AccountTableProps {
   onExpand?: (id: string) => void
 }
 
+// ─── Column resize hook ──────────────────────────────────────────────────────
+// Pointer-driven column resize for table-layout:fixed tables. Mount-time
+// useLayoutEffect measures the rendered <th> widths and seeds them into
+// state; subsequent drags adjust widths in pixels. Each drag shifts space
+// between the dragged column and the IMMEDIATE NEXT column so the table's
+// total width never changes — last column gets no handle.
+function useColumnResize(columnCount: number, minPx: number = 80) {
+  const tableRef = useRef<HTMLTableElement | null>(null)
+  const [widths, setWidths] = useState<number[] | null>(null)
+  const dragRef = useRef<{ i: number; startX: number; a: number; b: number } | null>(null)
+
+  useLayoutEffect(() => {
+    if (widths !== null) return
+    const t = tableRef.current
+    if (!t) return
+    const ths = t.querySelectorAll('thead > tr > th')
+    if (ths.length !== columnCount) return
+    const measured: number[] = []
+    ths.forEach((el) => measured.push((el as HTMLElement).getBoundingClientRect().width))
+    setWidths(measured)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [columnCount])
+
+  const handle = (i: number) => ({
+    onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
+      if (!widths || i >= columnCount - 1) return
+      e.preventDefault()
+      e.stopPropagation()
+      try { (e.currentTarget as HTMLDivElement).setPointerCapture(e.pointerId) } catch {}
+      dragRef.current = { i, startX: e.clientX, a: widths[i], b: widths[i + 1] }
+      document.body.style.cursor = 'col-resize'
+    },
+    onPointerMove: (e: React.PointerEvent<HTMLDivElement>) => {
+      const d = dragRef.current
+      if (!d || !widths) return
+      const raw = e.clientX - d.startX
+      const maxRight = d.b - minPx
+      const maxLeft = -(d.a - minPx)
+      const delta = Math.max(maxLeft, Math.min(maxRight, raw))
+      const next = widths.slice()
+      next[d.i] = d.a + delta
+      next[d.i + 1] = d.b - delta
+      setWidths(next)
+    },
+    onPointerUp: (e: React.PointerEvent<HTMLDivElement>) => {
+      dragRef.current = null
+      document.body.style.cursor = ''
+      try { (e.currentTarget as HTMLDivElement).releasePointerCapture(e.pointerId) } catch {}
+    },
+    onPointerCancel: () => {
+      dragRef.current = null
+      document.body.style.cursor = ''
+    },
+  })
+
+  return { tableRef, widths, handle }
+}
+
 export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTableProps = {}) {
   const [search, setSearch] = useState('')
+  // 5 columns: Account · Opportunities · Activities & Risks · Products · Sales Plays.
+  // Last column has no handle (drags only rebalance pairs of adjacent
+  // columns, total table width never changes).
+  const colResize = useColumnResize(5)
   // Default sort per spec §5: most-broken accounts at top of triage queue.
   const [sortKey, setSortKey] = useState<SortKey>('riskCount')
   const [sortDir, setSortDir] = useState<SortDir>('desc')
+
+  // Expanded filter row is collapsed by default; the search-row Filters
+  // toggle opens it. Applied filters show as a count tag on the toggle
+  // and a hover popover.
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   // Filter row state. Defaults pinned to spec §5.
   const [density, setDensity] = useState<DensityKey[]>([...ALL_DENSITY_KEYS])
@@ -1959,6 +2107,67 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
   const [upsellSingle, setUpsellSingle] = useState<string | null>(null)
   const [accountRiskMulti, setAccountRiskMulti] = useState<string[]>([])
   const [products, setProducts] = useState<string[]>([...ALL_PRODUCT_LEAVES])
+
+  // ── Applied filters aggregator (Filters-toggle button + popover) ──
+  // See opp-table for the architecture note — same shape here.
+  const appliedFilters = useMemo<AppliedFilterItem[]>(() => {
+    const out: AppliedFilterItem[] = []
+    if (lastActivitySingle) {
+      const lbl = LAST_ACTIVITY_OPTIONS.find(o => o.value === lastActivitySingle)?.label ?? lastActivitySingle
+      out.push({
+        value: `lastActivity:${lastActivitySingle}`,
+        label: `Last activity: ${lbl}`,
+        onRemove: () => setLastActivitySingle(null),
+      })
+    }
+    if (ebcSingle) {
+      const lbl = EBC_OPTIONS.find(o => o.value === ebcSingle)?.label ?? ebcSingle
+      out.push({
+        value: `ebc:${ebcSingle}`,
+        label: `EBC: ${lbl}`,
+        onRemove: () => setEbcSingle(null),
+      })
+    }
+    if (upsellSingle) {
+      const lbl = UPSELL_OPTIONS.find(o => o.value === upsellSingle)?.label ?? upsellSingle
+      out.push({
+        value: `upsell:${upsellSingle}`,
+        label: `Upsell: ${lbl}`,
+        onRemove: () => setUpsellSingle(null),
+      })
+    }
+    for (const v of accountRiskMulti) {
+      const lbl = ACCOUNT_RISK_FILTER_OPTIONS.find(o => o.value === v)?.label ?? v
+      out.push({
+        value: `risk:${v}`,
+        label: `Risk: ${lbl}`,
+        onRemove: () => setAccountRiskMulti(accountRiskMulti.filter(x => x !== v)),
+      })
+    }
+    for (const axis of ['overall', 'technical', 'adoption'] as const) {
+      for (const lvl of groupedHealth[axis]) {
+        out.push({
+          value: `health:${axis}:${lvl}`,
+          label: `${axis === 'overall' ? 'Overall' : axis === 'technical' ? 'Technical' : 'Adoption'}: ${HEALTH_LABEL[lvl]}`,
+          onRemove: () => setGroupedHealth({
+            ...groupedHealth,
+            [axis]: groupedHealth[axis].filter(x => x !== lvl),
+          }),
+        })
+      }
+    }
+    // Products always contribute to the count — every selected leaf
+    // is a filter option the AE has chosen, even if all are selected.
+    for (const v of products) {
+      const lbl = PRODUCT_LEAF_LABEL.get(v) ?? v
+      out.push({
+        value: `product:${v}`,
+        label: `Product: ${lbl}`,
+        onRemove: () => setProducts(products.filter(x => x !== v)),
+      })
+    }
+    return out
+  }, [lastActivitySingle, ebcSingle, upsellSingle, accountRiskMulti, groupedHealth, products])
 
   // Filtering wiring lands later. For now, sort renders against the full
   // fixture so the default-sort behavior is visibly verifiable.
@@ -1988,14 +2197,16 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
       <style>{LAYOUT_CSS}</style>
       <div className="acc-page">
         <div className="acc-page__shell">
-          {/* Search row: counts left · search center · sort right.
-              Search excludes opportunity names and quote IDs by spec
-              §3.1 — placeholder reflects what IS searched. */}
+          {/* ── Search row ──────────────────────────────────────────────
+              Left-to-right: search · sort · tags · filters-toggle. All
+              controls 32px; row carries 8px top/bottom padding. The
+              Filters-toggle opens/closes the bordered filter row
+              below; its trailing count tag carries the applied-filters
+              popover on hover. */}
           <div className="acc-search-row">
             <div className="acc-search-row__search">
               <Search
-                size="md"
-                background="grey0"
+                background="grey10"
                 placeholder="account, apex, product, sales play…"
                 value={search}
                 onChange={e => setSearch(e.target.value)}
@@ -2012,55 +2223,86 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
                 setSortDir(k === 'name' ? 'asc' : 'desc')
               }}
             />
+            <TagDensityFilter selected={density} onChange={setDensity} />
+            <FiltersToggle
+              open={filtersOpen}
+              onToggle={() => setFiltersOpen(v => !v)}
+              applied={appliedFilters}
+            />
           </div>
 
-          {/* Filter row — tag-density at the leading edge, divider,
-              then the seven data filters per spec §3.5–§3.11. */}
-          <div className="acc-filter-row">
-            <div className="acc-filter-group">
-              <TagDensityFilter selected={density} onChange={setDensity} />
-              <div className="acc-filter-divider" role="presentation" />
-              <GroupedHealthFilter
-                value={groupedHealth}
-                onApply={setGroupedHealth}
-              />
-              <SingleSelectFilter
-                label="last activity"
-                options={LAST_ACTIVITY_OPTIONS}
-                value={lastActivitySingle}
-                onChange={setLastActivitySingle}
-              />
-              <SingleSelectFilter
-                label="EBC"
-                options={EBC_OPTIONS}
-                value={ebcSingle}
-                onChange={setEbcSingle}
-              />
-              <SingleSelectFilter
-                label="upsell"
-                options={UPSELL_OPTIONS}
-                value={upsellSingle}
-                onChange={setUpsellSingle}
-              />
-              <Filter
-                label="account risk factors"
-                options={ACCOUNT_RISK_FILTER_OPTIONS}
-                selected={accountRiskMulti}
-                onApply={setAccountRiskMulti}
-              />
-              <ProductFilter selected={products} onApply={setProducts} />
+          {/* ── Filter row (collapsible) ───────────────────────────────
+              Bordered band; 12px top/bottom padding; each chip
+              clamped to 32px. Density moved out to the search row;
+              no leading divider needed here. */}
+          {filtersOpen && (
+            <div className="acc-filter-row" id="acc-filter-row">
+              <div className="acc-filter-group">
+                <GroupedHealthFilter
+                  value={groupedHealth}
+                  onApply={setGroupedHealth}
+                />
+                <SingleSelectFilter
+                  label="Last activity"
+                  options={LAST_ACTIVITY_OPTIONS}
+                  value={lastActivitySingle}
+                  onChange={setLastActivitySingle}
+                />
+                <SingleSelectFilter
+                  label="EBC"
+                  options={EBC_OPTIONS}
+                  value={ebcSingle}
+                  onChange={setEbcSingle}
+                />
+                <SingleSelectFilter
+                  label="Upsell"
+                  options={UPSELL_OPTIONS}
+                  value={upsellSingle}
+                  onChange={setUpsellSingle}
+                />
+                <Filter
+                  label="Account risk factors"
+                  options={ACCOUNT_RISK_FILTER_OPTIONS}
+                  selected={accountRiskMulti}
+                  onApply={setAccountRiskMulti}
+                />
+                <ProductFilter selected={products} onApply={setProducts} />
+              </div>
             </div>
-          </div>
+          )}
 
           <div className="acc-table-shell">
-            <table className="acc-table">
+            <table className="acc-table" ref={colResize.tableRef}>
+              {/* colgroup drives column widths once useLayoutEffect has
+                * seeded them from the rendered layout. Before seed the
+                * cols carry no inline width, so .acc-c-account (200px
+                * fixed) + .acc-c-equal rules govern the first paint. */}
+              <colgroup>
+                {[0, 1, 2, 3, 4].map((i) => (
+                  <col key={i} style={colResize.widths ? { width: colResize.widths[i] } : undefined} />
+                ))}
+              </colgroup>
               <thead>
                 <tr>
-                  <th className="acc-c-account acc-no-sort"><Header size="md" type="basic">Account</Header></th>
-                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Opportunities</Header></th>
-                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Activities &amp; Risks</Header></th>
-                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Products</Header></th>
-                  <th className="acc-c-equal acc-no-sort"><Header size="md" type="basic">Sales Plays</Header></th>
+                  <th className="acc-c-account acc-no-sort">
+                    <Header size="md" type="basic">Account</Header>
+                    <div className="acc-th-resizer" aria-hidden="true" {...colResize.handle(0)} />
+                  </th>
+                  <th className="acc-c-equal acc-no-sort">
+                    <Header size="md" type="basic">Opportunities</Header>
+                    <div className="acc-th-resizer" aria-hidden="true" {...colResize.handle(1)} />
+                  </th>
+                  <th className="acc-c-equal acc-no-sort">
+                    <Header size="md" type="basic">Activities &amp; Risks</Header>
+                    <div className="acc-th-resizer" aria-hidden="true" {...colResize.handle(2)} />
+                  </th>
+                  <th className="acc-c-equal acc-no-sort">
+                    <Header size="md" type="basic">Products</Header>
+                    <div className="acc-th-resizer" aria-hidden="true" {...colResize.handle(3)} />
+                  </th>
+                  <th className="acc-c-equal acc-no-sort">
+                    <Header size="md" type="basic">Sales plays</Header>
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -2147,7 +2389,10 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
                             {density.includes('lastActivity') && (
                               <HoverShell
                                 render={() => (
-                                  <div className="acc-pop acc-pop--simple">{row.activity.description} — {dayLabel}</div>
+                                  <div className="acc-pop acc-pop--simple acc-pop--two-line">
+                                    <div className="acc-pop__heading">{row.activity.description}</div>
+                                    <div className="acc-pop__sub">{dayLabel}</div>
+                                  </div>
                                 )}>
                                 <Tags
                                   shape={TAG_BASE.shape}
@@ -2219,10 +2464,19 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand }: AccountTablePr
                           (spec §4.5 + cr-failure §2). */}
                       <SalesPlayCluster buckets={row.salesPlays} />
                       {/* Row-level floating actions — absolutely positioned
-                          to top-right of the <tr>. Mirrors opp-table. */}
+                          to bottom-right of the <tr>. Same inverse-pill
+                          pattern as opp-table: dark ground, ghost buttons
+                          transparent at rest, surface.inverse on hover/pressed,
+                          icons.inverse white throughout. */}
                       <div className="acc-row-actions">
-                        <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask" />
-                        <IconButton kind="highlight" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Expand" onClick={() => onExpand?.(row.id)} />
+                        <div className="acc-row-actions__pill">
+                          <HoverShell side="top" align="center" openDelayMs={400} panelClassName="acc-btn-tooltip" render={() => 'Ask question'}>
+                            <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={CommentAdd} aria-label="Ask question" />
+                          </HoverShell>
+                          <HoverShell side="top" align="center" openDelayMs={400} panelClassName="acc-btn-tooltip" render={() => 'Open on right'}>
+                            <IconButton kind="ghost" size="sm" iconSize={16} renderIcon={Maximize} aria-label="Open on right" onClick={() => onExpand?.(row.id)} />
+                          </HoverShell>
+                        </div>
                       </div>
                     </td>
                   </tr>
@@ -2262,11 +2516,12 @@ const LAYOUT_CSS = `
   --panw-flyout-filter-placeholder: var(--ds-text-placeholder-rest);
   --panw-flyout-filter-border: var(--ds-lines-neutral-rest);
   /* Column headers ride the ghost surface — transparent at rest so the
-   * page ground reads through, ghost.hover / pressed for interaction.
-   * No paint of its own; the band is built by hover, not by fill. */
+   * page ground reads through. Hover and onclick deliberately match rest
+   * so the header band carries no visible interaction state. Sort is
+   * still functional; the active sort indicator is the only affordance. */
   --panw-header-bg:         var(--ds-ghost-rest);
-  --panw-header-bg-hover:   var(--ds-ghost-hover);
-  --panw-header-bg-onclick: var(--ds-ghost-pressed);
+  --panw-header-bg-hover:   var(--ds-ghost-rest);
+  --panw-header-bg-onclick: var(--ds-ghost-rest);
 }
 
 .acc-page {
@@ -2287,14 +2542,20 @@ const LAYOUT_CSS = `
 }
 
 /* ── Search row ─────────────────────────────────────────────────────────
- * Counts left · search center (flex:1) · sort right. Same vertical
- * rhythm as opp-table's search row. */
+ * Left-to-right: search (flex:1) · sort · tags · filters-toggle. All
+ * controls 40px tall. 8px top/bottom padding for breathing space;
+ * 16px left/right pulls the row's outer edges in to land where the
+ * data-row divider sits — search-row and filter-row share one
+ * inset column with the table's row dividers. */
 .acc-search-row {
   display: flex;
   align-items: center;
-  gap: var(--ds-spacing-04);
-  /* Owns the 8px gap to the filter row below it. */
-  margin-bottom: var(--ds-spacing-03); /* 8 */
+  gap: 6px;
+  /* 8 top/bottom · 16 right · 10 LEFT — left-inset matches the table's
+   * first-cell padding-left so search, hairlines, divider, header text,
+   * and cell content all share one vertical. */
+  padding: var(--ds-spacing-03) var(--ds-spacing-05) var(--ds-spacing-03) 10px;
+  margin-bottom: 0;
 }
 .acc-search-row__search {
   flex: 1;
@@ -2304,58 +2565,124 @@ const LAYOUT_CSS = `
   width: 100%;
 }
 
-/* Sort trigger — ghost-button shape, opens single-select Flyout.
- * Stretches to match the search input's height. */
-.acc-sort-trigger {
+/* Search-row inline filters paint the DS secondary-button chrome on
+ * the .panw--filter trigger so the "tags" control reads as a peer
+ * of the Sort and Filters secondary buttons next to it. See
+ * opp-table for the architecture note. */
+.acc-search-row .panw--filter,
+.acc-search-row .panw--filter__wrapper > .panw--filter {
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding: 0 var(--ds-spacing-04); /* 12 */
+  border: 1px solid var(--panw-button-secondary-border);
+  border-radius: var(--ds-radius-tight);
+  background-color: var(--panw-button-secondary-bg);
+  color: var(--panw-button-secondary-text);
+  transition:
+    background-color 110ms var(--ds-motion-easing-standard),
+    border-color 110ms var(--ds-motion-easing-standard);
+}
+.acc-search-row .panw--filter:hover:not(.panw--filter--open),
+.acc-search-row .panw--filter__wrapper > .panw--filter:hover:not(.panw--filter--open) {
+  background-color: var(--ds-surface-hover);
+  border-color: transparent;
+}
+.acc-search-row .panw--filter.panw--filter--open,
+.acc-search-row .panw--filter__wrapper > .panw--filter.panw--filter--open {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+/* Sort and Filters-toggle are DS Buttons — same open-state as filter triggers. */
+.acc-search-row .panw--btn--secondary[aria-expanded="true"] {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+.acc-search-row .panw--btn--secondary[aria-expanded="true"]:hover {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+
+/* Right-align the applied-filters popover off the Filters-toggle —
+ * it's the rightmost element in the search row, so default left:0
+ * runs the popover off-screen. */
+.acc-filters-toggle .panw--filter__chip-popover {
+  left: auto;
+  right: 0;
+}
+
+/* Filters-toggle button + count tag. */
+.acc-filters-toggle {
+  display: inline-flex;
+}
+.acc-filters-toggle__inner {
   display: inline-flex;
   align-items: center;
-  align-self: stretch;
   gap: var(--ds-spacing-02);
-  padding: 0 var(--ds-spacing-05);
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  font-family: inherit;
-  color: var(--ds-text-secondary-rest);
-  border-radius: var(--ds-radius-tight);
-  white-space: nowrap;
-  transition: background-color 110ms cubic-bezier(0.2, 0, 0.38, 0.9);
 }
-.acc-sort-trigger:hover {
-  background-color: var(--ds-ghost-hover);
-  color: var(--ds-text-primary);
-}
-.acc-sort-trigger[aria-expanded="true"] {
-  background-color: var(--ds-ghost-pressed);
-  color: var(--ds-text-primary);
+.acc-filters-toggle__count {
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
 }
 
 /* ── Filter row ─────────────────────────────────────────────────────────
  * Tag-density filter at the leading edge, vertical divider, then the
  * data-row filters. Mirrors opp-table mental model: density controls
  * how much each row shows; the others narrow the row set. */
+/* ── Expanded filter row ──────────────────────────────────────────
+ * Collapsible band below the search row. 1px hairlines top + bottom
+ * frame it; 12px top/bottom padding. Filter chips use the DS default
+ * 40px height, consistent with the search row above. */
 .acc-filter-row {
   display: flex;
   align-items: flex-start;
-  /* 6px matches .acc-tag-cluster — the filter row reads with the
-   * same rhythm as a tag cluster inside a row, so the eye crosses
-   * both clusters at the same density. Not a --ds-spacing step
-   * (4/8/12), so a literal here. */
   gap: 6px;
   flex-wrap: wrap;
-  /* Owns the 20px gap to the table header below it. 20 isn't a
-   * native --ds-spacing step, so it's a literal here. */
-  margin-bottom: 20px;
+  /* 12 top/bottom · 16 right · 10 LEFT — matches search row + divider. */
+  padding: var(--ds-spacing-04) var(--ds-spacing-05) var(--ds-spacing-04) 10px;
+  margin: 0;
+  position: relative;
 }
+/* Top + bottom hairlines drawn as pseudo-elements so they respect the
+ * row's horizontal inset. Left = 10 (column-1 content anchor);
+ * right = 16 (matches the toolbar's right edge). */
+.acc-filter-row::before,
+.acc-filter-row::after {
+  content: '';
+  position: absolute;
+  left: 10px;
+  right: var(--ds-spacing-05); /* 16 */
+  height: 1px;
+  background-color: var(--ds-lines-neutral-rest);
+  pointer-events: none;
+}
+.acc-filter-row::before { top: 0; }
+.acc-filter-row::after  { bottom: 0; }
 .acc-filter-group {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
-  /* Matches .acc-tag-cluster — see note above. */
   gap: 6px;
   row-gap: 6px;
   flex: 1;
   min-width: 0;
+}
+.acc-filter-row .panw--filter {
+  height: 40px;
+  min-height: 40px;
+  max-height: 40px;
+  padding: 0 var(--ds-spacing-04); /* 12 */
+}
+.acc-filter-row .panw--filter.panw--filter--open,
+.acc-filter-row .panw--filter__wrapper > .panw--filter.panw--filter--open {
+  background-color: var(--ds-surface-selected);
+  border-color: transparent;
+}
+.acc-filter-row .panw--filter:hover:not(.panw--filter--open),
+.acc-filter-row .panw--filter__wrapper > .panw--filter:hover:not(.panw--filter--open) {
+  background-color: var(--ds-surface-hover);
+  border-color: transparent;
 }
 .acc-filter-divider {
   display: inline-block;
@@ -2480,18 +2807,23 @@ const LAYOUT_CSS = `
 .acc-pop--health,
 .acc-pop--risks,
 .acc-pop--ebc { width: 320px; }
-/* 240 — single-concept surfaces (sales-play bucket, quarter pipeline,
- * activity-simple). */
+/* 240 — single-concept surfaces (quarter pipeline, activity-simple). */
 .acc-pop--simple,
-.acc-pop--quarter,
-.acc-pop--play-bucket { width: 240px; }
-/* Empty-state popovers (any variant) — 2px breathing room between
- * heading and sub. Default is 0 because the sub's negative top
- * margin cancels the parent gap-8; for empty branches we want the
- * sub to read as "directly related to" the heading rather than
- * collapsed onto it. */
-.acc-pop--empty .acc-pop__sub {
-  margin-top: calc(-1 * var(--ds-spacing-03) + 2px);
+.acc-pop--quarter { width: 240px; }
+/* 320 — sales-play bucket uses the max tier so play names have room to
+ * breathe before truncation fires. Overflow still truncates rather than
+ * wraps (see .acc-pop__kv-label override below). */
+.acc-pop--play-bucket { width: 320px; }
+/* Two-line popovers — 4px between heading and sub. Default is 0
+ * because the sub's negative top margin (-8px) cancels the parent
+ * gap-8; here we restore +4 so the sub reads as a tight subtitle
+ * directly under the heading. Shared by:
+ *   • .acc-pop--empty       — empty-state popovers (no-risk, no-EBC,
+ *                             empty quarter pipeline, etc.)
+ *   • .acc-pop--two-line    — activity hover (description + days-ago) */
+.acc-pop--empty .acc-pop__sub,
+.acc-pop--two-line .acc-pop__sub {
+  margin-top: calc(-1 * var(--ds-spacing-03) + 4px);
 }
 /* Heading + sub sit at the popover's content edge — no extra
  * horizontal margin. With the popover's 16px padding, they land
@@ -2510,6 +2842,16 @@ const LAYOUT_CSS = `
    * heading" treatment used by .opp-pop__sub. Held at 14/20 per
    * popover-text floor. */
   margin-top: calc(-1 * var(--ds-spacing-03));
+  font-size: 14px;
+  line-height: 20px;
+  color: var(--ds-text-tertiary-rest);
+}
+/* Tertiary description block that sits as its own row beneath the
+ * heading/sub pair — no negative margin, so the parent's 8px gap
+ * applies. Used by the populated EBC popover to carry the topic
+ * after the event/date split, and reusable for any future popover
+ * that needs a secondary descriptive line below the title pair. */
+.acc-pop__desc {
   font-size: 14px;
   line-height: 20px;
   color: var(--ds-text-tertiary-rest);
@@ -2690,6 +3032,42 @@ const LAYOUT_CSS = `
   text-align: left;
   padding: 0;
   vertical-align: middle;
+  /* Anchor for the absolute-positioned resize handle below. */
+  position: relative;
+}
+
+/* ── Column resize handle ──────────────────────────────────────────────
+ * 6px-wide hot zone straddling the column boundary on the right edge of
+ * each header (last column omits it). Transparent at rest, 1px vertical
+ * line in neutral-rest on hover, brand on drag. col-resize cursor;
+ * touch-action:none so pointer drags don't trigger scroll. */
+.acc-th-resizer {
+  position: absolute;
+  top: 8px;
+  bottom: 8px;
+  right: -3px;
+  width: 6px;
+  z-index: 1;
+  cursor: col-resize;
+  user-select: none;
+  touch-action: none;
+}
+.acc-th-resizer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  margin-left: -0.5px;
+  background-color: transparent;
+  transition: background-color 110ms var(--ds-motion-easing-standard);
+}
+.acc-th-resizer:hover::before {
+  background-color: var(--ds-lines-neutral-rest);
+}
+.acc-th-resizer:active::before {
+  background-color: var(--ds-lines-brand-rest);
 }
 /* No border on header cells — the separator between header and the
  * first data row is a standalone .acc-divider-row injected at the
@@ -2708,19 +3086,28 @@ const LAYOUT_CSS = `
  * Last cell:   t:12  r:8   b:16  l:8
  * Other cells: t:12  r:8   b:12  l:8
  * Row corners: 12px radius clipped on first/last td. */
+/* Per-cell padding — 8px top/bottom. First cell gets 10px left
+ * padding (tightens column-1 to the row's leading rail); last cell
+ * keeps uniform 8px. Header padding overrides below mirror these
+ * values so header text and row content line up column by column. */
 .acc-table td {
-  padding: 12px 8px;
+  padding: 8px;
   vertical-align: top;
   color: var(--ds-text-secondary-rest);
 }
 .acc-table tbody td:first-child {
-  padding: 12px 8px 12px 16px;
+  padding: 8px 8px 8px 10px;
   border-radius: 8px 0 0 8px;
 }
 .acc-table tbody td:last-child {
-  padding: 12px 8px 16px 8px;
+  padding: 8px;
   border-radius: 0 8px 8px 0;
 }
+/* Header alignment with row content — neutralize the DS Header's
+ * 16px padding-left and replace with values that match the cell
+ * padding-left for each column. */
+.acc-table th .panw--header { padding-left: 8px; }
+.acc-table th:first-child .panw--header { padding-left: 10px; }
 
 /* Column widths.
  * Account column fixed at 200px (absorbs long names + ARR line).
@@ -2736,8 +3123,22 @@ const LAYOUT_CSS = `
  * Hover lifts the band so row-level floating actions read as engaged;
  * no :active state — clicking a row does nothing, so a pressed
  * background would write a check the interaction can't cash. */
-.acc-table tbody tr { background-color: var(--ds-ghost-rest); }
-.acc-table tbody tr:hover  { background-color: var(--ds-ghost-hover); }
+.acc-table tbody tr {
+  background-color: var(--ds-ghost-rest);
+  /* Productive standard curve — state change in place, not an entrance.
+   * 100ms sits between fast-01 (70ms) and fast-02 (110ms), right at the
+   * micro-interaction boundary for a row-sized surface area. */
+  transition: background-color 100ms cubic-bezier(0.2, 0, 0.38, 0.9);
+}
+/* Row hover — locally derived alpha-40 of neutral20 instead of
+ * var(--ds-ghost-hover) (which is alpha-70). Rationale matches
+ * opp-table: ghost.rest at the resting state lets rows adapt to
+ * whatever page bg sits behind, but ghost.hover at alpha-70
+ * rendered too dense and masked the row-internal hover states.
+ * Alpha-40 carries the engaged signal while preserving the
+ * adapts-to-bg promise and giving room to row-nested hovers.
+ * Primitive resolves to neutral20 = #E4E8EB = rgb(228, 232, 235). */
+.acc-table tbody tr:hover  { background-color: rgb(228 232 235 / 40%); }
 
 /* Standalone divider rows — an independent element between rows, not
  * a border that belongs to either adjacent row. */
@@ -2753,22 +3154,20 @@ const LAYOUT_CSS = `
   line-height: 0;
   font-size: 0;
 }
-.acc-divider { height: 1px; background-color: var(--ds-lines-neutral-rest); transition: opacity 110ms ease; margin: 0 16px; }
+.acc-divider { height: 1px; background-color: var(--ds-lines-neutral-rest); transition: opacity 110ms ease; margin: 0 16px 0 10px; }
 /* Hide the divider below the hovered row */
 .acc-row:hover + .acc-divider-row .acc-divider { opacity: 0; }
 /* Hide the divider above the hovered row */
 .acc-divider-row:has(+ .acc-row:hover) .acc-divider { opacity: 0; }
 /* ── Row-level floating actions ──────────────────────────────────────────
- * Two highlight-kind buttons that surface only on row hover. The
- * highlight kind ships its own rest / hover / pressed treatment, so
- * no per-state CSS swap is needed here. Mirrors the opp-table pattern. */
+ * Two ghost icon-buttons inside an inverse-surface pill. Same compound-
+ * radius logic as opp-table: pill outer 6px = button inner 4px + 2px pad.
+ * Mirrors the opp-table pattern exactly. */
 .acc-row { position: relative; }
 .acc-row-actions {
   position: absolute;
   bottom: 6px;
   right: 6px;
-  display: flex;
-  gap: var(--ds-spacing-02);
   z-index: 1;
   pointer-events: none;
   opacity: 0;
@@ -2778,8 +3177,49 @@ const LAYOUT_CSS = `
   opacity: 1;
   pointer-events: auto;
 }
-/* DS IconButton ships 4px (radius.tight) natively — no local
- * override needed. */
+.acc-row-actions__pill {
+  display: flex;
+  gap: 2px;
+  padding: 2px;
+  background-color: var(--ds-surface-inverse-rest);
+  border-radius: var(--ds-radius-tight);
+}
+.acc-row-actions__pill .panw--btn-icon {
+  background-color: transparent;
+  color: var(--ds-icons-inverse-rest);
+}
+/* DS sm+16 = 32px; lock these action buttons to 24px */
+.acc-row-actions__pill .panw--btn-icon--sm.panw--btn-icon--icon-16 {
+  width: 1.5rem;
+  height: 1.5rem;
+}
+.acc-row-actions__pill .panw--btn-icon:hover:not(:disabled) {
+  background-color: var(--ds-surface-inverse-hover);
+  color: var(--ds-icons-inverse-hover);
+}
+.acc-row-actions__pill .panw--btn-icon:active:not(:disabled) {
+  background-color: var(--ds-surface-inverse-pressed);
+  color: var(--ds-icons-inverse-pressed);
+}
+
+/* Button tooltip — same override pattern as opp-table (.opp-btn-tooltip).
+ * Replaces the popover chrome with tooltip chrome on the HoverShell panel. */
+@keyframes acc-tooltip-up {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.acc-hover-panel.acc-btn-tooltip {
+  background-color: var(--ds-surface-inverse-rest);
+  border: none;
+  border-radius: var(--ds-radius-tight);
+  padding: 8px 12px;
+  animation: acc-tooltip-up 70ms var(--ds-motion-easing-entrance);
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-inverse-rest);
+  white-space: nowrap;
+}
 
 /* ── Column 1 — Account · Apex · ARR ───────────────────────────────────
  * Three-line stack. Name bold, Apex secondary, ARR 20px semibold.
@@ -2793,21 +3233,28 @@ const LAYOUT_CSS = `
   align-items: flex-start;
   min-width: 0;
 }
+/* Account name — body-01 (14/20), regular weight, text.primary.
+ * Apex sub reads at tertiary, so the name climbs to primary; column-1
+ * hierarchy is then primary (name) → tertiary (apex) → primary
+ * heading-02 (value). */
 .acc-multiline__name {
   font-size: 14px;
   line-height: 20px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-secondary-rest);
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-primary);
   overflow: hidden;
   text-overflow: ellipsis;
   display: -webkit-box;
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
 }
+/* Apex sub — label-02 (14/18, +0.01px tracking), text.tertiary.
+ * Was 13px (off-token); the smallest token at this rank is label-02. */
 .acc-multiline__sub {
   margin-top: 4px;
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 14px;
+  line-height: 1.28572;
+  letter-spacing: 0.01px;
   color: var(--ds-text-tertiary-rest);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -2827,21 +3274,25 @@ const LAYOUT_CSS = `
   text-decoration: underline;
   text-underline-offset: 2px;
 }
+/* Value — heading-02 (16/24 semibold). Down from heading-03's
+ * 20/28 — moving to the more compact, precise rhythm. */
 .acc-multiline__value {
-  margin-top: 12px;
-  font-size: 20px;
-  line-height: 28px;
+  margin-top: 4px;
+  font-size: 16px;
+  line-height: 24px;
   font-weight: var(--ds-type-font-weight-semibold);
+  letter-spacing: -0.15px;
   color: var(--ds-text-primary);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;
 }
-/* DS "black" Link palette — text.link-neutral family.
- * rest:  --ds-text-link-neutral-rest  (resolved by stage to neutral text)
- * hover: --ds-text-link-neutral-hover (shifts to brand on hover, with underline) */
+/* Anchor affordance for the account-name link. Rest color is
+ * inherited from .acc-multiline__name (text.secondary). This class
+ * only carries link-specific behavior (no underline at rest, pointer,
+ * brand hover below). Setting an explicit rest color here would
+ * mask the name's tier in the column-1 hierarchy. */
 .acc-multiline__link {
-  color: var(--ds-text-link-neutral-rest);
   text-decoration: none;
   cursor: pointer;
 }
@@ -2855,7 +3306,10 @@ const LAYOUT_CSS = `
 .acc-tag-cluster {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  /* 4px on both axes — tighter chip-to-chip rhythm so the cluster
+   * reads as one cluster rather than a string of separate chips.
+   * Single gap shorthand covers row-gap + column-gap together. */
+  gap: 4px;
   align-items: center;
   /* min-width:0 unlocks flex-children to shrink below their content
    * width — required for tag ellipsis truncation below to engage when
@@ -2989,19 +3443,47 @@ const LAYOUT_CSS = `
 .acc-pop-row__name {
   font-size: 14px;
   line-height: 20px;
-  font-weight: var(--ds-type-font-weight-semibold);
-  color: var(--ds-text-primary);
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-secondary-rest);
+  /* Name yields width when the icon+name+value triplet would exceed
+   * the popover's 208px content rail. flex:1 1 0 makes it the
+   * flex item that absorbs/releases space; min-width:0 unlocks
+   * shrink-below-content for text inside a flex item; overflow +
+   * text-overflow render the ellipsis. Without these, longer
+   * product names pushed the trailing value out past the popover's
+   * right edge (the panel has overflow:visible by default). */
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 .acc-pop-row__value {
   font-size: 14px;
   line-height: 20px;
-  color: var(--ds-text-secondary-rest);
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
   margin-left: var(--ds-spacing-06); /* 24 — clear separation from name */
+  /* Never shrink the dollar value — when the row runs tight the
+   * name truncates instead. The figure is the row's payload. */
+  flex-shrink: 0;
 }
 
-/* .acc-pop--play-bucket width is set in the tier block above (240). */
+/* .acc-pop--play-bucket width is set in the tier block above (320). */
+/* Truncation inside the play-bucket popover. Play names can be long
+ * (e.g. "XSIAM Splunk Takeout"); at 320px the label + value pair still
+ * fits most names, but the safety net below ensures overflow truncates
+ * with an ellipsis rather than wrapping and breaking the fixed 32px row
+ * height. The value side carries flex-shrink:0 (set above) so it always
+ * stays fully visible. */
+.acc-pop--play-bucket .acc-pop__kv-label {
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
 
 
 /* Tag padding + shape-rounded radius are now shipped natively by
@@ -3015,12 +3497,42 @@ const LAYOUT_CSS = `
  * forced #ffffff is gone: rest already IS surface.rest (white), so the
  * tag stays legible against the ghost-hover row band without a separate
  * rule fighting the tag's own :hover. Mirrors opportunity-table. */
-.stage .panw--tag.panw--tag--low.panw--tag--neutral {
-  background-color: var(--ds-surface-rest);
+/* Neutral-low tag styling is now shipped natively by @ds/tags. Local
+ * overrides removed — let the DS rules take effect. */
+
+/* ── Tag-as-trigger forced hover state ────────────────────────────
+ * When a tag opens a hover popover, the cursor moves off the tag
+ * onto the panel and the tag's :hover CSS releases. The rules below
+ * paint the hover surface for the duration the popover is open, so
+ * the visual link between trigger and popover holds. See opp-table
+ * for the architecture note. */
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--neutral {
+  background-color: var(--ds-field-hover);
   box-shadow: none;
 }
-.stage .panw--tag.panw--tag--low.panw--tag--neutral:hover {
-  background-color: var(--ds-surface-hover);
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--green {
+  background-color: var(--ds-tag-green-low-bg-hover);
+}
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--yellow {
+  background-color: var(--ds-tag-yellow-low-bg-hover);
+}
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--orange {
+  background-color: var(--ds-tag-orange-low-bg-hover);
+}
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--red {
+  background-color: var(--ds-tag-red-low-bg-hover);
+}
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--grey {
+  background-color: var(--ds-tag-grey-low-bg-hover);
+}
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--olive {
+  background-color: var(--ds-tag-olive-low-bg-hover);
+}
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--lime {
+  background-color: var(--ds-tag-lime-low-bg-hover);
+}
+.acc-hover-trigger[data-popover-open="true"] .panw--tag.panw--tag--low.panw--tag--jade {
+  background-color: var(--ds-tag-jade-low-bg-hover);
 }
 
 /* Static tag — display-only label inside an interactive wrapper
@@ -3064,7 +3576,19 @@ const LAYOUT_CSS = `
 
 /* KV rows: label left, value/tag right. Height + dividers + click
  * states come from the shared .acc-pop__kv-list > * and
- * .acc-pop__rows > * rules. */
+ * .acc-pop__rows > * rules.
+ *
+ * NOTE — overflow risk to harden if labels or values ever grow:
+ * these rows use space-between with no flex-shrink rules on either
+ * side. With short labels (e.g. "ARR") and short values (e.g. "$1.2M")
+ * everything fits inside the popover's content rail today. If a
+ * future label/value pair would exceed the rail, content will bleed
+ * past the popover's right edge (the panel defaults to overflow:
+ * visible). Fix when needed: give the label flex:1 1 0, min-width:0,
+ * overflow:hidden, text-overflow:ellipsis; and the value
+ * flex-shrink:0 — same pattern used in .acc-pop-row__name /
+ * .acc-pop-row__value where the same overflow bug was already
+ * surfaced and fixed. */
 .acc-pop__kv {
   display: flex;
   align-items: center;

@@ -16,7 +16,7 @@
   --panw-filter-bg-open:      var(--ds-surface-selected);
   --panw-filter-bg-disabled:  var(--ds-surface-disabled);
 
-  --panw-filter-border:           var(--ds-lines-neutral-rest);
+  --panw-filter-border:           var(--ds-base); // neutral10 — lightest visible line
   --panw-filter-border-hover:     var(--ds-lines-neutral-hover);
   --panw-filter-border-open:      var(--ds-lines-brand-rest);
   --panw-filter-border-disabled:  var(--ds-lines-neutral-disabled);

@@ -1,4 +1,5 @@
 @use 'tokens';
+@use '@ds/type/scss' as type;
 
 $panw-prefix: 'panw';
 
@@ -64,9 +65,7 @@ $panw-prefix: 'panw';
 }
 
 .#{$panw-prefix}--tooltip__text {
-  font-size: 12px;
-  line-height: 16px;
-  letter-spacing: 0.10px;
+  @include type.type-style('label-01'); // 12px / 1.333 / regular
   color: var(--panw-tooltip-text);
   margin: 0;
 }

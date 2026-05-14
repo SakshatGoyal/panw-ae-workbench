@@ -391,323 +391,391 @@ function mkPipeline(
 
 export const DEFAULT_ROWS: AccountRow[] = (() => {
   const rows: Omit<AccountRow, 'totalPipelineUsd' | 'hasUpsellPipeline'>[] = [
+    // scenario-1: Stripe Treasury Operations — XSOAR Renewal Landmine
+    // Critical health, 3 account risks, declining trend, 3-brand platformized
     {
       id: '1',
-      accountId: 'acc-tyrell',
-      name: 'Tyrell Corporation',
-      apex: 'Titan Industrial Holdings',
-      pipeline: mkPipeline(1_200_000, 800_000, 0, 450_000, [
-        { q: 0, type: 'renewal', usd: 900_000 },
-        { q: 0, type: 'upsell',  usd: 300_000 },
-        { q: 1, type: 'net-new', usd: 500_000 },
-        { q: 1, type: 'net-new', usd: 300_000 },
-        { q: 3, type: 'upsell',  usd: 250_000 },
-        { q: 3, type: 'upsell',  usd: 200_000 },
+      accountId: 'acc-stripe-treasury',
+      name: 'Stripe Treasury Operations',
+      apex: 'Stripe Inc',
+      pipeline: mkPipeline(1_370_000, 520_000, 270_000, 0, [
+        { q: 0, type: 'upsell',  usd: 310_000 },
+        { q: 0, type: 'net-new', usd: 420_000 },
+        { q: 0, type: 'renewal', usd: 640_000 },
+        { q: 1, type: 'upsell',  usd: 520_000 },
+        { q: 2, type: 'net-new', usd: 180_000 },
+        { q: 2, type: 'net-new', usd:  90_000 },
       ]),
-      activity: { daysAgo: 2, description: 'EBC follow-up with CIO' },
-      health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
-        trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
-      ebc: { absent: false, date: '2026-02-04', topic: 'SASE roadmap + cloud-first program',
-        attendees: ['Anuj Khanna (CISO)', 'Marlena Cruz (VP Architecture)'] },
-      risks: [],
-      products: [
-        mkProduct('Prisma Access',  3_600_000),
-        mkProduct('Prisma SD-WAN',  1_200_000),
-        mkProduct('PA Series',      900_000),
-        mkProduct('Cortex XDR+',    450_000),
-      ],
-      salesPlays: [
-        { status: 'pursuing', usd: 1_200_000, plays: [
-          { name: 'SASE Acceleration', usd: 800_000 },
-          { name: 'Hardware Refresh',  usd: 400_000 },
-        ]},
-        { status: 'closed-won', usd: 600_000, plays: [
-          { name: 'Cortex Cloud Pilot', usd: 600_000 },
-        ]},
-      ],
-      arrUsd: 6_150_000,
-      ltvUsd: 28_400_000,
-    },
-    {
-      id: '2',
-      accountId: 'acc-atlas-bank',
-      name: 'Atlas Bank',
-      apex: 'Meridian Financial Partners',
-      pipeline: mkPipeline(450_000, 1_200_000, 700_000, 0, [
-        { q: 0, type: 'upsell',  usd: 450_000 },
-        // Q1 — same-type pair (two Net News) per designer ask
-        { q: 1, type: 'net-new', usd: 700_000 },
-        { q: 1, type: 'net-new', usd: 500_000 },
-        { q: 2, type: 'renewal', usd: 700_000 },
-      ]),
-      activity: { daysAgo: 18, description: 'Pricing thread with procurement' },
-      // High-risk HEALTHY — cr-failure §10 negative-test case.
-      health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
-        trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
-      ebc: { absent: true },
-      risks: [
-        mkRisk('no-ebc'), mkRisk('not-platformized'),
-        mkRisk('derailed-povs'), mkRisk('no-csp'),
-      ],
-      products: [
-        mkProduct('Cortex XDR+', 1_400_000),
-        mkProduct('XSIAM',         700_000),
-      ],
-      salesPlays: [
-        { status: 'not-touched', usd: 950_000, plays: [
-          { name: 'XSIAM Splunk Takeout', usd: 600_000 },
-          { name: 'EBC Reset',            usd: 350_000 },
-        ]},
-        { status: 'pursuing', usd: 800_000, plays: [
-          { name: 'Cortex Expansion', usd: 800_000 },
-        ]},
-      ],
-      arrUsd: 2_100_000,
-      ltvUsd: 8_400_000,
-    },
-    {
-      id: '3',
-      accountId: 'acc-aperture',
-      name: 'Aperture Science',
-      apex: null, // standalone (spec §2) — no parent
-      pipeline: mkPipeline(0, 250_000, 0, 0, [
-        { q: 1, type: 'net-new', usd: 250_000 },
-      ]),
-      activity: { daysAgo: 5, description: 'Discovery with security lead' },
-      health: { overall: 'at-risk', technical: 'at-risk', adoption: 'healthy',
-        trend12mo: [0,0,0,0,0,0,0,1,1,1,1,1] },
-      ebc: { absent: false, date: '2025-11-20', topic: 'Initial platform overview',
-        attendees: ['Karim Yates (CTO)'] },
-      risks: [mkRisk('not-platformized')],
-      products: [
-        mkProduct('PA Series', 220_000),
-      ],
-      salesPlays: [
-        { status: 'pitched', usd: 250_000, plays: [
-          { name: 'Hardware Refresh', usd: 250_000 },
-        ]},
-      ],
-      arrUsd: 220_000,
-      ltvUsd: 440_000,
-    },
-    {
-      id: '4',
-      accountId: 'acc-orion-shipping',
-      name: 'Orion Shipping Services',
-      apex: 'Vertex Industrial Group',
-      pipeline: mkPipeline(3_100_000, 1_400_000, 900_000, 600_000, [
-        { q: 0, type: 'renewal', usd: 2_500_000 },
-        { q: 0, type: 'upsell',  usd: 600_000 },
-        // Q1 — mixed-type pair (Upsell + Renewal) per designer ask
-        { q: 1, type: 'upsell',  usd: 200_000 },
-        { q: 1, type: 'renewal', usd: 1_200_000 },
-        { q: 2, type: 'net-new', usd: 900_000 },
-        { q: 3, type: 'net-new', usd: 600_000 },
-      ]),
-      activity: { daysAgo: 9, description: 'Executive escalation call' },
-      health: { overall: 'critical', technical: 'critical', adoption: 'at-risk',
-        trend12mo: [0,0,1,1,1,1,2,2,2,2,2,2] },
-      ebc: { absent: false, date: '2025-08-12', topic: 'Renewal strategy + ZT roadmap',
-        attendees: ['Selene Wu (CTO)', 'Dario Lang (CIO)', 'Priya Mehta (CFO)'] },
-      risks: [mkRisk('derailed-povs'), mkRisk('no-asr'), mkRisk('no-csp')],
-      products: [
-        mkProduct('Prisma Access',  2_200_000),
-        mkProduct('Prisma SD-WAN',  1_500_000),
-        mkProduct('PA Series',      900_000),
-        mkProduct('Cortex XDR+',    600_000),
-        mkProduct('FW Data Lake',   400_000),
-      ],
-      salesPlays: [
-        { status: 'pursuing', usd: 3_100_000, plays: [
-          { name: 'SASE Acceleration', usd: 2_500_000 },
-          { name: 'Hardware Refresh',  usd: 600_000 },
-        ]},
-      ],
-      arrUsd: 5_600_000,
-      ltvUsd: 31_200_000,
-    },
-    {
-      id: '5',
-      accountId: 'acc-cyberdyne',
-      // CQ-only pipeline — three placeholder ($—) quarters.
-      name: 'Cyberdyne Systems',
-      apex: 'Pacific Commerce Holdings',
-      pipeline: mkPipeline(670_000, 0, 0, 0, [
-        { q: 0, type: 'upsell', usd: 470_000 },
-        { q: 0, type: 'upsell', usd: 200_000 },
-      ]),
-      activity: { daysAgo: 12, description: 'Pricing options shared via email' },
-      health: { overall: 'critical', technical: 'at-risk', adoption: 'critical',
-        trend12mo: [0,0,0,1,1,1,1,2,2,2,2,2] },
-      ebc: { absent: false, date: '2025-04-30', topic: 'Architecture deep-dive',
-        attendees: ['Tomás Berry (Head of SecOps)'] },
+      activity: { daysAgo: 3, description: 'Legal cleared MSA addendum on endpoint expansion' },
+      health: { overall: 'critical', technical: 'healthy', adoption: 'critical',
+        trend12mo: [2,2,2,1,1,1,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2025-11-12', topic: 'Cortex Cloud Roadmap and XSOAR Roadmap Review',
+        attendees: ['Marcus Chen (VP Security)', 'Priya Ramanathan (Director SecOps)'] },
       risks: [mkRisk('derailed-povs'), mkRisk('no-csp'), mkRisk('no-asr')],
       products: [
-        mkProduct('Cortex XDR+', 900_000),
-        mkProduct('Xpanse',      200_000),
+        mkProduct('Cortex XSOAR', 1_100_000),
+        mkProduct('PA Series',      660_000),
+        mkProduct('Cortex XDR+',    440_000),
       ],
       salesPlays: [
-        { status: 'declined', usd: 470_000, plays: [
-          { name: 'XSIAM Splunk Takeout', usd: 470_000 },
+        { status: 'pursuing', usd: 2_220_000, plays: [
+          { name: 'Cortex Cloud Land and Expand',      usd: 640_000 },
+          { name: 'XSOAR SOAR Modernization',           usd: 640_000 },
+          { name: 'Prisma Access Land',                 usd: 420_000 },
+          { name: 'FW Refresh and VM-Series Migration', usd: 520_000 },
         ]},
-        { status: 'not-touched', usd: 200_000, plays: [
-          { name: 'Cortex Expansion', usd: 200_000 },
+        { status: 'pitched', usd: 580_000, plays: [
+          { name: 'Cortex XDR Land',               usd: 310_000 },
+          { name: 'XSIAM Next-Gen SIEM',            usd: 180_000 },
+          { name: 'Unit 42 Proactive Assessment',   usd:  90_000 },
         ]},
-      ],
-      arrUsd: 1_100_000,
-      ltvUsd: 6_700_000,
-    },
-    {
-      id: '6',
-      accountId: 'acc-hooli',
-      // No EBC on record — carries 🏛️ derived risk.
-      name: 'Hooli',
-      apex: 'Axiom Group',
-      pipeline: mkPipeline(0, 0, 1_200_000, 500_000, [
-        { q: 2, type: 'net-new', usd: 1_200_000 },
-        { q: 3, type: 'upsell',  usd: 500_000 },
-      ]),
-      activity: { daysAgo: 30, description: 'Discovery call with security team' },
-      health: { overall: 'at-risk', technical: 'healthy', adoption: 'at-risk',
-        trend12mo: [0,0,0,0,0,0,0,0,0,1,1,1] },
-      ebc: { absent: true },
-      risks: [mkRisk('no-ebc'), mkRisk('no-asr'), mkRisk('no-csp')],
-      products: [
-        mkProduct('Cortex XSOAR', 600_000),
-        mkProduct('Xpanse',       250_000),
-      ],
-      salesPlays: [
-        { status: 'pitched', usd: 1_700_000, plays: [
-          { name: 'XSIAM Splunk Takeout', usd: 1_200_000 },
-          { name: 'Cortex Expansion',     usd: 500_000 },
+        { status: 'closed-won', usd: 180_000, plays: [
+          { name: 'CDSS Subscription Attach', usd: 180_000 },
         ]},
       ],
-      arrUsd: 850_000,
-      ltvUsd: 4_200_000,
+      arrUsd: 2_200_000,
+      ltvUsd: 14_200_000,
     },
+    // scenario-2: DoorDash Platform Security — Quiet XDR Land
+    // Healthy, no risks, multi-opp pipeline, recent activity
     {
-      id: '7',
-      accountId: 'acc-summit',
-      // All 7 sales-play statuses — overflow stress case.
-      name: 'Summit Technologies',
-      apex: 'Summit Health Holdings',
-      pipeline: mkPipeline(445_000, 280_000, 0, 165_000, [
-        // CQ — mixed-type pair (Upsell + Renewal in the same Q).
-        { q: 0, type: 'upsell',  usd: 280_000 },
-        { q: 0, type: 'renewal', usd: 165_000 },
-        { q: 1, type: 'net-new', usd: 280_000 },
-        { q: 3, type: 'upsell',  usd: 165_000 },
+      id: '2',
+      accountId: 'acc-doordash-platform',
+      name: 'DoorDash Platform Security',
+      apex: 'DoorDash Inc',
+      pipeline: mkPipeline(140_000, 300_000, 180_000, 0, [
+        { q: 0, type: 'upsell',  usd: 140_000 },
+        { q: 1, type: 'net-new', usd:  90_000 },
+        { q: 1, type: 'upsell',  usd: 210_000 },
+        { q: 2, type: 'net-new', usd: 180_000 },
       ]),
-      activity: { daysAgo: 5, description: 'POC kickoff meeting' },
-      health: { overall: 'at-risk', technical: 'healthy', adoption: 'at-risk',
-        trend12mo: [0,0,0,0,0,0,0,1,1,1,1,1] },
-      ebc: { absent: false, date: '2025-09-14', topic: 'Compliance + healthcare-specific controls',
-        attendees: ['Hana Liu (CISO)', 'Marco Reyes (VP Security)'] },
-      risks: [mkRisk('not-platformized'), mkRisk('no-csp')],
-      products: [
-        mkProduct('Cortex XDR+',        280_000),
-        mkProduct('PA Series Attached', 165_000),
-        mkProduct('Prisma Access',      600_000),
-      ],
-      salesPlays: [
-        { status: 'not-touched', usd: 250_000, plays: [{ name: 'EBC Reset', usd: 250_000 }] },
-        { status: 'pitched',     usd: 320_000, plays: [{ name: 'Hardware Refresh', usd: 320_000 }] },
-        { status: 'deferred',    usd: 180_000, plays: [{ name: 'Cortex Expansion', usd: 180_000 }] },
-        { status: 'declined',    usd: 90_000,  plays: [{ name: 'WildFire Add-on', usd: 90_000 }] },
-        { status: 'pursuing',    usd: 445_000, plays: [{ name: 'SASE Acceleration', usd: 445_000 }] },
-        { status: 'closed-won',  usd: 120_000, plays: [{ name: 'Initial Pilot', usd: 120_000 }] },
-        { status: 'closed-lost', usd: 60_000,  plays: [{ name: 'XSIAM Splunk Takeout', usd: 60_000 }] },
-      ],
-      arrUsd: 1_045_000,
-      ltvUsd: 5_800_000,
-    },
-    {
-      id: '8',
-      accountId: 'acc-northstar',
-      // Long name stress case.
-      name: 'NorthStar Transport',
-      apex: 'Royal Philips Holdings International',
-      pipeline: mkPipeline(1_800_000, 0, 2_400_000, 0, [
-        { q: 0, type: 'renewal', usd: 1_800_000 },
-        { q: 2, type: 'upsell',  usd: 2_400_000 },
-      ]),
-      activity: { daysAgo: 22, description: 'Procurement review scheduled' },
-      health: { overall: 'at-risk', technical: 'at-risk', adoption: 'healthy',
-        trend12mo: [0,0,0,0,0,0,1,1,1,1,1,1] },
-      ebc: { absent: false, date: '2026-04-01', topic: 'Pan-EU platform consolidation',
-        attendees: ['Sven de Vries (CIO)', 'Aiko Tanaka (VP Infra)'] },
-      risks: [mkRisk('no-asr')],
-      products: [
-        mkProduct('Prisma Access', 1_500_000),
-        mkProduct('PA Series',       800_000),
-        mkProduct('Cortex XDR+',     400_000),
-      ],
-      salesPlays: [
-        { status: 'pursuing', usd: 2_400_000, plays: [{ name: 'SASE Acceleration', usd: 2_400_000 }] },
-        { status: 'pitched',  usd: 1_800_000, plays: [{ name: 'EU Renewal',        usd: 1_800_000 }] },
-      ],
-      arrUsd: 2_700_000,
-      ltvUsd: 11_500_000,
-    },
-    {
-      id: '9',
-      accountId: 'acc-beacon-corp',
-      // Newcomer: high ARR, low LTV.
-      name: 'Beacon Corp',
-      apex: 'Helix Holdings',
-      pipeline: mkPipeline(400_000, 600_000, 0, 0, [
-        { q: 0, type: 'net-new', usd: 400_000 },
-        { q: 1, type: 'upsell',  usd: 600_000 },
-      ]),
-      activity: { daysAgo: 1, description: 'Roadmap call with Head of IT' },
+      activity: { daysAgo: 4, description: 'Initial scoping with SecOps Director' },
       health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
         trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
-      ebc: { absent: false, date: '2026-03-22', topic: 'Greenfield SASE deployment',
-        attendees: ['Inés Calderón (CIO)'] },
+      ebc: { absent: false, date: '2025-12-08', topic: 'Cortex XDR Roadmap and SecOps Modernization',
+        attendees: ['Nia Osei (Director of Security Engineering)'] },
       risks: [],
       products: [
-        mkProduct('Prisma Access', 1_100_000),
-        mkProduct('Cortex XDR+',     400_000),
+        mkProduct('Cortex XDR+', 900_000),
+        mkProduct('PA Series',   900_000),
       ],
       salesPlays: [
-        { status: 'pursuing', usd: 1_000_000, plays: [{ name: 'SASE Acceleration', usd: 1_000_000 }] },
+        { status: 'pursuing', usd: 530_000, plays: [
+          { name: 'Cortex XDR Land',                   usd: 180_000 },
+          { name: 'XSOAR SOAR Modernization',           usd: 210_000 },
+          { name: 'FW Refresh and VM-Series Migration', usd: 140_000 },
+        ]},
+        { status: 'pitched', usd: 90_000, plays: [
+          { name: 'Xpanse Attack Surface Management', usd: 90_000 },
+        ]},
       ],
-      arrUsd: 1_500_000,
-      ltvUsd: 1_500_000,
+      arrUsd: 520_000,
+      ltvUsd: 2_400_000,
     },
+    // scenario-3: Reddit Platform Engineering — Five-Risk Pile-up
+    // Critical health, 5 account risks, 42d stale, standalone-brand, no EBC
     {
-      id: '10',
-      accountId: 'acc-prime-dynamics',
-      // Shrinking: low ARR, high LTV.
-      name: 'Prime Dynamics',
-      apex: 'Harbor Maritime Holdings',
-      pipeline: mkPipeline(0, 150_000, 0, 0, [
-        { q: 1, type: 'net-new', usd: 150_000 },
+      id: '3',
+      accountId: 'acc-reddit-platform',
+      name: 'Reddit Platform Engineering',
+      apex: 'Reddit Inc',
+      // pipelineCQ=0 per canonical account (best-case opps excluded from committed CQ).
+      pipeline: mkPipeline(0, 310_000, 80_000, 120_000, [
+        { q: 1, type: 'renewal', usd: 310_000 },
+        { q: 2, type: 'upsell',  usd:  80_000 },
+        { q: 3, type: 'net-new', usd: 120_000 },
       ]),
-      activity: { daysAgo: 45, description: 'No replies to outreach' },
+      activity: { daysAgo: 42, description: 'No response from buyer since last renewal-prep call' },
       health: { overall: 'critical', technical: 'at-risk', adoption: 'critical',
-        trend12mo: [0,0,0,0,0,1,1,1,1,2,2,2] },
-      ebc: { absent: false, date: '2024-09-04', topic: 'Renewal expansion (historical)',
-        attendees: ['Renata Costa (former CISO)'] },
+        trend12mo: [2,2,2,2,2,2,2,2,2,2,2,2] },
+      ebc: { absent: true },
       risks: [
-        mkRisk('no-ebc'), mkRisk('derailed-povs'),
-        mkRisk('no-asr'),  mkRisk('no-csp'),
+        mkRisk('no-pipeline'), mkRisk('no-ebc'), mkRisk('not-platformized'),
+        mkRisk('derailed-povs'), mkRisk('no-asr'),
       ],
       products: [
-        mkProduct('PA Series',       380_000),
-        mkProduct('Prisma Access',   220_000),
+        mkProduct('PA Series',         700_000),
+        mkProduct('PA Series Support', 700_000),
       ],
       salesPlays: [
-        { status: 'closed-lost', usd: 800_000, plays: [
-          { name: 'SASE Acceleration', usd: 500_000 },
-          { name: 'Cortex Expansion',  usd: 300_000 },
-        ]},
-        { status: 'not-touched', usd: 150_000, plays: [
-          { name: 'Hardware Refresh', usd: 150_000 },
+        { status: 'not-touched', usd: 510_000, plays: [
+          { name: 'FW Refresh and VM-Series Migration', usd: 310_000 },
+          { name: 'Cortex XDR Land',                   usd: 120_000 },
+          { name: 'CDSS Subscription Attach',           usd:  80_000 },
         ]},
       ],
-      arrUsd: 600_000,
-      ltvUsd: 18_900_000,
+      arrUsd: 180_000,
+      ltvUsd: 1_800_000,
+    },
+    // scenario-4: Lyft Rideshare Operations — Boring Healthy Renewal Full
+    // Healthy across all axes, no risks, commit renewal closing in 18 days
+    {
+      id: '4',
+      accountId: 'acc-lyft-rideshare',
+      name: 'Lyft Rideshare Operations',
+      apex: 'Lyft Inc',
+      pipeline: mkPipeline(870_000, 330_000, 180_000, 0, [
+        { q: 0, type: 'renewal', usd: 420_000 },
+        { q: 0, type: 'upsell',  usd: 310_000 },
+        { q: 0, type: 'upsell',  usd: 140_000 },
+        { q: 1, type: 'upsell',  usd: 240_000 },
+        { q: 1, type: 'net-new', usd:  90_000 },
+        { q: 2, type: 'net-new', usd: 180_000 },
+      ]),
+      activity: { daysAgo: 1, description: 'Awaiting countersignature from procurement' },
+      health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
+        trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2026-02-25', topic: 'FW Refresh Strategy and CDSS Roadmap',
+        attendees: ['Camille Torres (VP Infrastructure)', 'Dev Sharma (Director Security)'] },
+      risks: [],
+      products: [
+        mkProduct('PA Series',         2_900_000),
+        mkProduct('Prisma SD-WAN',     1_740_000),
+        mkProduct('PA Series Support', 1_160_000),
+      ],
+      salesPlays: [
+        { status: 'pursuing', usd: 1_110_000, plays: [
+          { name: 'FW Refresh and VM-Series Migration', usd: 420_000 },
+          { name: 'SD-WAN Modernization',               usd: 240_000 },
+          { name: 'Prisma Access Land',                 usd: 310_000 },
+          { name: 'CDSS Subscription Attach',           usd: 140_000 },
+        ]},
+        { status: 'pitched', usd: 320_000, plays: [
+          { name: 'Remote Workforce SASE', usd: 140_000 },
+          { name: 'Cortex XDR Land',       usd: 180_000 },
+        ]},
+        { status: 'not-touched', usd: 90_000, plays: [
+          { name: 'Unit 42 Proactive Assessment', usd: 90_000 },
+        ]},
+      ],
+      arrUsd: 1_180_000,
+      ltvUsd: 7_800_000,
+    },
+    // scenario-5: Twilio Messaging Cloud — Renewal-and-Upsell Upsell Outcome
+    // Healthy overall but adoption at-risk, 1 derailed-povs risk, APAC expansion
+    {
+      id: '5',
+      accountId: 'acc-twilio-messaging',
+      name: 'Twilio Messaging Cloud',
+      apex: 'Twilio Inc',
+      pipeline: mkPipeline(630_000, 500_000, 90_000, 0, [
+        { q: 0, type: 'renewal', usd: 180_000 },
+        { q: 0, type: 'renewal', usd: 450_000 },
+        { q: 1, type: 'net-new', usd: 290_000 },
+        { q: 1, type: 'net-new', usd: 210_000 },
+        { q: 2, type: 'net-new', usd:  90_000 },
+      ]),
+      activity: { daysAgo: 5, description: 'Deal desk reviewing pricing schedule' },
+      health: { overall: 'healthy', technical: 'healthy', adoption: 'at-risk',
+        trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2026-01-15', topic: 'Cortex Platform Roadmap',
+        attendees: ['Rashida Okonkwo (CISO)', 'Ben Park (VP Engineering)'] },
+      risks: [mkRisk('derailed-povs')],
+      products: [
+        mkProduct('VM Series',         1_600_000),
+        mkProduct('PA Series Support', 1_600_000),
+      ],
+      salesPlays: [
+        { status: 'pursuing', usd: 920_000, plays: [
+          { name: 'FW Refresh and VM-Series Migration', usd: 450_000 },
+          { name: 'CDSS Subscription Attach',           usd: 180_000 },
+          { name: 'Prisma Access Land',                 usd: 290_000 },
+        ]},
+        { status: 'pitched', usd: 300_000, plays: [
+          { name: 'Cortex XDR Land',                 usd: 210_000 },
+          { name: 'Xpanse Attack Surface Management', usd:  90_000 },
+        ]},
+      ],
+      arrUsd: 920_000,
+      ltvUsd: 4_500_000,
+    },
+    // scenario-6: Databricks Lakehouse Security — Displacement Win
+    // At-risk overall, commit displacement renewal, heavy Cortex pipeline in Q1
+    {
+      id: '6',
+      accountId: 'acc-databricks-lakehouse',
+      name: 'Databricks Lakehouse Security',
+      apex: 'Databricks Inc',
+      pipeline: mkPipeline(890_000, 1_100_000, 140_000, 0, [
+        { q: 0, type: 'renewal', usd:   890_000 },
+        { q: 1, type: 'upsell',  usd:   290_000 },
+        { q: 1, type: 'upsell',  usd:   180_000 },
+        { q: 1, type: 'upsell',  usd:   420_000 },
+        { q: 1, type: 'net-new', usd:   210_000 },
+        { q: 2, type: 'net-new', usd:   140_000 },
+      ]),
+      activity: { daysAgo: 2, description: 'Closing-call follow-up with CISO' },
+      health: { overall: 'at-risk', technical: 'healthy', adoption: 'at-risk',
+        trend12mo: [1,1,0,0,0,0,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2026-03-18', topic: 'Strata Data Lake and Cortex Cloud Land Briefing',
+        attendees: ['Soren Lund (CTO)', 'Aiko Yamamoto (Head of Platform Security)'] },
+      risks: [mkRisk('derailed-povs')],
+      products: [
+        mkProduct('Cortex XDR+', 1_700_000),
+        mkProduct('XSIAM',       1_700_000),
+      ],
+      salesPlays: [
+        { status: 'pursuing', usd: 2_490_000, plays: [
+          { name: 'Cortex Cloud Land and Expand', usd: 890_000 },
+          { name: 'Cortex XDR Land',              usd: 890_000 },
+          { name: 'XSIAM Next-Gen SIEM',          usd: 420_000 },
+          { name: 'Strata Logging and Data Lake', usd: 290_000 },
+        ]},
+        { status: 'pitched', usd: 530_000, plays: [
+          { name: 'CDSS Subscription Attach', usd: 180_000 },
+          { name: 'Prisma Access Land',       usd: 210_000 },
+          { name: 'XSOAR SOAR Modernization', usd: 140_000 },
+        ]},
+      ],
+      arrUsd: 1_080_000,
+      ltvUsd: 5_200_000,
+    },
+    // scenario-7 + all-7-statuses stress case: Notion Workspace Trust
+    // Healthy, no risks — but carries all 7 sales play status values simultaneously
+    {
+      id: '7',
+      accountId: 'acc-notion-workspace',
+      name: 'Notion Workspace Trust',
+      apex: 'Notion Labs Inc',
+      pipeline: mkPipeline(620_000, 300_000, 180_000, 0, [
+        { q: 0, type: 'renewal', usd: 310_000 },
+        { q: 0, type: 'renewal', usd: 310_000 },
+        { q: 1, type: 'upsell',  usd: 180_000 },
+        { q: 1, type: 'upsell',  usd: 120_000 },
+        { q: 2, type: 'net-new', usd: 180_000 },
+      ]),
+      activity: { daysAgo: 3, description: 'Renewal contract sent to procurement' },
+      health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
+        trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2025-10-08', topic: 'Cortex XDR Roadmap',
+        attendees: ['Tae Kim (VP Security)'] },
+      risks: [],
+      products: [
+        mkProduct('Cortex XDR+',  550_000),
+        mkProduct('Cortex XSOAR', 550_000),
+      ],
+      salesPlays: [
+        { status: 'not-touched', usd: 120_000, plays: [{ name: 'Xpanse Attack Surface Management', usd: 120_000 }] },
+        { status: 'pitched',     usd: 180_000, plays: [{ name: 'XSOAR SOAR Modernization',          usd: 180_000 }] },
+        { status: 'deferred',    usd:  90_000, plays: [{ name: 'Unit 42 Proactive Assessment',       usd:  90_000 }] },
+        { status: 'declined',    usd:  60_000, plays: [{ name: 'Strata Logging and Data Lake',       usd:  60_000 }] },
+        { status: 'pursuing',    usd: 490_000, plays: [
+          { name: 'Cortex XDR Land',                   usd: 310_000 },
+          { name: 'FW Refresh and VM-Series Migration', usd: 180_000 },
+        ]},
+        { status: 'closed-won',  usd: 210_000, plays: [{ name: 'Cortex Cloud Land and Expand', usd: 210_000 }] },
+        { status: 'closed-lost', usd:  80_000, plays: [{ name: 'CDSS Subscription Attach',     usd:  80_000 }] },
+      ],
+      arrUsd: 310_000,
+      ltvUsd: 1_600_000,
+    },
+    // scenario-8: Linear Issue Tracking — Churn Budget Cuts
+    // Critical health, 3 risks, standalone (no apex), churn renewal outcome
+    {
+      id: '8',
+      accountId: 'acc-linear-issues',
+      name: 'Linear Issue Tracking',
+      apex: null,
+      pipeline: mkPipeline(270_000, 0, 80_000, 0, [
+        { q: 0, type: 'renewal', usd:  90_000 },
+        { q: 0, type: 'renewal', usd: 180_000 },
+        { q: 2, type: 'net-new', usd:  80_000 },
+      ]),
+      activity: { daysAgo: 12, description: 'Reduced scope conversation pending' },
+      health: { overall: 'critical', technical: 'at-risk', adoption: 'critical',
+        trend12mo: [2,2,2,1,1,1,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2025-07-22', topic: 'Cortex Platform Roadmap and XSOAR Briefing',
+        attendees: ['Arjun Mehta (CISO)'] },
+      risks: [mkRisk('no-csp'), mkRisk('derailed-povs'), mkRisk('no-asr')],
+      products: [
+        mkProduct('Cortex XSOAR', 460_000),
+        mkProduct('Cortex XDR+',  460_000),
+      ],
+      salesPlays: [
+        { status: 'pursuing', usd: 270_000, plays: [
+          { name: 'XSOAR SOAR Modernization', usd: 180_000 },
+          { name: 'Cortex XDR Land',          usd:  90_000 },
+        ]},
+        { status: 'pitched', usd: 80_000, plays: [
+          { name: 'Prisma Access Land', usd: 80_000 },
+        ]},
+      ],
+      arrUsd: 180_000,
+      ltvUsd: 1_200_000,
+    },
+    // scenario-9: Figma Design Cloud — Unknown Renewal
+    // Healthy, no risks, renewal outcome unknown (early engagement)
+    {
+      id: '9',
+      accountId: 'acc-figma-design',
+      name: 'Figma Design Cloud',
+      apex: 'Figma Inc',
+      pipeline: mkPipeline(180_000, 430_000, 80_000, 0, [
+        { q: 0, type: 'upsell',  usd: 180_000 },
+        { q: 1, type: 'upsell',  usd: 140_000 },
+        { q: 1, type: 'renewal', usd: 290_000 },
+        { q: 2, type: 'net-new', usd:  80_000 },
+      ]),
+      activity: { daysAgo: 4, description: 'Quote final review with procurement' },
+      health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
+        trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2025-11-19', topic: 'Cortex XDR Roadmap and Xpanse Briefing',
+        attendees: ['Sofia Nguyen (Director of Security)', 'Liam Park (VP Engineering)'] },
+      risks: [],
+      products: [
+        mkProduct('Cortex XDR+', 1_200_000),
+        mkProduct('PA Series',   1_200_000),
+      ],
+      salesPlays: [
+        { status: 'pursuing', usd: 610_000, plays: [
+          { name: 'Cortex XDR Land',                   usd: 290_000 },
+          { name: 'Xpanse Attack Surface Management',  usd: 140_000 },
+          { name: 'CDSS Subscription Attach',          usd: 180_000 },
+        ]},
+        { status: 'pitched', usd: 80_000, plays: [
+          { name: 'Unit 42 Proactive Assessment', usd: 80_000 },
+        ]},
+      ],
+      arrUsd: 720_000,
+      ltvUsd: 3_400_000,
+    },
+    // scenario-10: Asana Work Graph — Negotiate 9 Days
+    // Healthy, no risks, CQ commit closing imminently, SASE-heavy
+    {
+      id: '10',
+      accountId: 'acc-asana-work',
+      name: 'Asana Work Graph',
+      apex: 'Asana Inc',
+      pipeline: mkPipeline(820_000, 640_000, 0, 0, [
+        { q: 0, type: 'net-new', usd: 640_000 },
+        { q: 0, type: 'upsell',  usd: 180_000 },
+        { q: 1, type: 'upsell',  usd: 140_000 },
+        { q: 1, type: 'renewal', usd: 290_000 },
+        { q: 1, type: 'net-new', usd: 210_000 },
+      ]),
+      activity: { daysAgo: 1, description: 'Legal redline returned to procurement' },
+      health: { overall: 'healthy', technical: 'healthy', adoption: 'healthy',
+        trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+      ebc: { absent: false, date: '2026-02-12', topic: 'Strata Roadmap and CDSS Attach',
+        attendees: ['Priya Kapoor (CISO)', 'Sven Larsen (VP Infrastructure)'] },
+      risks: [],
+      products: [
+        mkProduct('Prisma Access', 950_000),
+        mkProduct('Prisma SD-WAN', 950_000),
+      ],
+      salesPlays: [
+        { status: 'pursuing', usd: 1_600_000, plays: [
+          { name: 'Prisma Access Land',                 usd: 640_000 },
+          { name: 'SD-WAN Modernization',               usd: 640_000 },
+          { name: 'CDSS Subscription Attach',           usd: 180_000 },
+          { name: 'Remote Workforce SASE',              usd: 140_000 },
+        ]},
+        { status: 'pitched', usd: 210_000, plays: [
+          { name: 'Cortex XDR Land', usd: 210_000 },
+        ]},
+      ],
+      arrUsd: 580_000,
+      ltvUsd: 2_800_000,
     },
   ]
   return rows.map(r => {

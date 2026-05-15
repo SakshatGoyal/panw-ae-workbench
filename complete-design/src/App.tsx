@@ -7,7 +7,25 @@ import { SalesPlayModal } from '../../poc-exploration/src/compositions/sales-pla
 import { ACCOUNTS } from '../../poc-exploration/src/mock/data/accounts'
 import { CONTACTS as CANONICAL_CONTACTS } from '../../poc-exploration/src/mock/data/contacts'
 import { OPPORTUNITIES as CANONICAL_OPPORTUNITIES } from '../../poc-exploration/src/mock/data/opportunities'
+import { SALES_PLAY_INSTANCES } from '../../poc-exploration/src/mock/data/sales-play-instances'
+import { SALES_PLAYS } from '../../poc-exploration/src/mock/data/sales-plays'
+import { mapOpportunityToRow } from '../../poc-exploration/src/mock/opportunity-row-mapper'
 import type { PlayContact, PlayOpportunity } from '../../poc-exploration/src/mock/sales-play-modal'
+
+function formatUsdCompact(n: number): string {
+  return new Intl.NumberFormat('en-US', {
+    notation: 'compact',
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 1,
+  }).format(n)
+}
+
+const MAPPED_ROWS = CANONICAL_OPPORTUNITIES.map(o =>
+  mapOpportunityToRow(o, ACCOUNTS, SALES_PLAY_INSTANCES, SALES_PLAYS)
+)
+const TOTAL_OPP_VALUE = MAPPED_ROWS.reduce((s, r) => s + r.valueUsd, 0)
+const OPP_SUMMARY_LABEL = `${MAPPED_ROWS.length} deals · ${formatUsdCompact(TOTAL_OPP_VALUE)}`
 
 type View = 'Opportunities' | 'Account Workbench'
 type ModalState = { type: 'salesPlay'; playId: string; sourceOppId?: string; accountId?: string } | null
@@ -101,7 +119,13 @@ export default function App() {
         <div className="cd-app__body">
           {activeView === 'Opportunities' ? (
             <main className="cd-app__main" aria-label="Opportunity Workbench">
-              <AEOpportunityTable onExpand={handleExpand} onOpenSalesPlay={handleOpenSalesPlay} />
+              <AEOpportunityTable
+                rows={MAPPED_ROWS}
+                totalItems={MAPPED_ROWS.length}
+                summaryLabel={OPP_SUMMARY_LABEL}
+                onExpand={handleExpand}
+                onOpenSalesPlay={handleOpenSalesPlay}
+              />
             </main>
           ) : (
             <main className="cd-app__main" aria-label="Account Workbench">

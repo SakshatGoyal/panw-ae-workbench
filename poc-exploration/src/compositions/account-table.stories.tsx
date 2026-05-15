@@ -970,6 +970,32 @@ const ALL_PRODUCT_LEAVES = PRODUCT_TREE.flatMap(g => g.children?.map(c => c.valu
 const PRODUCT_LEAF_LABEL = new Map<string, string>(
   PRODUCT_TREE.flatMap(g => (g.children ?? []).map(c => [c.value, c.label]))
 )
+// Reverse: product display name → leaf value. Used by the filtering
+// pipeline to check whether a row's products intersect the selected leaves.
+const PRODUCT_NAME_TO_LEAF = new Map<string, string>(
+  PRODUCT_TREE.flatMap(g => (g.children ?? []).map(c => [c.label, c.value]))
+)
+
+// Map a lastActivity bucket option value to a daysAgo predicate.
+function matchesLastActivity(daysAgo: number, bucket: string): boolean {
+  switch (bucket) {
+    case 'lt-7':  return daysAgo < 7
+    case '7-21':  return daysAgo >= 7 && daysAgo <= 21
+    case 'gt-21': return daysAgo > 21
+    default:      return true
+  }
+}
+
+// Map an EBC bucket option value to an ebc row predicate.
+function matchesEbcBucket(ebc: EBC, bucket: string, today: Date = DEMO_TODAY): boolean {
+  const days = ebc.absent ? Number.POSITIVE_INFINITY : daysBetween(ebc.date, today)
+  switch (bucket) {
+    case 'lt-180':  return days <= 180
+    case '180-365': return days > 180 && days <= 365
+    case 'gt-365':  return days > 365
+    default:        return true
+  }
+}
 
 // ─── Tag presets ─────────────────────────────────────────────────────────
 const TAG_BASE = {
@@ -2236,35 +2262,102 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand, onOpenSalesPlay 
         onRemove: () => setAccountRiskMulti(accountRiskMulti.filter(x => x !== v)),
       })
     }
+    const ALL_HEALTH_LEVELS_VALUES = HEALTH_LEVELS.map(l => l.value)
     for (const axis of ['overall', 'technical', 'adoption'] as const) {
-      for (const lvl of groupedHealth[axis]) {
-        out.push({
-          value: `health:${axis}:${lvl}`,
-          label: `${axis === 'overall' ? 'Overall' : axis === 'technical' ? 'Technical' : 'Adoption'}: ${HEALTH_LABEL[lvl]}`,
-          onRemove: () => setGroupedHealth({
-            ...groupedHealth,
-            [axis]: groupedHealth[axis].filter(x => x !== lvl),
-          }),
-        })
+      // Only count as an active filter when the axis is narrowed — i.e.
+      // it does NOT have all 3 levels selected.
+      const axisSelection = groupedHealth[axis]
+      const allSelected = ALL_HEALTH_LEVELS_VALUES.every(l => axisSelection.includes(l))
+      if (!allSelected) {
+        for (const lvl of axisSelection) {
+          out.push({
+            value: `health:${axis}:${lvl}`,
+            label: `${axis === 'overall' ? 'Overall' : axis === 'technical' ? 'Technical' : 'Adoption'}: ${HEALTH_LABEL[lvl]}`,
+            onRemove: () => setGroupedHealth({
+              ...groupedHealth,
+              [axis]: groupedHealth[axis].filter(x => x !== lvl),
+            }),
+          })
+        }
       }
     }
-    // Products always contribute to the count — every selected leaf
-    // is a filter option the AE has chosen, even if all are selected.
-    for (const v of products) {
-      const lbl = PRODUCT_LEAF_LABEL.get(v) ?? v
-      out.push({
-        value: `product:${v}`,
-        label: `Product: ${lbl}`,
-        onRemove: () => setProducts(products.filter(x => x !== v)),
-      })
+    // Only count products when partially selected — "all 15 selected"
+    // is no narrowing at all and should not appear as active filters.
+    if (products.length < ALL_PRODUCT_LEAVES.length) {
+      for (const v of products) {
+        const lbl = PRODUCT_LEAF_LABEL.get(v) ?? v
+        out.push({
+          value: `product:${v}`,
+          label: `Product: ${lbl}`,
+          onRemove: () => setProducts(products.filter(x => x !== v)),
+        })
+      }
     }
     return out
   }, [lastActivitySingle, ebcSingle, upsellSingle, accountRiskMulti, groupedHealth, products])
 
-  // Filtering wiring lands later. For now, sort renders against the full
-  // fixture so the default-sort behavior is visibly verifiable.
-  const sortedRows = useMemo(() => {
-    const arr = [...rows]
+  // Filter → sort pipeline. Filtering is AND across dimensions.
+  const displayRows = useMemo(() => {
+    const ALL_HEALTH_LEVELS_SET = new Set(HEALTH_LEVELS.map(l => l.value))
+
+    let arr = [...rows]
+
+    // 1. Search — case-insensitive substring on account name.
+    if (search.trim() !== '') {
+      const q = search.toLowerCase()
+      arr = arr.filter(r => r.name.toLowerCase().includes(q))
+    }
+
+    // 2. Grouped health — per axis, filter only when narrowed (non-empty AND not all-3).
+    for (const axis of ['overall', 'technical', 'adoption'] as const) {
+      const sel = groupedHealth[axis]
+      if (sel.length > 0 && sel.length < ALL_HEALTH_LEVELS_SET.size) {
+        const selSet = new Set(sel)
+        arr = arr.filter(r => selSet.has(r.health[axis]))
+      }
+    }
+
+    // 3. Last activity single-select.
+    if (lastActivitySingle) {
+      const bucket = lastActivitySingle
+      arr = arr.filter(r => matchesLastActivity(r.activity.daysAgo, bucket))
+    }
+
+    // 4. EBC single-select. Absent EBC falls in the 'gt-365' bucket.
+    if (ebcSingle) {
+      const bucket = ebcSingle
+      arr = arr.filter(r => matchesEbcBucket(r.ebc, bucket))
+    }
+
+    // 5. Upsell single-select.
+    if (upsellSingle) {
+      if (upsellSingle === 'with') {
+        arr = arr.filter(r => r.hasUpsellPipeline)
+      } else if (upsellSingle === 'without') {
+        arr = arr.filter(r => !r.hasUpsellPipeline)
+      }
+    }
+
+    // 6. Account risk factors — multi (AND). Empty = no filter.
+    if (accountRiskMulti.length > 0) {
+      arr = arr.filter(r => {
+        const rowRiskIds = new Set<string>(r.risks.map(rk => rk.id))
+        return accountRiskMulti.every(id => rowRiskIds.has(id))
+      })
+    }
+
+    // 7. Products — only filter when partially selected.
+    if (products.length < ALL_PRODUCT_LEAVES.length) {
+      const selLeaves = new Set(products)
+      arr = arr.filter(r =>
+        r.products.some(p => {
+          const leaf = PRODUCT_NAME_TO_LEAF.get(p.name)
+          return leaf !== undefined && selLeaves.has(leaf)
+        })
+      )
+    }
+
+    // Sort.
     arr.sort((a, b) => {
       let cmp = 0
       switch (sortKey) {
@@ -2282,7 +2375,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand, onOpenSalesPlay 
       return sortDir === 'asc' ? cmp : -cmp
     })
     return arr
-  }, [rows, sortKey, sortDir])
+  }, [rows, search, groupedHealth, lastActivitySingle, ebcSingle, upsellSingle, accountRiskMulti, products, sortKey, sortDir])
 
   return (
     <>
@@ -2404,7 +2497,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand, onOpenSalesPlay 
                 <tr className="acc-divider-row" aria-hidden="true">
                   <td colSpan={5}><div className="acc-divider" /></td>
                 </tr>
-                {sortedRows.map((row, i) => (
+                {displayRows.map((row, i) => (
                   <React.Fragment key={row.id}>
                   <tr className="acc-row">
                     <td className="acc-c-account">
@@ -2572,7 +2665,7 @@ export function AEAccountTable({ rows = DEFAULT_ROWS, onExpand, onOpenSalesPlay 
                       </div>
                     </td>
                   </tr>
-                  {i < sortedRows.length - 1 && (
+                  {i < displayRows.length - 1 && (
                     <tr className="acc-divider-row" aria-hidden="true">
                       <td colSpan={5}><div className="acc-divider" /></td>
                     </tr>

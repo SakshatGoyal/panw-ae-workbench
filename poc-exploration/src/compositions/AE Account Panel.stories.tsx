@@ -882,7 +882,7 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
             inputType="area"
             placeholder={isChurn ? 'Required notes on the churn rationale.' : 'Optional notes.'}
             showDescription={false}
-            background="grey00"
+            background="grey-00"
             value={draftNotes}
             onChange={(v: string) => setDraftNotes(v)}
           />

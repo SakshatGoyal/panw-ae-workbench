@@ -1359,6 +1359,73 @@ interface TagDensityFilterProps {
 function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
   const [open, setOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement>(null)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const [pos, setPos] = useState<{ top: number; left: number } | null>(null)
+
+  // Compute panel position after it mounts — same pattern as HoverShell in
+  // opp-table. Using createPortal + useLayoutEffect here (rather than the DS
+  // Flyout) because the Flyout's useLayoutEffect/setRef ordering produced an
+  // invisible panel for this particular trigger (Bug #5).
+  useLayoutEffect(() => {
+    if (!open) { setPos(null); return }
+    const trigger = triggerRef.current
+    const panel = panelRef.current
+    if (!trigger || !panel) return
+    const a = trigger.getBoundingClientRect()
+    const panelW = panel.offsetWidth
+    const panelH = panel.scrollHeight
+    const vw = window.innerWidth
+    const vh = window.innerHeight
+    const GAP = 4
+    const spaceBelow = vh - a.bottom - GAP - 8
+    const spaceAbove = a.top - GAP - 8
+    const top = spaceBelow >= panelH || spaceBelow >= spaceAbove
+      ? a.bottom + GAP
+      : Math.max(8, a.top - GAP - panelH)
+    const left = Math.max(8, Math.min(a.left, vw - panelW - 8))
+    setPos({ top, left })
+  }, [open])
+
+  // Close on outside click.
+  useEffect(() => {
+    if (!open) return
+    const onDown = (e: MouseEvent) => {
+      if (panelRef.current?.contains(e.target as Node)) return
+      if (triggerRef.current?.contains(e.target as Node)) return
+      setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    return () => document.removeEventListener('mousedown', onDown)
+  }, [open])
+
+  // Close on scroll/resize — position would drift otherwise.
+  useEffect(() => {
+    if (!open) return
+    const close = () => setOpen(false)
+    window.addEventListener('scroll', close, true)
+    window.addEventListener('resize', close)
+    return () => {
+      window.removeEventListener('scroll', close, true)
+      window.removeEventListener('resize', close)
+    }
+  }, [open])
+
+  // Tri-state for the select-all row.
+  const total = DENSITY_OPTIONS.length
+  const chosenCount = DENSITY_OPTIONS.filter(o => selected.includes(o.value)).length
+  const selectAllStatus: 'checked' | 'unchecked' | 'indeterminate' =
+    chosenCount === 0 ? 'unchecked' : chosenCount === total ? 'checked' : 'indeterminate'
+
+  const toggleAll = () => {
+    if (selectAllStatus === 'unchecked') onChange([...DENSITY_OPTIONS.map(o => o.value)] as DensityKey[])
+    else onChange([])
+  }
+
+  const toggleItem = (value: DensityKey) => {
+    if (selected.includes(value)) onChange(selected.filter(v => v !== value))
+    else onChange([...selected, value])
+  }
+
   return (
     <span className="panw--filter__wrapper">
       <button
@@ -1373,21 +1440,59 @@ function TagDensityFilter({ selected, onChange }: TagDensityFilterProps) {
           {open ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
         </span>
       </button>
-      <Flyout
-        open={open}
-        onOpenChange={setOpen}
-        anchorRef={triggerRef}
-        mode="multiple"
-        selected={selected}
-        onSelectionChange={(vals) => onChange(vals as DensityKey[])}
-        placement="bottom-start">
-        <FlyoutSelectAll />
-        <FlyoutList>
-          {DENSITY_OPTIONS.map(opt => (
-            <FlyoutItem key={opt.value} value={opt.value}>{opt.label}</FlyoutItem>
-          ))}
-        </FlyoutList>
-      </Flyout>
+
+      {/* Multi-select panel — instant commit (no Apply step).
+          Uses createPortal so the panel isn't clipped by any positioned
+          ancestor and position: fixed resolves against the viewport. */}
+      {open && createPortal(
+        <div
+          ref={panelRef}
+          className="panw--flyout"
+          role="listbox"
+          aria-multiselectable="true"
+          style={{
+            position: 'fixed',
+            top: pos?.top ?? -9999,
+            left: pos?.left ?? -9999,
+            visibility: pos ? 'visible' : 'hidden',
+            zIndex: 9999,
+          }}>
+          {/* Select-all header (tri-state) */}
+          <div
+            className="panw--flyout__select-all"
+            role="option"
+            aria-selected={selectAllStatus === 'checked'}
+            tabIndex={0}
+            onClick={toggleAll}
+            onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleAll() } }}>
+            <span className="panw--flyout__select-all-glyph" aria-hidden="true" style={{ pointerEvents: 'none', display: 'inline-flex' }}>
+              <Checkbox status={selectAllStatus} label="" tabIndex={-1} />
+            </span>
+          </div>
+          <div className="panw--flyout__divider" role="separator" aria-hidden="true" />
+          <div className="panw--flyout__list">
+            {DENSITY_OPTIONS.map(opt => {
+              const isSelected = selected.includes(opt.value)
+              return (
+                <div
+                  key={opt.value}
+                  className={`panw--flyout__item${isSelected ? ' panw--flyout__item--selected' : ''}`}
+                  role="option"
+                  aria-selected={isSelected}
+                  tabIndex={0}
+                  onClick={() => toggleItem(opt.value)}
+                  onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleItem(opt.value) } }}>
+                  <span className="panw--flyout__item-checkbox" aria-hidden="true" style={{ pointerEvents: 'none', display: 'inline-flex' }}>
+                    <Checkbox status={isSelected ? 'checked' : 'unchecked'} label="" tabIndex={-1} />
+                  </span>
+                  <span className="panw--flyout__item-label">{opt.label}</span>
+                </div>
+              )
+            })}
+          </div>
+        </div>,
+        document.body
+      )}
     </span>
   )
 }

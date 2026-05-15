@@ -1,6 +1,7 @@
 // AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
 import type { IconComponent } from '../types';
 import { Abacus } from './components/Abacus';
+import { AiMessage } from './components/AiMessage';
 import { AlarmSnooze } from './components/AlarmSnooze';
 import { Alerts } from './components/Alerts';
 import { Analytics } from './components/Analytics';
@@ -347,6 +348,7 @@ import { ZoomOut } from './components/ZoomOut';
 
 export const ICON_MANIFEST: Record<string, IconComponent> = {
   'abacus': Abacus as IconComponent,
+  'ai-message': AiMessage as IconComponent,
   'alarm-snooze': AlarmSnooze as IconComponent,
   'alerts': Alerts as IconComponent,
   'analytics': Analytics as IconComponent,

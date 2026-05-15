@@ -128,7 +128,12 @@ export function mapOpportunityToRow(
     overall:   (account?.health.overall ?? 'healthy') as 'healthy' | 'at-risk' | 'critical',
     technical: (account?.health.technical ?? 'healthy') as 'healthy' | 'at-risk' | 'critical',
     adoption:  (account?.health.deploymentAdoption ?? 'healthy') as 'healthy' | 'at-risk' | 'critical',
-    trend12mo: account?.health.trend12mo ?? [0,0,0,0,0,0,0,0,0,0,0,0],
+    // Canonical trend12mo is newest→oldest (index 0 = current month).
+    // HealthTrendBars expects oldest→newest so the current month renders on the right.
+    // Mirror what the account panel does at line 1304 of AE Account Panel.stories.tsx.
+    trend12mo: account?.health.trend12mo
+      ? [...account.health.trend12mo].reverse()
+      : [0,0,0,0,0,0,0,0,0,0,0,0],
   }
 
   // Risks

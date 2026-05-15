@@ -16,3 +16,16 @@ graphify-out/
 # Editor
 .vscode/
 .idea/
+
+# Test runner outputs
+complete-design/test-results/
+complete-design/playwright-report/
+
+# Phase scratchpads / triage artifacts (not referenced by code or active workflow)
+data-models/behavior-hunt.md
+data-models/bug-hunt.md
+data-models/coverage-matrix-opus.md
+data-models/wiring-gaps-from-scenarios-opus.md
+
+# Verification screenshots (session-level artifacts, not design assets)
+/*.png

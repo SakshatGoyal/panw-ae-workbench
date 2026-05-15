@@ -5,9 +5,12 @@ import { AEAccountTable } from '../../poc-exploration/src/compositions/account-t
 import { AccountPanel } from '../../poc-exploration/src/compositions/AE Account Panel.stories'
 import { SalesPlayModal } from '../../poc-exploration/src/compositions/sales-play-modal.stories'
 import { ACCOUNTS } from '../../poc-exploration/src/mock/data/accounts'
+import { CONTACTS as CANONICAL_CONTACTS } from '../../poc-exploration/src/mock/data/contacts'
+import { OPPORTUNITIES as CANONICAL_OPPORTUNITIES } from '../../poc-exploration/src/mock/data/opportunities'
+import type { PlayContact, PlayOpportunity } from '../../poc-exploration/src/mock/sales-play-modal'
 
 type View = 'Opportunities' | 'Account Workbench'
-type ModalState = { type: 'salesPlay'; playId: string; sourceOppId?: string } | null
+type ModalState = { type: 'salesPlay'; playId: string; sourceOppId?: string; accountId?: string } | null
 type PanelSection = 'installBase' | 'salesPlay' | 'opportunities' | 'accountHealth'
 type PanelIntent = { accountId: string; section?: PanelSection; oppId?: string } | null
 
@@ -25,6 +28,29 @@ export default function App() {
 
   const selectedAccount = panelIntent ? ACCOUNTS.find(a => a.id === panelIntent.accountId) : null
 
+  const modalAccountId = modal?.accountId ??
+    (modal?.sourceOppId
+      ? CANONICAL_OPPORTUNITIES.find(o => o.id === modal.sourceOppId)?.accountId
+      : undefined)
+
+  const modalContacts: PlayContact[] | undefined = modalAccountId
+    ? CANONICAL_CONTACTS
+        .filter(c => c.accountId === modalAccountId)
+        .map(c => ({ id: c.id, name: c.name, title: c.title, phone: c.phone ?? '', email: c.email ?? '' }))
+    : undefined
+
+  const modalOpportunities: PlayOpportunity[] | undefined = modalAccountId
+    ? CANONICAL_OPPORTUNITIES
+        .filter(o => o.accountId === modalAccountId)
+        .map(o => ({
+          id: o.id,
+          name: o.name,
+          stage: o.stageId,
+          amount: o.amount,
+          closeDate: new Date(Date.now() + o.daysToClose * 86_400_000).toISOString().slice(0, 10),
+        }))
+    : undefined
+
   const panelKey = panelIntent
     ? `${panelIntent.accountId}:${panelIntent.section ?? ''}:${panelIntent.oppId ?? ''}`
     : undefined
@@ -37,7 +63,7 @@ export default function App() {
         initialOpenSection={panelIntent.section}
         initialOpenOppId={panelIntent.oppId}
         onSalesPlayRowClick={(playId, sourceOppId) =>
-          setModal({ type: 'salesPlay', playId, sourceOppId })
+          setModal({ type: 'salesPlay', playId, sourceOppId, accountId: panelIntent.accountId })
         }
       />
     )
@@ -91,6 +117,8 @@ export default function App() {
             name: modal.playId,
             accountName: selectedAccount?.name ?? '',
           }}
+          contacts={modalContacts}
+          opportunities={modalOpportunities}
           onClose={closeModal}
           onCancel={closeModal}
         />

@@ -243,7 +243,11 @@ function healthTrend12FromAccount(trend: number[]): HealthStatus[] {
 // Falls back to DEFAULT_ACCOUNT_PANEL_DATA.salesPlays when no instances exist.
 function buildSalesPlays(accountId: string): AccSalesPlayFamily[] {
   const instances = SALES_PLAY_INSTANCES.filter(i => i.accountId === accountId)
-  if (instances.length === 0) return DEFAULT_ACCOUNT_PANEL_DATA.salesPlays
+  if (instances.length === 0) {
+    // eslint-disable-next-line no-console
+    console.warn(`[AccountPanel] canonical fallback: no SALES_PLAY_INSTANCES for '${accountId}' — using DEFAULT salesPlays`)
+    return DEFAULT_ACCOUNT_PANEL_DATA.salesPlays
+  }
   return (Object.values(SALES_PLAY_FAMILIES) as typeof SALES_PLAY_FAMILIES[keyof typeof SALES_PLAY_FAMILIES][])
     .map(family => ({
       id: family.id as AccSalesPlayFamily['id'],
@@ -1255,27 +1259,52 @@ export interface AccountPanelProps {
 // Fields absent from the Account mock fall back to DEFAULT_ACCOUNT_PANEL_DATA.
 // See complete-design/WIRING_INVENTORY.md §Mock data gaps for the full list.
 function buildPanelDataForAccountId(id: string): AccountPanelData {
-  const foundAccount = ACCOUNTS.find(a => a.id === id) ?? ACCOUNTS[0]
+  const foundAccount = ACCOUNTS.find(a => a.id === id)
+  if (!foundAccount) {
+    // eslint-disable-next-line no-console
+    console.warn(`[AccountPanel] canonical fallback: account '${id}' not found — using ACCOUNTS[0]`)
+  }
+  const acct = foundAccount ?? ACCOUNTS[0]
   const accountOpps: AccOpp[] = OPPORTUNITIES
-    .filter(o => o.accountId === foundAccount.id)
-    .map(o => ({ ...o, daysInStage: o.daysInStage ?? 21, daysInForecast: o.daysInForecast ?? 42 }))
+    .filter(o => o.accountId === acct.id)
+    .map(o => {
+      const daysInStage    = o.daysInStage    ?? (console.warn(`[AccountPanel] opp '${o.id}' missing daysInStage — defaulting to 21`),    21)
+      const daysInForecast = o.daysInForecast ?? (console.warn(`[AccountPanel] opp '${o.id}' missing daysInForecast — defaulting to 42`), 42)
+      return { ...o, daysInStage, daysInForecast }
+    })
   const renewalOpp: AccOpp =
     accountOpps.find(o => o.type === 'renewal' || o.type === 'renewal-and-upsell') ??
-    { ...STUB_CYBERDYNE_RENEWAL, accountId: foundAccount.id }
+    (() => {
+      // eslint-disable-next-line no-console
+      console.warn(`[AccountPanel] canonical fallback: no renewal opp for '${acct.id}' — using STUB_CYBERDYNE_RENEWAL`)
+      return { ...STUB_CYBERDYNE_RENEWAL, accountId: acct.id }
+    })()
+  if (accountOpps.length === 0) {
+    // eslint-disable-next-line no-console
+    console.warn(`[AccountPanel] canonical fallback: no opps for '${acct.id}' — using DEFAULT opportunities`)
+  }
+  if (!acct.installBase) {
+    // eslint-disable-next-line no-console
+    console.warn(`[AccountPanel] canonical fallback: account '${acct.id}' has no installBase — using DEFAULT`)
+  }
+  if (!acct.health.trend12mo) {
+    // eslint-disable-next-line no-console
+    console.warn(`[AccountPanel] canonical fallback: account '${acct.id}' has no health.trend12mo — using DEFAULT`)
+  }
   return {
-    account: foundAccount,
+    account: acct,
     opportunities: accountOpps.length > 0 ? accountOpps : DEFAULT_ACCOUNT_PANEL_DATA.opportunities,
-    apexName: foundAccount.apex ?? '—',
+    apexName: acct.apex ?? '—',
     renewalOpp,
-    installBase: foundAccount.installBase
-      ? fmtInstallBase(foundAccount.installBase)
+    installBase: acct.installBase
+      ? fmtInstallBase(acct.installBase)
       : DEFAULT_ACCOUNT_PANEL_DATA.installBase,
-    salesPlays:    buildSalesPlays(foundAccount.id),
-    healthTrend12: foundAccount.health.trend12mo
-      ? healthTrend12FromAccount(foundAccount.health.trend12mo)
+    salesPlays:    buildSalesPlays(acct.id),
+    healthTrend12: acct.health.trend12mo
+      ? healthTrend12FromAccount(acct.health.trend12mo)
       : DEFAULT_ACCOUNT_PANEL_DATA.healthTrend12,
-    techHealth:    foundAccount.health.technical,
-    adoptHealth:   foundAccount.health.deploymentAdoption,
+    techHealth:    acct.health.technical,
+    adoptHealth:   acct.health.deploymentAdoption,
     productHealth: DEFAULT_ACCOUNT_PANEL_DATA.productHealth,
   }
 }
@@ -3047,5 +3076,5 @@ const PANEL_CSS = `
 `
 
 export const Default: StoryObj = {
-  render: () => <AccountPanel />,
+  render: () => <AccountPanel accountId="acc-cyberdyne" />,
 }

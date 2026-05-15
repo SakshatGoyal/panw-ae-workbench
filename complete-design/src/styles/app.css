@@ -277,6 +277,14 @@ body.stage {
   box-shadow: none;
 }
 
+/* acc-stage has overflow:hidden + min-height:100vh designed for standalone
+   storybook. Inside the shell rail, that clips panel content beyond 100vh.
+   Reset to visible so the rail's own overflow-y:auto handles scrolling. */
+.cd-app__rail-right .acc-stage {
+  overflow: visible;
+  min-height: 100%;
+}
+
 /* ── Right rail empty state ───────────────────────────────────────────────── */
 
 .cd-rail-empty {

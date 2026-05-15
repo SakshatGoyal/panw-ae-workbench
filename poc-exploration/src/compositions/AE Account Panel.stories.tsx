@@ -754,10 +754,14 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
   const editing = draftOutcome !== 'unknown' || committedOutcome !== draftOutcome
   const churnReady = !isChurn || (!!draftReason && !!draftComp && draftNotes.trim() !== '')
   const dirtyOutcome = draftOutcome !== committedOutcome
-  // Save enables when (a) the outcome changed and (b) any required
-  // churn-flow fields are filled. Non-Churn dispositions enable Save
-  // the moment the outcome is picked (per spec §6).
-  const saveEnabled = dirtyOutcome && churnReady
+  const dirtyNotes   = draftNotes   !== committedNotes
+  const dirtyReason  = draftReason  !== committedReason
+  const dirtyComp    = draftComp    !== committedComp
+  // Save enables when (a) ANY field changed and (b) any required
+  // churn-flow fields are filled. This covers notes-only edits and
+  // reason/competitor updates on an already-saved churn disposition.
+  const dirtyFields  = dirtyOutcome || dirtyNotes || dirtyReason || dirtyComp
+  const saveEnabled  = dirtyFields && churnReady
 
   const handleSelect = useCallback((vals: string[]) => {
     const next = (vals[0] ?? 'unknown') as RenewalOutcome
@@ -878,7 +882,7 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
             inputType="area"
             placeholder={isChurn ? 'Required notes on the churn rationale.' : 'Optional notes.'}
             showDescription={false}
-            background="grey-00"
+            background="grey00"
             value={draftNotes}
             onChange={(v: string) => setDraftNotes(v)}
           />
@@ -1301,7 +1305,7 @@ function buildPanelDataForAccountId(id: string): AccountPanelData {
       : DEFAULT_ACCOUNT_PANEL_DATA.installBase,
     salesPlays:    buildSalesPlays(acct.id),
     healthTrend12: acct.health.trend12mo
-      ? healthTrend12FromAccount(acct.health.trend12mo)
+      ? healthTrend12FromAccount([...acct.health.trend12mo].reverse())
       : DEFAULT_ACCOUNT_PANEL_DATA.healthTrend12,
     techHealth:    acct.health.technical,
     adoptHealth:   acct.health.deploymentAdoption,

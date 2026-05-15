@@ -711,6 +711,11 @@ const ALL_PRODUCT_LEAVES = PRODUCT_TREE.flatMap(g => g.children?.map(c => c.valu
 const PRODUCT_LEAF_LABEL = new Map<string, string>(
   PRODUCT_TREE.flatMap(g => (g.children ?? []).map(c => [c.value, c.label]))
 )
+// Reverse: product display name → leaf value. Used by the filtering
+// pipeline to check whether a row's products intersect the selected leaves.
+const PRODUCT_NAME_TO_LEAF = new Map<string, string>(
+  PRODUCT_TREE.flatMap(g => (g.children ?? []).map(c => [c.label, c.value]))
+)
 
 // ─── Tag presets ─────────────────────────────────────────────────────────────
 
@@ -742,6 +747,35 @@ const MONTHS = ['jan','feb','mar','apr','may','jun','jul','aug','sep','oct','nov
 function closeDateOrdinal(s: string): number {
   const [m, d] = s.toLowerCase().split(/\s+/)
   return (MONTHS.indexOf(m ?? '') * 31) + (parseInt(d ?? '1', 10) || 1)
+}
+
+// Map a close-date display string ("jul 12", "may 23") to a quarter
+// token matching CLOSE_DATE_OPTIONS values. Demo clock = May 2026 = Q4FY26.
+//   may/jun/jul → 'this-q' (same quarter = Q4FY26; also matches 'q4fy26')
+//   aug/sep/oct → 'q1fy27'
+//   nov/dec     → 'q2fy27'
+//   jan/feb/mar → 'q3fy27'
+//   apr         → 'q4fy27'
+function closeDateToQuarterToken(s: string): string {
+  const month = s.toLowerCase().split(/\s+/)[0] ?? ''
+  switch (month) {
+    case 'may': case 'jun': case 'jul': return 'this-q'
+    case 'aug': case 'sep': case 'oct': return 'q1fy27'
+    case 'nov': case 'dec':             return 'q2fy27'
+    case 'jan': case 'feb': case 'mar': return 'q3fy27'
+    case 'apr':                         return 'q4fy27'
+    default:                            return 'this-q'
+  }
+}
+
+// Map a lastActivity bucket option value to a daysAgo predicate.
+function matchesLastActivity(daysAgo: number, bucket: string): boolean {
+  switch (bucket) {
+    case 'lt-7':  return daysAgo < 7
+    case '7-21':  return daysAgo >= 7 && daysAgo <= 21
+    case 'gt-21': return daysAgo > 21
+    default:      return true
+  }
 }
 
 // ─── Sort flyout (single-select) ─────────────────────────────────────────────
@@ -2535,27 +2569,36 @@ export function AEOpportunityTable({
         onRemove: () => setMultiFacet('risk', (multi.risk ?? []).filter(x => x !== v)),
       })
     }
+    const ALL_HEALTH_LEVELS = HEALTH_LEVELS.map(l => l.value)
     for (const axis of ['overall', 'technical', 'adoption'] as const) {
-      for (const lvl of groupedHealth[axis]) {
-        out.push({
-          value: `health:${axis}:${lvl}`,
-          label: `${axis === 'overall' ? 'Overall' : axis === 'technical' ? 'Technical' : 'Adoption'}: ${HEALTH_LABEL[lvl]}`,
-          onRemove: () => setGroupedHealth({
-            ...groupedHealth,
-            [axis]: groupedHealth[axis].filter(x => x !== lvl),
-          }),
-        })
+      // Only count as an active filter when the axis is narrowed — i.e.
+      // it does NOT have all 3 levels selected.
+      const axisSelection = groupedHealth[axis]
+      const allSelected = ALL_HEALTH_LEVELS.every(l => axisSelection.includes(l))
+      if (!allSelected) {
+        for (const lvl of axisSelection) {
+          out.push({
+            value: `health:${axis}:${lvl}`,
+            label: `${axis === 'overall' ? 'Overall' : axis === 'technical' ? 'Technical' : 'Adoption'}: ${HEALTH_LABEL[lvl]}`,
+            onRemove: () => setGroupedHealth({
+              ...groupedHealth,
+              [axis]: groupedHealth[axis].filter(x => x !== lvl),
+            }),
+          })
+        }
       }
     }
-    // Products always contribute to the count — every selected leaf
-    // is a filter option the AE has chosen, even if all are selected.
-    for (const v of products) {
-      const lbl = PRODUCT_LEAF_LABEL.get(v) ?? v
-      out.push({
-        value: `product:${v}`,
-        label: `Product: ${lbl}`,
-        onRemove: () => setProducts(products.filter(x => x !== v)),
-      })
+    // Only count products when partially selected — "all 15 selected"
+    // is no narrowing at all and should not appear as active filters.
+    if (products.length < ALL_PRODUCT_LEAVES.length) {
+      for (const v of products) {
+        const lbl = PRODUCT_LEAF_LABEL.get(v) ?? v
+        out.push({
+          value: `product:${v}`,
+          label: `Product: ${lbl}`,
+          onRemove: () => setProducts(products.filter(x => x !== v)),
+        })
+      }
     }
     return out
   }, [single, multi, groupedHealth, products])
@@ -2569,11 +2612,82 @@ export function AEOpportunityTable({
     }
   }
 
-  // Sort only — filtering wiring lands in a later pass alongside the
-  // density / grouped-health filters. Pass 1 is structural; the controls
-  // exist and hold state, but the table renders the full row set.
-  const sortedRows = useMemo(() => {
-    const arr = [...rows]
+  // Filter → sort pipeline. Filtering is AND across dimensions; within a
+  // multi-value dimension the row must match ANY of the selected values
+  // (OR), except for multi.risk which requires ALL selected risks (AND).
+  const displayRows = useMemo(() => {
+    const ALL_HEALTH_LEVELS_SET = new Set(HEALTH_LEVELS.map(l => l.value))
+
+    let arr = [...rows]
+
+    // 1. Search — case-insensitive substring on account or opp name.
+    if (search.trim() !== '') {
+      const q = search.toLowerCase()
+      arr = arr.filter(r =>
+        r.account.toLowerCase().includes(q) || r.oppName.toLowerCase().includes(q)
+      )
+    }
+
+    // 2. Single filters — null = no filter, value = must match.
+    if (single.forecast) {
+      const v = single.forecast
+      arr = arr.filter(r => r.forecast === v)
+    }
+    if (single.stage) {
+      const v = single.stage
+      arr = arr.filter(r => r.stage === v)
+    }
+    if (single.oppType) {
+      const v = single.oppType
+      arr = arr.filter(r => r.type === v)
+    }
+    if (single.lastActivity) {
+      const bucket = single.lastActivity
+      arr = arr.filter(r => matchesLastActivity(r.activity.daysAgo, bucket))
+    }
+
+    // 3. Close date — multi (OR). Empty = no filter.
+    //    'this-q' and 'q4fy26' are treated as the same quarter (May–Jul 2026).
+    if ((multi.closeDate ?? []).length > 0) {
+      const sel = new Set(multi.closeDate ?? [])
+      arr = arr.filter(r => {
+        const token = closeDateToQuarterToken(r.closeDate)
+        // May/Jun/Jul = 'this-q'. Since demo Q4FY26 = 'this-q', allow
+        // 'q4fy26' in the filter to also match that same month range.
+        return sel.has(token) || (token === 'this-q' && sel.has('q4fy26'))
+      })
+    }
+
+    // 4. Risk factors — multi (AND). Empty = no filter.
+    if ((multi.risk ?? []).length > 0) {
+      const requiredRisks = multi.risk ?? []
+      arr = arr.filter(r => {
+        const rowRiskIds = new Set<string>(r.risks.map(rk => rk.id))
+        return requiredRisks.every(id => rowRiskIds.has(id))
+      })
+    }
+
+    // 5. Grouped health — per axis, filter only when narrowed (non-empty AND not all-3).
+    for (const axis of ['overall', 'technical', 'adoption'] as const) {
+      const sel = groupedHealth[axis]
+      if (sel.length > 0 && sel.length < ALL_HEALTH_LEVELS_SET.size) {
+        const selSet = new Set(sel)
+        arr = arr.filter(r => selSet.has(r.health[axis]))
+      }
+    }
+
+    // 6. Products — only filter when partially selected.
+    if (products.length < ALL_PRODUCT_LEAVES.length) {
+      const selLeaves = new Set(products)
+      arr = arr.filter(r =>
+        r.products.some(p => {
+          const leaf = PRODUCT_NAME_TO_LEAF.get(p.name)
+          return leaf !== undefined && selLeaves.has(leaf)
+        })
+      )
+    }
+
+    // Sort.
     arr.sort((a, b) => {
       let cmp = 0
       switch (sortKey) {
@@ -2586,7 +2700,7 @@ export function AEOpportunityTable({
       return sortDir === 'asc' ? cmp : -cmp
     })
     return arr
-  }, [rows, sortKey, sortDir])
+  }, [rows, search, single, multi, groupedHealth, products, sortKey, sortDir])
 
   type HeaderSortKey = Extract<SortKey, 'oppName' | 'value'>
   const headerType = (key: HeaderSortKey) =>
@@ -2728,7 +2842,7 @@ export function AEOpportunityTable({
                 <tr className="opp-divider-row" aria-hidden="true">
                   <td colSpan={4}><div className="opp-divider" /></td>
                 </tr>
-                {sortedRows.map((row, i) => (
+                {displayRows.map((row, i) => (
                   <React.Fragment key={row.id}>
                     <OppRow
                       row={row}
@@ -2738,7 +2852,7 @@ export function AEOpportunityTable({
                       onExpand={onExpand}
                       onOpenSalesPlay={onOpenSalesPlay}
                     />
-                    {i < sortedRows.length - 1 && (
+                    {i < displayRows.length - 1 && (
                       <tr className="opp-divider-row" aria-hidden="true">
                         <td colSpan={4}><div className="opp-divider" /></td>
                       </tr>
@@ -2752,7 +2866,7 @@ export function AEOpportunityTable({
           {/* ── Pagination ──────────────────────────────────────────── */}
           <div className="opp-table-footer">
             <Pagination
-              totalItems={totalItems}
+              totalItems={displayRows.length}
               currentPage={page}
               rowsPerPage={rowsPerPage}
               recordLabel="deal"

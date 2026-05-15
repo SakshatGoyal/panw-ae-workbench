@@ -2800,6 +2800,15 @@ export function AEOpportunityTable({
     return arr
   }, [rows, search, single, multi, groupedHealth, products, sortKey, sortDir])
 
+  // Clamp page to the last valid page when filters shrink the result set.
+  // No useEffect needed — we derive effectivePage from displayRows every render.
+  const maxPage = Math.max(1, Math.ceil(displayRows.length / rowsPerPage))
+  const effectivePage = Math.min(page, maxPage)
+  const pagedRows = useMemo(
+    () => displayRows.slice((effectivePage - 1) * rowsPerPage, effectivePage * rowsPerPage),
+    [displayRows, effectivePage, rowsPerPage],
+  )
+
   type HeaderSortKey = Extract<SortKey, 'oppName' | 'value'>
   const headerType = (key: HeaderSortKey) =>
     sortKey === key ? (sortDir === 'asc' ? 'ascending' : 'descending') : 'basic'
@@ -2940,7 +2949,7 @@ export function AEOpportunityTable({
                 <tr className="opp-divider-row" aria-hidden="true">
                   <td colSpan={4}><div className="opp-divider" /></td>
                 </tr>
-                {displayRows.map((row, i) => (
+                {pagedRows.map((row, i) => (
                   <React.Fragment key={row.id}>
                     <OppRow
                       row={row}
@@ -2950,7 +2959,7 @@ export function AEOpportunityTable({
                       onExpand={onExpand}
                       onOpenSalesPlay={onOpenSalesPlay}
                     />
-                    {i < displayRows.length - 1 && (
+                    {i < pagedRows.length - 1 && (
                       <tr className="opp-divider-row" aria-hidden="true">
                         <td colSpan={4}><div className="opp-divider" /></td>
                       </tr>
@@ -2965,7 +2974,7 @@ export function AEOpportunityTable({
           <div className="opp-table-footer">
             <Pagination
               totalItems={displayRows.length}
-              currentPage={page}
+              currentPage={effectivePage}
               rowsPerPage={rowsPerPage}
               recordLabel="deal"
               onPageChange={setPage}

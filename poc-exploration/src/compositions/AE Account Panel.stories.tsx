@@ -952,7 +952,7 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
   const typeLabel = OPPORTUNITY_TYPE_LABELS[opp.type]
   const activeRisks = opp.riskIds.filter(r => r !== 'no-risks')
   const riskCount = activeRisks.length
-  const activityLabel = ACTIVITY_TYPES[opp.lastActivity.type].label
+  const activityLabel = opp.lastActivity.description ?? ACTIVITY_TYPES[opp.lastActivity.type].label
 
   // Snapshot rows authored as an array so dividers can render between
   // them without scattering Fragment + divider markup through the JSX.
@@ -1052,7 +1052,7 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
           <PopoverList
             title="Last Activity"
             rows={[
-              { label: 'Type', value: activityLabel },
+              { label: 'Activity', value: activityLabel },
               { label: 'When', value: `${opp.lastActivity.daysAgo} days ago` },
             ]}
           />

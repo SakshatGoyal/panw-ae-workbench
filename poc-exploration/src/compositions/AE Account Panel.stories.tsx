@@ -1537,7 +1537,7 @@ export function AccountPanel({
             <span className="acc-id-row__label">ARR</span>
             <div className="acc-id-row__value-row">
               <span className="acc-id-row__value acc-id-row__value--bold">
-                {fmtMoneyShort(data.productHealth.reduce((acc, p) => acc + p.arrUsd, 0))}
+                {fmtMoneyShort(data.account.installBase?.tcv ?? 0)}
               </span>
             </div>
           </div>

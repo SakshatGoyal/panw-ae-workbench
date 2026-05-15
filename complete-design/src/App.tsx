@@ -53,6 +53,8 @@ export default function App() {
       ? CANONICAL_OPPORTUNITIES.find(o => o.id === modal.sourceOppId)?.accountId
       : undefined)
 
+  const modalAccount = (modalAccountId ? ACCOUNTS.find(a => a.id === modalAccountId) : null) ?? selectedAccount
+
   const modalContacts: PlayContact[] | undefined = modalAccountId
     ? CANONICAL_CONTACTS
         .filter(c => c.accountId === modalAccountId)
@@ -143,7 +145,7 @@ export default function App() {
           header={{
             family: 'Sales Play',
             name: modal.playId,
-            accountName: selectedAccount?.name ?? '',
+            accountName: modalAccount?.name ?? '',
           }}
           contacts={modalContacts}
           opportunities={modalOpportunities}

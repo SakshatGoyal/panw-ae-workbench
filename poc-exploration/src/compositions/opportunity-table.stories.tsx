@@ -2275,7 +2275,6 @@ function OppRow({
           {showTag('quoteId')  && (
             <HoverShell
               interactive
-              openDelayMs={1000}
               panelClassName="opp-hover-panel--button"
               render={({ close }) => (
                 <ActionButtonPanel

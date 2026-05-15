@@ -16,6 +16,8 @@ const VIEW_TITLE: Record<View, string> = {
   'Account Workbench': 'Account Workbench',
 }
 
+const VALID_VIEWS = new Set<string>(['Opportunities', 'Account Workbench'])
+
 export default function App() {
   const [activeView, setActiveView] = useState<View>('Opportunities')
   const [panelIntent, setPanelIntent] = useState<PanelIntent>(null)
@@ -52,6 +54,7 @@ export default function App() {
   }
 
   function handleNavClick(label: string) {
+    if (!VALID_VIEWS.has(label)) return
     setActiveView(label as View)
     setPanelIntent(null)
   }

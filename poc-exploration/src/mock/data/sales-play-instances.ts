@@ -646,13 +646,13 @@ export const SALES_PLAY_INSTANCES: SalesPlayInstance[] = [
   {
     accountId: "acc-plaid-fintech",
     playId: "play-sase-prisma-access",
-    status: "closed-won",
+    status: "pursuing",
     amountUsd: 270000,
   },
   {
     accountId: "acc-plaid-fintech",
     playId: "play-cc-xsoar-soar",
-    status: "closed-lost",
+    status: "pursuing",
     amountUsd: 128000,
   },
   {

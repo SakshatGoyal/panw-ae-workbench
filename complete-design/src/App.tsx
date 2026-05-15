@@ -100,7 +100,8 @@ export default function App() {
   function handleNavClick(label: string) {
     if (!VALID_VIEWS.has(label)) return
     setActiveView(label as View)
-    setPanelIntent(null)
+    // Panel is account-centric, not view-centric — both views work with accounts.
+    // Preserve intent across nav switches so the AE doesn't lose context.
   }
 
   return (

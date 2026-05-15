@@ -3078,3 +3078,16 @@ const PANEL_CSS = `
 export const Default: StoryObj = {
   render: () => <AccountPanel accountId="acc-cyberdyne" />,
 }
+
+// Scenario click-through stories for canonical data verification
+export const Scenario1StripeXSOARLandmine: StoryObj = {
+  render: () => <AccountPanel accountId="acc-stripe-treasury" />,
+}
+
+export const Scenario4LyftHealthyRenewal: StoryObj = {
+  render: () => <AccountPanel accountId="acc-lyft-rideshare" />,
+}
+
+export const Scenario20CoinbaseCortexPursuit: StoryObj = {
+  render: () => <AccountPanel accountId="acc-coinbase-exchange" />,
+}

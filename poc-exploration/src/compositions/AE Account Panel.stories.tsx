@@ -744,14 +744,13 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
   const [draftComp,    setDraftComp]    = useState<string | undefined>(undefined)
 
   const [flyoutOpen, setFlyoutOpen] = useState(false)
+  // formOpen mirrors the opp-table popup: set true when user picks from
+  // the Flyout, cleared on Save or Cancel. This gives the same "form
+  // collapses after save/cancel" feel as the opp-table popup closing.
+  const [formOpen, setFormOpen] = useState(false)
   const triggerRef = useRef<HTMLButtonElement | null>(null)
 
-  // Form visibility: the inline form is shown only while the user is
-  // editing a non-Unknown disposition. Committed Unknown + draft Unknown
-  // ⇒ collapsed; any deviation (committed differs from draft, or either
-  // is non-Unknown) ⇒ form open.
   const isChurn = draftOutcome === 'churn'
-  const editing = draftOutcome !== 'unknown' || committedOutcome !== draftOutcome
   const churnReady = !isChurn || (!!draftReason && !!draftComp && draftNotes.trim() !== '')
   const dirtyOutcome = draftOutcome !== committedOutcome
   const dirtyNotes   = draftNotes   !== committedNotes
@@ -773,6 +772,8 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
       setDraftReason(undefined)
       setDraftComp(undefined)
     }
+    // Open the form for any non-unknown selection, collapse for unknown.
+    setFormOpen(next !== 'unknown')
   }, [])
 
   const handleSave = useCallback(() => {
@@ -781,9 +782,8 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
     setCommittedNotes(draftNotes)
     setCommittedReason(draftReason)
     setCommittedComp(draftComp)
-    // Draft and committed are now in sync — `editing` flips to false
-    // for non-Unknown saves the row collapses; the chip shows the
-    // newly-committed outcome.
+    // Collapse the form — mirrors the opp-table popup closing after Confirm.
+    setFormOpen(false)
   }, [saveEnabled, draftOutcome, draftNotes, draftReason, draftComp])
 
   const handleCancel = useCallback(() => {
@@ -791,6 +791,8 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
     setDraftNotes(committedNotes)
     setDraftReason(committedReason)
     setDraftComp(committedComp)
+    // Collapse the form — mirrors the opp-table popup closing after Cancel.
+    setFormOpen(false)
   }, [committedOutcome, committedNotes, committedReason, committedComp])
 
   // The chip shows the DRAFT outcome — what the user has actively
@@ -800,10 +802,9 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
   // the chip back to the last-saved committedOutcome.
   const chipColor = OUTCOME_TAG_COLOR[draftOutcome]
   const chipLabel = RENEWAL_OUTCOME_LABELS[draftOutcome]
-  // Keep the form open whenever the editor is in active edit mode OR the
-  // committed outcome is something other than Unknown (so the AE can see
-  // the rationale they captured without re-opening the picker).
-  const formVisible = editing && draftOutcome !== 'unknown'
+  // formOpen is set by handleSelect (any non-unknown pick) and cleared by
+  // Save/Cancel — mirrors the opp-table popup open/close lifecycle.
+  const formVisible = formOpen && draftOutcome !== 'unknown'
 
   return (
     <>
@@ -816,20 +817,15 @@ function RenewalOutcomeEditor({ initialOutcome }: { initialOutcome: RenewalOutco
           aria-expanded={flyoutOpen}
           onClick={() => setFlyoutOpen(v => !v)}
         >
-          {/* DS Tags with trailing icon — `icon` slot is leading by
-              default, but we lay the chevron OUT via a sibling span and
-              flip its order in CSS so the chip itself stays canonical
-              (correct radius, correct icon color from the tag's color
-              tokens, no hand-rolled class chain). */}
-          <span className="acc-opp-outcome-tag-wrap">
-            <Tags
-              color={chipColor}
-              contrast="low"
-              shape="rounded"
-              size="large"
-              label={chipLabel}
-            />
-            <span className="acc-opp-outcome-tag-wrap__chevron" aria-hidden="true">
+          {/* Raw DS tag class chain — same approach as the opp-table
+              RenewalOutcomeEditor. Chevron goes into panw--tag__icon
+              (trailing slot) so it sits inside the tag's visual boundary
+              rather than floating outside it as a sibling span. */}
+          <span
+            className={`panw--tag panw--tag--size-large panw--tag--shape-rounded panw--tag--low panw--tag--${chipColor}`}
+            role="presentation">
+            <span className="panw--tag__label">{chipLabel}</span>
+            <span className="panw--tag__icon" aria-hidden="true">
               <ChevronDown size={14} />
             </span>
           </span>

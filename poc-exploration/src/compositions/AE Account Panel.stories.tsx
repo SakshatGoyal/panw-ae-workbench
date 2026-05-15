@@ -1566,7 +1566,7 @@ export function AccountPanel({
             <span className="acc-id-row__label">ARR</span>
             <div className="acc-id-row__value-row">
               <span className="acc-id-row__value acc-id-row__value--bold">
-                {fmtMoneyShort(data.productHealth.reduce((acc, p) => acc + p.arrUsd, 0))}
+                {fmtMoneyShort(data.account.installBase?.tcv ?? 0)}
               </span>
             </div>
           </div>
@@ -1590,7 +1590,7 @@ export function AccountPanel({
         <Accordion
           size="large" theme="gray10" orientation="right"
           title="Install Base" showIcon={false}
-          showTag tagLabel="$25.8M" tagColor="cobalt" tagContrast="low" tagShape="rounded" tagSize="large"
+          showTag tagLabel={data.installBase.find(r => r.label === 'TCV')?.value ?? '—'} tagColor="cobalt" tagContrast="low" tagShape="rounded" tagSize="large"
           open={openSections.installBase}
           onToggle={() => toggle('installBase')}
         >

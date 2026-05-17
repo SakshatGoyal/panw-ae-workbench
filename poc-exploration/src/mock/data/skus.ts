@@ -31,7 +31,7 @@ export const PRODUCT_SKUS: Record<string, SkuLine[]> = {
     { sku: 'PA-VM-500-PERP', unitPriceUsd: 24_000 },
   ],
 
-  // ── Cloud-Delivered Security Services (CDSS) ───────────────────────────────
+  // ── PA Series Attached (CDSS add-ons) ─────────────────────────────────────
   // Sources: [mock] — follows PAN-CDSS-[SERVICE] convention
   'PA Series Attached': [
     { sku: 'PAN-CDSS-ADV-THRT', unitPriceUsd: 3_200 },

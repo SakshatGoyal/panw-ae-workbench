@@ -3609,10 +3609,12 @@ const LAYOUT_CSS = `
  * the SKU table a 248px content rail (280 − 2×16) which comfortably fits
  * the longest SKU (~20 chars) and a compact price without truncation. */
 .opp-pop--product { width: 280px; }
-/* SKU code cell — monospaced so SKU columns track visually. */
+/* SKU code cell — monospaced so SKU columns track visually.
+ * 13px matches .opp-pop__sku-price so both cells share the same
+ * baseline and the row reads as a single unit. */
 .opp-pop__sku-code {
   font-family: 'Söhne Mono', 'Roboto Mono', 'Menlo', monospace;
-  font-size: 12px;
+  font-size: 13px;
   line-height: 20px;
   color: var(--ds-text-secondary-rest);
   flex: 1 1 0;

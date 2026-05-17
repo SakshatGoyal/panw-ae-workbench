@@ -123,6 +123,17 @@ export interface OpportunityRenewal {
   arrUsd: number;
 }
 
+/** Structured quote terms surfaced in the quote-tag popover. */
+export type TermLength = '12 months' | '36 months' | '60 months';
+export type RouteToMarket = 'Direct' | '1-tier' | '2-tier' | 'Marketplace';
+export type PaymentOption = 'Upfront, no financing' | 'Upfront, PANW financing' | 'Annual';
+
+export interface QuoteTerms {
+  termLength: TermLength;
+  routeToMarket: RouteToMarket;
+  paymentOption: PaymentOption;
+}
+
 export interface Opportunity {
   id: string;
   accountId: string;
@@ -148,6 +159,8 @@ export interface Opportunity {
   renewalOutcome?: RenewalOutcome;
   /** Renewal financials for the hover popover. Only present on renewal-type opps. */
   renewal?: OpportunityRenewal;
+  /** Quote terms for the quote-tag hover popover. */
+  quoteTerms?: QuoteTerms;
   scenarios: string[];
 }
 

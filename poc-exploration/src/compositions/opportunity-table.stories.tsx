@@ -208,6 +208,13 @@ interface RenewalData {
   outcome: RenewalOutcome
 }
 
+// Quote terms sourced from Opportunity.quoteTerms in mock data.
+interface QuoteTerms {
+  termLength: '12 months' | '36 months' | '60 months'
+  routeToMarket: 'Direct' | '1-tier' | '2-tier' | 'Marketplace'
+  paymentOption: 'Upfront, no financing' | 'Upfront, PANW financing' | 'Annual'
+}
+
 export interface OpportunityRow {
   id: string
   /** Canonical Account.id from poc-exploration/src/mock/data/accounts.ts */
@@ -221,6 +228,7 @@ export interface OpportunityRow {
   stage: DealStage
   closeDate: string // "mar 7" — short display form
   quoteId: string
+  quoteTerms?: QuoteTerms
   products: Product[]
   valueUsd: number
   activity: Activity
@@ -392,6 +400,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'Stripe Treasury Operations',
     type: 'renewal', forecast: 'best-case', stage: 'active-pov',
     closeDate: 'jul 12', quoteId: 'Q-2026-04412',
+    quoteTerms: { termLength: '36 months', routeToMarket: 'Direct', paymentOption: 'Annual' },
     products: [
       mkProduct('Cortex XSOAR', 640_000),
     ],
@@ -413,6 +422,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'Asana Work Graph',
     type: 'net-new', forecast: 'commit', stage: 'negotiation',
     closeDate: 'may 23', quoteId: 'Q-2026-04201',
+    quoteTerms: { termLength: '36 months', routeToMarket: '1-tier', paymentOption: 'Upfront, no financing' },
     products: [
       mkProduct('Prisma Access', 380_000),
       mkProduct('Prisma SD-WAN', 260_000),
@@ -434,6 +444,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'Lyft Rideshare Operations',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
     closeDate: 'jun 1', quoteId: 'Q-2026-04412',
+    quoteTerms: { termLength: '60 months', routeToMarket: 'Direct', paymentOption: 'Upfront, PANW financing' },
     products: [
       mkProduct('PA Series', 180_000),
       mkProduct('PA Series Support', 100_000),
@@ -457,6 +468,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'Databricks Lakehouse Security',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
     closeDate: 'jun 21', quoteId: 'Q-2026-04401',
+    quoteTerms: { termLength: '12 months', routeToMarket: 'Marketplace', paymentOption: 'Upfront, no financing' },
     products: [
       mkProduct('Cortex XDR+', 420_000),
       mkProduct('XSIAM', 310_000),
@@ -480,6 +492,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'Reddit Platform Engineering',
     type: 'renewal', forecast: 'best-case', stage: 'negotiation',
     closeDate: 'jul 31', quoteId: 'Q-2026-04201',
+    quoteTerms: { termLength: '36 months', routeToMarket: '2-tier', paymentOption: 'Annual' },
     products: [
       mkProduct('PA Series', 220_000),
       mkProduct('PA Series Support', 90_000),
@@ -502,6 +515,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'Linear Issue Tracking',
     type: 'renewal', forecast: 'best-case', stage: 'active-pov',
     closeDate: 'jul 17', quoteId: 'Q-2026-04318',
+    quoteTerms: { termLength: '12 months', routeToMarket: 'Direct', paymentOption: 'Upfront, no financing' },
     products: [
       mkProduct('Cortex XSOAR', 180_000),
     ],
@@ -523,6 +537,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'Notion Workspace Trust',
     type: 'renewal', forecast: 'commit', stage: 'negotiation',
     closeDate: 'jun 15', quoteId: 'Q-2026-04612',
+    quoteTerms: { termLength: '36 months', routeToMarket: '1-tier', paymentOption: 'Annual' },
     products: [
       mkProduct('Cortex XDR+', 310_000),
     ],
@@ -544,6 +559,7 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     account: 'DoorDash Platform Security',
     type: 'net-new', forecast: 'pipeline', stage: 'discovery',
     closeDate: 'dec 20', quoteId: 'Q-2026-05201',
+    quoteTerms: { termLength: '60 months', routeToMarket: 'Direct', paymentOption: 'Annual' },
     products: [
       mkProduct('Cortex XDR+', 180_000),
     ],
@@ -2055,6 +2071,41 @@ function UpsellModifyPanel({ row, onClose, onModify }: { row: OpportunityRow; on
   return <ActionButtonPanel label="Modify" onClick={() => { onModify?.(); onClose() }} />
 }
 
+// ─── Quote popover (issue #13) ────────────────────────────────────────────────
+// 320px-wide popover showing three structured quote terms below the quote ID
+// tag on the opp row (and mirrored in the account panel). Layout: tabular KV
+// rows (Term Length / Route to Market / Payment Option) using the same
+// .opp-pop__rows / .opp-pop__row pattern as the Renewal and Health popovers,
+// followed by the "View quote" action button. Falls back to a button-only
+// surface if quoteTerms is absent.
+
+function QuotePanel({ row, onClose }: { row: OpportunityRow; onClose: () => void }) {
+  const qt = row.quoteTerms
+  return (
+    <div className="opp-pop opp-pop--quote">
+      {qt && (
+        <div className="opp-pop__rows opp-pop__rows--quote">
+          <div className="opp-pop__row">
+            <span className="opp-pop__row-label">Term Length</span>
+            <span className="opp-pop__row-value">{qt.termLength}</span>
+          </div>
+          <div className="opp-pop__row">
+            <span className="opp-pop__row-label">Route to Market</span>
+            <span className="opp-pop__row-value">{qt.routeToMarket}</span>
+          </div>
+          <div className="opp-pop__row">
+            <span className="opp-pop__row-label">Payment Option</span>
+            <span className="opp-pop__row-value">{qt.paymentOption}</span>
+          </div>
+        </div>
+      )}
+      <div className="opp-pop__cta">
+        <Button kind="ghost-brand" size="small" onClick={onClose}>View quote</Button>
+      </div>
+    </div>
+  )
+}
+
 // ─── Renewal Outcome editor (spec §4.2) ──────────────────────────────────────
 // Renders inside the renewal popover. Tag-as-button trigger with a
 // trailing chevron opens a DS Flyout listing the 6 outcomes. Picking a
@@ -2374,11 +2425,9 @@ function OppRow({
           {showTag('quoteId')  && (
             <HoverShell
               interactive
-              panelClassName="opp-hover-panel--button"
+              panelClassName="opp-hover-panel--quote"
               render={({ close }) => (
-                <ActionButtonPanel
-                  label="View quote"
-                  onClick={() => { /* hook */ close() }} />
+                <QuotePanel row={row} onClose={close} />
               )}>
               <Tags {...TAG_BASE} label={row.quoteId} />
             </HoverShell>
@@ -4024,6 +4073,18 @@ const LAYOUT_CSS = `
   gap: 0;
 }
 .opp-pop--action .panw--btn { width: 100%; justify-content: center; }
+
+/* ── Quote popover (issue #13) ────────────────────────────────────────────
+ * 320px width (same tier as health / risks / renewal). Three tabular KV
+ * rows (Term Length, Route to Market, Payment Option) followed by the
+ * "View quote" CTA button. The table uses the same .opp-pop__rows
+ * pattern as the Renewal popover so dividers and typography are
+ * consistent across all 320-tier surfaces. */
+.opp-pop--quote { width: 320px; }
+/* Override gap between the table and the CTA — a single gap-8 already
+ * separates them via the parent .opp-pop; no extra margin needed. */
+.opp-pop__rows--quote { margin-bottom: 0; }
+.opp-pop--quote .opp-pop__cta .panw--btn { width: 100%; justify-content: center; }
 
 /* ── Renewal popover (spec §4.2) ──────────────────────────────────────────
  * Renewal rows ride the shared .opp-pop__kv-list pattern — hairline

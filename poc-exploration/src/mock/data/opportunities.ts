@@ -25,6 +25,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-07-12", renewableTcvUsd: 640000, arrUsd: 640000 },
     salesPlayIds: ["play-cc-land-expand", "play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: ["scenario-1"],
   },
   {
@@ -46,6 +47,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 42,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-1"],
   },
   {
@@ -67,6 +69,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-1"],
   },
   {
@@ -88,6 +91,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 16,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -109,6 +113,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh", "play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -130,6 +135,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 9,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-proactive-assess"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -151,6 +157,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -172,6 +179,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -194,6 +202,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-29", renewableTcvUsd: 210000, arrUsd: 210000 },
     salesPlayIds: ["play-u42-proactive-assess"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: ["scenario-37"],
   },
   {
@@ -215,6 +224,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-reactive-retainer"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -236,6 +246,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 11,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -257,6 +268,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 12,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-2"],
   },
   {
@@ -278,6 +290,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -299,6 +312,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -320,6 +334,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -342,6 +357,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "unknown",
     renewal: { subEnd: "2026-07-30", renewableTcvUsd: 310000, arrUsd: 310000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: ["scenario-3"],
   },
   {
@@ -363,6 +379,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 124,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-3"],
   },
   {
@@ -384,6 +401,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 72,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -406,6 +424,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-05-31", renewableTcvUsd: 1100000, arrUsd: 420000 },
     salesPlayIds: ["play-fw-refresh", "play-sase-sd-wan-modernize"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: ["scenario-4", "scenario-39"],
   },
   {
@@ -427,6 +446,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access", "play-sase-mobile-users"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -448,6 +468,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-sd-wan-modernize", "play-sase-branch-consolidate"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -469,6 +490,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 12,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -490,6 +512,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 9,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-proactive-assess"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -511,6 +534,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -533,6 +557,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2025-08-04", renewableTcvUsd: 380000, arrUsd: 380000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -555,6 +580,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "upsell",
     renewal: { subEnd: "2026-07-24", renewableTcvUsd: 310000, arrUsd: 140000 },
     salesPlayIds: ["play-fw-refresh", "play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-5"],
   },
   {
@@ -576,6 +602,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -597,6 +624,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -619,6 +647,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-25", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -640,6 +669,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -662,6 +692,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "displacement",
     renewal: { subEnd: "2026-06-21", renewableTcvUsd: 890000, arrUsd: 890000 },
     salesPlayIds: ["play-cc-xdr-land", "play-cc-land-expand"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-6"],
   },
   {
@@ -683,6 +714,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -704,6 +736,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -725,6 +758,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -746,6 +780,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 36,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -767,6 +802,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 16,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -789,6 +825,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-15", renewableTcvUsd: 310000, arrUsd: 310000 },
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-7"],
   },
   {
@@ -811,6 +848,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "duplicate",
     renewal: { subEnd: "2026-06-15", renewableTcvUsd: 310000, arrUsd: 310000 },
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-7"],
   },
   {
@@ -832,6 +870,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -853,6 +892,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -874,6 +914,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -896,6 +937,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "churn",
     renewal: { subEnd: "2026-07-18", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: ["scenario-8"],
   },
   {
@@ -918,6 +960,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-07-26", renewableTcvUsd: 90000, arrUsd: 90000 },
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -939,6 +982,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 68,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -961,6 +1005,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "unknown",
     renewal: { subEnd: "2026-10-31", renewableTcvUsd: 290000, arrUsd: 290000 },
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: ["scenario-9"],
   },
   {
@@ -982,6 +1027,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1003,6 +1049,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -1024,6 +1071,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 12,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-proactive-assess"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1045,6 +1093,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 12,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access", "play-sase-sd-wan-modernize"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-10"],
   },
   {
@@ -1066,6 +1115,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1087,6 +1137,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1109,6 +1160,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-09-30", renewableTcvUsd: 290000, arrUsd: 290000 },
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1130,6 +1182,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1151,6 +1204,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-land-expand", "play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-11"],
   },
   {
@@ -1172,6 +1226,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1193,6 +1248,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1215,6 +1271,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 310000, arrUsd: 310000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -1236,6 +1293,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1257,6 +1315,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 47,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-12"],
   },
   {
@@ -1279,6 +1338,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-22", renewableTcvUsd: 140000, arrUsd: 140000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -1300,6 +1360,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1321,6 +1382,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 9,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-13"],
   },
   {
@@ -1342,6 +1404,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -1363,6 +1426,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 8,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -1384,6 +1448,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 46,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch", "play-cc-qradar-migrate"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-14"],
   },
   {
@@ -1405,6 +1470,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1426,6 +1492,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1447,6 +1514,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-proactive-assess"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1468,6 +1536,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1489,6 +1558,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 72,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-15"],
   },
   {
@@ -1510,6 +1580,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 68,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-15"],
   },
   {
@@ -1531,6 +1602,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 118,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-15", "scenario-49"],
   },
   {
@@ -1553,6 +1625,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 210000, arrUsd: 210000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1574,6 +1647,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1595,6 +1669,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1616,6 +1691,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1637,6 +1713,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-land-expand"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: ["scenario-16"],
   },
   {
@@ -1658,6 +1735,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1679,6 +1757,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -1701,6 +1780,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-25", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -1722,6 +1802,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 12,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1743,6 +1824,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-17"],
   },
   {
@@ -1764,6 +1846,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-sd-wan-modernize"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-17"],
   },
   {
@@ -1785,6 +1868,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-ztna-replace"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: ["scenario-17"],
   },
   {
@@ -1806,6 +1890,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1827,6 +1912,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1849,6 +1935,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-08-05", renewableTcvUsd: 290000, arrUsd: 290000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-18"],
   },
   {
@@ -1870,6 +1957,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-trade-up"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-18"],
   },
   {
@@ -1891,6 +1979,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: ["scenario-18"],
   },
   {
@@ -1912,6 +2001,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1933,6 +2023,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-19"],
   },
   {
@@ -1955,6 +2046,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-08-05", renewableTcvUsd: 140000, arrUsd: 140000 },
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -1976,6 +2068,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -1997,6 +2090,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 38,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-land-expand"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-20"],
   },
   {
@@ -2018,6 +2112,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 42,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: ["scenario-20"],
   },
   {
@@ -2039,6 +2134,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-20"],
   },
   {
@@ -2060,6 +2156,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-20"],
   },
   {
@@ -2082,6 +2179,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-25", renewableTcvUsd: 290000, arrUsd: 290000 },
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2103,6 +2201,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2124,6 +2223,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2145,6 +2245,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 12,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-proactive-assess"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2166,6 +2267,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2187,6 +2289,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-21"],
   },
   {
@@ -2208,6 +2311,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 68,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-21"],
   },
   {
@@ -2230,6 +2334,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-22", renewableTcvUsd: 290000, arrUsd: 290000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2251,6 +2356,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2272,6 +2378,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2293,6 +2400,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2314,6 +2422,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 72,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-land-expand", "play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: ["scenario-22"],
   },
   {
@@ -2335,6 +2444,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2357,6 +2467,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 290000, arrUsd: 290000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2378,6 +2489,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2399,6 +2511,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2420,6 +2533,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2442,6 +2556,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-07-26", renewableTcvUsd: 210000, arrUsd: 210000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-23", "scenario-48"],
   },
   {
@@ -2463,6 +2578,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 42,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2484,6 +2600,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2505,6 +2622,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2526,6 +2644,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-24"],
   },
   {
@@ -2547,6 +2666,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2568,6 +2688,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2590,6 +2711,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-09-08", renewableTcvUsd: 140000, arrUsd: 140000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2611,6 +2733,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-25"],
   },
   {
@@ -2633,6 +2756,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 210000, arrUsd: 210000 },
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-25"],
   },
   {
@@ -2654,6 +2778,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -2675,6 +2800,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2696,6 +2822,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 82,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-26"],
   },
   {
@@ -2718,6 +2845,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-08-05", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-27"],
   },
   {
@@ -2739,6 +2867,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-27"],
   },
   {
@@ -2760,6 +2889,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2781,6 +2911,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-28"],
   },
   {
@@ -2802,6 +2933,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-reactive-retainer"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-38"],
   },
   {
@@ -2824,6 +2956,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2845,6 +2978,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -2867,6 +3001,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-08-05", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-29"],
   },
   {
@@ -2888,6 +3023,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 52,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-29"],
   },
   {
@@ -2909,6 +3045,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2931,6 +3068,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-08-05", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-30"],
   },
   {
@@ -2952,6 +3090,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-sd-wan-modernize"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-30"],
   },
   {
@@ -2973,6 +3112,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -2995,6 +3135,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-05", renewableTcvUsd: 310000, arrUsd: 310000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-31"],
   },
   {
@@ -3016,6 +3157,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3037,6 +3179,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3058,6 +3201,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3079,6 +3223,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-32"],
   },
   {
@@ -3100,6 +3245,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3121,6 +3267,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3142,6 +3289,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-33"],
   },
   {
@@ -3163,6 +3311,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3184,6 +3333,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3205,6 +3355,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -3226,6 +3377,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 52,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-34"],
   },
   {
@@ -3247,6 +3399,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -3268,6 +3421,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3289,6 +3443,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -3310,6 +3465,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 42,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch", "play-cc-xdr-land", "play-u42-reactive-retainer", "play-fw-data-lake"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-35"],
   },
   {
@@ -3332,6 +3488,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-22", renewableTcvUsd: 310000, arrUsd: 310000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3353,6 +3510,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3374,6 +3532,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-reactive-retainer"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3395,6 +3554,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3416,6 +3576,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3437,6 +3598,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-36"],
   },
   {
@@ -3459,6 +3621,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-25", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -3480,6 +3643,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3501,6 +3665,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3522,6 +3687,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3543,6 +3709,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-36"],
   },
   {
@@ -3564,6 +3731,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3585,6 +3753,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3606,6 +3775,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: ["scenario-36"],
   },
   {
@@ -3628,6 +3798,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 140000, arrUsd: 140000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3649,6 +3820,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3670,6 +3842,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-36"],
   },
   {
@@ -3691,6 +3864,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -3712,6 +3886,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -3733,6 +3908,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-40"],
   },
   {
@@ -3755,6 +3931,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-09-08", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -3776,6 +3953,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3797,6 +3975,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-41"],
   },
   {
@@ -3819,6 +3998,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 210000, arrUsd: 210000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3840,6 +4020,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -3861,6 +4042,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -3883,6 +4065,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-25", renewableTcvUsd: 420000, arrUsd: 420000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-42"],
   },
   {
@@ -3904,6 +4087,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-42"],
   },
   {
@@ -3925,6 +4109,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-42"],
   },
   {
@@ -3946,6 +4131,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-42"],
   },
   {
@@ -3967,6 +4153,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-42"],
   },
   {
@@ -3988,6 +4175,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-42"],
   },
   {
@@ -4009,6 +4197,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: ["scenario-42"],
   },
   {
@@ -4030,6 +4219,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-42"],
   },
   {
@@ -4052,6 +4242,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-06-25", renewableTcvUsd: 840000, arrUsd: 840000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4074,6 +4265,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "upsell",
     renewal: { subEnd: "2026-07-12", renewableTcvUsd: 520000, arrUsd: 120000 },
     salesPlayIds: ["play-sase-prisma-access", "play-sase-sd-wan-modernize"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4095,6 +4287,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4116,6 +4309,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 38,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsoar-soar"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4137,6 +4331,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4158,6 +4353,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4180,6 +4376,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-u42-reactive-retainer"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4201,6 +4398,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-u42-proactive-assess"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4222,6 +4420,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-data-lake"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4243,6 +4442,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4264,6 +4464,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4285,6 +4486,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 11,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-qradar-migrate"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: ["scenario-45"],
   },
   {
@@ -4306,6 +4508,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 32,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xsiam-pitch"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4328,6 +4531,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 180000, arrUsd: 180000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4349,6 +4553,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4370,6 +4575,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4391,6 +4597,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4412,6 +4619,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4433,6 +4641,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4454,6 +4663,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4475,6 +4685,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4496,6 +4707,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4517,6 +4729,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4538,6 +4751,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4559,6 +4773,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4580,6 +4795,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4602,6 +4818,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-05", renewableTcvUsd: 140000, arrUsd: 140000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4623,6 +4840,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4644,6 +4862,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 14,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4665,6 +4884,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-mobile-users"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4686,6 +4906,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4708,6 +4929,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "full",
     renewal: { subEnd: "2026-07-22", renewableTcvUsd: 140000, arrUsd: 140000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4729,6 +4951,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 52,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "2-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4750,6 +4973,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4771,6 +4995,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4792,6 +5017,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-cdss-attach"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4813,6 +5039,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 18,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Marketplace", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4834,6 +5061,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "Marketplace", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4855,6 +5083,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4876,6 +5105,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4898,6 +5128,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     renewalOutcome: "downsell",
     renewal: { subEnd: "2026-08-05", renewableTcvUsd: 90000, arrUsd: 90000 },
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "1-tier", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4919,6 +5150,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 28,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xdr-land"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "1-tier", paymentOption: "Annual" },
     scenarios: [],
   },
   {
@@ -4940,6 +5172,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-sase-prisma-access"],
+    quoteTerms: { termLength: "60 months", routeToMarket: "Direct", paymentOption: "Upfront, PANW financing" },
     scenarios: [],
   },
   {
@@ -4961,6 +5194,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 22,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-fw-refresh"],
+    quoteTerms: { termLength: "36 months", routeToMarket: "Direct", paymentOption: "Upfront, no financing" },
     scenarios: [],
   },
   {
@@ -4982,6 +5216,7 @@ export const OPPORTUNITIES: Opportunity[] = [
     daysInForecast: 21,
     renewalOutcome: "unknown",
     salesPlayIds: ["play-cc-xpanse-asm"],
+    quoteTerms: { termLength: "12 months", routeToMarket: "2-tier", paymentOption: "Annual" },
     scenarios: [],
   },
 ];

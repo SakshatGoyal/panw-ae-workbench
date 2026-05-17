@@ -2,7 +2,7 @@
 // See poc-exploration/src/compositions/opportunity-table.stories.tsx for the target interface.
 
 import { PRODUCTS, ACTIVITY_TYPES } from './taxonomies'
-import type { Opportunity, Account, SalesPlayInstance, SalesPlay } from './types'
+import type { Opportunity, Account, SalesPlayInstance, SalesPlay, QuoteTerms } from './types'
 import type { OpportunityRow } from '../compositions/opportunity-table.stories'
 
 // ─── Local type aliases (mirror story-local types without importing them) ────
@@ -167,18 +167,19 @@ export function mapOpportunityToRow(
     : undefined
 
   return {
-    id:        opp.id,
-    accountId: opp.accountId,
-    oppId:     opp.id,
-    oppName:   opp.name,
-    account:   account?.name ?? opp.accountId,
-    type:      (TYPE_MAP[opp.type] ?? 'net-new') as OppType,
-    forecast:  (FORECAST_MAP[opp.forecastCategory] ?? 'pipeline') as Forecast,
-    stage:     (STAGE_MAP[opp.stageId] ?? 'discovery') as DealStage,
+    id:         opp.id,
+    accountId:  opp.accountId,
+    oppId:      opp.id,
+    oppName:    opp.name,
+    account:    account?.name ?? opp.accountId,
+    type:       (TYPE_MAP[opp.type] ?? 'net-new') as OppType,
+    forecast:   (FORECAST_MAP[opp.forecastCategory] ?? 'pipeline') as Forecast,
+    stage:      (STAGE_MAP[opp.stageId] ?? 'discovery') as DealStage,
     closeDate,
-    quoteId:   opp.quoteId,
+    quoteId:    opp.quoteId,
+    quoteTerms: opp.quoteTerms as QuoteTerms | undefined,
     products,
-    valueUsd:  opp.amount,
+    valueUsd:   opp.amount,
     activity,
     health,
     risks,

@@ -51,6 +51,7 @@ import {
   type ProductId,
   type RenewalOutcome,
   type HealthStatus,
+  type QuoteTerms,
 } from '../mock'
 
 const meta: Meta = {
@@ -909,6 +910,36 @@ function PopoverActionButton({ label, onClick }: { label: string; onClick?: () =
   )
 }
 
+// Quote popover — 320px structured surface mirroring the opp-row QuotePanel.
+// Three KV rows (Term Length / Route to Market / Payment Option) in the
+// .acc-popover--list tabular style, followed by the "View Quote" CTA.
+// Falls back to the button-only surface if quoteTerms is absent.
+function AccQuotePopover({ quoteTerms }: { quoteTerms?: QuoteTerms }) {
+  return (
+    <div className="acc-popover acc-popover--quote">
+      {quoteTerms && (
+        <div className="acc-popover__rows">
+          <div className="acc-popover__row">
+            <span className="acc-popover__row-label">Term Length</span>
+            <span className="acc-popover__row-value">{quoteTerms.termLength}</span>
+          </div>
+          <div className="acc-popover__row">
+            <span className="acc-popover__row-label">Route to Market</span>
+            <span className="acc-popover__row-value">{quoteTerms.routeToMarket}</span>
+          </div>
+          <div className="acc-popover__row">
+            <span className="acc-popover__row-label">Payment Option</span>
+            <span className="acc-popover__row-value">{quoteTerms.paymentOption}</span>
+          </div>
+        </div>
+      )}
+      <div className="acc-quote-popover__cta">
+        <Button kind="ghost-brand" size="default">View Quote</Button>
+      </div>
+    </div>
+  )
+}
+
 // Multi-row popover — shared body for Risks, Products, Last Activity.
 function PopoverList({ title, rows }: { title: string; rows: Array<{ label: string; value?: string }> }) {
   return (
@@ -967,7 +998,7 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
           interactive
           openDelayMs={300}
           align="end"
-          panel={<PopoverActionButton label="View Quote" />}
+          panel={<AccQuotePopover quoteTerms={opp.quoteTerms as QuoteTerms | undefined} />}
         >
           <Tags {...ACC_OPP_TAG_BASE} label={opp.quoteId} />
         </PanelHover>
@@ -3059,6 +3090,26 @@ const PANEL_CSS = `
     padding: var(--ds-spacing-03);
   }
   .acc-popover--button .panw--button {
+    justify-content: center;
+  }
+  /* ── Quote popover (issue #13) ───────────────────────────────────────────
+     320px fixed width (matches max-width cap on .acc-popover; use explicit
+     width so the surface is consistent whether or not content is shorter).
+     KV rows use the existing .acc-popover__rows tabular pattern — same
+     divider treatment and row rhythm as the Products and Risks popovers.
+     CTA sits below the rows separated by the standard 12px padding gap. */
+  .acc-popover--quote {
+    width: 320px;
+    padding: var(--ds-spacing-04); /* 12px */
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-spacing-03); /* 8px between table and button */
+  }
+  .acc-quote-popover__cta {
+    display: flex;
+  }
+  .acc-quote-popover__cta .panw--btn {
+    width: 100%;
     justify-content: center;
   }
   .acc-popover--list {

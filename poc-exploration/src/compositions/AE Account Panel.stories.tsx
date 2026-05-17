@@ -1049,13 +1049,14 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
       <PanelHover
         openDelayMs={300}
         panel={
-          <PopoverList
-            title="Last Activity"
-            rows={[
-              { label: 'Activity', value: activityLabel },
-              { label: 'When', value: `${opp.lastActivity.daysAgo} days ago` },
-            ]}
-          />
+          // Two-line structure mirrors the opp-row Last Activity popover
+          // (opp-pop--simple opp-pop--two-line): description as bold heading,
+          // "X days ago" as muted sub-line. Fixed 240px width matches
+          // opp-pop--simple so the two surfaces are visually identical.
+          <div className="acc-popover acc-popover--activity">
+            <div className="acc-popover__activity-heading">{activityLabel}</div>
+            <div className="acc-popover__activity-sub">{opp.lastActivity.daysAgo} days ago</div>
+          </div>
         }
       >
         <Tags {...ACC_OPP_TAG_BASE} label={fmtRelativeDate(opp.lastActivity.daysAgo)} />
@@ -3034,6 +3035,30 @@ const PANEL_CSS = `
     display: flex;
     flex-direction: column;
     gap: var(--ds-spacing-03);
+  }
+  /* ── Activity popover — two-line heading/sub layout ─────────────────────
+     Mirrors the opp-row's .opp-pop--simple + .opp-pop--two-line structure
+     exactly: 240px width (same tier), 16px padding, semibold heading,
+     tertiary-text sub with a 4px gap. word-break prevents long activity
+     strings from overrunning the container boundary (fixes the overflow
+     bug reported in issue #10). */
+  .acc-popover--activity {
+    padding: var(--ds-spacing-05); /* 16px — mirrors .opp-pop base padding */
+    width: 240px;                  /* matches .opp-pop--simple tier */
+  }
+  .acc-popover__activity-heading {
+    font-size: 0.875rem;
+    line-height: 1.42857;
+    font-weight: var(--ds-type-font-weight-semibold);
+    color: var(--ds-text-primary);
+    word-break: break-word;
+    overflow-wrap: break-word;
+  }
+  .acc-popover__activity-sub {
+    margin-top: 4px;
+    font-size: 0.875rem;
+    line-height: 1.42857;
+    color: var(--ds-text-tertiary-rest);
   }
   .acc-popover__title {
     font-size: 0.875rem;

@@ -571,6 +571,77 @@ export const DEFAULT_ROWS: OpportunityRow[] = [
     risks: [],
     salesPlay: { name: 'Cortex XDR Land', status: 'pursuing', valueUsd: 180_000 },
   },
+  // ── SKU-coverage rows (#11 follow-on) ────────────────────────────────────────
+  // These three fixtures exist solely to exercise product popover SKU tables
+  // for the 7 products not present in scenarios 1-8. Not editorial scenarios.
+
+  // scenario-sku-A: Okta VM-Series CDSS refresh — covers VM Series + PA Series Attached
+  // Close in Q4FY26 (jul 16), at-risk health → passes default filter.
+  {
+    id: '9',
+    accountId: 'acc-okta-iam',
+    oppId: 'opp-okta-vmseries-cdss',
+    oppName: 'Okta VM-Series CDSS Refresh',
+    account: 'Okta Identity Platform',
+    type: 'upsell', forecast: 'best-case', stage: 'solutioning',
+    closeDate: 'jul 16', quoteId: 'Q-2026-05801',
+    quoteTerms: { termLength: '36 months', routeToMarket: '1-tier', paymentOption: 'Annual' },
+    products: [
+      mkProduct('VM Series', 140_000),
+      mkProduct('PA Series Attached', 60_000),
+    ],
+    valueUsd: 200_000,
+    activity: { daysAgo: 9, description: 'Architecture review with network team' },
+    health: { overall: 'at-risk', technical: 'healthy', adoption: 'at-risk',
+      trend12mo: [0,0,0,0,0,0,0,1,1,0,0,0] },
+    risks: [],
+    salesPlay: { name: 'FW & CDSS Expansion', status: 'pitched', valueUsd: 200_000 },
+  },
+  // scenario-sku-B: Snowflake cloud-security trifecta — covers Xpanse + QRadar + Cortex & Cloud
+  // Close in Q4FY26 (jul 22), at-risk health → passes default filter.
+  {
+    id: '10',
+    accountId: 'acc-snowflake-cloud',
+    oppId: 'opp-snowflake-cloud-sec',
+    oppName: 'Snowflake Cloud Security Platform',
+    account: 'Snowflake Data Cloud',
+    type: 'net-new', forecast: 'best-case', stage: 'tech-validation',
+    closeDate: 'jul 22', quoteId: 'Q-2026-05902',
+    quoteTerms: { termLength: '12 months', routeToMarket: 'Direct', paymentOption: 'Upfront, no financing' },
+    products: [
+      mkProduct('Xpanse', 229_000),
+      mkProduct('QRadar', 365_000),
+      mkProduct('Cortex & Cloud', 286_000),
+    ],
+    valueUsd: 880_000,
+    activity: { daysAgo: 5, description: 'POC readout with CISO and cloud security team' },
+    health: { overall: 'at-risk', technical: 'healthy', adoption: 'healthy',
+      trend12mo: [0,0,0,0,0,1,1,1,0,0,0,0] },
+    risks: [mkRisk('budget')],
+    salesPlay: { name: 'Cortex Cloud Land and Expand', status: 'pursuing', valueUsd: 880_000 },
+  },
+  // scenario-sku-C: Cloudflare Unit 42 retainer — covers Reactive + Proactive
+  // Close in Q4FY26 (jun 27), at-risk health → passes default filter.
+  {
+    id: '11',
+    accountId: 'acc-cloudflare-network',
+    oppId: 'opp-cloudflare-u42-retainer',
+    oppName: 'Cloudflare Unit 42 Services',
+    account: 'Cloudflare Network Security',
+    type: 'net-new', forecast: 'pipeline', stage: 'discovery',
+    closeDate: 'jun 27', quoteId: 'Q-2026-06001',
+    quoteTerms: { termLength: '12 months', routeToMarket: 'Direct', paymentOption: 'Upfront, no financing' },
+    products: [
+      mkProduct('Reactive', 180_000),
+      mkProduct('Proactive', 65_000),
+    ],
+    valueUsd: 245_000,
+    activity: { daysAgo: 11, description: 'Introductory call with CISO on IR readiness' },
+    health: { overall: 'at-risk', technical: 'healthy', adoption: 'healthy',
+      trend12mo: [0,0,0,0,0,0,0,0,0,0,0,0] },
+    risks: [],
+    salesPlay: { name: 'Unit 42 Proactive + Reactive Bundle', status: 'pitched', valueUsd: 245_000 },
+  },
 ]
 
 // ─── Filter option sets ──────────────────────────────────────────────────────

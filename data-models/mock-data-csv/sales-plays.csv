@@ -1,15 +1,18 @@
-id,name,familyId,targetProducts,description
-play-ngfw-refresh,PA-Series NGFW Hardware Refresh,FW-CDSS,PA-series;PA-series-attached,Refresh on-prem firewalls to current PA-Series; attach CDSS subscriptions.
-play-vmseries-cloud,VM-Series Cloud Workload Protection,FW-CDSS,VM-series,Extend NGFW protection into AWS/Azure/GCP.
-play-cdss-bundle-attach,CDSS Bundle Attach,FW-CDSS,PA-series-attached;PA-series-support;FW-data-lake,Attach full subscription stack to existing NGFW footprint.
-play-prisma-access-gp,GlobalProtect to Prisma Access,SASE,Prisma-access,Migrate legacy VPN to cloud-delivered SASE.
-play-sdwan-takeout,Prisma SD-WAN Branch Takeout,SASE,Prisma-SD-WAN,"Displace legacy SD-WAN (Cisco Viptela, Velocloud)."
-play-sase-platform,Full SASE Platform Adoption,SASE,Prisma-access;Prisma-SD-WAN,Combined Prisma Access + SD-WAN platform pitch.
-play-xsiam-splunk,XSIAM Splunk Takeout,Cortex-cloud,XSIAM;QRadar,Displace Splunk SIEM with XSIAM.
-play-xsiam-qradar,XSIAM QRadar Takeout,Cortex-cloud,XSIAM;QRadar,Displace QRadar with XSIAM.
-play-xdr-edr,Cortex XDR EDR Consolidation,Cortex-cloud,Cortex-XDR,Replace CrowdStrike or SentinelOne with Cortex XDR.
-play-cortex-cloud-cnapp,Cortex Cloud CNAPP Adoption,Cortex-cloud,Cortex-cloud-leaf,CNAPP for cloud-native security posture.
-play-xpanse-attack-surf,Xpanse Attack Surface Management,Cortex-cloud,Xpanse,Deploy Xpanse for external attack-surface monitoring.
-play-xsoar-soc-modern,Cortex XSOAR SOC Modernization,Cortex-cloud,Cortex-XSOAR,Modernize SOC with XSOAR orchestration.
-play-unit42-ir-retainer,Unit 42 Incident Response Retainer,Unit-42,Unit-42-reactive,Sell IR retainer for incident readiness.
-play-unit42-proactive,Unit 42 Proactive Services,Unit-42,Unit-42-proactive,"Tabletop, threat assessment, advisory."
+id,name,familyId,description
+play-fw-refresh,FW Refresh and VM-Series Migration,fw-cdss,Refresh end-of-life PA-Series chassis and migrate workloads to VM-Series in public cloud.
+play-fw-cdss-attach,CDSS Subscription Attach,fw-cdss,Attach Threat Prevention WildFire URL Filtering and DNS Security to active PA-Series subscriptions.
+play-fw-data-lake,Strata Logging and Data Lake,fw-cdss,Replace third-party log forwarding with Strata Logging Service and Cortex Data Lake for unified visibility.
+play-fw-trade-up,PA-Series Hardware Trade-Up,fw-cdss,Trade up undersized appliances at branches to current PA-460 or PA-1410 chassis.
+play-sase-prisma-access,Prisma Access Land,sase,First-time Prisma Access landing replacing legacy VPN concentrators with cloud-delivered SASE.
+play-sase-sd-wan-modernize,SD-WAN Modernization,sase,Replace MPLS and legacy SD-WAN with Prisma SD-WAN for branch-to-cloud paths.
+play-sase-ztna-replace,ZTNA Incumbent Displacement,sase,Displace incumbent ZTNA vendors with Prisma Access ZTNA 2.0 for hybrid workforce.
+play-sase-mobile-users,Remote Workforce SASE,sase,Cloud-delivered secure access for remote and contractor populations.
+play-sase-branch-consolidate,Branch SASE Consolidation,sase,Collapse branch firewall MPLS and proxy stacks onto a single SASE fabric.
+play-cc-xdr-land,Cortex XDR Land,cortex-cloud,First-time XDR landing replacing legacy endpoint or EDR with Cortex XDR Pro.
+play-cc-xsoar-soar,XSOAR SOAR Modernization,cortex-cloud,Replace homegrown or legacy SOAR with Cortex XSOAR playbooks and managed integrations.
+play-cc-land-expand,Cortex Cloud Land and Expand,cortex-cloud,Land Cortex Cloud across XDR XSOAR and Xpanse with cross-sell expansion path.
+play-cc-xsiam-pitch,XSIAM Next-Gen SIEM,cortex-cloud,Pitch XSIAM as a next-generation SIEM replacing Splunk or QRadar with AI-driven detection.
+play-cc-xpanse-asm,Xpanse Attack Surface Management,cortex-cloud,Continuous external attack surface monitoring and remediation via Xpanse Expander.
+play-cc-qradar-migrate,QRadar to XSIAM Migration,cortex-cloud,Decommission IBM QRadar and migrate use cases to XSIAM with assisted detection conversion.
+play-u42-reactive-retainer,Unit 42 IR Retainer,unit-42,Pre-negotiated incident response retainer with Unit 42 for reactive engagements.
+play-u42-proactive-assess,Unit 42 Proactive Assessment,unit-42,Proactive readiness assessment tabletop and breach simulation engagement by Unit 42.

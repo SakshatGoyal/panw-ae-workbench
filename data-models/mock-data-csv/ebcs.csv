@@ -1,93 +1,72 @@
-id,accountId,date,type,topic,attendees
-ebc-0001,acc-salesforce,2025-12-22,Business-review,Quarterly business review,Carlos Johnson (Champion);Hiroshi Chen (Economic-buyer)
-ebc-0002,acc-salesforce,2025-11-10,Executive-briefing,Platform vision and roadmap,Jane Nguyen (User);Jake Khan (Decision-maker)
-ebc-0003,acc-salesforce,2025-08-08,Executive-briefing,Annual security strategy,Jake Khan (Decision-maker);Carlos Johnson (Champion)
-ebc-0004,acc-googlecloud,2025-07-03,Roadmap-session,Cortex Cloud product workshop,Carlos Russo (Influencer);Sara Ramirez (Champion)
-ebc-0005,acc-googlecloud,2026-01-15,Executive-briefing,Annual security strategy,Carlos Russo (Influencer);Sara Ramirez (Champion)
-ebc-0006,acc-wellsfargobank,2025-03-18,Executive-briefing,Annual security strategy,Marcus Chen (CISO);Priya Patel (VP Security)
-ebc-0007,acc-adobe,2024-10-26,Executive-briefing,Annual security strategy,Olivia Singh (Influencer);Lila Russo (Decision-maker)
-ebc-0008,acc-nvidia,2026-02-16,Business-review,Quarterly business review,Jake Ramirez (Influencer);Sara Schmidt (Champion)
-ebc-0009,acc-nvidia,2025-12-19,Business-review,Quarterly business review,Jake Ramirez (Influencer);Hana Park (Economic-buyer);Sara Schmidt (Champion)
-ebc-0010,acc-cisco,2025-07-18,Roadmap-session,XSIAM roadmap deep-dive,Amara Johnson (Economic-buyer);Iris Anderson (Influencer)
-ebc-0011,acc-oracle,2025-07-12,Business-review,Quarterly business review,Noah Dixon (Decision-maker);David O'Brien (Champion)
-ebc-0012,acc-oracle,2026-02-15,Business-review,Renewal readiness review,Noah Dixon (Decision-maker);Aisha Foster (Influencer)
-ebc-0013,acc-visa,2025-12-01,Business-review,Adoption health review,Priya Bennett (Economic-buyer);David Russo (Influencer);Sara Ng (Champion)
-ebc-0014,acc-visa,2025-11-11,Roadmap-session,Prisma Access feature roadmap,Sofia Dixon (Decision-maker);Sara Ng (Champion)
-ebc-0015,acc-chevron,2025-06-22,Executive-briefing,Board-level threat briefing,Sofia Nguyen (Decision-maker);Zara Garcia (Influencer)
-ebc-0016,acc-chevron,2025-12-17,Business-review,Quarterly business review,Carlos Walsh (Champion);Sofia Nguyen (Decision-maker)
-ebc-0017,acc-kaiser,2026-01-17,Roadmap-session,Prisma Access feature roadmap,Aisha Liu (Economic-buyer);Elena Singh (Influencer)
-ebc-0018,acc-kaiser,2026-01-23,Business-review,Adoption health review,Aisha Liu (Economic-buyer);Anika Cole (Champion)
-ebc-0019,acc-stanfordhc,2025-08-31,Business-review,Adoption health review,Tom Johnson (Influencer);Ethan Patel (User)
-ebc-0020,acc-stanfordhc,2026-02-06,Business-review,Adoption health review,Tom Johnson (Influencer);Sofia Ng (Economic-buyer)
-ebc-0021,acc-youtube,2025-12-10,Executive-briefing,Platform vision and roadmap,Amara Ng (Champion);Sofia Cohen (Economic-buyer);Amara Cole (Influencer)
-ebc-0022,acc-youtube,2026-02-19,Executive-briefing,Platform vision and roadmap,Sofia Cohen (Economic-buyer);Amara Ng (Champion)
-ebc-0023,acc-waymo,2025-06-25,Roadmap-session,Prisma Access feature roadmap,Naomi Chen (Economic-buyer);Yuki Dixon (Influencer)
-ebc-0024,acc-wfsecurities,2025-07-22,Executive-briefing,Platform vision and roadmap,Jane Anderson (User);Ravi Walsh (Economic-buyer)
-ebc-0025,acc-wfsecurities,2026-02-02,Executive-briefing,Annual security strategy,Jane Anderson (User);Ravi Walsh (Economic-buyer)
-ebc-0026,acc-slack,2026-01-16,Roadmap-session,Cortex Cloud product workshop,Carlos Patel (Economic-buyer);Priya Ng (Influencer)
-ebc-0027,acc-slack,2025-09-19,Executive-briefing,Board-level threat briefing,Priya Ng (Influencer);Owen Nguyen (Decision-maker)
-ebc-0028,acc-slack,2025-11-28,Roadmap-session,Prisma Access feature roadmap,Priya Ng (Influencer);Owen Nguyen (Decision-maker)
-ebc-0029,acc-tableau,2025-10-07,Roadmap-session,XSIAM roadmap deep-dive,Yuki Iqbal (Influencer);Sara Tanaka (Champion)
-ebc-0030,acc-tableau,2025-11-25,Business-review,Adoption health review,Sara Tanaka (Champion);Elena Foster (Economic-buyer)
-ebc-0031,acc-mulesoft,2025-11-16,Business-review,Renewal readiness review,Noah Schmidt (Champion);Hana Cohen (Economic-buyer)
-ebc-0032,acc-mulesoft,2025-10-16,Roadmap-session,Prisma Access feature roadmap,Amara Liu (Influencer);Noah Schmidt (Champion);Hana Cohen (Economic-buyer)
-ebc-0033,acc-mulesoft,2025-07-30,Business-review,Adoption health review,Hana Cohen (Economic-buyer);Amara Liu (Influencer);Noah Schmidt (Champion)
-ebc-0034,acc-sutterhealth,2025-06-28,Roadmap-session,XSIAM roadmap deep-dive,Jake Cohen (Decision-maker);Hiroshi Johnson (Champion)
-ebc-0035,acc-intel,2025-08-02,Executive-briefing,Annual security strategy,Iris Garcia (Decision-maker);Noah Liu (Champion)
-ebc-0036,acc-intel,2025-12-01,Business-review,Renewal readiness review,Carlos Nguyen (Influencer);Yuki Johnson (User)
-ebc-0037,acc-netflix,2025-12-06,Executive-briefing,Board-level threat briefing,Diego Ramirez (Economic-buyer);Lila Dixon (Champion)
-ebc-0038,acc-netflix,2025-11-14,Business-review,Adoption health review,Zara Khan (Decision-maker);Hiroshi Anderson (User)
-ebc-0039,acc-netflix,2025-12-24,Executive-briefing,Platform vision and roadmap,Lila Dixon (Champion);Zara Khan (Decision-maker);Carlos Reed (Influencer)
-ebc-0040,acc-stripe,2025-11-30,Business-review,Adoption health review,Amara Liu (Influencer);Naomi Iqbal (Champion);Marcus Park (Decision-maker)
-ebc-0041,acc-stripe,2025-11-02,Business-review,Renewal readiness review,Amara Liu (Influencer);Tom Khan (Economic-buyer);Marcus Park (Decision-maker)
-ebc-0042,acc-stripe,2025-11-09,Business-review,Quarterly business review,Naomi Iqbal (Champion);Tom Khan (Economic-buyer)
-ebc-0043,acc-pinterest,2025-01-27,Executive-briefing,Platform vision and roadmap,Sara Russo (Influencer);Zara Iqbal (Economic-buyer)
-ebc-0044,acc-servicenow,2026-02-28,Business-review,Renewal readiness review,Marcus Liu (Influencer);Carlos Iqbal (Economic-buyer)
-ebc-0045,acc-servicenow,2025-10-13,Executive-briefing,Board-level threat briefing,Carlos Iqbal (Economic-buyer);Priya Dixon (Decision-maker);Naomi Reed (Champion)
-ebc-0046,acc-servicenow,2025-11-26,Roadmap-session,Prisma Access feature roadmap,Carlos Iqbal (Economic-buyer);Priya Dixon (Decision-maker);Naomi Reed (Champion)
-ebc-0047,acc-workday,2025-07-04,Business-review,Adoption health review,Liam Brooks (Economic-buyer);Mateo Patel (Influencer)
-ebc-0048,acc-workday,2025-11-13,Business-review,Adoption health review,Liam Brooks (Economic-buyer);Mateo Patel (Influencer)
-ebc-0049,acc-twilio,2025-10-06,Roadmap-session,XSIAM roadmap deep-dive,Jane Park (Economic-buyer);Elena Ramirez (Decision-maker)
-ebc-0050,acc-twilio,2025-11-30,Roadmap-session,XSIAM roadmap deep-dive,Ravi Khan (Influencer);Jane Park (Economic-buyer)
-ebc-0051,acc-doordash,2025-07-10,Roadmap-session,Cortex Cloud product workshop,Marcus Hayes (Influencer);Marcus Hayes (Economic-buyer)
-ebc-0052,acc-lyft,2025-07-01,Business-review,Adoption health review,Iris Tanaka (Influencer);Olivia Nguyen (Decision-maker)
-ebc-0053,acc-lyft,2025-12-31,Roadmap-session,XSIAM roadmap deep-dive,Hana Iqbal (Economic-buyer);Iris Johnson (User)
-ebc-0054,acc-airbnb,2026-02-19,Roadmap-session,XSIAM roadmap deep-dive,Mateo Hayes (Economic-buyer);Olivia Nguyen (Influencer)
-ebc-0055,acc-airbnb,2025-10-08,Executive-briefing,Annual security strategy,Mateo Hayes (Economic-buyer);Jake Bennett (Champion)
-ebc-0056,acc-databricks,2026-02-12,Executive-briefing,Board-level threat briefing,Amara Reyes (Influencer);Elena Foster (User)
-ebc-0057,acc-databricks,2025-11-02,Executive-briefing,Annual security strategy,Amara Reyes (Influencer);Hana Singh (Champion)
-ebc-0058,acc-databricks,2025-11-29,Roadmap-session,XSIAM roadmap deep-dive,Hana Singh (Champion);Amara Reyes (Influencer)
-ebc-0059,acc-snowflake,2026-04-12,Executive-briefing,Annual security strategy,Priya Cohen (Influencer);Jane Russo (Champion);Naomi Garcia (Economic-buyer)
-ebc-0060,acc-snowflake,2025-12-11,Roadmap-session,Prisma Access feature roadmap,Priya Cohen (Influencer);Yuki Singh (Decision-maker);Jane Russo (Champion)
-ebc-0061,acc-roblox,2025-07-06,Roadmap-session,XSIAM roadmap deep-dive,Mateo Kowalski (Influencer);Lila Cohen (User)
-ebc-0062,acc-ebay,2026-02-28,Roadmap-session,XSIAM roadmap deep-dive,Amara Liu (Influencer);Yuki Brooks (Decision-maker)
-ebc-0063,acc-ebay,2026-01-13,Business-review,Renewal readiness review,Amara Liu (Influencer);Ravi Bennett (Economic-buyer);Noah Garcia (Champion)
-ebc-0064,acc-schwab,2026-04-04,Business-review,Renewal readiness review,Owen Singh (Champion);Jane Garcia (Influencer);Priya Liu (Economic-buyer)
-ebc-0065,acc-schwab,2026-01-31,Executive-briefing,Board-level threat briefing,Owen Singh (Champion);Jane Garcia (Influencer);Priya Liu (Economic-buyer)
-ebc-0066,acc-schwab,2025-09-17,Roadmap-session,Prisma Access feature roadmap,Owen Singh (Champion);Priya Liu (Economic-buyer)
-ebc-0067,acc-genentech,2025-08-03,Executive-briefing,Board-level threat briefing,Priya Cole (Decision-maker);Sofia Tanaka (Economic-buyer)
-ebc-0068,acc-genentech,2025-11-22,Roadmap-session,XSIAM roadmap deep-dive,Priya Cole (Decision-maker);Mateo Kowalski (User)
-ebc-0069,acc-ucsfhealth,2025-06-14,Business-review,Renewal readiness review,Ravi O'Brien (Influencer);Liam Kowalski (Champion)
-ebc-0070,acc-gilead,2026-04-14,Executive-briefing,Board-level threat briefing,Amara Anderson (Champion);Olivia Ng (Decision-maker);Ethan Cohen (Influencer)
-ebc-0071,acc-gilead,2025-10-25,Executive-briefing,Platform vision and roadmap,Amara Anderson (Champion);Ethan Cohen (Influencer)
-ebc-0072,acc-gilead,2025-10-10,Roadmap-session,XSIAM roadmap deep-dive,Olivia Ng (Decision-maker);Aisha Foster (Economic-buyer)
-ebc-0073,acc-ea,2025-06-28,Executive-briefing,Annual security strategy,David Ng (Influencer);Iris Tanaka (Economic-buyer)
-ebc-0074,acc-sutterbay,2025-06-16,Roadmap-session,Prisma Access feature roadmap,Tom Schmidt (Influencer);Carlos Ramirez (Champion)
-ebc-0075,acc-sutterbay,2026-01-12,Executive-briefing,Platform vision and roadmap,Carlos Chen (Decision-maker);Tom Schmidt (Influencer)
-ebc-0076,acc-pamf,2026-03-10,Roadmap-session,Prisma Access feature roadmap,Anika Garcia (Economic-buyer);Iris Nguyen (Champion)
-ebc-0077,acc-pamf,2025-12-01,Roadmap-session,Cortex Cloud product workshop,Anika Garcia (Economic-buyer);Iris Nguyen (Champion);Tom Liu (Influencer)
-ebc-0078,acc-pamf,2025-08-02,Roadmap-session,Prisma Access feature roadmap,Anika Garcia (Economic-buyer);Iris Nguyen (Champion);Tom Liu (Influencer)
-ebc-0079,acc-gap,2025-06-07,Business-review,Quarterly business review,Marcus Anderson (Decision-maker);David Hayes (Influencer)
-ebc-0080,acc-gap,2025-12-14,Executive-briefing,Platform vision and roadmap,Liam O'Brien (User);Marcus Anderson (Decision-maker)
-ebc-0081,acc-levi,2025-10-13,Business-review,Adoption health review,Jane Yamada (Decision-maker);Sofia Patel (Influencer)
-ebc-0082,acc-levi,2026-01-23,Roadmap-session,XSIAM roadmap deep-dive,Anika Cole (Champion);Jane Yamada (Decision-maker)
-ebc-0083,acc-safeway,2025-12-20,Roadmap-session,Cortex Cloud product workshop,Lila Ng (Economic-buyer);Olivia Garcia (Decision-maker);Iris Anderson (User)
-ebc-0084,acc-safeway,2025-11-02,Executive-briefing,Platform vision and roadmap,Olivia Garcia (Decision-maker);Tom Khan (Champion)
-ebc-0085,acc-citysf,2025-08-18,Business-review,Renewal readiness review,Ravi Schmidt (User);Anika Cohen (Decision-maker)
-ebc-0086,acc-citysf,2026-03-03,Business-review,Adoption health review,Ravi Schmidt (User);Anika Cohen (Decision-maker)
-ebc-0087,acc-stanforduniv,2025-12-10,Executive-briefing,Board-level threat briefing,Naomi Russo (Champion);Amara Ramirez (Influencer)
-ebc-0088,acc-stanforduniv,2025-12-15,Executive-briefing,Board-level threat briefing,Zara Cole (Decision-maker);Zara Hayes (Economic-buyer)
-ebc-0089,acc-stanforduniv,2025-12-03,Business-review,Quarterly business review,Amara Ramirez (Influencer);Zara Hayes (Economic-buyer)
-ebc-0090,acc-ucb,2025-10-10,Business-review,Adoption health review,Yuki Foster (Champion);Priya Walsh (Influencer)
-ebc-0091,acc-ucb,2026-02-23,Executive-briefing,Board-level threat briefing,Priya Walsh (Influencer);Yuki Foster (Champion)
-ebc-0092,acc-bart,2025-09-11,Executive-briefing,Board-level threat briefing,Ravi Johnson (Economic-buyer);Naomi Khan (Decision-maker)
+ebcId,accountId,date,topic,panwAttendees
+ebc-stripe-tr-01,acc-stripe-treasury,2025-11-12,Cortex Cloud Roadmap and XSOAR Roadmap Review,Anna Novak;Field SE Marcus Reyes;Cortex PM Aditi Sharma
+ebc-stripe-tr-02,acc-stripe-treasury,2025-06-04,Strata Platform Roadmap and Unit 42 Threat Brief,Anna Novak;Strata SE Devon Park
+ebc-stripe-rd-01,acc-stripe-radar,2025-10-22,Unit 42 Proactive Engagement Briefing,Anna Novak;U42 Director Sofia Mendes
+ebc-doordash-01,acc-doordash-platform,2025-12-08,Cortex XDR Roadmap and SecOps Modernization,Anna Novak;Cortex SE Lila Park
+ebc-lyft-01,acc-lyft-rideshare,2025-09-18,SASE Roadmap and SD-WAN Modernization Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-lyft-02,acc-lyft-rideshare,2026-02-25,FW Refresh Strategy and CDSS Roadmap,Anna Novak;Strata SE Devon Park
+ebc-twilio-01,acc-twilio-messaging,2025-09-10,APAC Expansion Architecture Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-twilio-02,acc-twilio-messaging,2026-01-15,Cortex Platform Roadmap,Anna Novak;Cortex PM Aditi Sharma
+ebc-databricks-01,acc-databricks-lakehouse,2025-06-12,Cortex XDR vs CrowdStrike Architecture Briefing,Anna Novak;Cortex SE Lila Park;Competitive PMM Roy Tanaka
+ebc-databricks-02,acc-databricks-lakehouse,2025-11-04,XSIAM Roadmap and Detection Engineering,Anna Novak;Detection Architect Maria Bauer
+ebc-databricks-03,acc-databricks-lakehouse,2026-03-18,Strata Data Lake and Cortex Cloud Land Briefing,Anna Novak;Cortex SE Lila Park
+ebc-notion-01,acc-notion-workspace,2025-10-08,Cortex XDR Roadmap,Anna Novak;Cortex SE Lila Park
+ebc-linear-01,acc-linear-issues,2025-07-22,Cortex Platform Roadmap and XSOAR Briefing,Anna Novak;Cortex PM Aditi Sharma
+ebc-figma-01,acc-figma-design,2025-11-19,Cortex XDR Roadmap and Xpanse Briefing,Anna Novak;Cortex SE Lila Park
+ebc-asana-01,acc-asana-work,2025-08-14,SASE Roadmap and ZTNA 2.0 Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-asana-02,acc-asana-work,2026-02-12,Strata Roadmap and CDSS Attach,Anna Novak;Strata SE Devon Park
+ebc-pinterest-01,acc-pinterest-discovery,2025-09-30,Cortex Cloud Roadmap and Xpanse Briefing,Anna Novak;Cortex SE Lila Park
+ebc-pinterest-02,acc-pinterest-discovery,2026-03-04,Strata Refresh Strategy,Anna Novak;Strata SE Devon Park
+ebc-eventbrite-01,acc-eventbrite-events,2025-11-04,SASE Architecture Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-allbirds-01,acc-allbirds,2025-12-19,Prisma Access Roadmap and Mobile Workforce,Anna Novak;SASE SE Tobias Lindgren
+ebc-23andme-01,acc-23andme-genetics,2025-10-15,Cortex XSIAM Roadmap and Bio-IT Threat Brief,Anna Novak;Detection Architect Maria Bauer;U42 Director Sofia Mendes
+ebc-23andme-02,acc-23andme-genetics,2026-03-12,Unit 42 Proactive and Cortex Cloud Briefing,Anna Novak;U42 Director Sofia Mendes
+ebc-houzz-01,acc-houzz-home,2025-09-08,Cortex Cloud Roadmap and POV Strategy Reset,Anna Novak;Cortex SE Lila Park
+ebc-instacart-01,acc-instacart-grocery,2025-08-21,Cortex Cloud Expansion Strategy,Anna Novak;Cortex SE Lila Park
+ebc-instacart-02,acc-instacart-grocery,2026-02-04,Strata Roadmap and CDSS Attach,Anna Novak;Strata SE Devon Park
+ebc-cloudflare-01,acc-cloudflare-edge,2025-10-02,SASE Roadmap and SD-WAN Modernization,Anna Novak;SASE SE Tobias Lindgren
+ebc-cloudflare-02,acc-cloudflare-edge,2026-02-19,ZTNA 2.0 Roadmap and Prisma Access Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-discord-01,acc-discord-platform,2025-09-25,Strata Refresh Strategy and CDSS Roadmap,Anna Novak;Strata SE Devon Park
+ebc-postmates-01,acc-postmates-delivery,2025-10-30,Cortex XDR Roadmap,Anna Novak;Cortex SE Lila Park
+ebc-coinbase-01,acc-coinbase-exchange,2025-10-09,Cortex Cloud Roadmap and XSIAM Briefing,Anna Novak;Cortex SE Lila Park;Detection Architect Maria Bauer
+ebc-coinbase-02,acc-coinbase-exchange,2026-03-25,SASE Roadmap and Strata CDSS Attach,Anna Novak;SASE SE Tobias Lindgren;Strata SE Devon Park
+ebc-plaid-01,acc-plaid-fintech,2025-12-04,SASE Roadmap and Cortex XDR Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-robinhood-01,acc-robinhood-markets,2025-08-28,Cortex Cloud Roadmap,Anna Novak;Cortex SE Lila Park
+ebc-brex-stale,acc-brex-spend,2025-03-28,Strata and Cortex Joint Roadmap,Anna Novak;Strata SE Devon Park
+ebc-ramp-01,acc-ramp-finance,2025-10-06,Prisma Access Roadmap and CDSS Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-gusto-01,acc-gusto-payroll,2026-04-06,Strata Refresh Strategy and Prisma Renewal,Anna Novak;Strata SE Devon Park
+ebc-gusto-02,acc-gusto-payroll,2025-09-15,SASE Roadmap and Mobile Workforce,Anna Novak;SASE SE Tobias Lindgren
+ebc-carta-01,acc-carta-equity,2025-08-12,Strata Refresh Strategy,Anna Novak;Strata SE Devon Park
+ebc-affirm-01,acc-affirm-pay,2025-11-22,Strata Roadmap and Platformization Briefing,Anna Novak;Strata SE Devon Park
+ebc-chime-01,acc-chime-banking,2025-10-30,Cortex XDR Roadmap and Unit 42 Briefing,Anna Novak;Cortex SE Lila Park;U42 Director Sofia Mendes
+ebc-roku-01,acc-roku-streaming,2025-09-04,Strata Refresh Strategy and Cortex XDR Briefing,Anna Novak;Cortex SE Lila Park
+ebc-nextdoor-01,acc-nextdoor-community,2025-12-10,Strata Refresh Strategy,Anna Novak;Strata SE Devon Park
+ebc-box-01,acc-box-content,2025-09-04,Strata Refresh Strategy,Anna Novak;Strata SE Devon Park
+ebc-box-02,acc-box-content,2026-02-18,SASE Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-billcom-01,acc-billcom-payables,2025-11-08,Strata and SASE Roadmap,Anna Novak;Strata SE Devon Park
+ebc-confluent-01,acc-confluent-streaming,2025-10-25,SASE Roadmap and Partner Strategy,Anna Novak;SASE SE Tobias Lindgren
+ebc-gitlab-01,acc-gitlab-devops,2025-08-20,Cortex XDR Roadmap and DevSecOps Briefing,Anna Novak;Cortex SE Lila Park
+ebc-gitlab-02,acc-gitlab-devops,2026-02-28,Cortex Cloud Land and XSOAR Briefing,Anna Novak;Cortex SE Lila Park
+ebc-snowflake-01,acc-snowflake-sector,2025-09-12,Sector Platform Briefing and XSIAM Roadmap,Anna Novak;Detection Architect Maria Bauer
+ebc-snowflake-02,acc-snowflake-sector,2026-03-08,Cortex Cloud Roadmap and Strata Refresh,Anna Novak;Cortex SE Lila Park;Strata SE Devon Park
+ebc-atlassian-01,acc-atlassian-marketplace,2025-10-21,SASE Roadmap and Strata Renewal Strategy,Anna Novak;SASE SE Tobias Lindgren
+ebc-atlassian-02,acc-atlassian-marketplace,2026-02-22,Cortex XDR Roadmap and Mobile Workforce,Anna Novak;Cortex SE Lila Park
+ebc-webflow-01,acc-webflow,2025-12-15,Prisma Access Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-segment-01,acc-segment-data,2025-12-10,Cortex XDR Roadmap,Anna Novak;Cortex SE Lila Park
+ebc-mixpanel-01,acc-mixpanel-analytics,2025-12-20,Prisma Access Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-aurora-01,acc-aurora,2025-11-18,Strata Refresh Strategy,Anna Novak;Strata SE Devon Park
+ebc-beacon-ind-01,acc-beacon-industries,2025-12-22,Strata Refresh and SASE Briefing,Anna Novak;Strata SE Devon Park
+ebc-tyrell-01,acc-tyrell,2025-10-04,Strata Roadmap and Cortex Platform Briefing,Anna Novak;Strata SE Devon Park;Cortex SE Lila Park
+ebc-tyrell-02,acc-tyrell,2026-03-22,SASE Roadmap and XSOAR Briefing,Anna Novak;SASE SE Tobias Lindgren
+ebc-cyberdyne-01,acc-cyberdyne,2025-08-04,Cortex Cloud Roadmap and Strata Refresh,Anna Novak;Cortex SE Lila Park;Strata SE Devon Park
+ebc-cyberdyne-02,acc-cyberdyne,2025-12-02,SASE and ZTNA Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-cyberdyne-03,acc-cyberdyne,2026-03-30,Unit 42 Proactive and Reactive Briefing,Anna Novak;U42 Director Sofia Mendes
+ebc-yelp-01,acc-yelp-reviews,2025-12-08,Strata Refresh Strategy,Anna Novak;Strata SE Devon Park
+ebc-strava-01,acc-strava-activities,2025-12-12,Prisma Access Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-patreon-01,acc-patreon-creators,2025-12-18,Cortex XDR Roadmap,Anna Novak;Cortex SE Lila Park
+ebc-calendly-01,acc-calendly-scheduling,2025-12-22,Prisma Access Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-loom-01,acc-loom-video,2025-12-26,Strata Renewal and Prisma Access Briefing,Anna Novak;Strata SE Devon Park
+ebc-miro-01,acc-miro-whiteboard,2025-11-30,Prisma Access Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-klaviyo-01,acc-klaviyo-marketing,2025-12-04,Strata Refresh Strategy,Anna Novak;Strata SE Devon Park
+ebc-lattice-01,acc-lattice-people,2025-12-15,Prisma Access Roadmap,Anna Novak;SASE SE Tobias Lindgren
+ebc-front-01,acc-front-inbox,2025-12-09,Strata and SASE Roadmap,Anna Novak;Strata SE Devon Park

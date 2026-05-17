@@ -1,0 +1,168 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   Icon Exploration — ai-interactions/Trace Reasoning
+   Dark-canvas reference table: Operation × Options × Verbs × When × Finalized
+   ──────────────────────────────────────────────────────────────────────────── */
+
+.ie-canvas {
+  min-height: 100vh;
+  background: var(--ds-surface-inverse-rest);
+  display: flex;
+  justify-content: center;
+  padding: 56px 48px;
+  box-sizing: border-box;
+  overflow-x: auto;
+}
+
+/* ─── Table — fixed layout enables column resizing ───────────────────────── */
+
+.ie-table {
+  width: 100%;
+  max-width: 1280px;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-family: var(--ds-type-font-family-sans);
+}
+
+/* ─── Column widths (set on <col>, overridable by resizing th) ───────────── */
+
+.ie-col-op      { width: 160px; }
+.ie-col-options { width: 320px; }
+.ie-col-verbs   { width: 220px; }
+.ie-col-when    { width: 220px; }
+.ie-col-final   { width: 100px; }
+
+/* ─── Header ──────────────────────────────────────────────────────────────── */
+
+.ie-table thead th {
+  font-size: 0.875rem;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-inverse-rest);
+  text-align: left;
+  padding: 0 0 16px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.25);
+  position: relative;
+  overflow: visible;
+}
+
+/*
+ * Resizable inner wrapper.
+ * resize:horizontal needs overflow≠visible. We clip on the inner div so
+ * the browser's resize grip renders inside the cell without bleeding into
+ * the header text area. The grip appears at the bottom-right of the div;
+ * padding-bottom gives it a dedicated landing zone.
+ */
+.ie-th-inner {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  padding-right: 24px;
+  padding-bottom: 2px;
+  resize: horizontal;
+  min-width: 40px;
+  box-sizing: border-box;
+}
+
+/* Suppress grip on last column */
+.ie-table thead th:last-child .ie-th-inner {
+  padding-right: 0;
+  resize: none;
+}
+
+/* Tighten the resize grip colour to be subtle on dark bg */
+.ie-th-inner::-webkit-resizer {
+  background: transparent;
+}
+
+/* ─── Rows ────────────────────────────────────────────────────────────────── */
+
+.ie-table tbody tr {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.ie-table tbody td {
+  padding: 20px 20px 20px 0;
+  vertical-align: top;
+  color: var(--ds-text-inverse-rest);
+  font-size: 0.875rem;
+  line-height: 1.42857;
+  overflow: hidden;
+}
+
+.ie-table tbody td:last-child {
+  padding-right: 0;
+}
+
+/* ─── Operation cell ─────────────────────────────────────────────────────── */
+
+.ie-op-name {
+  font-size: 0.875rem;
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-inverse-rest);
+}
+
+/* ─── Icon row ───────────────────────────────────────────────────────────── */
+
+.ie-icons {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.ie-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  width: 48px;
+  cursor: default;
+  flex-shrink: 0;
+}
+
+.ie-icon__glyph {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: var(--ds-radius-standard);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  transition: background 80ms;
+}
+
+.ie-icon:hover .ie-icon__glyph {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.ie-icon__name {
+  font-size: 9px;
+  line-height: 1.3;
+  color: rgba(255, 255, 255, 0.4);
+  text-align: center;
+  word-break: break-word;
+}
+
+/* ─── Verbs / When cells ─────────────────────────────────────────────────── */
+
+.ie-verbs {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.ie-when {
+  color: rgba(255, 255, 255, 0.75);
+}
+
+/* ─── Finalized cell ─────────────────────────────────────────────────────── */
+
+.ie-final {
+  vertical-align: top;
+}
+
+.ie-final .ie-icon {
+  width: auto;
+}
+
+.ie-final .ie-icon__glyph {
+  background: rgba(255, 255, 255, 0.14);
+}

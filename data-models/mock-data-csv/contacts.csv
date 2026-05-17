@@ -1,197 +1,152 @@
-id,accountId,name,title,role,email,phone
-c-0001,acc-salesforce,Hiroshi Chen,CFO,Economic-buyer,hiroshi.chen@salesforce.com,+1-415-555-1001
-c-0002,acc-salesforce,Carlos Johnson,Director of Cloud Security,Champion,carlos.johnson@salesforce.com,+1-415-555-1002
-c-0003,acc-salesforce,Lila Anderson,Security Engineer,Influencer,lila.anderson@salesforce.com,+1-415-555-1003
-c-0004,acc-salesforce,Jake Khan,VP of Information Security,Decision-maker,jake.khan@salesforce.com,+1-415-555-1004
-c-0005,acc-salesforce,Jane Nguyen,SOC Analyst,User,jane.nguyen@salesforce.com,+1-415-555-1005
-c-0006,acc-googlecloud,Yuki Bennett,CISO,Economic-buyer,yuki.bennett@googlecloud.com,+1-415-555-1006
-c-0007,acc-googlecloud,Sara Ramirez,Principal Security Architect,Champion,sara.ramirez@googlecloud.com,+1-415-555-1007
-c-0008,acc-googlecloud,Carlos Russo,Network Architect,Influencer,carlos.russo@googlecloud.com,+1-415-555-1008
-c-0009,acc-wellsfargobank,Ethan Reed,CIO,Economic-buyer,ethan.reed@wellsfargobank.com,+1-415-555-1009
-c-0010,acc-wellsfargobank,Noah Khan,"Sr Manager, SecOps",Champion,noah.khan@wellsfargobank.com,+1-415-555-1010
-c-0011,acc-wellsfargobank,Sofia Kowalski,Cloud Security Engineer,Influencer,sofia.kowalski@wellsfargobank.com,+1-415-555-1011
-c-0012,acc-adobe,Hiroshi Nguyen,SVP Technology,Economic-buyer,hiroshi.nguyen@adobe.com,+1-415-555-1012
-c-0013,acc-adobe,Hiroshi O'Brien,"Sr Manager, SecOps",Champion,hiroshi.obrien@adobe.com,+1-415-555-1013
-c-0014,acc-adobe,Olivia Singh,Security Engineer,Influencer,olivia.singh@adobe.com,+1-415-555-1014
-c-0015,acc-adobe,Lila Russo,Head of Cybersecurity,Decision-maker,lila.russo@adobe.com,+1-415-555-1015
-c-0016,acc-nvidia,Hana Park,CISO,Economic-buyer,hana.park@nvidia.com,+1-415-555-1016
-c-0017,acc-nvidia,Sara Schmidt,"Sr Manager, SecOps",Champion,sara.schmidt@nvidia.com,+1-415-555-1017
-c-0018,acc-nvidia,Jake Ramirez,Security Engineer,Influencer,jake.ramirez@nvidia.com,+1-415-555-1018
-c-0019,acc-cisco,Amara Johnson,CFO,Economic-buyer,amara.johnson@cisco.com,+1-415-555-1019
-c-0020,acc-cisco,Priya Iqbal,Director of Cloud Security,Champion,priya.iqbal@cisco.com,+1-415-555-1020
-c-0021,acc-cisco,Iris Anderson,DevSecOps Lead,Influencer,iris.anderson@cisco.com,+1-415-555-1021
-c-0022,acc-oracle,Naomi Liu,CFO,Economic-buyer,naomi.liu@oracle.com,+1-415-555-1022
-c-0023,acc-oracle,David O'Brien,"Sr Manager, SecOps",Champion,david.obrien@oracle.com,+1-415-555-1023
-c-0024,acc-oracle,Aisha Foster,Network Architect,Influencer,aisha.foster@oracle.com,+1-415-555-1024
-c-0025,acc-oracle,Noah Dixon,Head of Cybersecurity,Decision-maker,noah.dixon@oracle.com,+1-415-555-1025
-c-0026,acc-visa,Priya Bennett,CIO,Economic-buyer,priya.bennett@visa.com,+1-415-555-1026
-c-0027,acc-visa,Sara Ng,Director of Cloud Security,Champion,sara.ng@visa.com,+1-415-555-1027
-c-0028,acc-visa,David Russo,DevSecOps Lead,Influencer,david.russo@visa.com,+1-415-555-1028
-c-0029,acc-visa,Sofia Dixon,Head of Cybersecurity,Decision-maker,sofia.dixon@visa.com,+1-415-555-1029
-c-0030,acc-visa,Noah Cohen,SOC Analyst,User,noah.cohen@visa.com,+1-415-555-1030
-c-0031,acc-chevron,Mei Walsh,CISO,Economic-buyer,mei.walsh@chevron.com,+1-415-555-1031
-c-0032,acc-chevron,Carlos Walsh,Director of Security,Champion,carlos.walsh@chevron.com,+1-415-555-1032
-c-0033,acc-chevron,Zara Garcia,DevSecOps Lead,Influencer,zara.garcia@chevron.com,+1-415-555-1033
-c-0034,acc-chevron,Sofia Nguyen,VP of Information Security,Decision-maker,sofia.nguyen@chevron.com,+1-415-555-1034
-c-0035,acc-chevron,Hana Hayes,IT Manager,User,hana.hayes@chevron.com,+1-415-555-1035
-c-0036,acc-kaiser,Aisha Liu,SVP Technology,Economic-buyer,aisha.liu@kaiserpermanen.com,+1-415-555-1036
-c-0037,acc-kaiser,Anika Cole,Principal Security Architect,Champion,anika.cole@kaiserpermanen.com,+1-415-555-1037
-c-0038,acc-kaiser,Elena Singh,Cloud Security Engineer,Influencer,elena.singh@kaiserpermanen.com,+1-415-555-1038
-c-0039,acc-kaiser,Carlos Ng,Head of Cybersecurity,Decision-maker,carlos.ng@kaiserpermanen.com,+1-415-555-1039
-c-0040,acc-stanfordhc,Sofia Ng,SVP Technology,Economic-buyer,sofia.ng@stanfordhealth.com,+1-415-555-1040
-c-0041,acc-stanfordhc,Mateo Hayes,Principal Security Architect,Champion,mateo.hayes@stanfordhealth.com,+1-415-555-1041
-c-0042,acc-stanfordhc,Tom Johnson,Cloud Security Engineer,Influencer,tom.johnson@stanfordhealth.com,+1-415-555-1042
-c-0043,acc-stanfordhc,Yuki Brooks,VP of Information Security,Decision-maker,yuki.brooks@stanfordhealth.com,+1-415-555-1043
-c-0044,acc-stanfordhc,Ethan Patel,SOC Analyst,User,ethan.patel@stanfordhealth.com,+1-415-555-1044
-c-0045,acc-pge,Kenji Tanaka,SVP Technology,Economic-buyer,kenji.tanaka@pgande.com,+1-415-555-1045
-c-0046,acc-pge,Olivia Nguyen,Principal Security Architect,Champion,olivia.nguyen@pgande.com,+1-415-555-1046
-c-0047,acc-pge,Anika Bennett,DevSecOps Lead,Influencer,anika.bennett@pgande.com,+1-415-555-1047
-c-0048,acc-youtube,Sofia Cohen,CISO,Economic-buyer,sofia.cohen@youtube.com,+1-415-555-1048
-c-0049,acc-youtube,Amara Ng,Director of Security,Champion,amara.ng@youtube.com,+1-415-555-1049
-c-0050,acc-youtube,Amara Cole,Network Architect,Influencer,amara.cole@youtube.com,+1-415-555-1050
-c-0051,acc-youtube,Ethan Liu,VP of Infrastructure,Decision-maker,ethan.liu@youtube.com,+1-415-555-1051
-c-0052,acc-youtube,Hiroshi Schmidt,Security Operations Engineer,User,hiroshi.schmidt@youtube.com,+1-415-555-1052
-c-0053,acc-waymo,Naomi Chen,CFO,Economic-buyer,naomi.chen@waymo.com,+1-415-555-1053
-c-0054,acc-waymo,Yuki Martin,Director of Cloud Security,Champion,yuki.martin@waymo.com,+1-415-555-1054
-c-0055,acc-waymo,Yuki Dixon,Security Engineer,Influencer,yuki.dixon@waymo.com,+1-415-555-1055
-c-0056,acc-wfsecurities,Ravi Walsh,CIO,Economic-buyer,ravi.walsh@wellsfargosecu.com,+1-415-555-1056
-c-0057,acc-wfsecurities,Elena O'Brien,Director of Cloud Security,Champion,elena.obrien@wellsfargosecu.com,+1-415-555-1057
-c-0058,acc-wfsecurities,Sara Martin,Security Engineer,Influencer,sara.martin@wellsfargosecu.com,+1-415-555-1058
-c-0059,acc-wfsecurities,Olivia Garcia,VP of Infrastructure,Decision-maker,olivia.garcia@wellsfargosecu.com,+1-415-555-1059
-c-0060,acc-wfsecurities,Jane Anderson,Security Operations Engineer,User,jane.anderson@wellsfargosecu.com,+1-415-555-1060
-c-0061,acc-slack,Carlos Patel,CIO,Economic-buyer,carlos.patel@slack.com,+1-415-555-1061
-c-0062,acc-slack,Mateo Hayes,Director of Security,Champion,mateo.hayes@slack.com,+1-415-555-1062
-c-0063,acc-slack,Priya Ng,DevSecOps Lead,Influencer,priya.ng@slack.com,+1-415-555-1063
-c-0064,acc-slack,Owen Nguyen,Head of Cybersecurity,Decision-maker,owen.nguyen@slack.com,+1-415-555-1064
-c-0065,acc-tableau,Elena Foster,SVP Technology,Economic-buyer,elena.foster@tableau.com,+1-415-555-1065
-c-0066,acc-tableau,Sara Tanaka,"Sr Manager, SecOps",Champion,sara.tanaka@tableau.com,+1-415-555-1066
-c-0067,acc-tableau,Yuki Iqbal,DevSecOps Lead,Influencer,yuki.iqbal@tableau.com,+1-415-555-1067
-c-0068,acc-mulesoft,Hana Cohen,CIO,Economic-buyer,hana.cohen@mulesoft.com,+1-415-555-1068
-c-0069,acc-mulesoft,Noah Schmidt,Principal Security Architect,Champion,noah.schmidt@mulesoft.com,+1-415-555-1069
-c-0070,acc-mulesoft,Amara Liu,Network Architect,Influencer,amara.liu@mulesoft.com,+1-415-555-1070
-c-0071,acc-sutterhealth,Mateo Yamada,SVP Technology,Economic-buyer,mateo.yamada@sutterhealth.com,+1-415-555-1071
-c-0072,acc-sutterhealth,Hiroshi Johnson,Director of Cloud Security,Champion,hiroshi.johnson@sutterhealth.com,+1-415-555-1072
-c-0073,acc-sutterhealth,Priya Garcia,Security Engineer,Influencer,priya.garcia@sutterhealth.com,+1-415-555-1073
-c-0074,acc-sutterhealth,Jake Cohen,VP of Information Security,Decision-maker,jake.cohen@sutterhealth.com,+1-415-555-1074
-c-0075,acc-intel,Carlos Chen,CISO,Economic-buyer,carlos.chen@intel.com,+1-415-555-1075
-c-0076,acc-intel,Noah Liu,Director of Security,Champion,noah.liu@intel.com,+1-415-555-1076
-c-0077,acc-intel,Carlos Nguyen,Security Engineer,Influencer,carlos.nguyen@intel.com,+1-415-555-1077
-c-0078,acc-intel,Iris Garcia,VP of Information Security,Decision-maker,iris.garcia@intel.com,+1-415-555-1078
-c-0079,acc-intel,Yuki Johnson,Security Operations Engineer,User,yuki.johnson@intel.com,+1-415-555-1079
-c-0080,acc-netflix,Diego Ramirez,CIO,Economic-buyer,diego.ramirez@netflix.com,+1-415-555-1080
-c-0081,acc-netflix,Lila Dixon,Principal Security Architect,Champion,lila.dixon@netflix.com,+1-415-555-1081
-c-0082,acc-netflix,Carlos Reed,DevSecOps Lead,Influencer,carlos.reed@netflix.com,+1-415-555-1082
-c-0083,acc-netflix,Zara Khan,VP of Information Security,Decision-maker,zara.khan@netflix.com,+1-415-555-1083
-c-0084,acc-netflix,Hiroshi Anderson,IT Manager,User,hiroshi.anderson@netflix.com,+1-415-555-1084
-c-0085,acc-stripe,Tom Khan,SVP Technology,Economic-buyer,tom.khan@stripe.com,+1-415-555-1085
-c-0086,acc-stripe,Naomi Iqbal,Director of Security,Champion,naomi.iqbal@stripe.com,+1-415-555-1086
-c-0087,acc-stripe,Amara Liu,Security Engineer,Influencer,amara.liu@stripe.com,+1-415-555-1087
-c-0088,acc-stripe,Marcus Park,Head of Cybersecurity,Decision-maker,marcus.park@stripe.com,+1-415-555-1088
-c-0089,acc-pinterest,Zara Iqbal,CISO,Economic-buyer,zara.iqbal@pinterest.com,+1-415-555-1089
-c-0090,acc-pinterest,Carlos Ramirez,Director of Cloud Security,Champion,carlos.ramirez@pinterest.com,+1-415-555-1090
-c-0091,acc-pinterest,Sara Russo,Cloud Security Engineer,Influencer,sara.russo@pinterest.com,+1-415-555-1091
-c-0092,acc-pinterest,Liam Tanaka,VP of Infrastructure,Decision-maker,liam.tanaka@pinterest.com,+1-415-555-1092
-c-0093,acc-servicenow,Carlos Iqbal,CISO,Economic-buyer,carlos.iqbal@servicenow.com,+1-415-555-1093
-c-0094,acc-servicenow,Naomi Reed,Director of Security,Champion,naomi.reed@servicenow.com,+1-415-555-1094
-c-0095,acc-servicenow,Marcus Liu,Security Engineer,Influencer,marcus.liu@servicenow.com,+1-415-555-1095
-c-0096,acc-servicenow,Priya Dixon,VP of Information Security,Decision-maker,priya.dixon@servicenow.com,+1-415-555-1096
-c-0097,acc-workday,Liam Brooks,SVP Technology,Economic-buyer,liam.brooks@workday.com,+1-415-555-1097
-c-0098,acc-workday,Aisha Iqbal,Principal Security Architect,Champion,aisha.iqbal@workday.com,+1-415-555-1098
-c-0099,acc-workday,Mateo Patel,Cloud Security Engineer,Influencer,mateo.patel@workday.com,+1-415-555-1099
-c-0100,acc-twilio,Jane Park,CFO,Economic-buyer,jane.park@twilio.com,+1-415-555-1100
-c-0101,acc-twilio,Hana Reed,Principal Security Architect,Champion,hana.reed@twilio.com,+1-415-555-1101
-c-0102,acc-twilio,Ravi Khan,DevSecOps Lead,Influencer,ravi.khan@twilio.com,+1-415-555-1102
-c-0103,acc-twilio,Elena Ramirez,VP of Infrastructure,Decision-maker,elena.ramirez@twilio.com,+1-415-555-1103
-c-0104,acc-doordash,Marcus Hayes,CISO,Economic-buyer,marcus.hayes@doordash.com,+1-415-555-1104
-c-0105,acc-doordash,Lila Garcia,Director of Security,Champion,lila.garcia@doordash.com,+1-415-555-1105
-c-0106,acc-doordash,Marcus Hayes,DevSecOps Lead,Influencer,marcus.hayes@doordash.com,+1-415-555-1106
-c-0107,acc-lyft,Hana Iqbal,CIO,Economic-buyer,hana.iqbal@lyft.com,+1-415-555-1107
-c-0108,acc-lyft,Marcus Yamada,Director of Security,Champion,marcus.yamada@lyft.com,+1-415-555-1108
-c-0109,acc-lyft,Iris Tanaka,Security Engineer,Influencer,iris.tanaka@lyft.com,+1-415-555-1109
-c-0110,acc-lyft,Olivia Nguyen,Head of Cybersecurity,Decision-maker,olivia.nguyen@lyft.com,+1-415-555-1110
-c-0111,acc-lyft,Iris Johnson,Security Operations Engineer,User,iris.johnson@lyft.com,+1-415-555-1111
-c-0112,acc-airbnb,Mateo Hayes,CIO,Economic-buyer,mateo.hayes@airbnb.com,+1-415-555-1112
-c-0113,acc-airbnb,Jake Bennett,Director of Security,Champion,jake.bennett@airbnb.com,+1-415-555-1113
-c-0114,acc-airbnb,Olivia Nguyen,DevSecOps Lead,Influencer,olivia.nguyen@airbnb.com,+1-415-555-1114
-c-0115,acc-databricks,Jake Hayes,CFO,Economic-buyer,jake.hayes@databricks.com,+1-415-555-1115
-c-0116,acc-databricks,Hana Singh,Director of Cloud Security,Champion,hana.singh@databricks.com,+1-415-555-1116
-c-0117,acc-databricks,Amara Reyes,Network Architect,Influencer,amara.reyes@databricks.com,+1-415-555-1117
-c-0118,acc-databricks,Carlos Singh,VP of Infrastructure,Decision-maker,carlos.singh@databricks.com,+1-415-555-1118
-c-0119,acc-databricks,Elena Foster,IT Manager,User,elena.foster@databricks.com,+1-415-555-1119
-c-0120,acc-snowflake,Naomi Garcia,CISO,Economic-buyer,naomi.garcia@snowflake.com,+1-415-555-1120
-c-0121,acc-snowflake,Jane Russo,Director of Security,Champion,jane.russo@snowflake.com,+1-415-555-1121
-c-0122,acc-snowflake,Priya Cohen,Cloud Security Engineer,Influencer,priya.cohen@snowflake.com,+1-415-555-1122
-c-0123,acc-snowflake,Yuki Singh,VP of Information Security,Decision-maker,yuki.singh@snowflake.com,+1-415-555-1123
-c-0124,acc-reddit,Mateo Nguyen,CIO,Economic-buyer,mateo.nguyen@reddit.com,+1-415-555-1124
-c-0125,acc-reddit,Tom Schmidt,Director of Cloud Security,Champion,tom.schmidt@reddit.com,+1-415-555-1125
-c-0126,acc-reddit,Naomi Walsh,Network Architect,Influencer,naomi.walsh@reddit.com,+1-415-555-1126
-c-0127,acc-reddit,Olivia Reed,Head of Cybersecurity,Decision-maker,olivia.reed@reddit.com,+1-415-555-1127
-c-0128,acc-roblox,Jane Foster,CFO,Economic-buyer,jane.foster@roblox.com,+1-415-555-1128
-c-0129,acc-roblox,Hana Foster,Director of Security,Champion,hana.foster@roblox.com,+1-415-555-1129
-c-0130,acc-roblox,Mateo Kowalski,Network Architect,Influencer,mateo.kowalski@roblox.com,+1-415-555-1130
-c-0131,acc-roblox,Hiroshi Cole,VP of Information Security,Decision-maker,hiroshi.cole@roblox.com,+1-415-555-1131
-c-0132,acc-roblox,Lila Cohen,SOC Analyst,User,lila.cohen@roblox.com,+1-415-555-1132
-c-0133,acc-ebay,Ravi Bennett,CIO,Economic-buyer,ravi.bennett@ebay.com,+1-415-555-1133
-c-0134,acc-ebay,Noah Garcia,Director of Cloud Security,Champion,noah.garcia@ebay.com,+1-415-555-1134
-c-0135,acc-ebay,Amara Liu,Network Architect,Influencer,amara.liu@ebay.com,+1-415-555-1135
-c-0136,acc-ebay,Yuki Brooks,VP of Infrastructure,Decision-maker,yuki.brooks@ebay.com,+1-415-555-1136
-c-0137,acc-schwab,Priya Liu,SVP Technology,Economic-buyer,priya.liu@charlesschwab.com,+1-415-555-1137
-c-0138,acc-schwab,Owen Singh,Director of Security,Champion,owen.singh@charlesschwab.com,+1-415-555-1138
-c-0139,acc-schwab,Jane Garcia,Cloud Security Engineer,Influencer,jane.garcia@charlesschwab.com,+1-415-555-1139
-c-0140,acc-genentech,Sofia Tanaka,SVP Technology,Economic-buyer,sofia.tanaka@genentech.com,+1-415-555-1140
-c-0141,acc-genentech,Sara Reyes,Principal Security Architect,Champion,sara.reyes@genentech.com,+1-415-555-1141
-c-0142,acc-genentech,Sara Chen,Security Engineer,Influencer,sara.chen@genentech.com,+1-415-555-1142
-c-0143,acc-genentech,Priya Cole,Head of Cybersecurity,Decision-maker,priya.cole@genentech.com,+1-415-555-1143
-c-0144,acc-genentech,Mateo Kowalski,IT Manager,User,mateo.kowalski@genentech.com,+1-415-555-1144
-c-0145,acc-ucsfhealth,Owen O'Brien,CIO,Economic-buyer,owen.obrien@ucsfhealth.com,+1-415-555-1145
-c-0146,acc-ucsfhealth,Liam Kowalski,Director of Security,Champion,liam.kowalski@ucsfhealth.com,+1-415-555-1146
-c-0147,acc-ucsfhealth,Ravi O'Brien,Security Engineer,Influencer,ravi.obrien@ucsfhealth.com,+1-415-555-1147
-c-0148,acc-gilead,Aisha Foster,CIO,Economic-buyer,aisha.foster@gilead.com,+1-415-555-1148
-c-0149,acc-gilead,Amara Anderson,"Sr Manager, SecOps",Champion,amara.anderson@gilead.com,+1-415-555-1149
-c-0150,acc-gilead,Ethan Cohen,DevSecOps Lead,Influencer,ethan.cohen@gilead.com,+1-415-555-1150
-c-0151,acc-gilead,Olivia Ng,VP of Information Security,Decision-maker,olivia.ng@gilead.com,+1-415-555-1151
-c-0152,acc-ea,Iris Tanaka,CIO,Economic-buyer,iris.tanaka@electronicarts.com,+1-415-555-1152
-c-0153,acc-ea,Mateo Khan,Director of Security,Champion,mateo.khan@electronicarts.com,+1-415-555-1153
-c-0154,acc-ea,David Ng,Network Architect,Influencer,david.ng@electronicarts.com,+1-415-555-1154
-c-0155,acc-williamssonoma,Zara Foster,CIO,Economic-buyer,zara.foster@williamssonoma.com,+1-415-555-1155
-c-0156,acc-williamssonoma,Sofia Tanaka,Director of Security,Champion,sofia.tanaka@williamssonoma.com,+1-415-555-1156
-c-0157,acc-sutterbay,Iris Patel,SVP Technology,Economic-buyer,iris.patel@sutterbaymedic.com,+1-415-555-1157
-c-0158,acc-sutterbay,Carlos Ramirez,Principal Security Architect,Champion,carlos.ramirez@sutterbaymedic.com,+1-415-555-1158
-c-0159,acc-sutterbay,Tom Schmidt,Cloud Security Engineer,Influencer,tom.schmidt@sutterbaymedic.com,+1-415-555-1159
-c-0160,acc-sutterbay,Carlos Chen,Head of Cybersecurity,Decision-maker,carlos.chen@sutterbaymedic.com,+1-415-555-1160
-c-0161,acc-pamf,Anika Garcia,CFO,Economic-buyer,anika.garcia@paloaltomedica.com,+1-415-555-1161
-c-0162,acc-pamf,Iris Nguyen,"Sr Manager, SecOps",Champion,iris.nguyen@paloaltomedica.com,+1-415-555-1162
-c-0163,acc-pamf,Tom Liu,DevSecOps Lead,Influencer,tom.liu@paloaltomedica.com,+1-415-555-1163
-c-0164,acc-gap,Owen Cohen,CFO,Economic-buyer,owen.cohen@gapinc.com,+1-415-555-1164
-c-0165,acc-gap,Jane Anderson,"Sr Manager, SecOps",Champion,jane.anderson@gapinc.com,+1-415-555-1165
-c-0166,acc-gap,David Hayes,Network Architect,Influencer,david.hayes@gapinc.com,+1-415-555-1166
-c-0167,acc-gap,Marcus Anderson,Head of Cybersecurity,Decision-maker,marcus.anderson@gapinc.com,+1-415-555-1167
-c-0168,acc-gap,Liam O'Brien,IT Manager,User,liam.obrien@gapinc.com,+1-415-555-1168
-c-0169,acc-levi,Liam Bennett,CISO,Economic-buyer,liam.bennett@levistrauss.com,+1-415-555-1169
-c-0170,acc-levi,Anika Cole,Director of Cloud Security,Champion,anika.cole@levistrauss.com,+1-415-555-1170
-c-0171,acc-levi,Sofia Patel,DevSecOps Lead,Influencer,sofia.patel@levistrauss.com,+1-415-555-1171
-c-0172,acc-levi,Jane Yamada,Head of Cybersecurity,Decision-maker,jane.yamada@levistrauss.com,+1-415-555-1172
-c-0173,acc-safeway,Lila Ng,CIO,Economic-buyer,lila.ng@safeway.com,+1-415-555-1173
-c-0174,acc-safeway,Tom Khan,Director of Security,Champion,tom.khan@safeway.com,+1-415-555-1174
-c-0175,acc-safeway,Amara Dixon,Network Architect,Influencer,amara.dixon@safeway.com,+1-415-555-1175
-c-0176,acc-safeway,Olivia Garcia,Head of Cybersecurity,Decision-maker,olivia.garcia@safeway.com,+1-415-555-1176
-c-0177,acc-safeway,Iris Anderson,IT Manager,User,iris.anderson@safeway.com,+1-415-555-1177
-c-0178,acc-ross,Yuki Schmidt,SVP Technology,Economic-buyer,yuki.schmidt@rossstores.com,+1-415-555-1178
-c-0179,acc-ross,Mei Park,"Sr Manager, SecOps",Champion,mei.park@rossstores.com,+1-415-555-1179
-c-0180,acc-citysf,Elena Ramirez,SVP Technology,Economic-buyer,elena.ramirez@cityofsanfranc.com,+1-415-555-1180
-c-0181,acc-citysf,Amara Park,Director of Cloud Security,Champion,amara.park@cityofsanfranc.com,+1-415-555-1181
-c-0182,acc-citysf,Olivia Hayes,Network Architect,Influencer,olivia.hayes@cityofsanfranc.com,+1-415-555-1182
-c-0183,acc-citysf,Anika Cohen,VP of Information Security,Decision-maker,anika.cohen@cityofsanfranc.com,+1-415-555-1183
-c-0184,acc-citysf,Ravi Schmidt,SOC Analyst,User,ravi.schmidt@cityofsanfranc.com,+1-415-555-1184
-c-0185,acc-stanforduniv,Zara Hayes,CFO,Economic-buyer,zara.hayes@stanforduniver.com,+1-415-555-1185
-c-0186,acc-stanforduniv,Naomi Russo,Principal Security Architect,Champion,naomi.russo@stanforduniver.com,+1-415-555-1186
-c-0187,acc-stanforduniv,Amara Ramirez,DevSecOps Lead,Influencer,amara.ramirez@stanforduniver.com,+1-415-555-1187
-c-0188,acc-stanforduniv,Zara Cole,Head of Cybersecurity,Decision-maker,zara.cole@stanforduniver.com,+1-415-555-1188
-c-0189,acc-ucb,Amara Nguyen,CFO,Economic-buyer,amara.nguyen@ucberkeley.com,+1-415-555-1189
-c-0190,acc-ucb,Yuki Foster,"Sr Manager, SecOps",Champion,yuki.foster@ucberkeley.com,+1-415-555-1190
-c-0191,acc-ucb,Priya Walsh,Cloud Security Engineer,Influencer,priya.walsh@ucberkeley.com,+1-415-555-1191
-c-0192,acc-bart,Ravi Johnson,CIO,Economic-buyer,ravi.johnson@bart.com,+1-415-555-1192
-c-0193,acc-bart,Elena Chen,Director of Security,Champion,elena.chen@bart.com,+1-415-555-1193
-c-0194,acc-bart,Carlos Brooks,Security Engineer,Influencer,carlos.brooks@bart.com,+1-415-555-1194
-c-0195,acc-bart,Naomi Khan,Head of Cybersecurity,Decision-maker,naomi.khan@bart.com,+1-415-555-1195
-c-0196,acc-bart,Jake Ramirez,IT Manager,User,jake.ramirez@bart.com,+1-415-555-1196
+id,accountId,name,title,phone,email,avatarUrl
+con-stripe-tr-01,acc-stripe-treasury,Marcus Chen,VP Security,415-555-2010,marcus.chen@stripe-treasury.example.com,
+con-stripe-tr-02,acc-stripe-treasury,Priya Ramanathan,Director SecOps,415-555-2011,priya.ramanathan@stripe-treasury.example.com,
+con-stripe-tr-03,acc-stripe-treasury,Eli Rosenberg,Head of Detection Engineering,415-555-2012,eli.rosenberg@stripe-treasury.example.com,
+con-stripe-tr-04,acc-stripe-treasury,Anita Park,Security Procurement Lead,415-555-2013,anita.park@stripe-treasury.example.com,
+con-stripe-tr-05,acc-stripe-treasury,Tomas Velasco,CISO,415-555-2014,tomas.velasco@stripe-treasury.example.com,
+con-stripe-rd-01,acc-stripe-radar,Hannah Liu,Director Risk Engineering,415-555-2110,hannah.liu@stripe-radar.example.com,
+con-stripe-rd-02,acc-stripe-radar,Dmitri Ivanov,Head of Fraud Ops,415-555-2111,dmitri.ivanov@stripe-radar.example.com,
+con-stripe-rd-03,acc-stripe-radar,Yvonne Cardoso,Security Operations Manager,415-555-2112,yvonne.cardoso@stripe-radar.example.com,
+con-doordash-01,acc-doordash-platform,Sara Williams,SecOps Director,415-555-2210,sara.williams@doordash-platform.example.com,
+con-doordash-02,acc-doordash-platform,Reza Nazari,Cloud Security Lead,415-555-2211,reza.nazari@doordash-platform.example.com,
+con-doordash-03,acc-doordash-platform,Beatrice Owens,IT Procurement,415-555-2212,beatrice.owens@doordash-platform.example.com,
+con-reddit-01,acc-reddit-platform,Kevin O'Malley,Security Engineering Manager,415-555-2310,kevin.omalley@reddit-platform.example.com,
+con-reddit-02,acc-reddit-platform,Liang Park,Infrastructure Lead,415-555-2311,liang.park@reddit-platform.example.com,
+con-lyft-01,acc-lyft-rideshare,Rachel Stein,VP Platform Security,415-555-2410,rachel.stein@lyft-rideshare.example.com,
+con-lyft-02,acc-lyft-rideshare,Jamil Brooks,Networking Director,415-555-2411,jamil.brooks@lyft-rideshare.example.com,
+con-lyft-03,acc-lyft-rideshare,Sonia Martins,Security Procurement,415-555-2412,sonia.martins@lyft-rideshare.example.com,
+con-lyft-04,acc-lyft-rideshare,Henri Lefevre,CISO,415-555-2413,henri.lefevre@lyft-rideshare.example.com,
+con-lyft-05,acc-lyft-rideshare,Mei Tanaka,SOC Manager,415-555-2414,mei.tanaka@lyft-rideshare.example.com,
+con-twilio-01,acc-twilio-messaging,Daniel Forsberg,VP Security,415-555-2510,daniel.forsberg@twilio-messaging.example.com,
+con-twilio-02,acc-twilio-messaging,Anya Kowalski,APAC Infrastructure Lead,415-555-2511,anya.kowalski@twilio-messaging.example.com,
+con-twilio-03,acc-twilio-messaging,Marcus Bell,Procurement Manager,415-555-2512,marcus.bell@twilio-messaging.example.com,
+con-twilio-04,acc-twilio-messaging,Ines Sanchez,Detection Engineering Lead,415-555-2513,ines.sanchez@twilio-messaging.example.com,
+con-databricks-01,acc-databricks-lakehouse,Owen Stratton,CISO,415-555-2610,owen.stratton@databricks-lakehouse.example.com,
+con-databricks-02,acc-databricks-lakehouse,Felicia Kim,SecOps Director,415-555-2611,felicia.kim@databricks-lakehouse.example.com,
+con-databricks-03,acc-databricks-lakehouse,Asha Mathur,Lakehouse Security Architect,415-555-2612,asha.mathur@databricks-lakehouse.example.com,
+con-databricks-04,acc-databricks-lakehouse,Roman Petrov,Endpoint Security Manager,415-555-2613,roman.petrov@databricks-lakehouse.example.com,
+con-notion-01,acc-notion-workspace,Ivy Tan,Director Trust and Safety,415-555-2710,ivy.tan@notion-workspace.example.com,
+con-notion-02,acc-notion-workspace,Carlos Vargas,SecOps Manager,415-555-2711,carlos.vargas@notion-workspace.example.com,
+con-notion-03,acc-notion-workspace,Margot Reinhardt,IT Procurement,415-555-2712,margot.reinhardt@notion-workspace.example.com,
+con-linear-01,acc-linear-issues,Wendy Tanaka,Head of Security,415-555-2810,wendy.tanaka@linear-issues.example.com,
+con-linear-02,acc-linear-issues,Patrick Olusegun,Security Engineering,415-555-2811,patrick.olusegun@linear-issues.example.com,
+con-figma-01,acc-figma-design,Helena Bishop,Director Security,415-555-2910,helena.bishop@figma-design.example.com,
+con-figma-02,acc-figma-design,Quincy Park,Detection Engineering Lead,415-555-2911,quincy.park@figma-design.example.com,
+con-figma-03,acc-figma-design,Rosa Almeida,Security Operations Manager,415-555-2912,rosa.almeida@figma-design.example.com,
+con-asana-01,acc-asana-work,Vince Rao,VP Information Security,415-555-3010,vince.rao@asana-work.example.com,
+con-asana-02,acc-asana-work,Beth Caruso,Networking Lead,415-555-3011,beth.caruso@asana-work.example.com,
+con-asana-03,acc-asana-work,Tariq Ahmed,Legal Procurement,415-555-3012,tariq.ahmed@asana-work.example.com,
+con-pinterest-01,acc-pinterest-discovery,Lauren Hoffmann,Director Platform Security,415-555-3110,lauren.hoffmann@pinterest-discovery.example.com,
+con-pinterest-02,acc-pinterest-discovery,Dominic Sato,SecOps Manager,415-555-3111,dominic.sato@pinterest-discovery.example.com,
+con-pinterest-03,acc-pinterest-discovery,Nina Berglund,Cloud Security Lead,415-555-3112,nina.berglund@pinterest-discovery.example.com,
+con-pinterest-04,acc-pinterest-discovery,Aaron Khan,Procurement,415-555-3113,aaron.khan@pinterest-discovery.example.com,
+con-eventbrite-01,acc-eventbrite-events,Maya Lockhart,SecOps Director,415-555-3210,maya.lockhart@eventbrite-events.example.com,
+con-eventbrite-02,acc-eventbrite-events,Trevor Doyle,IT Manager,415-555-3211,trevor.doyle@eventbrite-events.example.com,
+con-allbirds-01,acc-allbirds,Iris Whitfield,CIO,415-555-3310,iris.whitfield@allbirds.example.com,
+con-23andme-01,acc-23andme-genetics,Soren Aldrich,CISO,408-555-3410,soren.aldrich@23andme-genetics.example.com,
+con-23andme-02,acc-23andme-genetics,Talia Reyes,SecOps Manager,408-555-3411,talia.reyes@23andme-genetics.example.com,
+con-23andme-03,acc-23andme-genetics,Mateus Oliveira,Detection Engineering,408-555-3412,mateus.oliveira@23andme-genetics.example.com,
+con-23andme-04,acc-23andme-genetics,Eun Park,Bio-IT Security Lead,408-555-3413,eun.park@23andme-genetics.example.com,
+con-houzz-01,acc-houzz-home,Lance Crawford,Director Security,650-555-3510,lance.crawford@houzz-home.example.com,
+con-houzz-02,acc-houzz-home,Sienna Petrov,SecOps Manager,650-555-3511,sienna.petrov@houzz-home.example.com,
+con-houzz-03,acc-houzz-home,Bradley Tao,Endpoint Engineering Lead,650-555-3512,bradley.tao@houzz-home.example.com,
+con-instacart-01,acc-instacart-grocery,Devon Murray,VP Security,415-555-3610,devon.murray@instacart-grocery.example.com,
+con-instacart-02,acc-instacart-grocery,Yara Halabi,SecOps Director,415-555-3611,yara.halabi@instacart-grocery.example.com,
+con-instacart-03,acc-instacart-grocery,Owen Driscoll,Cloud Security Lead,415-555-3612,owen.driscoll@instacart-grocery.example.com,
+con-instacart-04,acc-instacart-grocery,Joelle Saint-Pierre,IT Procurement,415-555-3613,joelle.saint-pierre@instacart-grocery.example.com,
+con-cloudflare-01,acc-cloudflare-edge,Renu Iyer,Director Network Security,415-555-3710,renu.iyer@cloudflare-edge.example.com,
+con-cloudflare-02,acc-cloudflare-edge,Pavel Krasic,Edge Security Engineer Lead,415-555-3711,pavel.krasic@cloudflare-edge.example.com,
+con-cloudflare-03,acc-cloudflare-edge,Mira Lindgren,Procurement Manager,415-555-3712,mira.lindgren@cloudflare-edge.example.com,
+con-discord-01,acc-discord-platform,Tomas Andriol,SecOps Manager,415-555-3810,tomas.andriol@discord-platform.example.com,
+con-discord-02,acc-discord-platform,Bea Murakami,Trust and Safety Director,415-555-3811,bea.murakami@discord-platform.example.com,
+con-postmates-01,acc-postmates-delivery,Greg Halverson,Director Security,415-555-3910,greg.halverson@postmates-delivery.example.com,
+con-postmates-02,acc-postmates-delivery,Anika Boateng,SOC Lead,415-555-3911,anika.boateng@postmates-delivery.example.com,
+con-coinbase-01,acc-coinbase-exchange,Jin Park,VP Security,415-555-4010,jin.park@coinbase-exchange.example.com,
+con-coinbase-02,acc-coinbase-exchange,Lorena Vance,CISO,415-555-4011,lorena.vance@coinbase-exchange.example.com,
+con-coinbase-03,acc-coinbase-exchange,Rashid Mansouri,Cloud Security Director,415-555-4012,rashid.mansouri@coinbase-exchange.example.com,
+con-coinbase-04,acc-coinbase-exchange,Maddie Sorensen,SecOps Manager,415-555-4013,maddie.sorensen@coinbase-exchange.example.com,
+con-coinbase-05,acc-coinbase-exchange,Tobias Brennan,Detection Engineering Lead,415-555-4014,tobias.brennan@coinbase-exchange.example.com,
+con-coinbase-06,acc-coinbase-exchange,Pia Niemi,Procurement Director,415-555-4015,pia.niemi@coinbase-exchange.example.com,
+con-plaid-01,acc-plaid-fintech,Marisol Burke,VP Security,415-555-4110,marisol.burke@plaid-fintech.example.com,
+con-plaid-02,acc-plaid-fintech,Rohan Mehra,SecOps Manager,415-555-4111,rohan.mehra@plaid-fintech.example.com,
+con-plaid-03,acc-plaid-fintech,Camille Doucet,IT Procurement,415-555-4112,camille.doucet@plaid-fintech.example.com,
+con-robinhood-01,acc-robinhood-markets,Holden Pearce,Director Security,650-555-4210,holden.pearce@robinhood-markets.example.com,
+con-robinhood-02,acc-robinhood-markets,Edda Olafsson,SecOps Manager,650-555-4211,edda.olafsson@robinhood-markets.example.com,
+con-robinhood-03,acc-robinhood-markets,Vikram Suresh,Detection Engineering,650-555-4212,vikram.suresh@robinhood-markets.example.com,
+con-robinhood-04,acc-robinhood-markets,Margaux Pelletier,Procurement,650-555-4213,margaux.pelletier@robinhood-markets.example.com,
+con-brex-01,acc-brex-spend,Anders Liu,SecOps Lead,415-555-4310,anders.liu@brex-spend.example.com,
+con-brex-02,acc-brex-spend,Phoebe Adekoya,IT Manager,415-555-4311,phoebe.adekoya@brex-spend.example.com,
+con-ramp-01,acc-ramp-finance,Garrett Mendoza,Director Security,415-555-4410,garrett.mendoza@ramp-finance.example.com,
+con-ramp-02,acc-ramp-finance,Tamsin O'Connor,SecOps Manager,415-555-4411,tamsin.oconnor@ramp-finance.example.com,
+con-ramp-03,acc-ramp-finance,Nikhil Banerjee,Networking Lead,415-555-4412,nikhil.banerjee@ramp-finance.example.com,
+con-gusto-01,acc-gusto-payroll,Caspian Wright,VP Security,415-555-4510,caspian.wright@gusto-payroll.example.com,
+con-gusto-02,acc-gusto-payroll,Helena Antonopoulos,SecOps Director,415-555-4511,helena.antonopoulos@gusto-payroll.example.com,
+con-gusto-03,acc-gusto-payroll,Ezra Bauman,IT Procurement,415-555-4512,ezra.bauman@gusto-payroll.example.com,
+con-carta-01,acc-carta-equity,Lila Brennan,Director Security,415-555-4610,lila.brennan@carta-equity.example.com,
+con-carta-02,acc-carta-equity,Boris Janowski,SecOps Manager,415-555-4611,boris.janowski@carta-equity.example.com,
+con-affirm-01,acc-affirm-pay,Selma Riise,VP Security,415-555-4710,selma.riise@affirm-pay.example.com,
+con-affirm-02,acc-affirm-pay,Marcus Achebe,Networking Director,415-555-4711,marcus.achebe@affirm-pay.example.com,
+con-chime-01,acc-chime-banking,Yuri Mendoza,VP Security,415-555-4810,yuri.mendoza@chime-banking.example.com,
+con-chime-02,acc-chime-banking,Petra Lindholm,SecOps Director,415-555-4811,petra.lindholm@chime-banking.example.com,
+con-chime-03,acc-chime-banking,Asim Qureshi,Detection Engineering Lead,415-555-4812,asim.qureshi@chime-banking.example.com,
+con-roku-01,acc-roku-streaming,Donovan Park,Director Security,408-555-4910,donovan.park@roku-streaming.example.com,
+con-roku-02,acc-roku-streaming,Imani Carter,SecOps Manager,408-555-4911,imani.carter@roku-streaming.example.com,
+con-nextdoor-01,acc-nextdoor-community,Esme Bauer,Director Security,415-555-5010,esme.bauer@nextdoor-community.example.com,
+con-nextdoor-02,acc-nextdoor-community,Jordan Mihailovic,Networking Lead,415-555-5011,jordan.mihailovic@nextdoor-community.example.com,
+con-box-01,acc-box-content,Sage Whitcomb,VP Security,650-555-5110,sage.whitcomb@box-content.example.com,
+con-box-02,acc-box-content,Iliana Kovacs,SecOps Director,650-555-5111,iliana.kovacs@box-content.example.com,
+con-box-03,acc-box-content,Wendell Tao,Procurement Manager,650-555-5112,wendell.tao@box-content.example.com,
+con-billcom-01,acc-billcom-payables,Lyle Anders,Director Security,408-555-5210,lyle.anders@billcom-payables.example.com,
+con-billcom-02,acc-billcom-payables,Phaedra Costas,SecOps Manager,408-555-5211,phaedra.costas@billcom-payables.example.com,
+con-confluent-01,acc-confluent-streaming,Hugo Marchetti,VP Security,650-555-5310,hugo.marchetti@confluent-streaming.example.com,
+con-confluent-02,acc-confluent-streaming,Nadia Sokolova,Networking Director,650-555-5311,nadia.sokolova@confluent-streaming.example.com,
+con-confluent-03,acc-confluent-streaming,Eitan Strauss,Procurement,650-555-5312,eitan.strauss@confluent-streaming.example.com,
+con-gitlab-01,acc-gitlab-devops,Marcus Caldwell,Director DevSecOps,415-555-5410,marcus.caldwell@gitlab-devops.example.com,
+con-gitlab-02,acc-gitlab-devops,Salma Idris,SOC Manager,415-555-5411,salma.idris@gitlab-devops.example.com,
+con-gitlab-03,acc-gitlab-devops,Ronan Devereux,Detection Engineering,415-555-5412,ronan.devereux@gitlab-devops.example.com,
+con-snowflake-01,acc-snowflake-sector,Vera Petrov,CISO,650-555-5510,vera.petrov@snowflake-sector.example.com,
+con-snowflake-02,acc-snowflake-sector,Tomohiro Endo,SecOps Director,650-555-5511,tomohiro.endo@snowflake-sector.example.com,
+con-snowflake-03,acc-snowflake-sector,Beatrix Holst,Public Sector Architect,650-555-5512,beatrix.holst@snowflake-sector.example.com,
+con-snowflake-04,acc-snowflake-sector,Ren Ishida,Detection Engineering,650-555-5513,ren.ishida@snowflake-sector.example.com,
+con-atlassian-01,acc-atlassian-marketplace,Imogen Park,Director Marketplace Security,415-555-5610,imogen.park@atlassian-marketplace.example.com,
+con-atlassian-02,acc-atlassian-marketplace,Konstantin Vasiliev,SecOps Manager,415-555-5611,konstantin.vasiliev@atlassian-marketplace.example.com,
+con-atlassian-03,acc-atlassian-marketplace,Persephone Doukas,Procurement,415-555-5612,persephone.doukas@atlassian-marketplace.example.com,
+con-webflow-01,acc-webflow,Theo Eriksson,SecOps Lead,415-555-5710,theo.eriksson@webflow.example.com,
+con-webflow-02,acc-webflow,Isadora Reyes,IT Manager,415-555-5711,isadora.reyes@webflow.example.com,
+con-segment-01,acc-segment-data,Lorenzo Bianchi,Director Data Security,415-555-5810,lorenzo.bianchi@segment-data.example.com,
+con-segment-02,acc-segment-data,Maeve O'Sullivan,SecOps Manager,415-555-5811,maeve.osullivan@segment-data.example.com,
+con-mixpanel-01,acc-mixpanel-analytics,Wren Hartley,SecOps Manager,415-555-5910,wren.hartley@mixpanel-analytics.example.com,
+con-mixpanel-02,acc-mixpanel-analytics,Cyrus Mehrabi,Networking Lead,415-555-5911,cyrus.mehrabi@mixpanel-analytics.example.com,
+con-beacon-ind-01,acc-beacon-industries,Adelaide Pickering,Director Security,650-555-6110,adelaide.pickering@beacon-industries.example.com,
+con-beacon-ind-02,acc-beacon-industries,Stellan Korhonen,SecOps Manager,650-555-6111,stellan.korhonen@beacon-industries.example.com,
+con-beacon-ind-03,acc-beacon-industries,Marisol Acuna,Procurement,650-555-6112,marisol.acuna@beacon-industries.example.com,
+con-tyrell-01,acc-tyrell,Hannelore Schiller,CISO,415-555-6210,hannelore.schiller@tyrell.example.com,
+con-tyrell-02,acc-tyrell,Quentin Roussel,VP Security Operations,415-555-6211,quentin.roussel@tyrell.example.com,
+con-tyrell-03,acc-tyrell,Imari Foster,Detection Engineering Lead,415-555-6212,imari.foster@tyrell.example.com,
+con-tyrell-04,acc-tyrell,Magnus Bredahl,Networking Director,415-555-6213,magnus.bredahl@tyrell.example.com,
+con-tyrell-05,acc-tyrell,Cordelia Patel,IT Procurement,415-555-6214,cordelia.patel@tyrell.example.com,
+con-cyberdyne-01,acc-cyberdyne,Eleanor Vance,CISO,415-555-6310,eleanor.vance@cyberdyne.example.com,
+con-cyberdyne-02,acc-cyberdyne,Wesley Kobayashi,VP Information Security,415-555-6311,wesley.kobayashi@cyberdyne.example.com,
+con-cyberdyne-03,acc-cyberdyne,Anastasia Linde,SecOps Director,415-555-6312,anastasia.linde@cyberdyne.example.com,
+con-cyberdyne-04,acc-cyberdyne,Tobias Ferreira,Detection Engineering Lead,415-555-6313,tobias.ferreira@cyberdyne.example.com,
+con-cyberdyne-05,acc-cyberdyne,Lilith Garner,Cloud Security Director,415-555-6314,lilith.garner@cyberdyne.example.com,
+con-cyberdyne-06,acc-cyberdyne,Raphael Kim,Networking VP,415-555-6315,raphael.kim@cyberdyne.example.com,
+con-cyberdyne-07,acc-cyberdyne,Stellan Brody,Procurement Director,415-555-6316,stellan.brody@cyberdyne.example.com,
+con-yelp-01,acc-yelp-reviews,Marsden Chu,SecOps Manager,415-555-6410,marsden.chu@yelp-reviews.example.com,
+con-yelp-02,acc-yelp-reviews,Briar Halstead,Networking Lead,415-555-6411,briar.halstead@yelp-reviews.example.com,
+con-strava-01,acc-strava-activities,Octavia Larsen,SecOps Lead,415-555-6510,octavia.larsen@strava-activities.example.com,
+con-strava-02,acc-strava-activities,Garrett Mwangi,IT Manager,415-555-6511,garrett.mwangi@strava-activities.example.com,
+con-patreon-01,acc-patreon-creators,Rosalind Park,Director Security,415-555-6610,rosalind.park@patreon-creators.example.com,
+con-patreon-02,acc-patreon-creators,Ezekiel Toure,SecOps Manager,415-555-6611,ezekiel.toure@patreon-creators.example.com,
+con-calendly-01,acc-calendly-scheduling,Tamsen Reilly,IT Manager,415-555-6710,tamsen.reilly@calendly-scheduling.example.com,
+con-loom-01,acc-loom-video,Felix Brandt,SecOps Lead,415-555-6810,felix.brandt@loom-video.example.com,
+con-loom-02,acc-loom-video,Marigold Sato,Procurement,415-555-6811,marigold.sato@loom-video.example.com,
+con-miro-01,acc-miro-whiteboard,Sebastien Wolfe,Director Security,415-555-6910,sebastien.wolfe@miro-whiteboard.example.com,
+con-miro-02,acc-miro-whiteboard,Lyra Voss,SecOps Manager,415-555-6911,lyra.voss@miro-whiteboard.example.com,
+con-klaviyo-01,acc-klaviyo-marketing,Hudson Reyes,VP Security,415-555-7010,hudson.reyes@klaviyo-marketing.example.com,
+con-klaviyo-02,acc-klaviyo-marketing,Theodora Liu,SecOps Lead,415-555-7011,theodora.liu@klaviyo-marketing.example.com,
+con-lattice-01,acc-lattice-people,Galen Hoffer,IT Director,415-555-7110,galen.hoffer@lattice-people.example.com,
+con-lattice-02,acc-lattice-people,Bianca Severino,SecOps Manager,415-555-7111,bianca.severino@lattice-people.example.com,
+con-classpass-01,acc-classpass-fitness,Wiley Tarkington,IT Manager,415-555-7210,wiley.tarkington@classpass-fitness.example.com,
+con-front-01,acc-front-inbox,Marcellus Drake,SecOps Lead,415-555-7310,marcellus.drake@front-inbox.example.com,
+con-front-02,acc-front-inbox,Beatrice Quinones,Networking Director,415-555-7311,beatrice.quinones@front-inbox.example.com,

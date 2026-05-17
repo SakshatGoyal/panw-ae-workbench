@@ -1,0 +1,1128 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   AI Response — ai-interactions/AI Response
+   Three aesthetic directions for: AI response text + derivation chip + panel.
+
+   Derivation flow
+   ───────────────
+   1. AI response renders.
+   2. Chip appears below in "generating" state (animated).
+   3. Chip settles to "ready" state after ~2 s.
+   4. Clicking chip opens/closes the derivation panel.
+
+   Direction A  "Ledger"  — Audit-grade. Monochromatic text. Sources are plain
+                            text. Derivation panel is a bordered list, no fill.
+
+   Direction B  "Trace"   — Process-visible. Chip is a pill with icon + shimmer
+                            on load. Steps share a left spine. Sources are
+                            colored brand-pill badges.
+
+   Direction C  "Ghost"   — Zero ceremony. Chip is inline tertiary text.
+                            Panel is an indented left-rule block. Sources are
+                            logo-only badges in a right column.
+
+   Token contract
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Shared canvas / demo scaffolding ───────────────────────────────────── */
+
+.arc-canvas {
+  min-height: 100vh;
+  background: var(--ds-surface-rest);
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 48px 40px;
+}
+
+.arc-demo {
+  width: 100%;
+  max-width: 720px;
+  display: flex;
+  flex-direction: column;
+  gap: 56px;
+}
+
+.arc-demo__label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  color: var(--ds-text-tertiary-rest);
+  margin-bottom: 16px;
+}
+
+.arc-demo__group {
+  display: flex;
+  flex-direction: column;
+}
+
+/* ─── Root card ──────────────────────────────────────────────────────────── */
+
+.air {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/* ─── Response area ──────────────────────────────────────────────────────── */
+
+.air__response {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ds-text-primary);
+}
+
+/* Structured response sub-elements (Scenario B) */
+.air__response-caveat {
+  display: block;
+  color: var(--ds-text-tertiary-rest);
+  font-style: italic;
+  margin-bottom: 8px;
+}
+
+.air__response-body {
+  display: block;
+  margin-bottom: 8px;
+}
+
+.air__response-scope {
+  display: block;
+  font-size: 13px;
+  color: var(--ds-text-secondary-rest);
+  margin-bottom: 8px;
+  padding-left: 12px;
+  border-left: 2px solid var(--ds-lines-neutral-tile-rest);
+}
+
+.air__response-action {
+  display: block;
+  font-size: 13px;
+  color: var(--ds-text-secondary-rest);
+}
+
+.air__response-action-label {
+  font-weight: 600;
+  color: var(--ds-text-secondary-rest);
+}
+
+/* ─── Chip — shared ──────────────────────────────────────────────────────── */
+
+.air__chip-wrap {
+  margin-top: 12px;
+}
+
+/* ─── Panel — shared ─────────────────────────────────────────────────────── */
+
+.air__panel {
+  margin-top: 8px;
+  overflow: hidden;
+}
+
+.air__panel[aria-hidden='true'] {
+  display: none;
+}
+
+.air__panel-head {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.air__shape-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+}
+
+.air__steps {
+  display: flex;
+  flex-direction: column;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTION A  "Ledger"
+   Audit-grade. Monochromatic. Sources as plain text.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Chip */
+.air--ledger .air__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  padding: 4px 8px;
+  border: 1px solid var(--ds-lines-neutral-rest);
+  border-radius: 4px;
+  cursor: pointer;
+  background: transparent;
+  transition: border-color 80ms, background 80ms;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  user-select: none;
+}
+
+.air--ledger .air__chip:hover {
+  border-color: var(--ds-lines-neutral-hover);
+  background: var(--ds-surface-hover);
+  color: var(--ds-text-secondary-rest);
+}
+
+.air--ledger .air__chip:active {
+  background: var(--ds-surface-pressed);
+  border-color: var(--ds-lines-neutral-pressed);
+}
+
+.air--ledger .air__chip--generating {
+  animation: ledger-chip-pulse 1.2s ease-in-out infinite;
+}
+
+.air--ledger .air__chip--open {
+  border-color: var(--ds-lines-brand-rest);
+  color: var(--ds-text-secondary-rest);
+}
+
+.air--ledger .air__chip-count {
+  font-variant-numeric: tabular-nums;
+}
+
+.air--ledger .air__chip-dot {
+  margin: 0 5px;
+  color: var(--ds-lines-neutral-rest);
+}
+
+@keyframes ledger-chip-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+/* Panel */
+.air--ledger .air__panel {
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: 6px;
+  padding: 16px 0;
+}
+
+/* Shape header */
+.air--ledger .air__panel-head {
+  padding: 0 16px;
+  margin-bottom: 14px;
+}
+
+.air--ledger .air__shape-label {
+  color: var(--ds-text-tertiary-rest);
+}
+
+.air--ledger .air__shape-sep {
+  color: var(--ds-lines-neutral-rest);
+  font-size: 11px;
+}
+
+.air--ledger .air__shape-count {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* Steps */
+.air--ledger .air__step {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0 8px;
+  align-items: baseline;
+  padding: 8px 16px;
+  border-top: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+.air--ledger .air__step:first-child {
+  border-top: none;
+}
+
+.air--ledger .air__step-num {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-tertiary-rest);
+  padding-top: 1px;
+}
+
+.air--ledger .air__step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.air--ledger .air__step-text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ds-text-secondary-rest);
+}
+
+.air--ledger .air__step-source {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  color: var(--ds-text-tertiary-rest);
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+
+.air--ledger .air__source-sep {
+  margin: 0 4px;
+  opacity: 0.5;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTION B  "Trace"
+   Process-visible. Colored source pills. Left spine connecting steps.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Response surface */
+.air--trace .air__response {
+  background: var(--ds-surface-alt-rest);
+  border-radius: 8px;
+  padding: 14px 16px;
+}
+
+/* Chip */
+.air--trace .air__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px 5px 10px;
+  border-radius: 20px;
+  cursor: pointer;
+  border: 1px solid transparent;
+  transition: background 80ms, border-color 80ms, box-shadow 80ms;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-secondary-rest);
+  background: var(--ds-surface-accent-rest);
+  user-select: none;
+  position: relative;
+  overflow: hidden;
+}
+
+.air--trace .air__chip-icon {
+  display: flex;
+  align-items: center;
+  color: var(--ds-text-tertiary-rest);
+  flex-shrink: 0;
+}
+
+.air--trace .air__chip:hover {
+  background: var(--ds-surface-hover);
+  border-color: var(--ds-lines-neutral-rest);
+}
+
+.air--trace .air__chip:active {
+  background: var(--ds-surface-pressed);
+}
+
+.air--trace .air__chip--open {
+  border-color: var(--ds-lines-brand-rest);
+  background: var(--ds-surface-accent-rest);
+}
+
+.air--trace .air__chip--generating::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    90deg,
+    transparent 0%,
+    rgba(255, 255, 255, 0.6) 50%,
+    transparent 100%
+  );
+  background-size: 200% 100%;
+  animation: trace-shimmer 1.4s ease-in-out infinite;
+}
+
+.air--trace .air__chip--generating .air__chip-icon {
+  animation: trace-icon-spin 1.8s linear infinite;
+}
+
+@keyframes trace-shimmer {
+  0%   { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes trace-icon-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Panel */
+.air--trace .air__panel {
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+/* Shape header */
+.air--trace .air__panel-head {
+  background: var(--ds-surface-accent-rest);
+  padding: 10px 16px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+.air--trace .air__shape-label {
+  color: var(--ds-text-tertiary-rest);
+}
+
+.air--trace .air__shape-icon {
+  display: flex;
+  align-items: center;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* Steps */
+.air--trace .air__steps {
+  padding: 16px 16px 16px 20px;
+  gap: 0;
+  position: relative;
+}
+
+/* Vertical spine */
+.air--trace .air__steps::before {
+  content: '';
+  position: absolute;
+  left: 31px;
+  top: 28px;
+  bottom: 28px;
+  width: 1px;
+  background: var(--ds-lines-neutral-tile-rest);
+}
+
+.air--trace .air__step {
+  display: grid;
+  grid-template-columns: 24px 1fr;
+  gap: 0 12px;
+  align-items: start;
+  padding: 0 0 16px 0;
+}
+
+.air--trace .air__step:last-child {
+  padding-bottom: 0;
+}
+
+.air--trace .air__step-num {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: var(--ds-surface-accent-rest);
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--ds-text-tertiary-rest);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+  margin-top: 1px;
+}
+
+/* Last step (inference) gets a different treatment */
+.air--trace .air__step--inference .air__step-num {
+  background: var(--ds-surface-inverse-rest);
+  border-color: var(--ds-surface-inverse-rest);
+  color: var(--ds-stage-text-inverse-rest, #fff);
+}
+
+.air--trace .air__step-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.air--trace .air__step-text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 1.45;
+  color: var(--ds-text-secondary-rest);
+  padding-top: 3px;
+}
+
+/* Source pill */
+.air--trace .air__step-source {
+  display: inline-flex;
+  align-items: center;
+  gap: 0;
+  align-self: flex-start;
+}
+
+.air--trace .air__source-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: 4px;
+  padding: 3px 8px 3px 6px;
+}
+
+.air--trace .air__source-mark {
+  width: 18px;
+  height: 18px;
+  border-radius: 3px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 9px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+
+.air--trace .air__source-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.air--trace .air__source-name {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.air--trace .air__source-path {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 10px;
+  line-height: 1.3;
+  opacity: 0.65;
+}
+
+/* Trace source badge colors — brand values, not DS tokens (external company colors) */
+.air--trace .air__source-badge--salesforce {
+  background: #e8f5fd;
+}
+.air--trace .air__source-badge--salesforce .air__source-mark { background: #00A1E0; }
+.air--trace .air__source-badge--salesforce .air__source-name { color: #0070a0; }
+.air--trace .air__source-badge--salesforce .air__source-path { color: #0070a0; }
+
+.air--trace .air__source-badge--clari {
+  background: #f0ecfb;
+}
+.air--trace .air__source-badge--clari .air__source-mark { background: #6B4FBB; }
+.air--trace .air__source-badge--clari .air__source-name { color: #4e3a8a; }
+.air--trace .air__source-badge--clari .air__source-path { color: #4e3a8a; }
+
+.air--trace .air__source-badge--tableau {
+  background: #fdf2e9;
+}
+.air--trace .air__source-badge--tableau .air__source-mark { background: #E8762D; }
+.air--trace .air__source-badge--tableau .air__source-name { color: #a85520; }
+.air--trace .air__source-badge--tableau .air__source-path { color: #a85520; }
+
+.air--trace .air__source-badge--peopleai {
+  background: #e6f9f7;
+}
+.air--trace .air__source-badge--peopleai .air__source-mark { background: #00897B; }
+.air--trace .air__source-badge--peopleai .air__source-name { color: #006158; }
+.air--trace .air__source-badge--peopleai .air__source-path { color: #006158; }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTION C  "Ghost"
+   Zero ceremony. Inline chip. Left-rule panel. Logo-only source column.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Chip */
+.air--ghost .air__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  padding: 2px 0;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  color: var(--ds-text-tertiary-rest);
+  transition: color 80ms;
+  user-select: none;
+}
+
+.air--ghost .air__chip:hover {
+  color: var(--ds-text-secondary-rest);
+}
+
+.air--ghost .air__chip-bullet {
+  color: var(--ds-lines-neutral-rest);
+}
+
+.air--ghost .air__chip-arrow {
+  display: inline-flex;
+  align-items: center;
+  transition: transform 150ms;
+  color: var(--ds-text-tertiary-rest);
+}
+
+.air--ghost .air__chip--open .air__chip-arrow {
+  transform: rotate(90deg);
+}
+
+.air--ghost .air__chip--generating .air__chip-word {
+  animation: ghost-blink 1s step-end infinite;
+}
+
+@keyframes ghost-blink {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+
+/* Panel */
+.air--ghost .air__panel {
+  margin-top: 12px;
+  padding-left: 16px;
+  border-left: 2px solid var(--ds-lines-brand-rest);
+}
+
+/* Shape header */
+.air--ghost .air__panel-head {
+  margin-bottom: 10px;
+}
+
+.air--ghost .air__shape-label {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 0;
+  text-transform: none;
+  font-style: italic;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* Steps — two-column: text | logo */
+.air--ghost .air__steps {
+  gap: 0;
+}
+
+.air--ghost .air__step {
+  display: grid;
+  grid-template-columns: 1fr 24px;
+  gap: 0 12px;
+  align-items: center;
+  padding: 7px 0;
+  border-top: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+.air--ghost .air__step:first-child {
+  border-top: none;
+}
+
+.air--ghost .air__step-main {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
+.air--ghost .air__step-num {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 10px;
+  color: var(--ds-text-tertiary-rest);
+  flex-shrink: 0;
+  font-variant-numeric: tabular-nums;
+  min-width: 16px;
+}
+
+.air--ghost .air__step-text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--ds-text-secondary-rest);
+  min-width: 0;
+}
+
+/* Source column — logo badge only */
+.air--ghost .air__step-source {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.air--ghost .air__source-dot {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 8px;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  letter-spacing: 0;
+}
+
+.air--ghost .air__source-dot--salesforce { background: #00A1E0; }
+.air--ghost .air__source-dot--clari      { background: #6B4FBB; }
+.air--ghost .air__source-dot--tableau    { background: #E8762D; }
+.air--ghost .air__source-dot--peopleai   { background: #00897B; }
+.air--ghost .air__source-dot--none       { background: var(--ds-surface-accent-rest); }
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTIONS D + E  — Workbench-grounded
+   ─────────────────────────────────────────────────────────────────────────────
+   Both inherit the Opportunity Workbench's visual vocabulary:
+     • Neutral-bordered chip — no fill, no brand colour. Matches the
+       "Tech validation" / "Active POV" chip treatment in the workbench.
+     • Source block — real platform logo (18 × 18 px, 4 px radius) with
+       tool name bold-primary above, sub-path tertiary-regular below.
+       Brand identity lives only in the logos themselves; no extra colour
+       is introduced anywhere else.
+     • Indices — two-digit (01–06), tertiary, tabular-nums. Matches the
+       Quote-ID treatment in the workbench.
+     • Panel header — bold sentence-case. Never ALL CAPS.
+     • Response — no card wrapper. Lives on canvas like an opportunity row.
+     • Inference steps — WorkbenchSource returns null; source slot is
+       completely empty, no glyph, no placeholder.
+     • No italic anywhere.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* Caveat no-italic override (shared rule uses font-style: italic) */
+.air--panel .air__response-caveat,
+.air--inline .air__response-caveat,
+.air--iterative .air__response-caveat {
+  font-style: normal;
+}
+
+/* ── Chip — shared between D, E, and F ──────────────────────────────────── */
+
+.air--panel .air__chip,
+.air--inline .air__chip,
+.air--iterative .air__chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 28px;
+  padding: 0 10px 0 8px;
+  border: 1px solid var(--ds-lines-neutral-rest);
+  border-radius: var(--ds-radius-standard, 8px);
+  cursor: pointer;
+  background: transparent;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-secondary-rest);
+  user-select: none;
+  transition: background 80ms, border-color 80ms;
+}
+
+.air--panel .air__chip:hover,
+.air--inline .air__chip:hover,
+.air--iterative .air__chip:hover {
+  background: var(--ds-surface-hover);
+  border-color: var(--ds-lines-neutral-hover);
+}
+
+.air--panel .air__chip:active,
+.air--inline .air__chip:active,
+.air--iterative .air__chip:active {
+  background: var(--ds-surface-pressed);
+  border-color: var(--ds-lines-neutral-pressed);
+}
+
+/* Open: neutral — explicitly no brand-blue border */
+.air--panel .air__chip--open,
+.air--inline .air__chip--open,
+.air--iterative .air__chip--open {
+  background: var(--ds-surface-hover);
+}
+
+/* Generating: subtle neutral opacity pulse — no coloured flash */
+.air--panel .air__chip--generating,
+.air--inline .air__chip--generating,
+.air--iterative .air__chip--generating {
+  animation: wb-pulse 1.5s ease-in-out infinite;
+  color: var(--ds-text-tertiary-rest);
+}
+
+@keyframes wb-pulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.45; }
+}
+
+.air--panel .air__chip-icon,
+.air--inline .air__chip-icon,
+.air--iterative .air__chip-icon {
+  display: flex;
+  align-items: center;
+  color: var(--ds-text-tertiary-rest);
+  flex-shrink: 0;
+}
+
+.air--panel .air__chip-sep,
+.air--inline .air__chip-sep,
+.air--iterative .air__chip-sep {
+  color: var(--ds-text-tertiary-rest);
+}
+
+.air--panel .air__chip-count,
+.air--inline .air__chip-count,
+.air--iterative .air__chip-count {
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* ── Source block — shared between D and E ───────────────────────────────── */
+/*
+  Layout per step:
+    [18px logo]  Salesforce        ← bold primary, 12px
+                 Contact Roles     ← tertiary, 11px
+
+  Inference step: WorkbenchSource() returns null — slot is truly empty.
+  Brand identity comes only from the logos; no colour is added elsewhere.
+*/
+
+.air__wb-source {
+  display: flex;
+  align-items: flex-start;
+  gap: 6px;
+  margin-top: 5px;
+}
+
+.air__wb-logo {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px; /* matches workbench brand-mark corner treatment */
+  object-fit: cover;
+  flex-shrink: 0;
+  margin-top: 1px;    /* optical alignment with first text line */
+  display: block;
+}
+
+.air__wb-source-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.air__wb-source-name {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--ds-text-primary);
+  line-height: 16px;
+  white-space: nowrap;
+}
+
+.air__wb-source-path {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ds-text-tertiary-rest);
+  line-height: 15px;
+}
+
+/* ── Steps — shared between D, E, and F ─────────────────────────────────── */
+
+.air--panel .air__step,
+.air--inline .air__step,
+.air--iterative .air__step {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 0 8px;
+  padding: 10px 0;
+  border-top: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+.air--panel .air__step:first-child,
+.air--inline .air__step:first-child,
+.air--iterative .air__step:first-child {
+  border-top: none;
+}
+
+/* Two-digit index — tertiary, tabular-nums, "mono-feeling" via spacing + size */
+.air--panel .air__step-num,
+.air--inline .air__step-num,
+.air--iterative .air__step-num {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  font-weight: 400;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-tertiary-rest);
+  line-height: 20px;
+  padding-top: 1px;
+}
+
+.air--panel .air__step-body,
+.air--inline .air__step-body,
+.air--iterative .air__step-body {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.air--panel .air__step-text,
+.air--inline .air__step-text,
+.air--iterative .air__step-text {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--ds-text-primary);
+  display: block;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTION D  "Panel"
+   Chip opens a region below: hairline top border, bold sentence-case header,
+   numbered step list. Reads like the workbench right-panel expanded sections.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.air--panel .air__panel {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ds-lines-neutral-tile-rest);
+  overflow: visible;
+}
+
+.air--panel .air__panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  padding-bottom: 10px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+/* Bold sentence-case — NOT ALL CAPS, not tertiary */
+.air--panel .air__shape-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ds-text-primary);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+.air--panel .air__shape-sep {
+  font-size: 13px;
+  color: var(--ds-text-tertiary-rest);
+  margin: 0 5px;
+}
+
+.air--panel .air__shape-count {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  font-weight: 400;
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTION E  "Inline"
+   Steps unfold in conversation flow below the chip — no panel chrome.
+   Shape label: tertiary, small, regular, sentence-case — quiet through
+   position and weight alone (no italic, no colour shift).
+   ───────────────────────────────────────────────────────────────────────── */
+
+.air--inline .air__panel {
+  margin-top: 12px;
+  overflow: visible;
+}
+
+.air--inline .air__panel-head {
+  margin-bottom: 2px;
+}
+
+/* Tertiary, small, regular, sentence-case — quiet through position + weight */
+.air--inline .air__shape-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  font-weight: 400;
+  color: var(--ds-text-tertiary-rest);
+  letter-spacing: 0;
+  text-transform: none;
+  font-style: normal;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTION F  "Iterative"
+   Same panel chrome as D. Source block is horizontal: logo → name → path → last-updated.
+   ───────────────────────────────────────────────────────────────────────── */
+
+.air--iterative .air__panel {
+  margin-top: 16px;
+  padding: 12px;
+  border-radius: var(--ds-radius-generous);
+  background-color: color-mix(in srgb, var(--ds-color-core-neutral-20) 40%, transparent);
+  overflow: visible;
+}
+
+.air--iterative .air__panel-head {
+  display: flex;
+  align-items: baseline;
+  gap: 0;
+  padding-bottom: 10px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+/* heading-01: 0.875rem / 1.42857 / semibold */
+.air--iterative .air__shape-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 0.875rem;
+  line-height: 1.42857;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  letter-spacing: 0;
+  text-transform: none;
+}
+
+/* body-01: 0.875rem / 1.42857 / regular */
+.air--iterative .air__shape-sep {
+  font-size: 0.875rem;
+  line-height: 1.42857;
+  color: var(--ds-text-tertiary-rest);
+  margin: 0 5px;
+}
+
+/* label-01: 0.75rem / 1.33333 / regular */
+.air--iterative .air__shape-count {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 0.75rem;
+  line-height: 1.33333;
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-tertiary-rest);
+}
+
+/* body-01 override for step sentence text (shared rule uses 13px) */
+.air--iterative .air__step-text {
+  font-size: 0.875rem;
+  line-height: 1.42857;
+}
+
+/* label-01 override for step index (shared rule uses 11px) */
+.air--iterative .air__step-num {
+  font-size: 0.75rem;
+  line-height: 1.33333;
+}
+
+/* ── Iterative source row ─────────────────────────────────────────────────── */
+/*
+  Row layout: [tag: logo + name + path]  [Last updated: ##:## pm PT]
+  Tag wraps only the platform identity. Last updated sits inline to its right.
+*/
+
+.air__it-source {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 8px;
+  margin-top: 5px;
+  flex-wrap: wrap;
+}
+
+/*
+  Tag: large neutral low — rounded shape (var(--ds-radius-tight) = 4px).
+  Sizing matches @ds/tags large: padding 5px 7px, gap 6px.
+  Width is fit-content (inline-flex child).
+  Interactive: hover shifts to field-hover bg, border drops; active to field-pressed.
+  Matches the neutral low tag token contract exactly.
+*/
+.air__it-tag {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 7px;
+  background: var(--ds-surface-alt-rest);
+  box-shadow: inset 0 0 0 1px var(--ds-base);
+  border-radius: var(--ds-radius-tight);
+  box-sizing: border-box;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color 70ms var(--ds-motion-easing-hover),
+    box-shadow       70ms var(--ds-motion-easing-hover);
+}
+
+.air__it-tag:hover {
+  background-color: var(--ds-field-hover);
+  box-shadow: none;
+}
+
+.air__it-tag:active {
+  background-color: var(--ds-field-pressed);
+  box-shadow: none;
+}
+
+/* Name: label-01 regular — 0.75rem / 1.33333 */
+.air__it-tag .air__wb-source-name {
+  font-size: 0.75rem;
+  line-height: 1.33333;
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-primary);
+  white-space: nowrap;
+}
+
+/* Path inside tag: label-01 regular tertiary */
+.air__it-tag .air__it-source-meta {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 0.75rem;
+  line-height: 1.33333;
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-tertiary-rest);
+  white-space: nowrap;
+}
+
+/* Last updated: same label-01 tertiary style, outside the tag */
+.air__it-last-updated {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 0.75rem;
+  line-height: 1.33333;
+  font-weight: var(--ds-type-font-weight-regular);
+  color: var(--ds-text-tertiary-rest);
+  white-space: nowrap;
+}
+
+/* ── Step border — aligned to text column, not spanning index ────────────── */
+/*
+  Technique: remove padding and border from .air__step grid row.
+  Re-apply padding on each grid child (num + body) so text stays vertically
+  aligned. Border-top lives only on .air__step-body — so the 1px rule starts
+  at the left edge of the text column (x = 28px col + 8px gap = 36px),
+  exactly where the step text begins, matching the annotation.
+*/
+
+.air--iterative .air__step {
+  grid-template-columns: 16px 1fr;
+  align-items: baseline; /* aligns "01"–"06" baseline to first line of step text */
+  padding: 0;
+  border-top: none;
+}
+
+.air--iterative .air__step-num {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.air--iterative .air__step-body {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  border-top: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+.air--iterative .air__step:first-child .air__step-body {
+  border-top: none;
+}

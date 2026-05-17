@@ -1,51 +1,55 @@
-id,name,industry,segment,region,apexName,lifetimeValue,last3YearsValue,cqPipeline,attainmentPct,activePOVs,ebcsLastYear,overallHealth,technicalHealth,adoptionHealth,lastActivityType,lastActivityDaysAgo,riskIds,scenarios
-acc-salesforce,Salesforce,Technology,Strategic,Americas,Salesforce Inc.,125000000,28000000,2500000,92,2,3,Healthy,Healthy,Healthy,Executive-briefing,4,,Outlier-full-coverage
-acc-googlecloud,Google Cloud,Technology,Strategic,Americas,Alphabet,110000000,25000000,1600000,84,3,2,At-risk,Healthy,At-risk,Technical-deep-dive,9,POVs-without-progression,
-acc-wellsfargobank,Wells Fargo Bank,Financial Services,Strategic,Americas,Wells Fargo & Company,88000000,20000000,3000000,31,1,0,Critical,Critical,Critical,Customer-engagement,38,No-pipeline-CQ-next-4Q;No-EBCs-last-year;Not-platformized;Critical-technical-health;Low-adoption-deployment,Outlier-multi-risk-critical
-acc-adobe,Adobe,Technology,Strategic,Americas,,70000000,18000000,1780000,78,1,0,Critical,Critical,At-risk,Technical-deep-dive,6,Critical-technical-health;POVs-without-progression,Outlier-one-product-critical
-acc-nvidia,NVIDIA,Technology,Strategic,Americas,,135000000,30000000,6080000,152,0,2,Healthy,Healthy,Healthy,Executive-briefing,3,,Outlier-over-attain
-acc-cisco,Cisco,Technology,Strategic,Americas,,60000000,14000000,1920000,70,1,1,At-risk,At-risk,Healthy,Architecture-review,12,Not-platformized,
-acc-oracle,Oracle,Technology,Strategic,Americas,,55000000,12500000,1400000,62,2,2,At-risk,At-risk,At-risk,Technical-deep-dive,18,POVs-without-progression;No-or-stale-ASR,Outlier-stalled-opp
-acc-visa,Visa,Financial Services,Strategic,Americas,,80000000,19000000,1750000,95,1,2,Healthy,Healthy,Healthy,Executive-briefing,5,,
-acc-chevron,Chevron,Energy,Strategic,Americas,,45000000,11000000,1650000,68,1,2,At-risk,Healthy,At-risk,Deployment-health-check,11,No-customer-success-plan,
-acc-kaiser,Kaiser Permanente,Healthcare,Strategic,Americas,,58000000,13500000,1920000,81,0,2,Healthy,Healthy,Healthy,Deployment-health-check,7,,
-acc-stanfordhc,Stanford Health Care,Healthcare,Strategic,Americas,,28000000,7500000,320000,74,1,2,At-risk,At-risk,Healthy,Renewal-prep-call,10,No-or-stale-ASR,
-acc-pge,PG&E,Energy,Strategic,Americas,,42000000,9500000,0,10,0,0,Critical,Critical,Critical,Customer-engagement,45,No-pipeline-CQ-next-4Q;No-EBCs-last-year;POVs-without-progression;Critical-technical-health,Outlier-catastrophic-miss
-acc-youtube,YouTube,Media,Enterprise,Americas,Alphabet,14000000,4200000,1460000,77,1,2,Healthy,Healthy,Healthy,Solution-workshop,6,,
-acc-waymo,Waymo,Technology,Enterprise,Americas,Alphabet,4500000,3600000,0,64,1,1,At-risk,At-risk,At-risk,POC-scoping-session,13,POVs-without-progression,
-acc-wfsecurities,Wells Fargo Securities,Financial Services,Enterprise,Americas,Wells Fargo & Company,11000000,3400000,680000,72,0,2,At-risk,Healthy,At-risk,Renewal-prep-call,15,No-customer-success-plan,
-acc-slack,Slack,Technology,Enterprise,Americas,Salesforce Inc.,9500000,3100000,1070000,88,0,3,Healthy,Healthy,Healthy,Technical-deep-dive,4,,
-acc-tableau,Tableau,Technology,Enterprise,Americas,Salesforce Inc.,7800000,2600000,0,66,0,2,At-risk,At-risk,Healthy,Architecture-review,14,Not-platformized,
-acc-mulesoft,MuleSoft,Technology,Enterprise,Americas,Salesforce Inc.,6200000,2300000,580000,79,0,3,Healthy,Healthy,Healthy,Solution-workshop,8,,
-acc-sutterhealth,Sutter Health,Healthcare,Enterprise,Americas,Sutter Health System,12000000,3900000,0,58,1,1,At-risk,At-risk,At-risk,Deployment-health-check,19,No-or-stale-ASR;POVs-without-progression,
-acc-intel,Intel,Technology,Enterprise,Americas,,22000000,5800000,1200000,71,1,2,At-risk,Healthy,At-risk,Technical-deep-dive,11,Low-adoption-deployment,
-acc-netflix,Netflix,Media,Enterprise,Americas,,18500000,5200000,1100000,85,0,3,Healthy,Healthy,Healthy,Executive-briefing,5,,
-acc-stripe,Stripe,Financial Services,Enterprise,Americas,,15000000,4800000,3100000,98,1,3,Healthy,Healthy,Healthy,Contract-review,2,,Outlier-velocity-deal
-acc-pinterest,Pinterest,Media,Enterprise,Americas,,8500000,2900000,420000,41,0,0,Critical,At-risk,Critical,Renewal-prep-call,22,Low-adoption-deployment;No-customer-success-plan;POVs-without-progression,Outlier-churn
-acc-servicenow,ServiceNow,Technology,Enterprise,Americas,,19000000,5400000,1250000,82,1,3,Healthy,Healthy,Healthy,Solution-workshop,7,,
-acc-workday,Workday,Technology,Enterprise,Americas,,16500000,4700000,720000,76,0,2,At-risk,Healthy,At-risk,Technical-deep-dive,9,Not-platformized,
-acc-twilio,Twilio,Technology,Enterprise,Americas,,10500000,3300000,0,69,1,2,At-risk,At-risk,At-risk,POC-scoping-session,16,POVs-without-progression,
-acc-doordash,DoorDash,Technology,Enterprise,Americas,,9200000,3100000,1430000,73,0,1,At-risk,Healthy,At-risk,Deployment-health-check,12,No-customer-success-plan,
-acc-lyft,Lyft,Technology,Enterprise,Americas,,7400000,2500000,620000,54,0,2,At-risk,At-risk,At-risk,Customer-engagement,24,No-pipeline-CQ-next-4Q;POVs-without-progression,Outlier-sparse-pipeline
-acc-airbnb,Airbnb,Technology,Enterprise,Americas,,13500000,4100000,980000,80,1,2,Healthy,Healthy,Healthy,Executive-briefing,6,,
-acc-databricks,Databricks,Technology,Enterprise,Americas,,11800000,3800000,1450000,86,0,3,Healthy,Healthy,Healthy,Technical-deep-dive,4,,
-acc-snowflake,Snowflake,Technology,Enterprise,Americas,,12500000,4000000,1700000,83,0,2,Healthy,Healthy,Healthy,Solution-workshop,5,,
-acc-reddit,Reddit,Media,Enterprise,Americas,,6800000,2400000,0,47,0,0,Critical,At-risk,Critical,Contract-review,17,Low-adoption-deployment;No-customer-success-plan,Outlier-displacement
-acc-roblox,Roblox,Media,Enterprise,Americas,,7900000,2700000,720000,74,1,1,At-risk,Healthy,At-risk,Architecture-review,13,POVs-without-progression,
-acc-ebay,eBay,Retail,Enterprise,Americas,,14200000,4300000,680000,78,0,2,Healthy,Healthy,Healthy,Solution-workshop,8,,
-acc-schwab,Charles Schwab,Financial Services,Enterprise,Americas,,21500000,6100000,1780000,87,1,3,Healthy,Healthy,Healthy,Executive-briefing,7,,
-acc-genentech,Genentech,Biotech,Enterprise,Americas,,17000000,4800000,920000,72,0,2,At-risk,At-risk,Healthy,Technical-deep-dive,14,Not-platformized,
-acc-ucsfhealth,UCSF Health,Healthcare,Enterprise,Americas,,9800000,3200000,0,68,1,1,At-risk,At-risk,At-risk,Deployment-health-check,20,No-or-stale-ASR,
-acc-gilead,Gilead,Biotech,Enterprise,Americas,,13200000,4000000,1360000,77,0,3,Healthy,Healthy,Healthy,Solution-workshop,6,,
-acc-ea,Electronic Arts,Gaming,Enterprise,Americas,,10800000,3500000,720000,65,1,1,At-risk,At-risk,At-risk,POC-scoping-session,18,POVs-without-progression,
-acc-williamssonoma,Williams-Sonoma,Retail,Enterprise,Americas,,8100000,2700000,0,34,0,0,Critical,At-risk,Critical,Customer-engagement,58,No-pipeline-CQ-next-4Q;No-EBCs-last-year;Low-adoption-deployment,Outlier-cold-account
-acc-sutterbay,Sutter Bay Medical Foundation,Healthcare,Mid-market,Americas,Sutter Health System,2200000,850000,0,69,0,2,At-risk,Healthy,At-risk,Deployment-health-check,15,Not-platformized,
-acc-pamf,Palo Alto Medical Foundation,Healthcare,Mid-market,Americas,Sutter Health System,1400000,620000,180000,74,0,3,Healthy,Healthy,Healthy,Solution-workshop,9,,
-acc-gap,Gap Inc.,Retail,Mid-market,Americas,,2800000,980000,340000,67,0,2,At-risk,At-risk,Healthy,Technical-deep-dive,12,No-or-stale-ASR,
-acc-levi,Levi Strauss,Retail,Mid-market,Americas,,1900000,760000,0,71,1,2,At-risk,Healthy,At-risk,POC-scoping-session,16,POVs-without-progression,
-acc-safeway,Safeway,Retail,Mid-market,Americas,,3100000,1100000,380000,78,0,2,Healthy,Healthy,Healthy,Solution-workshop,7,,
-acc-ross,Ross Stores,Retail,Mid-market,Americas,,1650000,580000,0,29,0,0,Critical,Critical,Critical,Customer-engagement,72,No-pipeline-CQ-next-4Q;No-EBCs-last-year;Not-platformized;Low-adoption-deployment;Critical-technical-health,Outlier-neglected
-acc-citysf,City of San Francisco,Public Sector,Mid-market,Americas,,3900000,1400000,0,62,0,2,At-risk,At-risk,Healthy,Architecture-review,17,No-customer-success-plan,
-acc-stanforduniv,Stanford University,Education,Mid-market,Americas,,2400000,920000,220000,79,0,3,Healthy,Healthy,Healthy,Executive-briefing,8,,
-acc-ucb,UC Berkeley,Education,Mid-market,Americas,,1800000,710000,180000,73,0,2,At-risk,Healthy,At-risk,Deployment-health-check,14,No-or-stale-ASR,
-acc-bart,BART,Public Sector,Mid-market,Americas,,2050000,780000,0,66,0,1,At-risk,At-risk,At-risk,POC-scoping-session,19,POVs-without-progression,
+id,name,apex,lifetimeValue,valueLast3Years,pipelineCQ,activePOVs,ebcsLastYear,health_overall,health_technical,health_deploymentAdoption,health_valueRealization,health_customerEngagement,riskIds,platformizations,region,installBase_tcv,installBase_incrementalAcv,installBase_margin,installBase_rpo,scenarios
+acc-stripe-treasury,Stripe Treasury Operations,Stripe Inc,14200000,4180000,1640000,2,2,critical,healthy,critical,at-risk,,derailed-povs;no-csp;no-asr,STRATA;CORTEX;UNIT42,South San Francisco,8900000,180000,0.094,2200000,scenario-1;scenario-44
+acc-stripe-radar,Stripe Radar and Risk,Stripe Inc,3200000,1140000,420000,0,1,healthy,healthy,healthy,,,no-risks,UNIT42;CORTEX,South San Francisco,2100000,140000,0.121,640000,scenario-37
+acc-doordash-platform,DoorDash Platform Security,DoorDash Inc,2400000,920000,520000,1,1,healthy,healthy,healthy,,,no-risks,CORTEX;STRATA,San Francisco,1800000,210000,0.138,520000,scenario-2
+acc-reddit-platform,Reddit Platform Engineering,Reddit Inc,1800000,640000,0,0,0,critical,at-risk,critical,critical,critical,no-pipeline;no-ebc;not-platformized;derailed-povs;no-asr,STRATA,San Francisco,1400000,-40000,0.041,180000,scenario-3
+acc-lyft-rideshare,Lyft Rideshare Operations,Lyft Inc,7800000,2660000,860000,1,2,healthy,healthy,healthy,,,no-risks,PRISMA;STRATA,San Francisco,5800000,420000,0.141,1180000,scenario-4;scenario-39
+acc-twilio-messaging,Twilio Messaging Cloud,Twilio Inc,4500000,1620000,690000,1,2,healthy,healthy,at-risk,,,derailed-povs,STRATA;PRISMA,San Francisco,3200000,180000,0.108,920000,scenario-5
+acc-databricks-lakehouse,Databricks Lakehouse Security,Databricks Inc,5200000,2240000,1310000,1,3,at-risk,healthy,at-risk,,,derailed-povs,CORTEX;STRATA,San Francisco,3400000,310000,0.124,1080000,scenario-6
+acc-notion-workspace,Notion Workspace Trust,Notion Labs Inc,1600000,720000,480000,0,1,healthy,healthy,healthy,,,no-risks,CORTEX,San Francisco,1100000,90000,0.118,310000,scenario-7
+acc-linear-issues,Linear Issue Tracking,,1200000,640000,90000,0,1,critical,at-risk,critical,critical,,no-csp;derailed-povs;no-asr,CORTEX,San Francisco,920000,-80000,0.038,180000,scenario-8
+acc-figma-design,Figma Design Cloud,Figma Inc,3400000,1180000,540000,0,1,healthy,healthy,healthy,,,no-risks,CORTEX;STRATA,San Francisco,2400000,180000,0.124,720000,scenario-9
+acc-asana-work,Asana Work Graph,Asana Inc,2800000,1140000,820000,0,2,healthy,healthy,healthy,,,no-risks,PRISMA;STRATA,San Francisco,1900000,210000,0.131,580000,scenario-10
+acc-pinterest-discovery,Pinterest Discovery Engineering,Pinterest Inc,3600000,1380000,640000,1,2,healthy,healthy,at-risk,,,derailed-povs,CORTEX;STRATA,San Francisco,2400000,240000,0.118,640000,scenario-11
+acc-eventbrite-events,Eventbrite Events Platform,Eventbrite Inc,1400000,560000,290000,1,1,at-risk,at-risk,healthy,,,derailed-povs,STRATA;PRISMA,San Francisco,940000,-20000,0.062,180000,scenario-12
+acc-allbirds,Allbirds,,1100000,420000,140000,0,1,healthy,healthy,healthy,,,no-risks,PRISMA,San Francisco,640000,80000,0.118,140000,scenario-13
+acc-23andme-genetics,23andMe Genetic Security,23andMe Inc,2200000,820000,420000,1,2,healthy,healthy,healthy,healthy,healthy,no-risks,CORTEX;STRATA;UNIT42,Sunnyvale,1480000,210000,0.142,420000,scenario-14
+acc-houzz-home,Houzz Home Platform,Houzz Inc,2000000,720000,540000,3,1,critical,at-risk,critical,critical,,derailed-povs;no-csp;no-asr,CORTEX;STRATA,Palo Alto,1280000,40000,0.062,310000,scenario-15
+acc-instacart-grocery,Instacart Grocery Trust,Instacart Inc,4000000,1820000,720000,1,2,healthy,healthy,healthy,,,no-risks,CORTEX;STRATA,San Francisco,2800000,310000,0.131,820000,scenario-16
+acc-cloudflare-edge,Cloudflare Edge Security,Cloudflare Inc,3000000,1140000,920000,1,2,at-risk,healthy,at-risk,,,derailed-povs,PRISMA;STRATA,San Francisco,2100000,140000,0.108,580000,scenario-17
+acc-discord-platform,Discord Platform Trust,Discord Inc,1600000,660000,310000,0,1,at-risk,at-risk,at-risk,,,derailed-povs,STRATA,San Francisco,1180000,60000,0.082,310000,scenario-18
+acc-postmates-delivery,Postmates Delivery Trust,,900000,420000,140000,0,1,at-risk,healthy,at-risk,,,no-csp,CORTEX,San Francisco,640000,40000,0.094,140000,scenario-19
+acc-coinbase-exchange,Coinbase Exchange Trust,Coinbase Inc,5100000,2120000,1840000,2,2,healthy,healthy,healthy,,,no-risks,CORTEX;PRISMA;STRATA,San Francisco,3400000,320000,0.138,920000,scenario-20;scenario-43
+acc-plaid-fintech,Plaid Fintech Trust,Plaid Inc,2700000,1080000,520000,1,1,at-risk,healthy,at-risk,,,derailed-povs,STRATA;PRISMA;CORTEX,San Francisco,1840000,140000,0.108,540000,scenario-21
+acc-robinhood-markets,Robinhood Markets Security,Robinhood Markets Inc,3800000,1480000,920000,1,1,at-risk,healthy,at-risk,,,derailed-povs;no-asr,STRATA;CORTEX,Menlo Park,2480000,210000,0.118,640000,scenario-22
+acc-brex-spend,Brex Spend Operations,Brex Inc,2300000,820000,180000,0,0,critical,at-risk,at-risk,,,no-ebc;derailed-povs,STRATA;CORTEX,San Francisco,1640000,40000,0.062,420000,scenario-23;scenario-48
+acc-ramp-finance,Ramp Business Finance,Ramp Business Inc,2100000,920000,420000,1,1,healthy,healthy,healthy,,,no-risks,STRATA;PRISMA,San Francisco,1380000,140000,0.124,310000,scenario-24
+acc-gusto-payroll,Gusto Payroll Engineering,Gusto Inc,2600000,1080000,480000,0,2,healthy,healthy,healthy,,,no-risks,STRATA;PRISMA,San Francisco,1740000,180000,0.131,460000,scenario-25
+acc-carta-equity,Carta Equity Operations,Carta Inc,1500000,540000,0,0,1,critical,at-risk,at-risk,,,no-pipeline;derailed-povs,STRATA,San Francisco,1080000,-40000,0.058,210000,scenario-26
+acc-affirm-pay,Affirm Pay Trust,Affirm Inc,1900000,720000,290000,0,1,at-risk,healthy,at-risk,,,not-platformized,STRATA,San Francisco,1380000,80000,0.094,310000,scenario-27
+acc-chime-banking,Chime Banking Trust,Chime Financial Inc,2400000,920000,480000,1,1,at-risk,healthy,at-risk,at-risk,,no-csp,CORTEX;UNIT42;STRATA,San Francisco,1620000,140000,0.118,420000,scenario-28;scenario-38
+acc-roku-streaming,Roku Streaming Platform,Roku Inc,2500000,920000,420000,1,1,critical,healthy,critical,at-risk,,no-csp;derailed-povs,CORTEX;STRATA,San Jose,1640000,-20000,0.062,420000,scenario-29
+acc-nextdoor-community,Nextdoor Community Trust,Nextdoor Holdings Inc,1700000,640000,290000,0,1,critical,critical,at-risk,,,derailed-povs;no-asr,STRATA,San Francisco,1240000,-40000,0.052,210000,scenario-30
+acc-box-content,Box Content Security,Box Inc,3300000,1240000,640000,0,2,healthy,healthy,healthy,,,no-risks,PRISMA;STRATA,Redwood City,2240000,210000,0.131,540000,scenario-31
+acc-billcom-payables,Bill.com Payables Trust,Bill.com Holdings Inc,1400000,540000,290000,0,1,healthy,healthy,healthy,,,no-risks,STRATA,San Jose,920000,80000,0.118,210000,scenario-32
+acc-confluent-streaming,Confluent Streaming Trust,Confluent Inc,2800000,1080000,420000,1,1,at-risk,healthy,at-risk,,,derailed-povs,STRATA;PRISMA,Mountain View,1840000,140000,0.108,420000,scenario-33
+acc-gitlab-devops,GitLab DevOps Security,GitLab Inc,2200000,920000,540000,1,2,at-risk,healthy,at-risk,,,derailed-povs,CORTEX;STRATA,San Francisco,1480000,80000,0.094,420000,scenario-34
+acc-snowflake-sector,Snowflake Public Sector,Snowflake Inc,4600000,1820000,1240000,1,2,at-risk,at-risk,at-risk,,,derailed-povs;no-csp,CORTEX;STRATA;UNIT42,San Mateo,2840000,210000,0.118,840000,scenario-35
+acc-atlassian-marketplace,Atlassian Marketplace Security,Atlassian Corp,2900000,1140000,580000,0,2,healthy,healthy,healthy,,,no-risks,PRISMA;STRATA,San Francisco,1980000,210000,0.138,540000,scenario-36
+acc-webflow,Webflow,,1000000,420000,180000,0,1,healthy,healthy,healthy,,,no-risks,PRISMA,San Francisco,640000,80000,0.124,140000,scenario-36
+acc-segment-data,Segment Customer Data Platform,Twilio Inc,1300000,540000,210000,0,1,healthy,healthy,healthy,,,no-risks,STRATA;CORTEX,San Francisco,840000,80000,0.118,210000,scenario-36
+acc-mixpanel-analytics,Mixpanel Analytics,,1100000,420000,180000,0,1,healthy,healthy,healthy,,,no-risks,PRISMA,San Francisco,720000,80000,0.124,180000,scenario-36
+acc-aurora,Aurora Innovations,,1200000,540000,310000,1,1,healthy,healthy,at-risk,,,derailed-povs,STRATA,Palo Alto,820000,40000,0.094,210000,scenario-40
+acc-beacon-industries,Beacon Industries,Beacon Corp,2000000,720000,420000,0,1,at-risk,healthy,at-risk,,,derailed-povs,STRATA;PRISMA,San Mateo,1380000,80000,0.094,310000,scenario-41
+acc-tyrell,Tyrell Security Operations,Tyrell Corporation,5800000,2160000,940000,1,2,at-risk,at-risk,at-risk,at-risk,at-risk,derailed-povs;no-asr,STRATA;PRISMA;CORTEX,San Francisco,3840000,140000,0.094,1180000,scenario-42
+acc-cyberdyne,Cyberdyne Security Engineering,Cyberdyne Industries,11200000,4140000,2840000,2,3,at-risk,at-risk,at-risk,at-risk,at-risk,derailed-povs;no-asr,STRATA;PRISMA;CORTEX;UNIT42,San Francisco,42000000,1040000,0.125,3000000,scenario-45
+acc-yelp-reviews,Yelp Reviews Platform,Yelp Inc,1800000,720000,290000,0,1,healthy,healthy,healthy,,,no-risks,STRATA,San Francisco,1240000,80000,0.108,310000,
+acc-strava-activities,Strava Activities,Strava Inc,1300000,540000,210000,0,1,healthy,healthy,healthy,,,no-risks,PRISMA,San Francisco,820000,80000,0.124,210000,
+acc-patreon-creators,Patreon Creator Operations,,1000000,420000,180000,0,1,healthy,healthy,at-risk,,,no-csp,STRATA;CORTEX,San Francisco,640000,40000,0.094,180000,
+acc-calendly-scheduling,Calendly Scheduling,,900000,380000,140000,0,1,healthy,healthy,healthy,,,no-risks,PRISMA,San Francisco,540000,40000,0.118,140000,
+acc-loom-video,Loom Video Messaging,Atlassian Corp,1100000,420000,210000,0,1,healthy,healthy,healthy,,,no-risks,STRATA;PRISMA,San Francisco,720000,80000,0.124,180000,
+acc-miro-whiteboard,Miro Whiteboard,,1400000,540000,310000,0,1,at-risk,healthy,at-risk,,,derailed-povs,PRISMA;STRATA,San Francisco,940000,40000,0.094,210000,
+acc-klaviyo-marketing,Klaviyo Marketing Trust,Klaviyo Inc,1700000,640000,290000,0,1,healthy,healthy,healthy,,,no-risks,STRATA,San Francisco,1080000,80000,0.118,210000,
+acc-lattice-people,Lattice People Operations,,1100000,420000,140000,0,1,healthy,healthy,healthy,,,no-risks,PRISMA,San Francisco,720000,80000,0.124,180000,
+acc-classpass-fitness,ClassPass Fitness,,800000,290000,90000,0,0,at-risk,healthy,at-risk,,,no-ebc;no-csp,STRATA,San Francisco,480000,-20000,0.062,90000,
+acc-front-inbox,Front Inbox Platform,,1200000,480000,180000,0,1,healthy,healthy,healthy,,,no-risks,STRATA;PRISMA,San Francisco,820000,80000,0.118,210000,

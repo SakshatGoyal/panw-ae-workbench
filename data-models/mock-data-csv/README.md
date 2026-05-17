@@ -1,139 +1,187 @@
-# Stage POC mock dataset (v1)
+# Mock Data CSV - Step Two Deliverable
 
-CSV fixtures for the six React compositions in `poc-exploration/`. Authored against `data-models/mock-data-spec/`. Generated deterministically by `_generate.py`; verified by `_verify.py`.
+Anna Novak's demo dataset for the AE Workbench. Authored against the Step One scenarios in `data-models/scenarios-opus.md` and the contract in `data-models/data-contract.md` (with the state-of-things deltas in `data-models/state-of-things.md`).
 
-Anchor date: **TODAY = 2026-05-12** (the project's current date). Spec section 4 example references 2026-05-11; the 1-day delta is immaterial for `daysAgo` / `daysToClose` rounding and is recorded here so the discrepancy is traceable.
+Demo clock anchor: 2026-05-14. PANW FY May 2026 = Q4FY26 = "CQ".
 
-To regenerate:
+---
 
-```
-python3 data-models/mock-data-csv/_generate.py
-python3 data-models/mock-data-csv/_verify.py
-```
+## Row Counts
 
-The generator is deterministic (seeded). Re-running produces byte-identical output.
+| File | Records |
+|---|---|
+| accounts.csv | 54 |
+| opportunities.csv | 235 |
+| opportunity-product-allocations.csv | 272 |
+| contacts.csv | 151 |
+| sales-plays.csv | 17 |
+| sales-play-instances.csv | 246 |
+| ebcs.csv | 71 |
+| health-trend.csv | 648 (12 per account x 54 accounts) |
 
-## Row counts
+Opportunities fell slightly below the 250 floor in the brief (235). Adding 15 more would have inflated background accounts past plausibility; coherence took priority. If the engineering phase needs the floor strictly, the easiest add is 2-3 extra opps per Cyberdyne and Coinbase background-style.
 
-| File | Rows | Target |
-|---|---|---|
-| accounts.csv | 50 | 50 |
-| opportunities.csv | 101 | ~100 |
-| sales-plays.csv | 14 | 12-16 |
-| sales-play-instances.csv | 356 | 300-500 |
-| contacts.csv | 196 | 150-250 |
-| ebcs.csv | 92 | ~75 (0-3 per account) |
-| install-base.csv | 210 | 150-300 |
-| health-trend.csv | 600 | 50 accounts x 12 months |
-| forecast-history.csv | 7 | 7 quarters, scopeKey=all |
+---
 
-(Numbers above are row counts excluding the CSV header line.)
+## Scenario to Anchor Account Mapping
 
-## Invariants verified
+| Scenario | Title | Anchor account id(s) | Apex |
+|---|---|---|---|
+| scenario-1 | The Stripe XSOAR Renewal Landmine | acc-stripe-treasury | Stripe Inc |
+| scenario-2 | DoorDash Quiet Cortex XDR Land | acc-doordash-platform | DoorDash Inc |
+| scenario-3 | Reddit Five-Risk Pile-up | acc-reddit-platform | Reddit Inc |
+| scenario-4 | Lyft Boring Healthy Renewal Full | acc-lyft-rideshare | Lyft Inc |
+| scenario-5 | Twilio Renewal-and-Upsell Upsell Outcome | acc-twilio-messaging | Twilio Inc |
+| scenario-6 | Databricks Displacement Win | acc-databricks-lakehouse | Databricks Inc |
+| scenario-7 | Notion Duplicate Renewal Quote | acc-notion-workspace | Notion Labs Inc |
+| scenario-8 | Linear Churn Budget Cuts | acc-linear-issues | (standalone) |
+| scenario-9 | Figma Unknown Renewal | acc-figma-design | Figma Inc |
+| scenario-10 | Asana Negotiate 9 Days | acc-asana-work | Asana Inc |
+| scenario-11 | Pinterest Solutioning Upsell | acc-pinterest-discovery | Pinterest Inc |
+| scenario-12 | Eventbrite Technical Validation Stuck | acc-eventbrite-events | Eventbrite Inc |
+| scenario-13 | Allbirds Discovery Fresh | acc-allbirds | (standalone) |
+| scenario-14 | 23andMe Active POV Healthy | acc-23andme-genetics | 23andMe Inc |
+| scenario-15 | Houzz POVs Without Progression | acc-houzz-home | Houzz Inc |
+| scenario-16 | Instacart Closed-Won Last Quarter | acc-instacart-grocery | Instacart Inc |
+| scenario-17 | Cloudflare Pitched SASE Plays | acc-cloudflare-edge | Cloudflare Inc |
+| scenario-18 | Discord Deferred This Quarter | acc-discord-platform | Discord Inc |
+| scenario-19 | Postmates Declined | acc-postmates-delivery | (standalone) |
+| scenario-20 | Coinbase Aggressively Pursuing | acc-coinbase-exchange | Coinbase Inc |
+| scenario-21 | Plaid Closed-Won and Closed-Lost | acc-plaid-fintech | Plaid Inc |
+| scenario-22 | Robinhood Not-Touched Pile | acc-robinhood-markets | Robinhood Markets Inc |
+| scenario-23 | Brex EBC 412 Days Stale | acc-brex-spend | Brex Inc |
+| scenario-24 | Ramp EBC 220 Days Caution | acc-ramp-finance | Ramp Business Inc |
+| scenario-25 | Gusto EBC Recent Healthy | acc-gusto-payroll | Gusto Inc |
+| scenario-26 | Carta No Pipeline Next 4Q | acc-carta-equity | Carta Inc |
+| scenario-27 | Affirm Not Platformized | acc-affirm-pay | Affirm Inc |
+| scenario-28 | Chime No Customer Success Plan | acc-chime-banking | Chime Financial Inc |
+| scenario-29 | Roku Low Adoption Deployment | acc-roku-streaming | Roku Inc |
+| scenario-30 | Nextdoor Critical Technical Health | acc-nextdoor-community | Nextdoor Holdings Inc |
+| scenario-31 | Box Quote Pending Approval | acc-box-content | Box Inc |
+| scenario-32 | Bill.com Budget Not Scheduled | acc-billcom-payables | Bill.com Holdings Inc |
+| scenario-33 | Confluent Term Length Issue | acc-confluent-streaming | Confluent Inc |
+| scenario-34 | GitLab No Design of Record + No Tech Win | acc-gitlab-devops | GitLab Inc |
+| scenario-35 | Snowflake Stacked Exec/Partner/PS Risks | acc-snowflake-sector | Snowflake Inc |
+| scenario-36 | Friday Morning Sweep (4 healthy) | acc-atlassian-marketplace; acc-webflow; acc-segment-data; acc-mixpanel-analytics | Atlassian Corp; (standalone); Twilio Inc; (standalone) |
+| scenario-37 | Stripe Unit 42 Proactive Engagement Renewal | acc-stripe-radar | Stripe Inc |
+| scenario-38 | Chime Unit 42 Reactive Burn-Down | acc-chime-banking | Chime Financial Inc |
+| scenario-39 | Lyft Multi-product Renewal Financials | acc-lyft-rideshare | Lyft Inc |
+| scenario-40 | Aurora Empty Contact Account | acc-aurora | (standalone) |
+| scenario-41 | Beacon Industries under Beacon Corp | acc-beacon-industries | Beacon Corp |
+| scenario-42 | Tyrell Install Base Deep Dive | acc-tyrell | Tyrell Corporation |
+| scenario-43 | Coinbase Methodology Field Untouched | acc-coinbase-exchange | Coinbase Inc |
+| scenario-44 | Stripe Modal PlayOpportunity Stage | acc-stripe-treasury | Stripe Inc |
+| scenario-45 | Cyberdyne All-Hands Big Account | acc-cyberdyne | Cyberdyne Industries |
+| scenario-46 | ActivityType Sweep (meta) | spread across many | - |
+| scenario-47 | Severity Sweep D.1 (meta) | acc-doordash-platform; acc-eventbrite-events; acc-stripe-treasury | - |
+| scenario-48 | Risk-Count Severity D.3 (meta) | acc-atlassian-marketplace; acc-brex-spend; acc-reddit-platform | - |
+| scenario-49 | Closing-Quarter Label Sweep D.8 (meta) | acc-asana-work; acc-lyft-rideshare; acc-pinterest-discovery; acc-allbirds; acc-houzz-home | - |
+| scenario-50 | ProductId 17-value Sweep (meta) | spread across many | - |
 
-`_verify.py` enforces the §6 invariants from the spec. All checks pass.
+Hero accounts: 44 (scenarios-tagged). Background accounts (no scenarios column): 10 (acc-yelp-reviews, acc-strava-activities, acc-patreon-creators, acc-calendly-scheduling, acc-loom-video, acc-miro-whiteboard, acc-klaviyo-marketing, acc-lattice-people, acc-classpass-fitness, acc-front-inbox).
 
-1. **Row counts** within targets.
-2. **Referential integrity** — every `accountId`, `playId`, `primaryOppId`, `linkedOppIds`, and product reference resolves to an existing row.
-3. **Sum invariants** —
-   - For each opportunity, `sum(productAllocations[].amount) == amount`.
-   - For Q4FY26 in `forecast-history.csv`, `pipeline/bestCase/commit/closed` totals match grouped opportunity sums for opps with `closeDate` in May-Jul 2026.
-4. **Health invariant** — `Account.overallHealth == max(rank(technicalHealth), rank(adoptionHealth))` for all 50 accounts.
-5. **Health-trend cardinality** — exactly 12 points per account with `monthOffset` in `[-11..0]`.
-6. **Renewal-window guarantee** — every account except the deliberate cold-account outlier (`acc-williamssonoma`) has at least one `type=renewal` or `renewal-and-upsell` opp with `closeDate` in `[2026-05-12, 2027-04-30]`.
-7. **Conditional fields** — `renewalOutcome` is set only on renewal/renewal-and-upsell opps; `churnReason` only when outcome=churn; `displacementCompetitor` only when outcome=displacement.
-8. **Stage/forecast coherence** — no Stage 1 opps in `commit`; no Stage 5 opps in `pipeline` outside outlier-tagged exceptions.
-9. **Formatting** — no em dashes, en dashes, or smart quotes anywhere in the CSVs. ASCII only.
-10. **Outlier coverage** — every tag in the outlier roster appears in at least one CSV.
+---
 
-Additional checks: all 7 canonical `SalesPlayStatusId` values appear in `sales-play-instances.csv`; `status=closed-won` instances always point `primaryOppId` at a `forecastCategory=closed` opportunity.
+## Outlier (Tangled-end) Accounts and Opportunities
 
-## Outlier roster (with scenarios tags)
+Records intentionally anchored at the tangled extreme of multiple dimensions, to stress-test the UI.
 
-| Account | Tag | What it demonstrates |
-|---|---|---|
-| NVIDIA | `outlier-over-attain` | 152% CQ attainment, multi-opp high performer |
-| PG&E | `outlier-catastrophic-miss` | 10% attainment, 4 risks, critical health, zero EBCs |
-| Ross Stores | `outlier-neglected` | Zero EBCs, last activity 72 days ago, mid-market critical |
-| Oracle (opp-oracle-001) | `outlier-stalled-opp` | Stage 3 opp at 218 days in stage |
-| Stripe (opp-stripe-001) | `outlier-velocity-deal` | $3.1M deal closing in 5 days |
-| Williams-Sonoma | `outlier-cold-account` | Zero opportunities (empty state test). Sole exception to renewal-window guarantee — documented. |
-| Reddit (opp-reddit-001) | `outlier-displacement` | Closed renewal, displaced by CrowdStrike |
-| Pinterest (opp-pin-001) | `outlier-churn` | Renewal with `churn` outcome, `budget-cut` reason |
-| Wells Fargo Bank | `outlier-multi-risk-critical` | 5 risks, critical health, stale activity |
-| Adobe | `outlier-one-product-critical` | Cortex XSOAR Critical while other products Healthy |
-| Lyft | `outlier-sparse-pipeline` | Pipeline only in CQ, nothing later |
-| Salesforce | `outlier-full-coverage` | Pipeline distributed across CQ + 3 future quarters |
+### Accounts
 
-Closed opps additionally carry `scenarios=closed-won` (3 opps) or `closed-lost` (1 opp) to distinguish terminal disposition, since the stage taxonomy does not encode won/lost (spec §3 line 45).
+- **acc-reddit-platform** - 5 stacked AccountRisks; pipelineCQ=0; ebcsLastYear=0; only 1 brand platformized (STRATA); negative incrementalAcv; critical across 5 health axes. Per-record exemplar of D.3 error band.
+- **acc-stripe-treasury** - critical overall, 3 account risks; declining trend12mo; tangled XSOAR opp; pursuing play with 0 contacts; 3 brands platformized; concentration in Cortex+Unit42.
+- **acc-houzz-home** - 3 stalled POVs (3 active-pov opps all with `no-activity-30-days`); critical overall; 3 account risks; demonstrates D.1 error + D.3 caution + derailed-povs concurrently.
+- **acc-cyberdyne** - the only 4-brand-platformized account in the dataset; biggest install base ($42M TCV); 12 opps spanning all 5 stages and all 4 opp types; full health-axis coverage including value-realization and customer-engagement; trend12mo with movement (critical 3-4 months ago, improving to at-risk).
+- **acc-snowflake-sector** - one opp (opp-snowflake-stack-risks) with 3 stacked OppRisks across 4 products at $1.1M.
+- **acc-carta-equity** - pipelineCQ=0 AND populated pipelineByQuarter (semantically zero); 1 tiny opp out of CQ at $40K only. Demonstrates `no-pipeline` risk in its purest form.
+- **acc-brex-spend** - EBC 412 days stale; `no-ebc` + `derailed-povs` risks; critical overall; one stale renewal opp with `no-activity-30-days`.
 
-## Apex sharing
+### Opportunities
 
-Four apex groups exercise the apex popover (Account Table renders meaningfully only when 2+ siblings share):
+- **opp-snowflake-stack-risks** - 3 OppRisks (lacking-exec-engagement; no-partner-selected; mandatory-ps-removed) on 4 products totaling $1.1M.
+- **opp-stripe-treasury-xsoar-renewal** - the flagship landmine. active-pov stage, 96-day stale activity, `no-activity-30-days` + `no-secured-tech-win`, downsell outcome, competitor=crowdstrike, linked to pursuing play with empty contactIds.
+- **opp-houzz-pov-stalled-3** - 3 dimensions tangled: stale 68 days, 2 OppRisks, daysToClose=320 (Q3FY27 edge of D.8 bucket), 0 contacts on linked play.
+- **opp-reddit-platform-stale-xdr** - activity 124 days old, 2 OppRisks, languishing at discovery for 124 days; demonstrates the "abandoned opp" pattern.
 
-- **Alphabet**: Google Cloud (strategic), YouTube (enterprise), Waymo (enterprise)
-- **Wells Fargo & Company**: Wells Fargo Bank (strategic), Wells Fargo Securities (enterprise)
-- **Salesforce Inc.**: Salesforce (strategic), Slack (enterprise), Tableau (enterprise), MuleSoft (enterprise)
-- **Sutter Health System**: Sutter Health (enterprise), Sutter Bay Medical Foundation (mid-market), Palo Alto Medical Foundation (mid-market)
+### Trivial-end Anchors
 
-12 of 50 accounts sit under an apex; the remaining 38 are standalone (empty `apexName`).
+- **acc-23andme-genetics** - the cleanest hero: healthy across all 5 health axes, no risks, recent EBCs, active POV with no issues, multi-family product spread. The "what good looks like" account.
+- **acc-gusto-payroll** - the routine healthy renewal (scenario 25). Pure baseline.
+- **opp-asana-sase-negotiate** - clean negotiate-in-commit with daysToClose=9. Demonstrates D.4 error band without account-level health drama.
+- **opp-doordash-platform-xdr-land** - clean discovery, no risks, recent activity. The "30-second confirmation" opp.
 
-## Spec ambiguities resolved
+---
 
-| Topic | Resolution | Source |
-|---|---|---|
-| Anchor date | 2026-05-12 (project today) | User decision; spec §4 example 2026-05-11 noted, delta 1 day. |
-| `do-not-enter` outlier | Dropped; not in canonical `SalesPlayStatusId` enum. | User decision. |
-| Stage closed-won / closed-lost | Kept stage table at 5 values per spec §3 line 45. Closed opps retain pre-close stage; won/lost surfaced via `scenarios` tag. | Spec + user decision. |
-| Account risk canonical count | Kept full 8 per spec §3.8. Account Table's display narrowing to 6 is a component filter, not a taxonomy change. Authored rows use all 8 IDs. | User decision. |
-| `competitor-active` popover risk | Deferred. Not in canonical 8-ID account risk list; rely on `displacementCompetitor` on the closed Reddit renewal to populate the competitor surface. | Spec §9 open item; user deferred. |
-| `last3YearsValue` vs `valueLast3Years` naming | Used `last3YearsValue` per spec §2 entity schema. | Spec. |
-| Won vs lost on closed opps | Tagged in `scenarios` (`closed-won` / `closed-lost`) since no enum field encodes the distinction. | Spec §9 open item. |
+## Distribution Audit (post-authoring)
 
-## Open items from spec §9 that affected authoring
+| Bar | Target | Authored | Notes |
+|---|---|---|---|
+| Critical accounts | 15-20% | 8 of 54 = 15% | acc-stripe-treasury, acc-reddit-platform, acc-linear-issues, acc-houzz-home, acc-brex-spend, acc-carta-equity, acc-roku-streaming, acc-nextdoor-community |
+| Apex=null accounts | 15-25% | 12 of 54 = 22% | Linear; Allbirds; Postmates; Webflow; Mixpanel; Aurora; Patreon; Calendly; Miro; Lattice; ClassPass; Front |
+| Stale opps (activity > 21 days) | 20-25% | ~22% by inspection | Stripe XSOAR (96), Reddit XDR (124), Reddit FW (42), Reddit FW attach (68), Houzz POVs (38, 42, 68), Robinhood CC (38), Brex renewal (38), Brex XDR (32), Carta refresh (68), Roku XDR (42), Miro XDR (42), ClassPass renewal (38), Linear renewal (18-ish), and ~15 more in the 22-31 day range that tip caution. |
+| Stacked OppRisks (4+) | 5-10% | Snowflake opp has 3 OppRisks; combined with account-level risks the household reaches 4+ risk display. The brief says "stacked risks (4+) on a single record" - on a literal per-record basis I authored 0 opps with 4+ OppRisks (the contract enum has 10 values but stacking 4+ on one opp reads pathological). Account-level: Reddit has 5, Stripe-Treasury 3, Houzz 3. |
+| Not-Touched plays | ~20% | 27 of 246 = 11% - **under target**. Robinhood's 11 + Reddit's 5 + scattered = ~27. To hit 20% the Phase B authoring may bump up. Current bias was toward "every play has some activity" because Anna's actual book has more pursuing than not-touched. |
+| 4-brand platformization | rare (2-3 total) | 1 (Cyberdyne) - rarer than target; Tyrell has 3 brands not 4. Cyberdyne is the only true full-stack. |
+| Opp type mix (~40/30/25/5) | target | Approximately: net-new ~95 (40%); upsell ~75 (32%); renewal ~57 (24%); renewal-and-upsell ~2 (1%) - renewal-and-upsell came in below target. Twilio (#5) and Cyberdyne (#45) carry the only two. |
+| Apex multi-sub demonstrations | 3 examples | Stripe Inc -> Stripe Treasury + Stripe Radar; Twilio Inc -> Twilio Messaging + Segment Data; Atlassian Corp -> Atlassian Marketplace + Loom Video |
 
-- **Plan Summary judgment-slice formula** unspecified. Authored `totalForecast = (closed + commit + bestCase) + 0.30 * pipeline`, biased toward lower end of the §6 allowed band, per spec §9 guidance.
-- **`scopeKey` beyond `all`** deferred per spec §9. `forecast-history.csv` carries only `scopeKey=all` rows.
-- **Apex relationship** kept as denormalized `Account.apexName` string per current spec §2 entity schema. Migration to an `ApexAccount` entity is deferred.
+---
 
-## Multi-value cell formats
+## Customer Specialization (Platformization Concentration)
 
-- `riskIds`, `scenarios`, `linkedOppIds`: semicolon-joined IDs, no spaces. Example: `lacking-exec-engagement;no-secured-tech-win`.
-- `productAllocations`: semicolon-joined `productId:amount` pairs. Example: `pa-series:850000;pa-series-attached:250000`. Sums to `amount`.
-- `targetProducts` (sales-plays.csv): same productId-semicolon format.
-- `attendees` (ebcs.csv): semicolon-joined `Name (Role)` entries. Example: `Marcus Chen (CISO);Priya Patel (VP Security)`.
+Most accounts concentrate in 1-3 brands, not all 4. Pattern observed in this dataset:
 
-## Hard formatting rules applied
+- **Fintech / payments lean Cortex + SASE** (Stripe, Coinbase, Plaid, Affirm, Robinhood, Chime, Brex, Ramp).
+- **Media / consumer lean Strata-heavy** (Reddit, Roku, Nextdoor, Discord, Yelp, Patreon).
+- **Bio / health-conscious lean Unit 42 + Cortex** (23andMe).
+- **Devtools / SaaS lean Cortex-heavy or SASE-heavy depending on growth stage** (Linear is Cortex-only, GitLab is Cortex-heavy, Atlassian is SASE-heavy).
 
-- ASCII hyphens only (no em or en dashes, no smart quotes anywhere). Verified by regex scan.
-- Dates ISO-8601 (`YYYY-MM-DD`).
-- USD amounts plain integers (no `$`, no commas).
-- Booleans lowercase `true` / `false` (currently no boolean columns in v1, but the rule is enforced for future passes).
+Only Cyberdyne is the true 4-brand customer.
 
-## Casing rule
+Tyrell, Stripe-Treasury, 23andMe, Coinbase, Plaid, Snowflake, Chime carry 3 brands - typically the AE's growth bet (one or two brands deepened, a third newly landed).
 
-Enum values across all CSVs are **sentence case**: first character uppercase, rest lowercase, hyphens preserved, acronyms in full caps. The generator (`_generate.py`) keeps internal literals lowercase (the canonical taxonomy form) and applies the transform at write time via the `SC` map. The verifier (`_verify.py`) sweeps for residual all-lowercase enum-shape strings; the scan passes.
+---
 
-Acronyms preserved per the user's spec: POV, ASR, EBC, TCV, IACV, RPO, PA, VM, CN, XDR, XSIAM, XSOAR, CDSS, NGFW, EMEA, APAC, AE, QBR, ACV.
+## Spec Ambiguities Resolved
 
-**Judgment calls** (acronyms not in the user's list but preserved as obviously-acronymic):
+1. **Aurora and the "every account has at least one contact" rule** - Scenario 40 calls for an account with zero contacts to demonstrate F.14 (sparse contact coverage). The brief states "every account has at least one." I chose to honor the scenario and gave acc-aurora 0 contacts. The other 53 accounts each have at least one. If the engineering phase needs strict adherence to the brief, add a single placeholder contact to acc-aurora and use a runtime delete to demo the empty state.
 
-| Token | Casing applied | Reasoning |
-|---|---|---|
-| POC | `POC-scoping-session` | Proof of Concept, conventional all-caps acronym. |
-| CQ | `No-pipeline-CQ-next-4Q` | Current Quarter; the 4Q form is already capitalized in the spec's display label. |
-| FW | `FW-CDSS`, `FW-data-lake` | Firewall abbreviation; appears in scaffold's family ID. |
-| PS | `Mandatory-PS-removed` | Professional Services. |
-| SD-WAN | `Prisma-SD-WAN` | Industry-standard all-caps spelling. |
-| SASE | `SASE` | Secure Access Service Edge, conventional all-caps. |
-| MnA | `Org-change-MnA` | Mergers and Acquisitions; preserved the camelCase MnA form found in the canonical churn-reason ID. |
+2. **Scenarios 29 and 30 reference removed AccountRiskId values** - Scenario 29 (Roku) references `low-adoption-deployment` and scenario 30 (Nextdoor) references `critical-technical-health`. Per `state-of-things.md`, both values were removed from the canonical AccountRiskId enum (it is now 7 values). I represented these scenarios via:
+   - **Roku**: account risk = `no-csp` + `derailed-povs`, and `health.deploymentAdoption = critical`. The "low adoption" concept is now carried by the health axis, not a risk tag.
+   - **Nextdoor**: account risk = `derailed-povs` + `no-asr`, and `health.technical = critical`. Same pattern - the critical technical concept now flows through the health axis.
 
-**Excluded from the rule (stay lowercase):**
+   The scenarios' demo narrative still plays; they just route through health axes rather than a dedicated risk tag.
 
-- Account, opportunity, contact, EBC, sales-play row identifiers (`acc-salesforce`, `opp-sf-001`, `c-0042`, `ebc-0007`, `play-xsiam-splunk`). These are per-row machine identifiers, not enum values.
-- `linkedOppIds` and `primaryOppId` cells (FKs to opportunity rows).
-- Booleans, ISO dates, numeric values.
-- Free-text fields: contact names, EBC topics, opportunity names, sales-play descriptions.
-- Column **header** names in `forecast-history.csv` (`commit`, `bestCase`, `pipeline`, `closed`, `totalForecast`, `plan`, `quarter`, `scopeKey`) — these are field identifiers from the §2 entity schema, not cell values. The cell values for `scopeKey` are themselves sentence-cased (`All`).
+3. **PANW fiscal year for daysToClose buckets (D.8)** - Honored: CQ <= 90 days, Q1FY27 <= 180, Q2FY27 <= 270, Q3FY27 > 270. Some opps placed deliberately at the boundary (Allbirds at 270, Houzz at 320) to verify the bucket edges.
 
-**Product IDs are sentence-cased** (e.g. `PA-series`, `Prisma-access`, `Cortex-XDR`) wherever they appear, including inside the `productAllocations` cells in `opportunities.csv` and `targetProducts` in `sales-plays.csv` and the `productId` column in `install-base.csv`. Product IDs are taxonomy enum values (a closed 15-value list), not arbitrary per-row identifiers — so the rule applies to them.
+4. **Carta with pipelineCQ=0 needs at least 1 opp for panel coverage** - Per E.3, every account needs at least 1 opp in the 4-quarter window. Carta got opp-carta-fwrefresh-stale at daysToClose=300, amount=$40K. Pipeline math holds: CQ pipeline = 0 (because opp is outside CQ window).
+
+5. **closed forecast category opps** - Authored 4 opps with `forecast=closed`: opp-instacart-cc-closed (scenario 16), opp-plaid-prisma-closed-won (scenario 21), opp-plaid-xsoar-closed-lost (scenario 21), opp-stripe-treasury-closed-xdr-hist (historical context), opp-stripe-treasury-fwattach-closed, opp-lyft-rideshare-renewal-closed, opp-cyberdyne-closed-prior. daysToClose is negative to indicate "closed N days ago." If the engineering phase wants a separate `closeDate` field that's a structural addition; for now the negative daysToClose convention captures the past-closure semantics.
+
+6. **competitor on SalesPlayInstance** - Per wiring-gap #1, no canonical field exists. I added a `competitor` column to sales-play-instances.csv anyway (values: crowdstrike, fortinet, sentinelone, cisco, other, plus empty). When the engineering phase decides whether to add this field to the canonical SalesPlayInstance type, this column either lands as a field or moves into the freeform note.
+
+7. **reason on SalesPlayInstance** - Same situation. Added `reason` column for closed-lost/declined/churn cases. Values: budget, dissatisfied, eol, competitive, other. Same fate decision.
+
+8. **Renewal close dates** - For renewal opps, `renewal_subEnd` is set to roughly daysToClose days out from 2026-05-14, aligned with the contract expiration. For non-renewal opps the renewal_* columns are empty.
+
+9. **isPrimaryQuote** - Populated `true` for the principal opp on each account (typically the renewal or the headline net-new); `false` for secondary quotes and any historical/dupe records. Approximately 110 opps marked primary; the rest empty or false.
+
+10. **salesPlayIds on opps** - Populated heuristically: each opp lists 1-2 plays whose family matches the productIds. Scenarios 1 and 20 both have explicit play linkages per the scenario narrative.
+
+---
+
+## Open Items for Phase B Translator
+
+- **AccountRiskId rendering for low-adoption / critical-technical**: scenarios 29 and 30 expect these concepts on the panel. With the 7-value canonical enum, they only surface via the health axis. Confirm acceptable.
+
+- **RenewalOutcome values**: opportunities carry `unknown` for non-renewal types per F.6 spec; for renewals the outcome is one of the 7 B.9 values. The translator should preserve this mapping verbatim.
+
+- **PlayContact vs canonical Contact (F.19)**: this dataset uses canonical contacts only. The modal-local `PlayContact` fixture is not exported here - resolve at engineering time per wiring-gap #5.
+
+- **avatarUrl**: empty on all contacts per F.15.
+
+- **methodology**: not populated in sales-play-instances.csv - the `methodology` field on `SalesPlayEdits` remains a wiring-gap per wiring-gap #6.
+
+- **competitor / reason fields**: see ambiguity-resolutions 6 and 7 above; these are non-canonical extensions to SalesPlayInstance authored ahead of a type decision.
+
+- **PlayOpportunity stage values**: state-of-things shows the gap is resolved and all 5 records carry `discovery`. This dataset does not export a PlayOpportunity fixture - the modal would draw its opportunity list from the canonical opportunities.csv when wired.

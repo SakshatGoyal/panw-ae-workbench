@@ -3694,11 +3694,12 @@ const LAYOUT_CSS = `
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-/* SKU price cell — tabular numerals, never shrinks. */
+/* SKU price cell — tabular numerals, never shrinks. Medium weight (500)
+ * so the heading row's semibold value reads as the dominant figure. */
 .opp-pop__sku-price {
   font-size: 13px;
   line-height: 20px;
-  font-weight: var(--ds-type-font-weight-semibold);
+  font-weight: 500;
   color: var(--ds-text-primary);
   font-feature-settings: 'tnum' 1, 'lnum' 1;
   font-variant-numeric: tabular-nums;
@@ -4196,6 +4197,11 @@ const LAYOUT_CSS = `
 /* Override gap between the table and the CTA — a single gap-8 already
  * separates them via the parent .opp-pop; no extra margin needed. */
 .opp-pop__rows--quote { margin-bottom: 0; }
+/* Quote rows carry text only (no chips) — use the 32px text-only height
+ * instead of the 40px tag-bearing height inherited from .opp-pop__rows > *. */
+.opp-pop__rows--quote > * { height: 32px; }
+/* Right-side value column is bold to create label / value contrast. */
+.opp-pop--quote .opp-pop__row-value { font-weight: 600; }
 .opp-pop--quote .opp-pop__cta .panw--btn { width: 100%; justify-content: center; }
 
 /* ── Renewal popover (spec §4.2) ──────────────────────────────────────────

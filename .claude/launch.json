@@ -43,6 +43,14 @@
       "runtimeArgs": ["vite", "--port", "5274"],
       "port": 5274,
       "cwd": "complete-design"
+    },
+    {
+      "name": "design-explorer",
+      "runtimeExecutable": "npx",
+      "runtimeArgs": ["vite", "--port", "38280"],
+      "port": 38280,
+      "autoPort": false,
+      "cwd": "complete-design"
     }
   ]
 }

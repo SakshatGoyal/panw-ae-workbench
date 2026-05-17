@@ -1021,24 +1021,38 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
     ),
   })
 
+  // One tag per product, matching the opp-table ProductCluster pattern.
+  // Each tag gets its own PanelHover with name + per-product value so the
+  // AE can identify individual products on hover rather than a single merged chip.
+  const productAllocations = allocateProductValues(opp.productIds, opp.amount)
   rows.push({
     key: 'products',
     label: 'Products',
     value: (
-      <PanelHover
-        openDelayMs={300}
-        panel={
-          <PopoverList
-            title="Products"
-            rows={allocateProductValues(opp.productIds, opp.amount).map(p => ({
-              label: PRODUCTS[p.id]?.name ?? p.id,
-              value: fmtMoneyFull(p.usd),
-            }))}
-          />
-        }
-      >
-        <ProductsTag productIds={opp.productIds} />
-      </PanelHover>
+      <div className="acc-product-cluster">
+        {productAllocations.map(({ id, usd }) => {
+          const Icon = PRODUCT_BRAND_ICON[id]
+          const name = PRODUCTS[id]?.name ?? id
+          return (
+            <PanelHover
+              key={id}
+              openDelayMs={300}
+              align="end"
+              panel={
+                <PopoverList
+                  title={name}
+                  rows={[{ label: 'Value', value: fmtMoneyFull(usd) }]}
+                />
+              }
+            >
+              {Icon
+                ? <Tags {...ACC_OPP_TAG_BASE} icon renderIcon={Icon} label={name} />
+                : <Tags {...ACC_OPP_TAG_BASE} label={name} />
+              }
+            </PanelHover>
+          )
+        })}
+      </div>
     ),
   })
 
@@ -2741,6 +2755,23 @@ const PANEL_CSS = `
   .acc-opp-products-tag__icon svg {
     width: 16px;
     height: 16px;
+  }
+
+  /* ── Product cluster — stacked individual product tags ───────────────────
+     Replaces the single consolidated ProductsTag chip with one DS Tags
+     chip per product, stacked column-direction and right-aligned to match
+     the value column's right rail. Gap mirrors the opp-table cluster's
+     var(--ds-spacing-02) (4px). The acc-opp-row__value container is
+     inline-flex so the cluster is treated as a single inline-block; the
+     column flex inside it creates the vertical stack.
+     The acc-hover-trigger spans around each tag are already
+     display:inline-flex (see .acc-hover-trigger rule), so each row of the
+     cluster renders as: [trigger-span → DS tag chip]. */
+  .acc-product-cluster {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: var(--ds-spacing-02); /* 4px */
   }
 
   /* ── Renewal Outcome trigger surface ─────────────────────────────────────

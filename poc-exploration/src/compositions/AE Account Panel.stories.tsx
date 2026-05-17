@@ -53,6 +53,7 @@ import {
   type HealthStatus,
   type QuoteTerms,
 } from '../mock'
+import { PRODUCT_SKUS } from '../mock/data/skus'
 
 const meta: Meta = {
   title: 'compositions/AE Account Panel',
@@ -668,11 +669,45 @@ const COMPETITORS: Array<{ label: string; value: string }> = [
 // Single static tag row inside an expanded opportunity. Right-side renders
 // either the DS <Tags /> or a passed-in custom node (Products, Renewal
 // Outcome — both need bespoke chip markup).
-function OppTagRow({
-  label, children,
-}: { label: string; children: React.ReactNode }) {
+// Product hover popover (issue #11 mirror). Mirrors the opp-table ProductPanel
+// pattern: brand icon · name · per-opp value in a heading row, followed by a
+// SKU table (from PRODUCT_SKUS) using the existing acc-popover__rows grammar.
+// Uses `acc-popover acc-popover--product` so the surface, radius, and shadow
+// match every other acc-popover; the inner structure matches opp-pop-row closely.
+function AccProductPopover({ id, usd }: { id: ProductId; usd: number }) {
+  const name = PRODUCTS[id]?.name ?? id
+  const Icon = PRODUCT_BRAND_ICON[id]
+  const skus = PRODUCT_SKUS[name] ?? []
   return (
-    <div className="acc-opp-row">
+    <div className="acc-popover acc-popover--product">
+      <div className="acc-popover__product-header">
+        {Icon && (
+          <span className="acc-popover__product-icon" aria-hidden="true">
+            <Icon size={20} />
+          </span>
+        )}
+        <span className="acc-popover__product-name">{name}</span>
+        <span className="acc-popover__product-value">{fmtMoneyShort(usd)}</span>
+      </div>
+      {skus.length > 0 && (
+        <div className="acc-popover__rows" aria-label="SKU line items">
+          {skus.map(line => (
+            <div key={line.sku} className="acc-popover__row">
+              <span className="acc-popover__row-label">{line.sku}</span>
+              <span className="acc-popover__row-value">{fmtMoneyShort(line.unitPriceUsd)}</span>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
+
+function OppTagRow({
+  label, children, labelAlign = 'center',
+}: { label: string; children: React.ReactNode; labelAlign?: 'center' | 'top' }) {
+  return (
+    <div className={`acc-opp-row${labelAlign === 'top' ? ' acc-opp-row--top' : ''}`}>
       <span className="acc-opp-row__label">{label}</span>
       <span className="acc-opp-row__value">{children}</span>
     </div>
@@ -987,7 +1022,7 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
 
   // Snapshot rows authored as an array so dividers can render between
   // them without scattering Fragment + divider markup through the JSX.
-  const rows: Array<{ key: string; label: string; value: React.ReactNode }> = []
+  const rows: Array<{ key: string; label: string; value: React.ReactNode; labelAlign?: 'center' | 'top' }> = []
 
   if (opp.quoteId) {
     rows.push({
@@ -1053,12 +1088,16 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
   })
 
   // One tag per product, matching the opp-table ProductCluster pattern.
-  // Each tag gets its own PanelHover with name + per-product value so the
-  // AE can identify individual products on hover rather than a single merged chip.
+  // Each tag gets its own PanelHover with brand icon · name · deal value +
+  // SKU table (via AccProductPopover, mirroring the opp-table ProductPanel).
+  // labelAlign: 'top' because the cluster wraps vertically when an opp has
+  // 3+ products; the 'Products' label should pin to the top of the row, not
+  // float to the vertical center (which shifts it down on tall rows).
   const productAllocations = allocateProductValues(opp.productIds, opp.amount)
   rows.push({
     key: 'products',
     label: 'Products',
+    labelAlign: 'top',
     value: (
       <div className="acc-product-cluster">
         {productAllocations.map(({ id, usd }) => {
@@ -1069,12 +1108,7 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
               key={id}
               openDelayMs={300}
               align="end"
-              panel={
-                <PopoverList
-                  title={name}
-                  rows={[{ label: 'Value', value: fmtMoneyFull(usd) }]}
-                />
-              }
+              panel={<AccProductPopover id={id} usd={usd} />}
             >
               {Icon
                 ? <Tags {...ACC_OPP_TAG_BASE} icon renderIcon={Icon} label={name} />
@@ -1114,7 +1148,7 @@ function OpportunitySnapshot({ opp }: { opp: AccOpp }) {
       {rows.map((r, i) => (
         <React.Fragment key={r.key}>
           {i > 0 && <div className="acc-divider" aria-hidden="true" />}
-          <OppTagRow label={r.label}>{r.value}</OppTagRow>
+          <OppTagRow label={r.label} labelAlign={r.labelAlign}>{r.value}</OppTagRow>
         </React.Fragment>
       ))}
 
@@ -2763,6 +2797,19 @@ const PANEL_CSS = `
   .acc-opp-row--plain {
     min-height: 40px;
   }
+  /* Top-align variant — used when the value column can contain multiple
+     stacked tags (e.g. the Products row). Standard rows use align-items:
+     center which vertically centers a single tag in the 40px row budget.
+     When tags stack, centering pushes the label to the row's midpoint.
+     6px padding = (40px min-height − 28px tag height) / 2 — preserves
+     the same visual whitespace as centering does on single-tag rows. */
+  .acc-opp-row--top {
+    align-items: flex-start;
+    padding: 6px 0;
+  }
+  .acc-opp-row--top .acc-opp-row__value {
+    align-items: flex-start;
+  }
 
   /* ── Products tag — custom inline chip with stacked brand icons ─────────
      Uses the DS Tags class chain so the chip ground / radius / padding
@@ -3141,6 +3188,52 @@ const PANEL_CSS = `
     font-size: 0.875rem;
     line-height: 1.42857;
     color: var(--ds-text-tertiary-rest);
+  }
+  /* ── Product popover (issue #11 mirror) ──────────────────────────────────
+     Mirrors the opp-table ProductPanel: 280px width, heading row with brand
+     icon + name + deal value, followed by a SKU table using the existing
+     acc-popover__rows tabular grammar. AccProductPopover renders this.
+     The heading row has no internal padding — 12px outer padding in the
+     container + 8px gap to the SKU list mirrors the opp-pop-row contract
+     (opp-pop base padding + kv-list separation = same visual rhythm). */
+  .acc-popover--product {
+    width: 280px;
+    padding: var(--ds-spacing-04); /* 12px — matches .acc-popover--list */
+    display: flex;
+    flex-direction: column;
+    gap: var(--ds-spacing-03); /* 8px between header row and SKU list */
+  }
+  .acc-popover__product-header {
+    display: flex;
+    align-items: center;
+    gap: var(--ds-spacing-03); /* 8px between icon, name, value */
+  }
+  .acc-popover__product-icon {
+    display: inline-flex;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: center;
+  }
+  .acc-popover__product-name {
+    flex: 1 1 0;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    font-size: 0.875rem;
+    line-height: 1.42857;
+    color: var(--ds-text-secondary-rest);
+  }
+  .acc-popover__product-value {
+    font-size: 0.875rem;
+    line-height: 1.42857;
+    font-weight: var(--ds-type-font-weight-semibold);
+    color: var(--ds-text-primary);
+    font-feature-settings: 'tnum' 1, 'lnum' 1;
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
   }
   .acc-popover__title {
     font-size: 0.875rem;

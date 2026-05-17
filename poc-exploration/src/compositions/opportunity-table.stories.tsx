@@ -168,6 +168,7 @@ import {
   FlyoutSelectAll,
   FlyoutFooter,
 } from '@ds/flyout'
+import { PRODUCT_SKUS } from '../mock/data/skus'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -1997,19 +1998,19 @@ function SalesPlayPanel({ salesPlay, onUpdate }: { salesPlay: SalesPlay; onUpdat
   )
 }
 
-// Single-product popover. Mirrors the acc-table's ProductARRPanel — one
-// row, three cells (icon · name · absolute value). The absolute dollar
-// figure replaces the earlier "share of deal value (n%)" treatment per
-// design call: percentage of a deal is one inferential hop the AE has to
-// make in their head; the raw dollar is what they actually need.
+// Single-product popover (issue #11). Heading row (icon · name · deal value)
+// is unchanged. A SKU table follows below when PRODUCT_SKUS has entries for
+// this product name — showing list-price line items so the AE can see which
+// SKUs are in play without opening the full quote. Uses .opp-pop__kv-list for
+// the tabular divider pattern (space-between, 32px rows, hairlines) consistent
+// with the Renewal and Quote popovers. Width bumped to 280px so longer SKU
+// strings (e.g. PAN-XSOAR-CLD-ENT) don't clip at the 208px content rail.
 function ProductPanel({ product }: { product: Product; totalUsd?: number }) {
   const Icon = BRAND_ICON[product.brand]
-  // Single-row popover (no list chrome) wrapped in .opp-pop so the
-  // popover keeps its 16px content padding — without the wrapper the
-  // frame collapses onto the row outline and the popover reads as a
-  // sliver. Tier (240) is inherited from .opp-pop's default width.
+  const skus = PRODUCT_SKUS[product.name] ?? []
   return (
     <div className="opp-pop opp-pop--product">
+      {/* Heading row — unchanged from pre-#11 design */}
       <div className="opp-pop-row">
         <span className="opp-pop-row__icon" aria-hidden="true">
           {Icon ? <Icon size={20} /> : null}
@@ -2017,6 +2018,17 @@ function ProductPanel({ product }: { product: Product; totalUsd?: number }) {
         <span className="opp-pop-row__name">{product.name}</span>
         <span className="opp-pop-row__value">{formatUsdCompact(product.valueUsd)}</span>
       </div>
+      {/* SKU table — list unit prices per line item */}
+      {skus.length > 0 && (
+        <ul className="opp-pop__kv-list opp-pop__sku-list" aria-label="SKU line items">
+          {skus.map(line => (
+            <li key={line.sku}>
+              <span className="opp-pop__sku-code">{line.sku}</span>
+              <span className="opp-pop__sku-price">{formatUsdCompact(line.unitPriceUsd)}</span>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   )
 }
@@ -3592,6 +3604,33 @@ const LAYOUT_CSS = `
 .opp-pop--salesplay { gap: 0; }
 .opp-pop--salesplay .opp-pop__kv-list::before,
 .opp-pop--salesplay .opp-pop__kv-list::after { display: none; }
+/* Product popover (issue #11) — 280px tier. Default 240px is too narrow
+ * for longer SKU strings (e.g. PAN-XSOAR-CLD-ENT + price); 280px gives
+ * the SKU table a 248px content rail (280 − 2×16) which comfortably fits
+ * the longest SKU (~20 chars) and a compact price without truncation. */
+.opp-pop--product { width: 280px; }
+/* SKU code cell — monospaced so SKU columns track visually. */
+.opp-pop__sku-code {
+  font-family: 'Söhne Mono', 'Roboto Mono', 'Menlo', monospace;
+  font-size: 12px;
+  line-height: 20px;
+  color: var(--ds-text-secondary-rest);
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+/* SKU price cell — tabular numerals, never shrinks. */
+.opp-pop__sku-price {
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  font-feature-settings: 'tnum' 1, 'lnum' 1;
+  font-variant-numeric: tabular-nums;
+  flex-shrink: 0;
+}
 /* Single-button popover — no tier width. The popover is a halo
  * around exactly one button, so it sizes to fit that button rather
  * than committing to one of the 160 / 240 / 320 tiers. The

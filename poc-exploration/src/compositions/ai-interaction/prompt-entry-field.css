@@ -8,7 +8,7 @@
 /* ─── Container ─────────────────────────────────────────────────────────── */
 
 .pef {
-  background: var(--ds-surface-rest);
+  background: var(--ds-field-rest);
   border: 1px solid var(--ds-lines-neutral-tile-rest);
   border-radius: var(--ds-radius-generous);
 
@@ -21,6 +21,17 @@
 
   box-shadow: var(--ds-shadow-modals);
   width: 100%;
+
+  transition: background 70ms var(--ds-motion-easing-hover);
+}
+
+.pef:hover {
+  background: var(--ds-field-hover);
+}
+
+.pef:focus-within,
+.pef:active {
+  background: var(--ds-field-pressed);
 }
 
 /* Elevated modifier kept for semantic clarity; shadow is now uniform */

@@ -1,0 +1,208 @@
+/* ────────────────────────────────────────────────────────────────────────────
+   Chat Panel — ai-interactions/Chat Panel
+   Persistent right-side panel surface. Two variants: Empty (zero state) and Active.
+
+   Panel anatomy (top → bottom):
+     [ChatWindowHeader]  48 px   fixed
+     [Body]             flex:1   scrollable — variant-specific content
+     [Footer]           auto     prompt entry field, pinned to bottom
+
+   Token contract:
+     panel bg       var(--ds-surface-rest)
+     panel border   var(--ds-lines-neutral-tile-rest)
+     panel shadow   var(--ds-shadow-tiles)
+     panel radius   0  (sharp edges — embedded side panel)
+
+   Spacing:
+     All non-header content: 24px from each panel edge.
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Story canvas ──────────────────────────────────────────────────────── */
+
+/*
+ * Simulates the panel docked to the right side of a page.
+ * The ds-base fill represents the main content area to the left.
+ * padding-right gives the panel 20px of breathing room from the viewport
+ * edge so the panel shadow isn't clipped at the screen boundary.
+ */
+.cp-canvas {
+  height: 100vh;
+  background: var(--ds-base);
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  box-sizing: border-box;
+}
+
+/* ─── Resizable panel wrapper ────────────────────────────────────────────── */
+
+/*
+ * Wrapper owns the width so the panel itself never needs inline style.
+ * display: block (not flex) — block children respect width: 100% against
+ * the wrapper's inline-style pixel width without flex-sizing quirks.
+ * The drag handle is absolute-positioned and therefore out of flow.
+ */
+.cp-panel-resize-wrapper {
+  position: relative;
+  display: block;
+  height: 100vh;
+}
+
+/* Left-edge drag handle — 6px wide invisible touch-target */
+.cp-resize-handle {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 6px;
+  cursor: ew-resize;
+  z-index: 10;
+  /* Subtle hover indicator: a 2px inset highlight on the inner edge */
+  transition: background 80ms;
+}
+
+.cp-resize-handle:hover,
+.cp-resize-handle--dragging {
+  background: linear-gradient(
+    to right,
+    transparent 2px,
+    var(--ds-lines-brand-rest) 2px,
+    var(--ds-lines-brand-rest) 4px,
+    transparent 4px
+  );
+}
+
+/* ─── Panel shell ────────────────────────────────────────────────────────── */
+
+.cp-panel {
+  width: 100%; /* fills the wrapper — wrapper owns the pixel width */
+  min-width: 280px;
+  max-width: 640px;
+  height: 100vh;
+  background: var(--ds-surface-rest);
+  border-left: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: 0; /* sharp edges — side panel, not floating card */
+  box-shadow: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* ─── Scrollable body ─────────────────────────────────────────────────────── */
+
+.cp-body {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 0, 0, 0.12) transparent;
+}
+
+/* ─── Footer — pinned prompt input ───────────────────────────────────────── */
+
+/*
+ * Vertical padding only — no horizontal padding.
+ * The PEF's 24px left/right inset is controlled by margin on the PEF itself
+ * (see below). Padding would not constrain a width:100% child; margin does.
+ *
+ * The PEF's standalone box-shadow is suppressed: inside the panel the panel's
+ * own shadow frames the surface; the PEF shadow is for floating/standalone use.
+ */
+.cp-footer {
+  flex-shrink: 0;
+  padding: 12px 0 24px;
+  background: var(--ds-surface-rest);
+}
+
+.cp-footer .pef {
+  box-shadow: none;
+  width: auto;          /* overrides width:100% from prompt-entry-field.css   */
+  margin-left: 24px;   /* 24px inset from panel left                         */
+  margin-right: 24px;  /* 24px inset from panel right                        */
+}
+
+/* ─── Empty state ─────────────────────────────────────────────────────────── */
+
+.cp-empty {
+  padding: 24px 24px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Section label — body-compact-01 scale, bold, primary color */
+.cp-section-label {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 0.875rem;     /* body-compact-01 */
+  line-height: 1.28572;
+  font-weight: var(--ds-type-font-weight-semibold); /* bold */
+  color: var(--ds-text-primary);
+  margin-bottom: 12px;
+}
+
+/*
+ * Contextual left padding — aligns label text with the content text inside
+ * the interactive element in each section.
+ *
+ * Recent     → session rows have padding-left: 8px  → label indented 8px
+ * Suggestions → buttons have padding-left: 12px (small btn) → label indented 12px
+ */
+.cp-section-label:has(+ .ps-list) {
+  padding-left: 8px;
+}
+.cp-section-label:has(+ .sg-list) {
+  padding-left: 8px;
+}
+
+/*
+ * Invisible spacer between sections — replaces the hairline divider.
+ * Maintains the same vertical rhythm without introducing a decorative line.
+ */
+.cp-section-spacer {
+  height: 24px;
+  flex-shrink: 0;
+}
+
+/*
+ * Suggestion list — no extra offset; buttons flush with the section label.
+ * Session rows use 8px internal left padding; the two sections don't need
+ * to optically align their inner content — they're different element types.
+ */
+
+/* ─── Active state — conversation area ────────────────────────────────────── */
+
+.cp-conversation {
+  padding: 24px 12px; /* 24px top/bottom, 12px left/right for the thread */
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* ─── AI response block ───────────────────────────────────────────────────── */
+
+.cp-ai-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+/*
+ * AI response text — 16 px left indent aligns the first character with
+ * the text inside the user message bubble (.um: padding 12px 16px).
+ */
+.cp-ai-response {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ds-text-primary);
+  margin: 0;
+  padding-left: 16px;
+}
+
+/* air--inline / air--distinguished wrapper — reset top margin in panel context */
+.cp-ai-block .air {
+  margin-top: 0;
+}
+
+.cp-ai-actions {
+  margin-top: 8px;
+}

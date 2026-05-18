@@ -25,7 +25,22 @@
  */
 import type { Meta, StoryObj } from '@storybook/react'
 import React from 'react'
-import { ChevronRight, ProjectDiagram } from '@ds/icons'
+import {
+  ChevronRight,
+  ExternalLink,
+  ProjectDiagram,
+  // Finalized operation icons (used in E — Inline keyword classification)
+  FileSearch,
+  DataDonut,
+  Table,
+  Scanning,
+  Sitemap,
+  ClipboardCheck,
+  DoNotEnter,
+  Sliders,
+  Lightbulb,
+  ChevronDown,
+} from '@ds/icons'
 import logoSalesforce from './logos/logo-salesforce.jpeg'
 import logoClari     from './logos/logo-clari.png'
 import logoTableau   from './logos/logo-tableau.jpg'
@@ -61,7 +76,7 @@ interface Scenario {
   derivation: DerivationData
 }
 
-type Direction = 'ledger' | 'trace' | 'ghost' | 'panel' | 'inline' | 'iterative'
+type Direction = 'ledger' | 'trace' | 'ghost' | 'panel' | 'inline' | 'iterative' | 'distinguished'
 
 // ─── Logo images (for workbench directions D + E) ────────────────────────────
 
@@ -102,6 +117,50 @@ const SOURCES: Record<
     badgeClass: 'air__source-badge--peopleai',
     dotClass:   'air__source-dot--peopleai',
   },
+}
+
+// ─── Step classification (E — Inline icon nodes) ─────────────────────────────
+
+/**
+ * Deterministic keyword classifier.
+ *
+ * Maps a step sentence → one of 9 reasoning operations → finalized icon.
+ * Rules are ordered by specificity; the first match wins.
+ * Sourcing is last — it's the broadest category and acts as a fallback.
+ */
+type ReasoningOp =
+  | 'sourcing' | 'quantifying' | 'comparing' | 'pattern'
+  | 'linking' | 'validating' | 'falsifying' | 'methodology' | 'interpretive'
+
+const STEP_RULES: Array<{ op: ReasoningOp; re: RegExp }> = [
+  { op: 'falsifying',   re: /found no|no evidence|ruled out|discounted|\bzero \b/i },
+  { op: 'interpretive', re: /\binferred\b|\bassessed\b|\bconcluded\b|\bestimated\b|conditions met/i },
+  { op: 'validating',   re: /\bverified\b|\bconfirmed\b|\bcorroborated\b|marked met|success criteria/i },
+  { op: 'comparing',    re: /cross-referenced|cross referenced|\bcompared\b|\bbenchmarked\b|\breconciled\b/i },
+  { op: 'pattern',      re: /\bdetected\b|\btraced\b|\bflagged\b|\bpattern\b|\brecurring\b|anomal/i },
+  { op: 'linking',      re: /\blinked\b|\battributed\b|\bconnected\b|correlat|stalled because/i },
+  { op: 'methodology',  re: /\bprioritized\b|\bweighted\b|\bexcluded\b|in scope|out of scope/i },
+  { op: 'quantifying',  re: /\bcalculated\b|\bmeasured\b|\bquantified\b/i },
+  { op: 'sourcing',     re: /\blocated\b|\bidentified\b|\bsurfaced\b|\bpulled\b|\bfound\b|\bextracted\b/i },
+]
+
+const OP_ICONS: Record<ReasoningOp, React.ElementType> = {
+  sourcing:    FileSearch,
+  quantifying: DataDonut,
+  comparing:   Table,
+  pattern:     Scanning,
+  linking:     Sitemap,
+  validating:  ClipboardCheck,
+  falsifying:  DoNotEnter,
+  methodology: Sliders,
+  interpretive: Lightbulb,
+}
+
+function classifyStep(text: string): ReasoningOp | null {
+  for (const { op, re } of STEP_RULES) {
+    if (re.test(text)) return op
+  }
+  return null
 }
 
 // ─── Scenario data ────────────────────────────────────────────────────────────
@@ -433,7 +492,7 @@ function IterativeSource({
   const meta = SOURCES[source]
   return (
     <div className="air__it-source">
-      {/* Tag: logo + name + path only */}
+      {/* Tag: logo + name + path + hover-only launch icon */}
       <span className="air__it-tag">
         <img
           src={WB_LOGOS[source]}
@@ -443,8 +502,11 @@ function IterativeSource({
         />
         <span className="air__wb-source-name">{meta.name}</span>
         {subPath && <span className="air__it-source-meta">{subPath}</span>}
+        <span className="air__it-tag-launch" aria-hidden="true">
+          <ExternalLink size={11} />
+        </span>
       </span>
-      {/* Last updated sits outside the tag */}
+      {/* Last updated sits below the tag — flush and close */}
       {lastUpdated && (
         <span className="air__it-last-updated">Last updated: {lastUpdated}</span>
       )}
@@ -452,7 +514,65 @@ function IterativeSource({
   )
 }
 
-// ─── Workbench chip (directions D + E + F) ───────────────────────────────────
+// ─── Inline chip (direction E) ────────────────────────────────────────────────
+
+/**
+ * Chip for E — Inline.
+ * Label: "Trace Reasoning" (fixed, not the derivation shape name).
+ * Icon area: deduplicated circular logo avatars, overlapping like user avatars.
+ *   Scenario A (Tableau + SF + people.ai) → 3 circles.
+ *   Scenario B (SF + people.ai) → 2 circles.
+ */
+function InlineChip({
+  chipState,
+  open,
+  onClick,
+  steps,
+}: {
+  chipState: 'generating' | 'ready'
+  open: boolean
+  onClick: () => void
+  steps: DerivationStep[]
+}) {
+  // Unique source keys in first-appearance order, nulls excluded
+  const uniqueSources = steps.reduce<Exclude<SourceKey, null>[]>((acc, s) => {
+    if (s.source && !acc.includes(s.source)) acc.push(s.source)
+    return acc
+  }, [])
+
+  const cls = [
+    'air__chip',
+    chipState === 'generating' ? 'air__chip--generating' : '',
+    open ? 'air__chip--open' : '',
+  ].filter(Boolean).join(' ')
+
+  return (
+    <button className={cls} onClick={onClick} aria-expanded={open} type="button">
+      {chipState === 'generating' ? (
+        <span>Deriving reasoning…</span>
+      ) : (
+        <>
+          <span className="air__logo-stack" aria-hidden="true">
+            {uniqueSources.map(src => (
+              <img
+                key={src}
+                src={WB_LOGOS[src]}
+                className="air__logo-stack__item"
+                alt={SOURCES[src].name}
+              />
+            ))}
+          </span>
+          <span>Trace</span>
+          <span className="air__chip-arrow" aria-hidden="true">
+            <ChevronDown size={12} />
+          </span>
+        </>
+      )}
+    </button>
+  )
+}
+
+// ─── Workbench chip (directions D + F) ───────────────────────────────────────
 
 /**
  * Neutral-bordered chip. No fill, no brand-blue. Matches the "Tech validation" /
@@ -506,15 +626,13 @@ function AIResponseCard({
   scenario: Scenario
   direction: Direction
 }) {
-  const [chipState, setChipState] = React.useState<'generating' | 'ready'>('generating')
+  // Always ready — no generating animation
+  const chipState = 'ready' as const
   const [panelOpen, setPanelOpen] = React.useState(false)
 
-  // Auto-transition chip from generating → ready
+  // Reset panel on scenario/direction change
   React.useEffect(() => {
-    setChipState('generating')
     setPanelOpen(false)
-    const t = setTimeout(() => setChipState('ready'), 2000)
-    return () => clearTimeout(t)
   }, [scenario.id, direction])
 
   const { derivation } = scenario
@@ -526,10 +644,30 @@ function AIResponseCard({
     }
   }
 
+  const isInlineLike = direction === 'inline' || direction === 'distinguished'
   const isWorkbench = direction === 'panel' || direction === 'inline' || direction === 'iterative'
 
+  // Vancouver citation numbers for G — Distinguished.
+  // Each step with a source gets a sequential [n]; inference steps are uncited.
+  let _citIdx = 0
+  const stepCitNums: (number | null)[] = derivation.steps.map(s =>
+    s.source !== null ? ++_citIdx : null
+  )
+  const distSources: Array<{ step: DerivationStep; citNum: number }> = []
+  derivation.steps.forEach((step, i) => {
+    const citNum = stepCitNums[i]
+    if (citNum !== null) distSources.push({ step, citNum })
+  })
+
   const chip =
-    isWorkbench ? (
+    isInlineLike ? (
+      <InlineChip
+        chipState={chipState}
+        open={panelOpen}
+        onClick={handleChipClick}
+        steps={derivation.steps}
+      />
+    ) : isWorkbench ? (
       <WorkbenchChip
         chipState={chipState}
         open={panelOpen}
@@ -561,8 +699,16 @@ function AIResponseCard({
       />
     )
 
+  /*
+   * G — Distinguished inherits all E — Inline styling via the dual class.
+   * air--inline provides the base; air--distinguished layers overrides on top.
+   */
+  const rootClass = direction === 'distinguished'
+    ? 'air air--inline air--distinguished'
+    : `air air--${direction}`
+
   return (
-    <div className={`air air--${direction}`}>
+    <div className={rootClass}>
       {/* Response */}
       <div className="air__response">
         {scenario.response}
@@ -573,21 +719,23 @@ function AIResponseCard({
 
       {/* Derivation panel */}
       <div className="air__panel" aria-hidden={!panelOpen ? 'true' : undefined}>
-        {/* Shape header */}
-        <div className="air__panel-head">
-          {direction === 'trace' && (
-            <span className="air__shape-icon" aria-hidden="true">
-              <ProjectDiagram size={12} />
-            </span>
-          )}
-          <span className="air__shape-label">{derivation.shape}</span>
-          {(direction === 'ledger' || direction === 'panel' || direction === 'iterative') && (
-            <>
-              <span className="air__shape-sep">·</span>
-              <span className="air__shape-count">{stepCount} steps</span>
-            </>
-          )}
-        </div>
+        {/* Shape header — hidden for E — Inline and G — Distinguished (chip carries the label) */}
+        {!isInlineLike && (
+          <div className="air__panel-head">
+            {direction === 'trace' && (
+              <span className="air__shape-icon" aria-hidden="true">
+                <ProjectDiagram size={12} />
+              </span>
+            )}
+            <span className="air__shape-label">{derivation.shape}</span>
+            {(direction === 'ledger' || direction === 'panel' || direction === 'iterative') && (
+              <>
+                <span className="air__shape-sep">·</span>
+                <span className="air__shape-count">{stepCount} steps</span>
+              </>
+            )}
+          </div>
+        )}
 
         {/* Steps */}
         <ol className="air__steps">
@@ -595,7 +743,46 @@ function AIResponseCard({
             const isInference = step.source === null
             const num = String(i + 1).padStart(2, '0')
 
-            // Workbench directions (D — Panel, E — Inline, F — Iterative)
+            // E — Inline: icon-node spine replaces step numbers
+            if (direction === 'inline') {
+              const op     = classifyStep(step.text)
+              const OpIcon = op ? OP_ICONS[op] : null
+              return (
+                <li key={i} className="air__step">
+                  <div className="air__step-node" aria-hidden="true">
+                    {OpIcon && <OpIcon size={16} />}
+                  </div>
+                  <div className="air__step-body">
+                    <span className="air__step-text">{step.text}</span>
+                    <IterativeSource
+                      source={step.source}
+                      subPath={step.subPath}
+                      lastUpdated={step.lastUpdated}
+                    />
+                  </div>
+                </li>
+              )
+            }
+
+            // G — Distinguished: plain numbered list, Vancouver [n] citations inline
+            if (direction === 'distinguished') {
+              const citNum = stepCitNums[i]
+              return (
+                <li key={i} className="air__step">
+                  <span className="air__step-num">{num}</span>
+                  <div className="air__step-body">
+                    <span className="air__step-text">
+                      {step.text}
+                      {citNum !== null && (
+                        <sup className="air__dist-cite">[{citNum}]</sup>
+                      )}
+                    </span>
+                  </div>
+                </li>
+              )
+            }
+
+            // Workbench directions (D — Panel, F — Iterative)
             if (isWorkbench) {
               return (
                 <li key={i} className="air__step">
@@ -657,6 +844,25 @@ function AIResponseCard({
             )
           })}
         </ol>
+
+        {/* G — Distinguished: Vancouver source list */}
+        {direction === 'distinguished' && distSources.length > 0 && (
+          <div className="air__dist-sources">
+            <h3 className="air__dist-sources-heading">Sources</h3>
+            <ol className="air__dist-sources-list">
+              {distSources.map(({ step: s, citNum }) => (
+                <li key={citNum} className="air__dist-source-row">
+                  <span className="air__dist-cite-num">[{String(citNum).padStart(2, '0')}]</span>
+                  <IterativeSource
+                    source={s.source}
+                    subPath={s.subPath}
+                    lastUpdated={s.lastUpdated}
+                  />
+                </li>
+              ))}
+            </ol>
+          </div>
+        )}
       </div>
     </div>
   )
@@ -682,7 +888,7 @@ function DirectionCanvas({ direction }: { direction: Direction }) {
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta: Meta = {
-  title:     'ai-interactions/Trace Reasoning',
+  title:     'ai-interactions/Trace',
   parameters: {
     layout: 'fullscreen',
     docs:   { story: { height: '100vh' } },
@@ -770,9 +976,25 @@ export const Iterative: StoryObj = {
 /**
  * Direction E — Inline
  *
- * Now mirrors F — Iterative exactly.
+ * Icon-node stream. Step numbers replaced by 20 px circular nodes on a
+ * vertical spine. Each node's icon is determined at render time by a
+ * keyword classifier scanning the step sentence — no manual tagging.
+ * The nine finalized icons (from Icon Exploration) cover the full
+ * reasoning verb taxonomy.
  */
 export const Inline: StoryObj = {
   name:   'E — Inline',
-  render: () => <DirectionCanvas direction="iterative" />,
+  render: () => <DirectionCanvas direction="inline" />,
+}
+
+/**
+ * Direction G — Distinguished
+ *
+ * Duplicate of E — Inline used as a divergence starting point.
+ * Inherits all E styling via the dual air--inline / air--distinguished class.
+ * Override rules go into the .air--distinguished block in ai-response.css.
+ */
+export const Distinguished: StoryObj = {
+  name:   'G — Distinguished',
+  render: () => <DirectionCanvas direction="distinguished" />,
 }

@@ -1025,11 +1025,11 @@
 
 .air__it-source {
   display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 8px;
+  flex-direction: column;   /* Last updated stacks directly below its tag */
+  align-items: flex-start;
+  gap: 2px;                 /* tight coupling — clearly belongs to the tag above */
   margin-top: 5px;
-  flex-wrap: wrap;
+  min-width: 0;             /* allow flex shrinkage for truncation */
 }
 
 /*
@@ -1045,13 +1045,15 @@
   align-items: center;
   gap: 6px;
   padding: 5px 7px;
-  background: var(--ds-surface-alt-rest);
+  background: var(--ds-surface-rest);
   box-shadow: inset 0 0 0 1px var(--ds-base);
   border-radius: var(--ds-radius-tight);
   box-sizing: border-box;
   white-space: nowrap;
   cursor: pointer;
   user-select: none;
+  max-width: 100%;        /* don't overflow the parent */
+  overflow: hidden;       /* clip when sub-path would cause overflow */
   transition:
     background-color 70ms var(--ds-motion-easing-hover),
     box-shadow       70ms var(--ds-motion-easing-hover);
@@ -1067,6 +1069,18 @@
   box-shadow: none;
 }
 
+/* Launch icon — hidden at rest, appears on hover */
+.air__it-tag-launch {
+  display: none;
+  align-items: center;
+  color: var(--ds-icons-tertiary-rest);
+  flex-shrink: 0;
+}
+
+.air__it-tag:hover .air__it-tag-launch {
+  display: flex;
+}
+
 /* Name: label-01 regular — 0.75rem / 1.33333 */
 .air__it-tag .air__wb-source-name {
   font-size: 0.75rem;
@@ -1076,7 +1090,7 @@
   white-space: nowrap;
 }
 
-/* Path inside tag: label-01 regular tertiary */
+/* Path inside tag: label-01 regular tertiary — truncates when tag hits max-width */
 .air__it-tag .air__it-source-meta {
   font-family: var(--ds-type-font-family-sans);
   font-size: 0.75rem;
@@ -1084,6 +1098,9 @@
   font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-tertiary-rest);
   white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
 }
 
 /* Last updated: same label-01 tertiary style, outside the tag */
@@ -1094,6 +1111,203 @@
   font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-tertiary-rest);
   white-space: nowrap;
+}
+
+/* ────────────────────────────────────────────────────────────────────────────
+   E — Inline  (icon-node spine)
+   ──────────────────────────────────────────────────────────────────────────── */
+
+/* ─── Pill chip ──────────────────────────────────────────────────────────── */
+
+.air--inline .air__chip {
+  border-radius: var(--ds-radius-pill);
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+/* Chevron rotates 180° when panel is open */
+.air--inline .air__chip-arrow {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 2px;
+  color: var(--ds-text-tertiary-rest);
+  transition: transform 150ms ease;
+}
+
+.air--inline .air__chip--open .air__chip-arrow {
+  transform: rotate(180deg);
+}
+
+/* Panel wrapper — identical envelope to F. No panel-head for this direction. */
+.air--inline .air__panel {
+  margin-top: 8px; /* 8px between chip and panel */
+  padding: 12px;
+  border-radius: var(--ds-radius-generous);
+  background-color: var(--ds-surface-alt-rest);
+  overflow: visible;
+}
+
+/* Entrance animation — fires each time aria-hidden is removed (panel opens).
+   240ms moderate-02, productive entrance easing per Stage motion guidelines. */
+.air--inline .air__panel:not([aria-hidden='true']) {
+  animation: inline-panel-enter 240ms cubic-bezier(0, 0, 0.38, 0.9) both;
+}
+
+@keyframes inline-panel-enter {
+  from {
+    opacity: 0;
+    transform: translateY(-4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Honour reduced-motion — render in final position with no fade */
+@media (prefers-reduced-motion: reduce) {
+  .air--inline .air__panel:not([aria-hidden='true']) {
+    animation: none;
+  }
+}
+
+/* ─── Chip logo stack ────────────────────────────────────────────────────── */
+
+/*
+ * Circular logo avatars that overlap from left to right — identical pattern
+ * to user-avatar stacks. Each logo after the first overlaps the previous by 6px.
+ * A white ring (2px) provides visual separation between circles.
+ * The chip gap separates the stack from the "Trace Reasoning" label.
+ */
+.air__logo-stack {
+  display: inline-flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.air__logo-stack__item {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 1.5px solid var(--ds-surface-rest); /* white separation ring */
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.air__logo-stack__item + .air__logo-stack__item {
+  margin-left: -5px; /* overlap: 5px out of 16px visible */
+}
+
+/* Step list */
+.air--inline .air__steps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+/*
+ * Step row — grid: [16px icon | 1fr body]
+ * position:relative is required for the per-step spine pseudo-elements.
+ */
+.air--inline .air__step {
+  display: grid;
+  grid-template-columns: 16px 1fr;
+  gap: 12px;
+  align-items: start;
+  padding: 0;
+  border-top: none;
+  position: relative;
+}
+
+/*
+ * Spine — drawn as two per-step segments so it starts exactly at icon-1's
+ * center and ends exactly at icon-N's center with no overshoot.
+ *
+ * Icon center from row top: margin-top(10) + icon-height/2(8) = 18px.
+ * Spine left: center of 16px column = 8px.
+ *
+ * ::before — from this step's icon center DOWN to the row bottom.
+ *            Suppressed on the last step so the line doesn't continue past it.
+ * ::after  — from the row top UP to this step's icon center.
+ *            Suppressed on the first step so the line doesn't start above it.
+ */
+.air--inline .air__step::before,
+.air--inline .air__step::after {
+  content: '';
+  position: absolute;
+  left: 8px;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.14);
+  z-index: 0;
+}
+
+/*
+ * Spine segments with breathing room around each icon.
+ *
+ * Icon center = margin-top(10) + icon-height/2(8) = 18px from row top.
+ * Gap = 8px on each side of the icon.
+ *
+ * Segment A: starts 8px BELOW the icon center → bottom of row.
+ * Segment B: starts at row top → ends 8px ABOVE the icon center.
+ *
+ * Together these form a spine that floats cleanly beside each icon
+ * without running through it.
+ */
+
+/* Segment A: icon center + 12px gap → row bottom */
+.air--inline .air__step::before {
+  top: 30px;   /* 18 + 12 */
+  bottom: 0;
+}
+
+/* No segment below the last icon */
+.air--inline .air__step:last-child::before {
+  display: none;
+}
+
+/* Segment B: row top → icon center − 12px gap */
+.air--inline .air__step::after {
+  top: 0;
+  height: 6px; /* 18 − 12 */
+}
+
+/* No segment above the first icon */
+.air--inline .air__step:first-child::after {
+  display: none;
+}
+
+/* Body: padding sets row height and positions text */
+.air--inline .air__step-body {
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+/*
+ * Icon — bare 16×16, no bounding circle.
+ * margin-top: 10px = body padding-top(8) + (line-height 20 − icon 16) / 2(2)
+ * This lands the icon center at 18px from the row top, matching the
+ * first-line cap-height center. Works for wrapped text too — the icon
+ * stays pinned to the first line while the body grows downward.
+ */
+.air--inline .air__step-node {
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--ds-text-secondary-rest);
+  flex-shrink: 0;
+  margin-top: 10px;
+  position: relative;
+  z-index: 1; /* sits above the spine line */
+}
+
+/* Step body text */
+.air--inline .air__step-text {
+  font-size: 0.875rem;
+  line-height: 1.42857;
+  color: var(--ds-text-primary);
+  display: block;
 }
 
 /* ── Step border — aligned to text column, not spanning index ────────────── */
@@ -1125,4 +1339,134 @@
 
 .air--iterative .air__step:first-child .air__step-body {
   border-top: none;
+}
+
+/* ─────────────────────────────────────────────────────────────────────────────
+   DIRECTION G  "Distinguished"
+   Plain numbered step list + Vancouver citations + Sources section below.
+   Root carries both air--inline and air--distinguished; rules here override
+   the inherited E — Inline styles via same-or-higher specificity + later order.
+   ───────────────────────────────────────────────────────────────────────── */
+
+/* ── Kill the spine pseudo-elements inherited from air--inline ───────────── */
+
+.air--distinguished .air__step::before,
+.air--distinguished .air__step::after {
+  display: none;
+}
+
+/* ── Step row — numbered two-column with dividers ────────────────────────── */
+
+.air--distinguished .air__step {
+  grid-template-columns: 14px 1fr;
+  gap: 0 12px;
+  align-items: baseline;
+  padding: 10px 0;
+  border-top: 1px solid var(--ds-lines-neutral-tile-rest);
+  position: static; /* reset relative used by E for spine positioning */
+}
+
+.air--distinguished .air__step:first-child {
+  border-top: none;
+  padding-top: 0;
+}
+
+.air--distinguished .air__step:last-child {
+  padding-bottom: 0;
+}
+
+/* Step number — 11px / primary / tabular-nums */
+.air--distinguished .air__step-num {
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-primary);
+  line-height: 1.42857;
+  padding-top: 0;
+}
+
+/* Step body — flush top, no extra padding */
+.air--distinguished .air__step-body {
+  padding-top: 0;
+  padding-bottom: 0;
+}
+
+/* Step text */
+.air--distinguished .air__step-text {
+  line-height: 1.5;
+  color: var(--ds-text-primary);
+}
+
+/* ── Inline citation superscript ─────────────────────────────────────────── */
+
+.air__dist-cite {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 9px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-tertiary-rest);
+  vertical-align: super;
+  line-height: 1;
+  margin-left: 2px;
+  letter-spacing: 0;
+}
+
+/* ── Sources section ─────────────────────────────────────────────────────── */
+
+.air__dist-sources {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--ds-lines-neutral-tile-rest);
+}
+
+/* heading-01: 0.875rem / semibold */
+.air__dist-sources-heading {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 0.875rem;
+  line-height: 1.42857;
+  font-weight: var(--ds-type-font-weight-semibold);
+  color: var(--ds-text-primary);
+  margin: 0 0 10px 0;
+  padding: 0;
+}
+
+.air__dist-sources-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/*
+ * [##]  <source-tag>  <last-updated> — single row per citation.
+ *
+ * Grid mirrors the step row exactly: 14px col + 12px gap.
+ * The cite-num is pinned to 14px regardless of its text width ([01] is
+ * wider than 14px and overflows into the gap, but the tag column always
+ * starts at 26px — flush with the step text column above it.
+ *   step:   grid 14px + 12px gap → text at 26px
+ *   source: grid 14px + 12px gap → tag  at 26px  ← aligned
+ */
+.air__dist-source-row {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 0 12px;
+  align-items: start; /* [##] aligns with the tag's first line, not the row center */
+}
+
+/* Citation label — occupies the 14px column, overflow into gap is intentional.
+   padding-top: 5px optically aligns [##] baseline with the tag's text line (tag has 5px top padding). */
+.air__dist-cite-num {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  color: var(--ds-text-tertiary-rest);
+  overflow: visible;
+  white-space: nowrap;
+  padding-top: 5px; /* matches tag's vertical padding so text baselines align */
+}
+
+/* Source tag inside sources list — suppress the top margin used in step context */
+.air__dist-source-row .air__it-source {
+  margin-top: 0;
 }

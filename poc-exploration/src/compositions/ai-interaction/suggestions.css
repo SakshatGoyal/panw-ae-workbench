@@ -41,13 +41,12 @@
 
 .sg-demo__label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
-  line-height: 16px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  color: var(--ds-text-tertiary-rest);
-  margin-bottom: 8px;
+  font-size: 0.875rem;     /* body-compact-01 */
+  line-height: 1.28572;
+  font-weight: var(--ds-type-font-weight-semibold); /* bold — matches heading intent */
+  color: var(--ds-text-primary);
+  margin-bottom: 12px;
+  padding-left: 12px; /* aligns label text with button text (small btn padding = 12px) */
 }
 
 .sg-demo__group {
@@ -72,4 +71,41 @@
   border-radius: var(--ds-radius-tight);
   background: var(--ds-surface-alt);
   letter-spacing: 0.01em;
+}
+
+/* ─── Suggestion button overrides ────────────────────────────────────────── */
+
+/*
+ * Text color: secondary rest/hover/pressed.
+ * The button's built-in color transition (70ms ease-hover) carries
+ * the rest→hover→pressed animation automatically.
+ */
+.sg-list .panw--btn--secondary {
+  color: var(--ds-text-secondary-rest);
+}
+.sg-list .panw--btn--secondary:hover:not(:disabled) {
+  color: var(--ds-text-secondary-hover);
+}
+.sg-list .panw--btn--secondary:active:not(:disabled) {
+  color: var(--ds-text-secondary-pressed);
+}
+
+/*
+ * Icon color: icons.brand.rest — brand blue, per spec.
+ * fill: currentColor on the path overrides the SVG presentation attribute
+ * (fill="black") so the icon responds to this CSS color token.
+ */
+.sg-list .panw--btn .panw--btn__icon {
+  color: var(--ds-icons-brand-rest);
+}
+.sg-list .panw--btn .panw--btn__icon svg path {
+  fill: currentColor;
+}
+
+/*
+ * Left padding override — 8px instead of the small-button default (12px).
+ * Aligns the button text edge with the "Suggestions" section label at 8px.
+ */
+.sg-list .panw--btn--small {
+  padding-left: 8px;
 }

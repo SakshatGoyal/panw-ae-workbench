@@ -235,10 +235,10 @@ function ResponseActions({
                 />
                 <span className="raf__feedback-label">Give Feedback</span>
                 <div className="raf__feedback-btns">
-                  <Button kind="primary" size="small" onClick={handleFeedbackYes}>
+                  <Button kind="primary" size="xs" onClick={handleFeedbackYes}>
                     Yes
                   </Button>
-                  <Button kind="ghost" size="small" onClick={handleFeedbackNo}>
+                  <Button kind="ghost" size="xs" onClick={handleFeedbackNo}>
                     No
                   </Button>
                 </div>
@@ -258,8 +258,8 @@ function ResponseActions({
       <div className="raf__buttons">
         <IconButton
           kind="ghost"
-          size="sm"
-          iconSize={16}
+          size="xs"
+          iconSize={12}
           renderIcon={ThumbsDown}
           isSelected={disliked}
           aria-label={disliked ? 'Undo dislike' : 'Dislike response'}
@@ -267,8 +267,8 @@ function ResponseActions({
         />
         <IconButton
           kind="ghost"
-          size="sm"
-          iconSize={16}
+          size="xs"
+          iconSize={12}
           renderIcon={ThumbsUp}
           isSelected={liked}
           aria-label={liked ? 'Unlike response' : 'Like response'}
@@ -276,8 +276,8 @@ function ResponseActions({
         />
         <IconButton
           kind="ghost"
-          size="sm"
-          iconSize={16}
+          size="xs"
+          iconSize={12}
           renderIcon={Copy}
           aria-label="Copy response"
           onClick={handleCopy}

@@ -4,7 +4,6 @@ node_modules/
 
 # Build outputs
 dist/
-graphify-out/
 
 # Tooling caches
 .tmp/

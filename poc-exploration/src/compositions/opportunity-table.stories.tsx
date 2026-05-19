@@ -2657,11 +2657,18 @@ function OppRow({
 // as the container changes width (e.g. right-rail expand). When the
 // scaled widths hit the 240px floor the table overflows and the shell's
 // overflow-x: auto triggers horizontal scroll.
-function useColumnResize(columnCount: number, minPx: number = 240) {
+function useColumnResize(columnCount: number, minPx: number | number[] = 240) {
   const tableRef = useRef<HTMLTableElement | null>(null)
   const [widths, setWidths] = useState<number[] | null>(null)
   const prevContainerWidthRef = useRef<number>(0)
   const dragRef = useRef<{ i: number; startX: number; a: number; b: number } | null>(null)
+  // Per-column minimums, stable for the component's lifetime. A scalar
+  // minPx is expanded to a uniform array; an array is used as-is.
+  // Stored in a ref so the useEffect/useLayoutEffect closures always
+  // read the initial value without re-running on every render.
+  const minsRef = useRef<number[]>(
+    Array.isArray(minPx) ? [...minPx] : Array(columnCount).fill(minPx) as number[]
+  )
 
   useLayoutEffect(() => {
     if (widths !== null) return
@@ -2672,16 +2679,16 @@ function useColumnResize(columnCount: number, minPx: number = 240) {
     const ths = t.querySelectorAll<HTMLElement>('thead > tr > th.opp-c-equal')
     if (ths.length !== columnCount) return
     const measured: number[] = []
-    ths.forEach((el) => measured.push(Math.max(el.getBoundingClientRect().width, minPx)))
+    ths.forEach((el, i) => measured.push(Math.max(el.getBoundingClientRect().width, minsRef.current[i])))
     setWidths(measured)
     const shell = t.parentElement
     if (shell) prevContainerWidthRef.current = shell.getBoundingClientRect().width
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnCount, minPx])
+  }, [columnCount])
 
   // Scale column widths proportionally when the table shell is resized.
-  // Each width is clamped to minPx; once all columns are at the floor
-  // the table overflows and the scroll container shows a horizontal bar.
+  // Each width is clamped to its per-column minimum; once all columns
+  // hit their floor the table overflows and the shell's overflow-x kicks in.
   useEffect(() => {
     const shell = tableRef.current?.parentElement
     if (!shell) return
@@ -2692,13 +2699,14 @@ function useColumnResize(columnCount: number, minPx: number = 240) {
       if (prevWidth <= 0 || Math.abs(newWidth - prevWidth) < 1) return
       const scale = newWidth / prevWidth
       setWidths(prev =>
-        prev ? prev.map(w => Math.max(Math.round(w * scale), minPx)) : prev
+        prev ? prev.map((w, j) => Math.max(Math.round(w * scale), minsRef.current[j])) : prev
       )
       prevContainerWidthRef.current = newWidth
     })
     ro.observe(shell)
     return () => ro.disconnect()
-  }, [minPx])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const handle = (i: number) => ({
     onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
@@ -2713,8 +2721,8 @@ function useColumnResize(columnCount: number, minPx: number = 240) {
       const d = dragRef.current
       if (!d || !widths) return
       const raw = e.clientX - d.startX
-      const maxRight = d.b - minPx
-      const maxLeft = -(d.a - minPx)
+      const maxRight = d.b - minsRef.current[d.i + 1]
+      const maxLeft  = -(d.a - minsRef.current[d.i])
       const delta = Math.max(maxLeft, Math.min(maxRight, raw))
       const next = widths.slice()
       next[d.i] = d.a + delta
@@ -2750,7 +2758,36 @@ export function AEOpportunityTable({
   // 4 columns: Opportunity · Deal State · Activity & Blockers · Products.
   // Last column has no resize handle (it absorbs no extra space — every
   // drag rebalances between two adjacent columns, total width fixed).
-  const colResize = useColumnResize(4)
+  // Per-column minimums reflect content density: Opportunity carries name +
+  // account + value (260px); Activity & Blockers has multi-tag rows (220px);
+  // Deal State has 2–3 narrow chips (200px); Products has 1–2 brand chips (160px).
+  const colResize = useColumnResize(4, [260, 200, 220, 160])
+
+  // Shell ref for the scroll-shadow listener below.
+  const shellRef = useRef<HTMLDivElement | null>(null)
+
+  // Scroll shadow listener — toggles .has-scroll-left / .has-scroll-right on
+  // the table shell. CSS uses these to show/hide the sticky-column right-edge
+  // shadow and the right-edge scroll affordance shadow respectively. Runs on
+  // mount (initial state), scroll (passive), and shell resize (column drag or
+  // container resize can change scrollWidth without a scroll event).
+  useEffect(() => {
+    const shell = shellRef.current
+    if (!shell) return
+    function sync() {
+      const { scrollLeft, scrollWidth, clientWidth } = shell!
+      shell!.classList.toggle('has-scroll-left',  scrollLeft > 0)
+      shell!.classList.toggle('has-scroll-right', scrollLeft + clientWidth < scrollWidth - 1)
+    }
+    sync()
+    shell.addEventListener('scroll', sync, { passive: true })
+    const ro = new ResizeObserver(sync)
+    ro.observe(shell)
+    return () => {
+      shell.removeEventListener('scroll', sync)
+      ro.disconnect()
+    }
+  }, [])
   // Default: every leaf selected (all 15). Spec §3.12 says "All
   // (default)"; we encode that as the explicit full list so the trigger
   // chip reports the count and the SelectAll header shows checked.
@@ -2984,6 +3021,11 @@ export function AEOpportunityTable({
       <style>{LAYOUT_CSS}</style>
       <div className="opp-page">
         <div className="opp-page__shell">
+          {/* ── Padded header — search row + collapsible filter row ───────
+               opp-page__top restores the right padding that opp-page no
+               longer provides. The table shell below is a full-bleed
+               sibling; only the header content carries the 32px inset. */}
+          <div className="opp-page__top">
           {/* ── Search row ──────────────────────────────────────────────
                Left-to-right: search · sort · tags · filters-toggle. All
                controls are 32px tall. The row carries 8px top/bottom
@@ -3071,14 +3113,15 @@ export function AEOpportunityTable({
               </div>
             </div>
           )}
+          </div>{/* /opp-page__top */}
 
-          {/* ── Table ───────────────────────────────────────────────────
+          {/* ── Table — full bleed ──────────────────────────────────────
                Headers are Title Case. The four content columns
                (Opportunity, Deal State, Activity & Blockers, Products)
                share equal width; Value and Actions take only what they
                need. Header icons removed — the sort arrow on the two
                sortable headers is sufficient affordance. */}
-          <div className="opp-table-shell">
+          <div className="opp-table-shell" ref={shellRef}>
             <table className="opp-table" ref={colResize.tableRef}>
               {/* colgroup drives column widths once useLayoutEffect has
                 * seeded them from the rendered 25% layout. Before seed
@@ -3189,7 +3232,10 @@ const LAYOUT_CSS = `
   min-height: 100vh;
   background-color: var(--ds-ghost-rest);
   font-family: var(--ds-type-font-family-sans);
-  padding: var(--ds-spacing-07) var(--ds-spacing-07) var(--ds-spacing-10);
+  /* Right padding removed — the table shell is a full-bleed child that
+   * reaches the viewport right edge. Non-table content (search row, filter
+   * row) live inside .opp-page__top which carries its own padding-right. */
+  padding: var(--ds-spacing-07) 0 var(--ds-spacing-10) var(--ds-spacing-07);
 }
 
 /* Shell sits inside a parent card/tile. No own border or background.
@@ -3202,6 +3248,12 @@ const LAYOUT_CSS = `
   border: 0;
   display: flex;
   flex-direction: column;
+}
+
+/* Padded header section — restores the right inset for non-table content.
+ * The table shell is a full-bleed sibling; this wrapper is not. */
+.opp-page__top {
+  padding-right: var(--ds-spacing-07);
 }
 
 /* ── Search row ─────────────────────────────────────────────────────────── *
@@ -3386,35 +3438,27 @@ const LAYOUT_CSS = `
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
-/* Right-edge scroll affordance — visible only when content overflows right.
- * Two background layers (background-attachment trick):
- *   Layer 1 (local):  cover gradient, scrolls with content. Aligns with and
- *     masks layer 2 when fully scrolled to the right end.
- *   Layer 2 (scroll): shadow gradient, pinned to the viewport right edge.
- * When there is no overflow both layers sit at the same right edge and the
- * cover wins — shadow is invisible.
+/* Scroll container — full bleed to the viewport right edge (opp-page has
+ * no right padding). Two JS-toggled shadow surfaces signal overflow:
  *
- * Shadow opacity: derived from --ds-shadow-tiles (rgb(0 0 0 / 8%)) — the
- * lowest content-panel elevation tier. No Stage token exists for a
- * directional right-edge scroll affordance; --ds-shadow-tiles is the nearest
- * applicable semantic (content panel, not flyout, not modal). The tile
- * shadow's downward box-shadow geometry is replaced with a lateral gradient
- * because direction matters here. --ds-shadow-shell (10%) is reserved with
- * no assigned use and is explicitly excluded. */
+ *   has-scroll-right: inset box-shadow at the visible right edge. Reads as
+ *     the table surface's right boundary when content is clipped. Uses
+ *     --ds-shadow-tiles opacity (8%) — the content-panel elevation tier.
+ *
+ *   has-scroll-left: sticky-column right-edge shadow via ::after on td/th
+ *     first-child. Uses --ds-shadow-tile-on-tile opacity (6%) — tile-on-tile
+ *     semantics: the sticky column is literally a tile sitting above the
+ *     horizontally scrolling content tiles. Toggled by the scroll listener
+ *     in the component's useEffect.
+ *
+ * Both are crisp box-shadow surfaces, not gradient fades. */
 .opp-table-shell {
+  position: relative;
   overflow-x: auto;
-  background-image:
-    linear-gradient(to right, transparent 0%, var(--ds-surface-rest) 100%),
-    linear-gradient(to left,  rgb(0 0 0 / 8%) 0%, transparent 100%);
-  background-size: 32px 100%, 32px 100%;
-  background-position: right center, right center;
-  background-attachment: local, scroll;
-  background-repeat: no-repeat, no-repeat;
-  /* Bleed to actual viewport right edge when the table is wider than the
-   * padded page content area. Negative margin cancels the page's right
-   * padding (--ds-spacing-07 = 32px) for this element only. Non-table
-   * content above (search row, filter row) keeps its padding unaffected. */
-  margin-right: calc(-1 * var(--ds-spacing-07));
+  transition: box-shadow 150ms ease;
+}
+.opp-table-shell.has-scroll-right {
+  box-shadow: inset -8px 0 10px -6px rgb(0 0 0 / 8%);
 }
 /* border-separate + border-spacing:0 allows border-radius on <td> —
  * border-collapse:collapse silently ignores border-radius on cells. */
@@ -3472,35 +3516,41 @@ const LAYOUT_CSS = `
   display: none;
 }
 
-/* Four equal columns split the full width — value and actions columns
- * both removed; value lives in column 1, actions float over the row.
- * min-width: 240px mirrors the JS hook floor so the constraint is visible
- * in both places; once columns hit 240px the shell's overflow-x kicks in. */
+/* Four equal columns split the full width at first paint. Per-column
+ * minimums are enforced in JS (useColumnResize minsRef) rather than CSS —
+ * a single CSS min-width can't be per-column without column-specific
+ * selectors, and JS already seeds explicit widths before paint via
+ * useLayoutEffect, making CSS min-width redundant after seed.
+ * Minimums: Opportunity 260px · Deal state 200px · Activity 220px · Products 160px. */
 .opp-table th.opp-c-equal,
-.opp-table td.opp-c-equal { width: 25%; min-width: 240px; }
+.opp-table td.opp-c-equal { width: 25%; }
 
 /* Row backgrounds — data rows only.
  * Hover lifts the band so row-level floating actions read as engaged;
  * no :active state — clicking a row does nothing, so a pressed
- * background would write a check the interaction can't cash. */
+ * background would write a check the interaction can't cash.
+ *
+ * Rest is surface-rest (white) rather than ghost-rest (transparent).
+ * Visually identical since the page background is also white, but
+ * opaque rows are required for the unified-hover mechanism below:
+ * td:first-child uses background-color:inherit so all cells change
+ * the same property in the same frame — no sticky-layer stagger. */
 .opp-table tbody tr {
-  background-color: var(--ds-ghost-rest);
+  background-color: var(--ds-surface-rest);
   /* Hover easing — state change in place, not an entrance.
    * 100ms sits between fast-01 (70ms) and fast-02 (110ms), right at the
    * micro-interaction boundary for a row-sized surface area. */
   transition: background-color 100ms var(--ds-motion-easing-hover);
 }
-/* Row hover — locally derived alpha-40 of neutral20 instead of
- * var(--ds-ghost-hover) (which is alpha-70). The rest state of
- * data rows is ghost.rest (transparent) so the row adapts to
- * whichever page background sits behind the table; at alpha-70
- * the hover composited into a near-solid band that masked the
- * row-internal hover affordances (icon-button highlights, tag
- * chip hovers, link hovers). Alpha-40 keeps the row legible as
- * the engaged band without overwhelming the hovers nested
- * inside it, and still composites cleanly over any page bg.
- * Primitive resolves to neutral20 = #E4E8EB = rgb(228, 232, 235). */
-.opp-table tbody tr:hover  { background-color: rgb(228 232 235 / 40%); }
+/* Row hover — precomputed opaque equivalent of neutral20 @40% over white.
+ * Using rgba caused a sticky-layer stagger: the tr's alpha-tint and the
+ * sticky td's inset box-shadow ran as separate compositing-layer paints.
+ * Opaque #F4F6F7 = 0.4×rgb(228,232,235) + 0.6×rgb(255,255,255) makes all
+ * cells paint a single background-color change on the same frame.
+ * Alpha-40 rather than --ds-ghost-hover (alpha-70): at alpha-70 the hover
+ * composited into a near-solid band that masked nested interactive affordances
+ * (icon-button hovers, tag chip hovers, link hovers). */
+.opp-table tbody tr:hover  { background-color: #F4F6F7; }
 
 /* Standalone divider rows — an independent element between rows, not
  * a border that belongs to either adjacent row. The <div> is the line;
@@ -3546,25 +3596,41 @@ const LAYOUT_CSS = `
   border-radius: 8px 0 0 8px;
   /* Sticky left — keeps column-1 identity visible as the user scrolls right.
    * z-index 2 sits above normal cells but below the sticky header (z:4)
-   * and the sticky actions column (z:3). background-color is the opaque
-   * surface token; without it scrolled content would bleed through the
-   * transparent row background. hover re-applies the row tint on top. */
+   * and the sticky actions column (z:3).
+   * background-color:inherit tracks the row's value (surface-rest at rest,
+   * #F4F6F7 on hover) so all cells change the same property on the same
+   * compositing frame — no sticky-layer stagger. will-change hints the
+   * browser to promote this layer before the hover, keeping the transition
+   * in lockstep with the tr. */
   position: sticky;
   left: 0;
   z-index: 2;
-  background-color: var(--ds-surface-rest);
+  background-color: inherit;
+  will-change: background-color;
 }
-.opp-table tbody tr:hover td:first-child {
-  /* Keep surface-rest as the opaque base; layer the row hover tint on top
-   * via inset shadow instead of replacing background-color. Replacing it
-   * directly with the alpha tint makes the cell semi-transparent:
-   *   (a) scrolled columns bleed through the sticky cell (transparency issue)
-   *   (b) the tint composites over whatever is behind z-index:2, not over
-   *       surface-rest, so the visible hover hue diverges from adjacent cells
-   *       (hue-mismatch issue).
-   * inset 0 0 0 9999px fills the entire cell including under border-radius. */
-  background-color: var(--ds-surface-rest);
-  box-shadow: inset 0 0 0 9999px rgb(228 232 235 / 40%);
+/* Sticky-column right-edge shadow — visible only when scrollLeft > 0.
+ * Toggled via .has-scroll-left class on .opp-table-shell by scroll listener.
+ * Token tier: --ds-shadow-tile-on-tile (6%) — the sticky column IS a tile
+ * sitting on top of the horizontally scrolling content tiles. Geometry is
+ * direction-matched (rightward) since the token's downward geometry doesn't
+ * apply here. Pseudo-element sits at right:-1px so it overlaps the cell edge
+ * by 1px to avoid a visual gap; box-shadow provides the actual shadow area. */
+.opp-table tbody td:first-child::after,
+.opp-table th:first-child::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: -1px;
+  bottom: 0;
+  width: 8px;
+  box-shadow: 4px 0 8px -2px rgb(0 0 0 / 6%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+}
+.opp-table-shell.has-scroll-left .opp-table tbody td:first-child::after,
+.opp-table-shell.has-scroll-left .opp-table th:first-child::after {
+  opacity: 1;
 }
 /* 4th td (Products) keeps its right-side border-radius now that the 5th
  * 0-width actions column is the last child. */

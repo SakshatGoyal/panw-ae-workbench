@@ -3,8 +3,8 @@ import { Informational } from '@ds/icons'
 
 const STORAGE_KEY = 'complete-design.right-rail-width'
 const MIN = 320
-const MAX = 480
-const DEFAULT = 430
+const MAX = 640
+const DEFAULT = 480
 const KEYBOARD_STEP = 8
 
 function readStored(): number {

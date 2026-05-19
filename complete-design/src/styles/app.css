@@ -24,7 +24,7 @@ body.stage {
      because the grid container is exactly 100vh tall. The main column is
      the only scrollable region. */
   display: grid;
-  grid-template-columns: 64px 1fr var(--cd-right-rail-width, 430px);
+  grid-template-columns: 64px 1fr var(--cd-right-rail-width, 480px);
   height: 100vh;
   background: var(--ds-surface-rest);
 }
@@ -196,8 +196,38 @@ body.stage {
   background: var(--ds-surface-rest);
   border-left: 1px solid var(--ds-lines-neutral-rest);
   min-width: 320px;
-  max-width: 480px;
+  max-width: 640px;
   overflow-y: auto; /* if detail content exceeds viewport, scroll inside */
+}
+
+/* Right-rail shadow — cast onto table content scrolling under the rail.
+ * ::before spans the rail's full height; box-shadow bleeds leftward.
+ * Visual character: --ds-shadow-flyout recipe applied laterally:
+ *   x=-8px  y=0  blur=16px  spread=-4px  alpha=12%.
+ * Opacity driven by data-table-scroll-right on .cd-app, set by the
+ * table's useLayoutEffect scroll listener when content extends under
+ * the rail. Opacity transition matches the left-column shadow (150ms). */
+.cd-app__rail-right::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 1px;
+  box-shadow: -8px 0 16px -4px rgb(0 0 0 / 12%);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease;
+  z-index: 1;
+}
+.cd-app[data-table-scroll-right] .cd-app__rail-right::before {
+  opacity: 1;
+}
+
+/* The cp-panel carries its own border-left for standalone/story use;
+   suppress it here — the rail shell already provides the divider. */
+.cd-app__rail-right .cp-panel {
+  border-left: none;
 }
 
 /* ── Page header (legacy — no longer rendered; topbar owns the heading) ────── */
@@ -213,6 +243,14 @@ body.stage {
   min-height: 0;
   padding: 0;
   background: transparent;
+}
+
+/* Bleed-to-rail: the table's scroll shell extends flush to the rail's
+ * left edge — no gap. .cd-app__main carries 16px right padding for all
+ * other content; a negative margin of the same amount compensates here.
+ * .cd-app__column has overflow:hidden, so the shell cannot burst the grid. */
+.cd-app .opp-table-shell {
+  margin-right: calc(-1 * var(--ds-spacing-05));
 }
 
 /* Row hover — the poc tables flip the row background to ghost.hover but

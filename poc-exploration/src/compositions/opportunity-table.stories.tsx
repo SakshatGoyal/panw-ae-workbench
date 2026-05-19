@@ -2758,26 +2758,32 @@ export function AEOpportunityTable({
   // 4 columns: Opportunity · Deal State · Activity & Blockers · Products.
   // Last column has no resize handle (it absorbs no extra space — every
   // drag rebalances between two adjacent columns, total width fixed).
-  // Per-column minimums reflect content density: Opportunity carries name +
-  // account + value (260px); Activity & Blockers has multi-tag rows (220px);
-  // Deal State has 2–3 narrow chips (200px); Products has 1–2 brand chips (160px).
-  const colResize = useColumnResize(4, [260, 200, 220, 160])
+  // Default uniform minimum (240px) — per-column overrides deferred until
+  // real content overflow data justifies specific numbers.
+  const colResize = useColumnResize(4)
 
   // Shell ref for the scroll-shadow listener below.
   const shellRef = useRef<HTMLDivElement | null>(null)
 
   // Scroll shadow listener — toggles .has-scroll-left / .has-scroll-right on
   // the table shell. CSS uses these to show/hide the sticky-column right-edge
-  // shadow and the right-edge scroll affordance shadow respectively. Runs on
-  // mount (initial state), scroll (passive), and shell resize (column drag or
-  // container resize can change scrollWidth without a scroll event).
-  useEffect(() => {
+  // shadow. Also bubbles has-scroll-right state to the nearest .cd-app ancestor
+  // (when running inside complete-design) so the right rail can cast its own
+  // shadow onto scrolling content. useLayoutEffect ensures initial boolean
+  // state is written before first browser paint — no flash of wrong shadow.
+  useLayoutEffect(() => {
     const shell = shellRef.current
     if (!shell) return
+    // Capture ancestor once — stable for effect lifetime. Null in standalone story.
+    const cdApp = shell.closest('.cd-app') as HTMLElement | null
     function sync() {
       const { scrollLeft, scrollWidth, clientWidth } = shell!
-      shell!.classList.toggle('has-scroll-left',  scrollLeft > 0)
-      shell!.classList.toggle('has-scroll-right', scrollLeft + clientWidth < scrollWidth - 1)
+      const hasLeft  = scrollLeft > 0
+      const hasRight = scrollLeft + clientWidth < scrollWidth - 1
+      shell!.classList.toggle('has-scroll-left',  hasLeft)
+      shell!.classList.toggle('has-scroll-right', hasRight)
+      // Bubble to parent app so rail shadow can respond without prop threading.
+      cdApp?.toggleAttribute('data-table-scroll-right', hasRight)
     }
     sync()
     shell.addEventListener('scroll', sync, { passive: true })
@@ -2786,6 +2792,7 @@ export function AEOpportunityTable({
     return () => {
       shell.removeEventListener('scroll', sync)
       ro.disconnect()
+      cdApp?.removeAttribute('data-table-scroll-right')
     }
   }, [])
   // Default: every leaf selected (all 15). Spec §3.12 says "All
@@ -3438,27 +3445,23 @@ const LAYOUT_CSS = `
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
-/* Scroll container — full bleed to the viewport right edge (opp-page has
- * no right padding). Two JS-toggled shadow surfaces signal overflow:
+/* Scroll container — full bleed to the right edge (opp-page has no right
+ * padding; in complete-design, .cd-app .opp-table-shell uses margin-right
+ * to compensate for .cd-app__main's padding so the table reaches the rail).
  *
- *   has-scroll-right: inset box-shadow at the visible right edge. Reads as
- *     the table surface's right boundary when content is clipped. Uses
- *     --ds-shadow-tiles opacity (8%) — the content-panel elevation tier.
+ * Two JS-toggled shadow surfaces signal scroll overflow:
+ *   has-scroll-left: sticky-column right-edge shadow via ::after. The sticky
+ *     column is a fixed surface; the shadow is cast onto the content sliding
+ *     under it from the right. Flyout-recipe geometry applied laterally.
  *
- *   has-scroll-left: sticky-column right-edge shadow via ::after on td/th
- *     first-child. Uses --ds-shadow-tile-on-tile opacity (6%) — tile-on-tile
- *     semantics: the sticky column is literally a tile sitting above the
- *     horizontally scrolling content tiles. Toggled by the scroll listener
- *     in the component's useEffect.
+ *   right shadow: owned by the right rail in complete-design (::before on
+ *     .cd-app__rail-right), not by this shell. Driven by
+ *     data-table-scroll-right on .cd-app, bubbled from this scroll listener.
  *
- * Both are crisp box-shadow surfaces, not gradient fades. */
+ * Both are crisp box-shadow cast shadows, not gradient fades. */
 .opp-table-shell {
   position: relative;
   overflow-x: auto;
-  transition: box-shadow 150ms ease;
-}
-.opp-table-shell.has-scroll-right {
-  box-shadow: inset -8px 0 10px -6px rgb(0 0 0 / 8%);
 }
 /* border-separate + border-spacing:0 allows border-radius on <td> —
  * border-collapse:collapse silently ignores border-radius on cells. */
@@ -3520,8 +3523,7 @@ const LAYOUT_CSS = `
  * minimums are enforced in JS (useColumnResize minsRef) rather than CSS —
  * a single CSS min-width can't be per-column without column-specific
  * selectors, and JS already seeds explicit widths before paint via
- * useLayoutEffect, making CSS min-width redundant after seed.
- * Minimums: Opportunity 260px · Deal state 200px · Activity 220px · Products 160px. */
+ * useLayoutEffect, making CSS min-width redundant after seed. */
 .opp-table th.opp-c-equal,
 .opp-table td.opp-c-equal { width: 25%; }
 
@@ -3610,11 +3612,11 @@ const LAYOUT_CSS = `
 }
 /* Sticky-column right-edge shadow — visible only when scrollLeft > 0.
  * Toggled via .has-scroll-left class on .opp-table-shell by scroll listener.
- * Token tier: --ds-shadow-tile-on-tile (6%) — the sticky column IS a tile
- * sitting on top of the horizontally scrolling content tiles. Geometry is
- * direction-matched (rightward) since the token's downward geometry doesn't
- * apply here. Pseudo-element sits at right:-1px so it overlaps the cell edge
- * by 1px to avoid a visual gap; box-shadow provides the actual shadow area. */
+ * Visual character: --ds-shadow-flyout recipe (0 8px 16px -4px / 12%) applied
+ * laterally — x=8px, y=0, blur=16px, spread=-4px, alpha=12%. The sticky
+ * column is a fixed surface; the shadow is cast onto content passing under it.
+ * Pseudo-element sits at right:-1px to avoid a visual gap; the shadow bleeds
+ * rightward from there into the scroll area. */
 .opp-table tbody td:first-child::after,
 .opp-table th:first-child::after {
   content: '';
@@ -3623,7 +3625,7 @@ const LAYOUT_CSS = `
   right: -1px;
   bottom: 0;
   width: 8px;
-  box-shadow: 4px 0 8px -2px rgb(0 0 0 / 6%);
+  box-shadow: 8px 0 16px -4px rgb(0 0 0 / 12%);
   pointer-events: none;
   opacity: 0;
   transition: opacity 150ms ease;

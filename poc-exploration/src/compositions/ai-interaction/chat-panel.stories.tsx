@@ -902,7 +902,7 @@ const suggestionStyle: React.CSSProperties = {
 
 // ─── Empty panel ──────────────────────────────────────────────────────────────
 
-function EmptyChatPanel() {
+export function EmptyChatPanel() {
   return (
     <div className="cp-panel">
       <ChatWindowHeader />

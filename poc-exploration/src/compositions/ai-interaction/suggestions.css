@@ -64,7 +64,7 @@
 
 .sg-event-log__entry {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: var(--ds-text-tertiary-rest);
   padding: 4px 8px;

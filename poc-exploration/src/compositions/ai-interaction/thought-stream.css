@@ -196,9 +196,9 @@
 
 .ts__think-text {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 13px;
-  line-height: 20px;
-  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.33333;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-secondary-rest);
   margin: 0;
 }
@@ -233,8 +233,8 @@
 
 .ts__action-label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 13px;
-  line-height: 18px;
+  font-size: 0.875rem;
+  line-height: 1.28572;
   font-weight: 500;
   color: var(--ds-text-secondary-rest);
   white-space: nowrap;
@@ -274,9 +274,9 @@
 .ts__action-description {
   margin: 2px 0 0;
   font-family: var(--ds-type-font-family-sans);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 18px;
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-tertiary-rest);
 }
 
@@ -284,9 +284,9 @@
 .ts__action-result {
   margin: 4px 0 0;
   font-family: var(--ds-type-font-family-sans);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 18px;
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-secondary-rest);
 }
 
@@ -332,9 +332,9 @@
   border: 1px solid var(--ds-lines-neutral-rest);
   background: var(--ds-surface-alt);
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-tertiary-rest);
   letter-spacing: 0.01em;
   white-space: nowrap;
@@ -352,8 +352,8 @@
 
 .ts__finding-text {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.875rem;
+  line-height: 1.42857;
   font-weight: 500;
   color: var(--ds-text-primary);
   margin: 0;
@@ -398,7 +398,7 @@
 
 .ts-demo__label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -436,7 +436,7 @@
 
 .ts-showcase__col-label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 10px;
+  font-size: 0.75rem;
   line-height: 16px;
   letter-spacing: 0.09em;
   text-transform: uppercase;
@@ -480,9 +480,9 @@
 /* Cycling word — fades out (opacity 0) then new word fades in */
 .tsr__word {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 13px;
-  line-height: 20px;
-  font-weight: 400;
+  font-size: 0.875rem;
+  line-height: 1.42857;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-secondary-rest);
   white-space: nowrap;
   opacity: 1;
@@ -502,7 +502,7 @@
 
 .tsr-response {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ds-text-primary);
   margin: 0;
@@ -518,7 +518,7 @@
 .tsr-replay {
   align-self: flex-start;
   font-family: var(--ds-type-font-family-sans);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: var(--ds-text-tertiary-rest);
   background: none;

@@ -106,16 +106,16 @@
 /* CSV value line */
 .um__table-ref-values {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 13px;
-  line-height: 20px;
-  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.33333;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-secondary-rest);
   margin: 0;
 }
 
 /* First value in the CSV row — key anchor, rendered bold */
 .um__table-ref-first {
-  font-weight: 600;
+  font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
 
@@ -123,9 +123,9 @@
 
 .um__text {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 20px;
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-primary);
   margin: 0;
   text-align: left;
@@ -152,7 +152,7 @@
 
 .um-demo__label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;

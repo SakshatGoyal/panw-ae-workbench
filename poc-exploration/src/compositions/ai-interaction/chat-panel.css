@@ -204,7 +204,7 @@
  */
 .cp-ai-response {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 1.5;
   color: var(--ds-text-primary);
   margin: 0;

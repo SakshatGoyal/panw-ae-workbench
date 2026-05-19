@@ -216,7 +216,7 @@
 
 .dt-demo__label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;

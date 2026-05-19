@@ -55,7 +55,7 @@
   resize: none;
 
   font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 20px;
   letter-spacing: 0.25px;
   color: var(--ds-text-primary);
@@ -102,7 +102,7 @@
 
 .pef-demo__label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -188,9 +188,9 @@
 /* CSV values line — truncates on long rows */
 .pef__table-ref-values {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 13px;
-  line-height: 20px;
-  font-weight: 400;
+  font-size: 0.75rem;
+  line-height: 1.33333;
+  font-weight: var(--ds-type-font-weight-regular);
   color: var(--ds-text-secondary-rest);
   margin: 0;
   overflow: hidden;
@@ -200,7 +200,7 @@
 
 /* First value — key anchor, bold */
 .pef__table-ref-first {
-  font-weight: 600;
+  font-weight: var(--ds-type-font-weight-semibold);
   color: var(--ds-text-primary);
 }
 

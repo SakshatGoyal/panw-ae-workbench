@@ -158,7 +158,7 @@
    4px flex-gap + 12px margin-right = 16px */
 .raf__feedback-label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: var(--ds-text-tertiary-rest);
   white-space: nowrap;
@@ -177,7 +177,7 @@
 
 .raf__thanks {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: var(--ds-text-secondary-rest);
   white-space: nowrap;
@@ -204,7 +204,7 @@
 
 .raf-demo__label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -232,8 +232,8 @@
 
 .raf-message__text {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 13px;
-  line-height: 20px;
+  font-size: 0.875rem;
+  line-height: 1.42857;
   color: var(--ds-text-primary);
 }
 
@@ -252,7 +252,7 @@
 
 .raf-event-log__entry {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: var(--ds-text-tertiary-rest);
   padding: 4px 8px;

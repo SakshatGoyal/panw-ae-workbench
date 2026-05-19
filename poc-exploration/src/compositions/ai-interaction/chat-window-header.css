@@ -37,7 +37,7 @@
 .cwh__placeholder {
   flex: 1;
   font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 18px;
   font-weight: var(--ds-type-font-weight-semibold);
   letter-spacing: 0.1px;
@@ -60,9 +60,9 @@
   min-width: 0;           /* required for text-overflow to fire in flex child */
   margin-left: 12px;
   font-family: var(--ds-type-font-family-sans);
-  font-size: 14px;
+  font-size: 0.875rem;
   line-height: 18px;
-  font-weight: 600;
+  font-weight: var(--ds-type-font-weight-semibold);
   letter-spacing: 0.1px;
   color: var(--ds-text-primary);
   white-space: nowrap;
@@ -135,7 +135,7 @@
 
 .cwh-demo__label {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   letter-spacing: 0.08em;
   text-transform: uppercase;
@@ -161,7 +161,7 @@
 .cwh-panel__body {
   padding: 16px;
   font-family: var(--ds-type-font-family-sans);
-  font-size: 12px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: var(--ds-text-tertiary-rest);
 }
@@ -176,7 +176,7 @@
 
 .cwh-event-log__entry {
   font-family: var(--ds-type-font-family-sans);
-  font-size: 11px;
+  font-size: 0.75rem;
   line-height: 16px;
   color: var(--ds-text-tertiary-rest);
   padding: 4px 8px;

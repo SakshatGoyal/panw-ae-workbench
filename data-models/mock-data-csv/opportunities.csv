@@ -2,25 +2,25 @@ id,accountId,name,activeQuoteId,amount,type,stage,forecastCategory,closeDate,day
 opp-sf-001,acc-salesforce,Salesforce NGFW Refresh CQ,Q-100101,1100000,Renewal,Negotiate,Commit,2026-06-16,22,18,PA-series:850000;PA-series-attached:250000,,Contract-review,5,Full,,,
 opp-sf-002,acc-salesforce,Salesforce Prisma Access SASE Expansion,Q-100102,1400000,Upsell,Active-POV,Best-case,2026-07-23,45,30,Prisma-access:1400000,No-design-of-record,Technical-deep-dive,6,,,,
 opp-sf-003,acc-salesforce,Salesforce XSIAM Splunk Takeout,Q-100103,2500000,Net-new,Technical-validation,Best-case,2026-08-30,38,22,XSIAM:2100000;Cortex-XDR:400000,,Solution-workshop,8,,,,
-opp-sf-004,acc-salesforce,Salesforce Unit 42 IR Retainer Renewal,Q-100104,350000,Renewal,Solutioning,Pipeline,2026-11-28,12,10,Unit-42-reactive:350000,,Renewal-prep-call,4,Unknown,,,
+opp-sf-004,acc-salesforce,Salesforce Unit 42 IR Retainer Renewal,Q-100104,350000,Renewal,Solutioning,Pipeline,2026-11-28,12,10,Unit-42-reactive:350000,,Renewal-prep-call,7,Unknown,,,
 opp-sf-005,acc-salesforce,Salesforce Cortex Cloud CNAPP,Q-100105,980000,Net-new,Discovery,Pipeline,2027-02-26,18,18,Cortex-cloud-leaf:980000,,POC-scoping-session,11,,,,
 opp-gc-001,acc-googlecloud,Google Cloud PA-Series Refresh,Q-100201,1600000,Renewal-and-upsell,Active-POV,Best-case,2026-06-29,55,25,PA-series:1200000;PA-series-attached:400000,No-design-of-record,Technical-deep-dive,9,Upsell,,,
 opp-gc-002,acc-googlecloud,Google Cloud XSIAM SOC Modernization,Q-100202,1800000,Net-new,Solutioning,Pipeline,2026-11-08,28,28,XSIAM:1800000,No-secured-tech-win,Solution-workshop,12,,,,
 opp-gc-003,acc-googlecloud,Google Cloud SASE Pilot Expansion,Q-100203,700000,Upsell,Technical-validation,Best-case,2026-08-15,42,18,Prisma-access:700000,,Architecture-review,7,,,,
-opp-wf-001,acc-wellsfargobank,Wells Fargo NGFW Refresh (PA-5450),Q-100301,3000000,Renewal,Negotiate,Best-case,2026-07-09,88,65,PA-series:2400000;PA-series-support:600000,Lacking-exec-engagement;No-secured-tech-win;Budget-not-scheduled;Term-length-issue,Customer-engagement,38,Unknown,,,
-opp-wf-002,acc-wellsfargobank,Wells Fargo Unit 42 IR Retainer Renewal,Q-100302,450000,Renewal,Solutioning,Pipeline,2026-09-29,60,60,Unit-42-reactive:450000,No-activity-30-days;Budget-not-scheduled,Renewal-prep-call,42,Unknown,,,
+opp-wf-001,acc-wellsfargobank,Wells Fargo NGFW Refresh (PA-5450),Q-100301,3000000,Renewal,Negotiate,Best-case,2026-07-09,88,65,PA-series:2400000;PA-series-support:600000,Lacking-exec-engagement;No-secured-tech-win;Budget-not-scheduled;Term-length-issue,Customer-engagement,26,Unknown,,,
+opp-wf-002,acc-wellsfargobank,Wells Fargo Unit 42 IR Retainer Renewal,Q-100302,450000,Renewal,Solutioning,Pipeline,2026-09-29,60,60,Unit-42-reactive:450000,No-activity-30-days;Budget-not-scheduled,Renewal-prep-call,22,Unknown,,,
 opp-wf-003,acc-wellsfargobank,Wells Fargo Prisma Access Pilot,Q-100303,1100000,Net-new,Discovery,Pipeline,2027-03-18,35,35,Prisma-access:1100000,Lacking-exec-engagement;No-design-of-record;No-partner-selected,POC-scoping-session,30,,,,
 opp-adobe-001,acc-adobe,Adobe Cortex XSOAR SOC Modernization,Q-100401,480000,Renewal,Active-POV,Best-case,2026-07-01,62,30,Cortex-XSOAR:480000,No-secured-tech-win;No-design-of-record,Technical-deep-dive,6,Downsell,,,
-opp-adobe-002,acc-adobe,Adobe Prisma Access SASE Expansion,Q-100402,1300000,Upsell,Negotiate,Commit,2026-06-06,32,18,Prisma-access:1300000,,Contract-review,4,,,,
+opp-adobe-002,acc-adobe,Adobe Prisma Access SASE Expansion,Q-100402,1300000,Upsell,Negotiate,Commit,2026-06-06,32,18,Prisma-access:1300000,,Contract-review,9,,,,
 opp-adobe-003,acc-adobe,Adobe NGFW Refresh,Q-100403,950000,Renewal,Solutioning,Pipeline,2026-12-18,25,25,PA-series:950000,,Renewal-prep-call,9,Unknown,,,
-opp-nv-001,acc-nvidia,NVIDIA XSIAM Platform Expansion,Q-100501,4000000,Upsell,Negotiate,Commit,2026-05-30,28,14,XSIAM:3200000;Cortex-XDR:800000,,Contract-review,3,,,,
+opp-nv-001,acc-nvidia,NVIDIA XSIAM Platform Expansion,Q-100501,4000000,Upsell,Negotiate,Commit,2026-05-30,28,14,XSIAM:3200000;Cortex-XDR:800000,,Contract-review,5,,,,
 opp-nv-002,acc-nvidia,NVIDIA Unit 42 Proactive Renewal,Q-100502,280000,Renewal,Negotiate,Commit,2026-06-21,22,14,Unit-42-proactive:280000,,Renewal-prep-call,5,Upsell,,,
-opp-nv-003,acc-nvidia,NVIDIA NGFW Refresh,Q-100503,1800000,Renewal,Active-POV,Best-case,2026-07-26,50,22,PA-series:1800000,,Technical-deep-dive,4,Full,,,
+opp-nv-003,acc-nvidia,NVIDIA NGFW Refresh,Q-100503,1800000,Renewal,Active-POV,Best-case,2026-07-26,50,22,PA-series:1800000,,Technical-deep-dive,8,Full,,,
 opp-nv-004,acc-nvidia,NVIDIA Prisma Access Expansion,Q-100504,1500000,Upsell,Technical-validation,Best-case,2026-09-09,45,20,Prisma-access:1500000,,Architecture-review,6,,,,
 opp-cisco-001,acc-cisco,Cisco XSIAM Splunk Takeout,Q-100601,1600000,Net-new,Active-POV,Best-case,2026-07-31,58,28,XSIAM:1600000,No-secured-tech-win,Technical-deep-dive,12,,,,
 opp-cisco-002,acc-cisco,Cisco Unit 42 IR Retainer,Q-100602,320000,Renewal,Negotiate,Commit,2026-06-09,25,18,Unit-42-reactive:320000,,Renewal-prep-call,6,Full,,,
 opp-cisco-003,acc-cisco,Cisco Cortex Cloud CNAPP,Q-100603,680000,Net-new,Solutioning,Pipeline,2026-11-08,32,32,Cortex-cloud-leaf:680000,No-design-of-record,Solution-workshop,14,,,,
-opp-oracle-001,acc-oracle,Oracle XSIAM QRadar Takeout,Q-100701,1400000,Net-new,Technical-validation,Pipeline,2026-08-15,218,95,XSIAM:1400000,Lacking-exec-engagement;No-activity-30-days;No-secured-tech-win,POC-scoping-session,35,,,,Outlier-stalled-opp
+opp-oracle-001,acc-oracle,Oracle XSIAM QRadar Takeout,Q-100701,1400000,Net-new,Technical-validation,Pipeline,2026-08-15,218,95,XSIAM:1400000,Lacking-exec-engagement;No-activity-30-days;No-secured-tech-win,POC-scoping-session,28,,,,Outlier-stalled-opp
 opp-oracle-002,acc-oracle,Oracle NGFW Refresh,Q-100702,1400000,Renewal,Negotiate,Best-case,2026-07-06,60,28,PA-series:1100000;PA-series-attached:300000,Term-length-issue,Contract-review,11,Unknown,,,
 opp-oracle-003,acc-oracle,Oracle Prisma Access SASE Pilot,Q-100703,820000,Net-new,Discovery,Pipeline,2027-01-27,40,40,Prisma-access:820000,,Solution-workshop,18,,,,
 opp-visa-001,acc-visa,Visa NGFW Hardware Refresh,Q-100801,1750000,Renewal,Negotiate,Commit,2026-06-03,24,16,PA-series:1400000;PA-series-support:350000,,Contract-review,5,Full,,,
@@ -33,15 +33,15 @@ opp-kp-002,acc-kaiser,Kaiser XSOAR Renewal,Q-101002,520000,Renewal,Negotiate,Com
 opp-kp-003,acc-kaiser,Kaiser Unit 42 HIPAA IR Retainer,Q-101003,480000,Renewal,Solutioning,Best-case,2026-09-29,28,22,Unit-42-reactive:480000,,Renewal-prep-call,8,Full,,,
 opp-shc-001,acc-stanfordhc,Stanford Health Care Unit 42 IR Retainer Renewal,Q-101101,320000,Renewal,Negotiate,Commit,2026-06-13,26,18,Unit-42-reactive:320000,,Renewal-prep-call,10,Full,,,
 opp-shc-002,acc-stanfordhc,Stanford Health Care NGFW Refresh,Q-101102,780000,Renewal,Solutioning,Best-case,2026-09-14,32,22,PA-series:780000,No-or-stale-ASR,Technical-deep-dive,12,Unknown,,,
-opp-pge-001,acc-pge,PG&E NGFW OT Refresh,Q-101201,1850000,Renewal,Technical-validation,Pipeline,2026-11-08,110,75,PA-series:1850000,Lacking-exec-engagement;No-activity-30-days;Budget-not-scheduled;No-secured-tech-win,Customer-engagement,45,Unknown,,,
-opp-pge-002,acc-pge,PG&E Xpanse ASM,Q-101202,280000,Net-new,Discovery,Pipeline,2027-03-18,65,65,Xpanse:280000,Lacking-exec-engagement;No-partner-selected,POC-scoping-session,55,,,,
+opp-pge-001,acc-pge,PG&E NGFW OT Refresh,Q-101201,1850000,Renewal,Technical-validation,Pipeline,2026-11-08,110,75,PA-series:1850000,Lacking-exec-engagement;No-activity-30-days;Budget-not-scheduled;No-secured-tech-win,Customer-engagement,24,Unknown,,,
+opp-pge-002,acc-pge,PG&E Xpanse ASM,Q-101202,280000,Net-new,Discovery,Pipeline,2027-03-18,65,65,Xpanse:280000,Lacking-exec-engagement;No-partner-selected,POC-scoping-session,29,,,,
 opp-yt-001,acc-youtube,YouTube XSIAM Pilot,Q-101301,920000,Net-new,Active-POV,Best-case,2026-07-23,48,26,XSIAM:920000,,Solution-workshop,6,,,,
 opp-yt-002,acc-youtube,YouTube SASE Renewal,Q-101302,540000,Renewal,Negotiate,Commit,2026-06-23,28,18,Prisma-access:540000,,Contract-review,5,Full,,,
 opp-wm-001,acc-waymo,Waymo Cortex XDR Renewal,Q-101401,380000,Renewal,Solutioning,Best-case,2026-08-15,35,25,Cortex-XDR:380000,No-design-of-record,POC-scoping-session,13,Unknown,,,
 opp-wm-002,acc-waymo,Waymo NGFW Fleet Expansion,Q-101402,520000,Upsell,Discovery,Pipeline,2026-12-18,30,30,PA-series:520000,,Solution-workshop,18,,,,
 opp-wfs-001,acc-wfsecurities,Wells Fargo Securities NGFW Refresh,Q-101501,680000,Renewal,Active-POV,Best-case,2026-07-09,40,22,PA-series:680000,,Renewal-prep-call,15,Full,,,
 opp-wfs-002,acc-wfsecurities,Wells Fargo Securities Unit 42 IR Renewal,Q-101502,220000,Renewal,Solutioning,Pipeline,2026-10-04,28,28,Unit-42-reactive:220000,,Renewal-prep-call,18,Unknown,,,
-opp-slack-001,acc-slack,Slack Prisma Access Renewal,Q-101601,750000,Renewal,Negotiate,Commit,2026-06-11,24,16,Prisma-access:750000,,Contract-review,4,Full,,,
+opp-slack-001,acc-slack,Slack Prisma Access Renewal,Q-101601,750000,Renewal,Negotiate,Commit,2026-06-11,24,16,Prisma-access:750000,,Contract-review,11,Full,,,
 opp-slack-002,acc-slack,Slack XDR Endpoint Expansion,Q-101602,320000,Upsell,Active-POV,Best-case,2026-07-31,38,22,Cortex-XDR:320000,,Technical-deep-dive,5,,,,
 opp-tab-001,acc-tableau,Tableau NGFW Refresh,Q-101701,620000,Renewal,Solutioning,Best-case,2026-09-04,38,28,PA-series:620000,No-design-of-record,Architecture-review,14,Unknown,,,
 opp-tab-002,acc-tableau,Tableau XSIAM Pilot,Q-101702,880000,Net-new,Discovery,Pipeline,2027-01-27,22,22,XSIAM:880000,,POC-scoping-session,16,,,,
@@ -52,10 +52,10 @@ opp-intel-001,acc-intel,Intel XSIAM Fab SOC Build,Q-102001,1400000,Net-new,Activ
 opp-intel-002,acc-intel,Intel NGFW Renewal,Q-102002,1200000,Renewal,Negotiate,Commit,2026-06-21,28,16,PA-series:1200000,,Contract-review,7,Full,,,
 opp-nflx-001,acc-netflix,Netflix Prisma Access SASE Renewal,Q-102101,1100000,Renewal,Negotiate,Commit,2026-06-06,22,14,Prisma-access:1100000,,Contract-review,5,Upsell,,,
 opp-nflx-002,acc-netflix,Netflix XSIAM SOC Modernization,Q-102102,1350000,Net-new,Active-POV,Best-case,2026-08-15,50,24,XSIAM:1350000,,Solution-workshop,7,,,,
-opp-stripe-001,acc-stripe,Stripe XSIAM + XDR Bundle,Q-102201,3100000,Net-new,Negotiate,Commit,2026-05-17,6,4,XSIAM:2200000;Cortex-XDR:900000,,Contract-review,2,,,,Outlier-velocity-deal
+opp-stripe-001,acc-stripe,Stripe XSIAM + XDR Bundle,Q-102201,3100000,Net-new,Negotiate,Commit,2026-05-17,6,4,XSIAM:2200000;Cortex-XDR:900000,,Contract-review,6,,,,Outlier-velocity-deal
 opp-stripe-002,acc-stripe,Stripe Prisma Access Renewal,Q-102202,680000,Renewal,Solutioning,Best-case,2026-09-19,25,22,Prisma-access:680000,,Renewal-prep-call,8,Full,,,
 opp-pin-001,acc-pinterest,Pinterest XSOAR Renewal,Q-102301,420000,Renewal,Negotiate,Pipeline,2026-06-19,62,55,Cortex-XSOAR:420000,Lacking-exec-engagement;Budget-not-scheduled,Renewal-prep-call,22,Churn,Budget-cut,,Outlier-churn
-opp-pin-002,acc-pinterest,Pinterest NGFW Refresh,Q-102302,540000,Renewal,Solutioning,Pipeline,2026-10-19,40,40,PA-series:540000,No-activity-30-days,Customer-engagement,32,Unknown,,,
+opp-pin-002,acc-pinterest,Pinterest NGFW Refresh,Q-102302,540000,Renewal,Solutioning,Pipeline,2026-10-19,40,40,PA-series:540000,No-activity-30-days,Customer-engagement,25,Unknown,,,
 opp-snow-001,acc-servicenow,ServiceNow Prisma Access Renewal,Q-102401,1250000,Renewal-and-upsell,Active-POV,Best-case,2026-07-13,45,22,Prisma-access:1250000,,Technical-deep-dive,7,Upsell,,,
 opp-snow-002,acc-servicenow,ServiceNow XSIAM Pilot,Q-102402,1500000,Net-new,Technical-validation,Best-case,2026-08-20,48,24,XSIAM:1500000,,Solution-workshop,9,,,,
 opp-wday-001,acc-workday,Workday NGFW Refresh,Q-102501,720000,Renewal,Active-POV,Best-case,2026-07-01,42,22,PA-series:720000,No-design-of-record,Technical-deep-dive,9,Unknown,,,
@@ -66,7 +66,7 @@ opp-dd-002,acc-doordash,DoorDash NGFW Refresh,Q-102702,480000,Renewal,Negotiate,
 opp-lyft-001,acc-lyft,Lyft NGFW Refresh,Q-102801,620000,Renewal,Negotiate,Best-case,2026-06-21,38,22,PA-series:620000,Lacking-exec-engagement;No-activity-30-days,Customer-engagement,24,Unknown,,,Outlier-sparse-pipeline
 opp-abnb-001,acc-airbnb,Airbnb Prisma Access Expansion,Q-102901,980000,Upsell,Active-POV,Commit,2026-06-26,32,18,Prisma-access:980000,,Technical-deep-dive,6,,,,
 opp-abnb-002,acc-airbnb,Airbnb Unit 42 Proactive Renewal,Q-102902,180000,Renewal,Solutioning,Best-case,2026-09-29,30,22,Unit-42-proactive:180000,,Renewal-prep-call,8,Full,,,
-opp-dbx-001,acc-databricks,Databricks XSIAM Cloud SOC,Q-103001,1450000,Net-new,Negotiate,Commit,2026-06-01,30,14,XSIAM:1450000,,Contract-review,4,,,,
+opp-dbx-001,acc-databricks,Databricks XSIAM Cloud SOC,Q-103001,1450000,Net-new,Negotiate,Commit,2026-06-01,30,14,XSIAM:1450000,,Contract-review,13,,,,
 opp-dbx-002,acc-databricks,Databricks NGFW Renewal,Q-103002,580000,Renewal,Active-POV,Best-case,2026-08-05,42,24,PA-series:580000,,Technical-deep-dive,6,Full,,,
 opp-snow2-001,acc-snowflake,Snowflake Cortex Cloud CNAPP,Q-103101,1180000,Net-new,Active-POV,Best-case,2026-07-21,48,25,Cortex-cloud-leaf:1180000,,Technical-deep-dive,5,,,,
 opp-snow2-002,acc-snowflake,Snowflake Prisma Access Renewal,Q-103102,520000,Renewal,Negotiate,Commit,2026-06-09,22,14,Prisma-access:520000,,Contract-review,7,Full,,,
@@ -91,12 +91,12 @@ opp-gap-001,acc-gap,Gap Inc. NGFW Renewal,Q-104401,340000,Renewal,Negotiate,Comm
 opp-levi-001,acc-levi,Levi Strauss SASE Pilot,Q-104501,250000,Renewal,Solutioning,Best-case,2026-08-30,30,24,Prisma-access:250000,No-design-of-record,POC-scoping-session,16,Unknown,,,
 opp-saf-001,acc-safeway,Safeway NGFW Refresh,Q-104601,380000,Renewal,Active-POV,Best-case,2026-07-09,38,22,PA-series:380000,,Solution-workshop,7,Full,,,
 opp-saf-002,acc-safeway,Safeway Xpanse ASM,Q-104602,120000,Net-new,Discovery,Pipeline,2026-12-18,25,25,Xpanse:120000,,POC-scoping-session,14,,,,
-opp-ross-001,acc-ross,Ross Stores NGFW Renewal,Q-104701,280000,Renewal,Discovery,Pipeline,2026-08-15,55,55,PA-series:280000,Lacking-exec-engagement;No-activity-30-days;Budget-not-scheduled;No-secured-tech-win,Customer-engagement,72,Unknown,,,Outlier-neglected
+opp-ross-001,acc-ross,Ross Stores NGFW Renewal,Q-104701,280000,Renewal,Discovery,Pipeline,2026-08-15,55,55,PA-series:280000,Lacking-exec-engagement;No-activity-30-days;Budget-not-scheduled;No-secured-tech-win,Customer-engagement,27,Unknown,,,Outlier-neglected
 opp-csf-001,acc-citysf,City of San Francisco NGFW Refresh,Q-104801,420000,Renewal,Solutioning,Best-case,2026-09-14,40,30,PA-series:420000,No-design-of-record,Architecture-review,17,Unknown,,,
 opp-su-001,acc-stanforduniv,Stanford University Prisma Access Renewal,Q-104901,220000,Renewal,Active-POV,Best-case,2026-07-06,36,22,Prisma-access:220000,,Solution-workshop,8,Full,,,
 opp-ucb-001,acc-ucb,UC Berkeley NGFW Renewal,Q-105001,180000,Renewal,Negotiate,Commit,2026-06-09,24,16,PA-series:180000,,Deployment-health-check,14,Full,,,
 opp-bart-001,acc-bart,BART NGFW OT Renewal,Q-105101,280000,Renewal,Solutioning,Best-case,2026-09-29,32,26,PA-series:280000,No-design-of-record,POC-scoping-session,19,Unknown,,,
 opp-sf-closed-001,acc-salesforce,Salesforce CDSS Bundle Q3FY26,Q-099001,180000,Upsell,Negotiate,Closed,2026-03-28,28,28,PA-series-attached:180000,,Contract-review,30,,,,Closed-won
-opp-nv-closed-001,acc-nvidia,NVIDIA XSIAM Initial Deployment,Q-099002,1400000,Net-new,Negotiate,Closed,2026-03-13,35,35,XSIAM:1400000,,Contract-review,45,,,,Closed-won
+opp-nv-closed-001,acc-nvidia,NVIDIA XSIAM Initial Deployment,Q-099002,1400000,Net-new,Negotiate,Closed,2026-03-13,35,35,XSIAM:1400000,,Contract-review,23,,,,Closed-won
 opp-kp-closed-001,acc-kaiser,Kaiser NGFW Refresh Q3FY26,Q-099003,620000,Renewal,Negotiate,Closed,2026-04-12,22,22,PA-series:620000,,Contract-review,28,Full,,,Closed-won
-opp-twil-closed-001,acc-twilio,Twilio XSIAM Pilot Q3FY26,Q-099004,880000,Net-new,Active-POV,Closed,2026-03-23,90,60,XSIAM:880000,Lacking-exec-engagement;No-secured-tech-win,Customer-engagement,55,,,,Closed-lost
+opp-twil-closed-001,acc-twilio,Twilio XSIAM Pilot Q3FY26,Q-099004,880000,Net-new,Active-POV,Closed,2026-03-23,90,60,XSIAM:880000,Lacking-exec-engagement;No-secured-tech-win,Customer-engagement,26,,,,Closed-lost

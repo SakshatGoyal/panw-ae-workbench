@@ -445,6 +445,93 @@
   margin-bottom: 12px;
 }
 
+/* ─── Thinking Ribbon (.tsr) ─────────────────────────────────────────────── */
+
+/*
+ * Compact loading banner rendered while the AI is processing.
+ * Anatomy: white pill · neutral-tile border · small spinner · fading word.
+ * Uses .tsr__ prefix to avoid collision with the .ts__ timeline classes above.
+ */
+
+.tsr {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--ds-surface-rest);       /* white */
+  border: 1px solid var(--ds-lines-neutral-tile-rest);  /* neutral border */
+  border-radius: 8px;
+  padding: 12px 16px;
+}
+
+/* Carbon-style small spinner — 16 × 16, rotates via keyframe */
+.tsr__spinner {
+  flex-shrink: 0;
+  display: block;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: tsr-spin 700ms linear infinite;
+}
+
+@keyframes tsr-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* Cycling word — fades out (opacity 0) then new word fades in */
+.tsr__word {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 13px;
+  line-height: 20px;
+  font-weight: 400;
+  color: var(--ds-text-secondary-rest);
+  white-space: nowrap;
+  opacity: 1;
+  transition: opacity 150ms ease;
+}
+
+.tsr__word--hidden {
+  opacity: 0;
+}
+
+/* Response text that replaces the ribbon after dismissal */
+.tsr-response-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.tsr-response {
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--ds-text-primary);
+  margin: 0;
+  animation: tsr-fade-in 200ms ease both;
+}
+
+@keyframes tsr-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* Replay button — story-only utility */
+.tsr-replay {
+  align-self: flex-start;
+  font-family: var(--ds-type-font-family-sans);
+  font-size: 12px;
+  line-height: 16px;
+  color: var(--ds-text-tertiary-rest);
+  background: none;
+  border: 1px solid var(--ds-lines-neutral-tile-rest);
+  border-radius: var(--ds-radius-tight);
+  padding: 4px 10px;
+  cursor: pointer;
+}
+
+.tsr-replay:hover {
+  background: var(--ds-surface-alt-rest);
+}
+
 /* ─── Reduced motion ─────────────────────────────────────────────────────── */
 
 @media (prefers-reduced-motion: reduce) {
@@ -471,4 +558,9 @@
     animation: none;
     opacity: 0.6;
   }
+
+  /* Thinking ribbon */
+  .tsr__spinner { animation: none; }
+  .tsr__word, .tsr__word--hidden { transition: none; opacity: 1; }
+  .tsr-response { animation: none; }
 }

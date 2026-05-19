@@ -31,7 +31,7 @@
  *   finding text                   var(--ds-text-primary)          13px/500
  */
 import type { Meta, StoryObj } from '@storybook/react'
-import React from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import {
   Analytics,
   Check,
@@ -505,4 +505,170 @@ export const ShortReasoning: Story = {
       </div>
     </div>
   ),
+}
+
+// ─── Thinking Ribbon ──────────────────────────────────────────────────────────
+//
+// A compact loading banner shown while the AI is working — before the response
+// arrives. Anatomy: white pill · neutral-tile border · small spinner · cycling
+// words that fade in/out every 300 ms.
+//
+// Duration: 50 × (response char count) ms. When elapsed, the ribbon unmounts
+// and the caller renders the response.
+
+const THINKING_WORDS = ['Thinking', 'Searching', 'Gathering Data', 'Deriving', 'Synthesizing']
+
+// Carbon-style small loading spinner — 16 × 16 SVG, 75 % arc, rotates via CSS.
+function ThinkSpinner() {
+  const r = 6
+  const circumference = 2 * Math.PI * r   // ≈ 37.70
+  const arc  = circumference * 0.75        // ≈ 28.27
+  const gap  = circumference * 0.25        // ≈  9.42
+  return (
+    <svg className="tsr__spinner" width={16} height={16} viewBox="0 0 16 16" fill="none" aria-hidden>
+      {/* Track */}
+      <circle cx={8} cy={8} r={r} stroke="var(--ds-lines-neutral-rest)" strokeWidth={1.5} />
+      {/* Arc */}
+      <circle
+        cx={8} cy={8} r={r}
+        stroke="var(--ds-lines-brand-rest)"
+        strokeWidth={1.5}
+        strokeLinecap="round"
+        strokeDasharray={`${arc} ${gap}`}
+      />
+    </svg>
+  )
+}
+
+interface ThinkingRibbonProps {
+  /** When provided, the ribbon auto-dismisses after 50 × chars ms. */
+  responseText?: string
+  onDismiss?: () => void
+}
+
+function ThinkingRibbon({ responseText, onDismiss }: ThinkingRibbonProps) {
+  const wordIdxRef          = useRef(0)
+  const [wordIdx, setWordIdx]       = useState(0)
+  const [wordVisible, setWordVisible] = useState(true)
+  const [dismissed, setDismissed]   = useState(false)
+
+  // Word cycling — 300 ms visible, 150 ms fade-out, then next word fades in.
+  useEffect(() => {
+    let alive = true
+
+    const tick = () => {
+      if (!alive) return
+      setWordVisible(false)
+      setTimeout(() => {
+        if (!alive) return
+        wordIdxRef.current = (wordIdxRef.current + 1) % THINKING_WORDS.length
+        setWordIdx(wordIdxRef.current)
+        // Double-RAF: let the new word render at opacity 0 before CSS fade-in fires.
+        requestAnimationFrame(() => requestAnimationFrame(() => {
+          if (alive) setWordVisible(true)
+        }))
+      }, 150) // 150 ms fade-out before swapping word
+    }
+
+    const id = setInterval(tick, 3150) // 3000 ms show + 150 ms fade-out
+    return () => { alive = false; clearInterval(id) }
+  }, [])
+
+  // Auto-dismiss timer — 50 ms × response character count.
+  // onDismiss is stored in a ref so the effect never re-runs if the caller's
+  // callback identity changes on re-renders (avoids timer restarts).
+  const onDismissRef = useRef(onDismiss)
+  onDismissRef.current = onDismiss
+
+  useEffect(() => {
+    if (!responseText) return
+    const ms = 50 * responseText.length
+    const t = setTimeout(() => { setDismissed(true); onDismissRef.current?.() }, ms)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [responseText]) // responseText is stable; ref pattern keeps onDismiss out of deps
+
+  if (dismissed) return null
+
+  return (
+    <div className="tsr" role="status" aria-live="polite">
+      <ThinkSpinner />
+      <span className={`tsr__word${wordVisible ? '' : ' tsr__word--hidden'}`}>
+        {THINKING_WORDS[wordIdx]}
+      </span>
+    </div>
+  )
+}
+
+// ─── Story: static ────────────────────────────────────────────────────────────
+
+/**
+ * ThinkingRibbonStatic — infinite cycling, no response timer.
+ * Words fade through: Thinking → Searching → Gathering Data → Deriving → Synthesizing.
+ * 300 ms per word, 150 ms cross-fade.
+ */
+export const ThinkingRibbonStatic: Story = {
+  render: () => (
+    <div className="ts-canvas">
+      <div className="ts-demo">
+        <div className="ts-demo__group">
+          <div className="ts-demo__label">Thinking ribbon — static · infinite word cycle</div>
+          <ThinkingRibbon />
+        </div>
+      </div>
+    </div>
+  ),
+}
+
+// ─── Story: with response ─────────────────────────────────────────────────────
+
+const DEMO_RESPONSE =
+  'Three AMER deals are stalled post-evaluation: Northbay Financial ($1.4M), Apex Logistics ($820K), ' +
+  'and Meridian Health ($2.1M). Each cleared the POC but hasn’t converted to a buying motion — ' +
+  'no Economic Buyer engagement in the 45 days since evaluation closed.'
+
+/**
+ * ThinkingRibbonWithResponse — auto-dismisses after 50 × charCount ms.
+ * Demo response: 237 chars → ~11 850 ms.
+ * After dismissal the response text fades in. Hit Replay to restart.
+ */
+export const ThinkingRibbonWithResponse: Story = {
+  render: () => {
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [done, setDone] = useState(false)
+    // eslint-disable-next-line react-hooks/rules-of-hooks
+    const [key, setKey]   = useState(0)
+    const charCount = DEMO_RESPONSE.length
+    const durationMs = 50 * charCount
+
+    return (
+      <div className="ts-canvas">
+        <div className="ts-demo">
+          <div className="ts-demo__group">
+            <div className="ts-demo__label">
+              {`Thinking ribbon · ${charCount} chars · ${(durationMs / 1000).toFixed(1)} s duration`}
+            </div>
+
+            {!done ? (
+              <ThinkingRibbon
+                key={key}
+                responseText={DEMO_RESPONSE}
+                onDismiss={() => setDone(true)}
+              />
+            ) : (
+              <div className="tsr-response-wrap">
+                <p className="tsr-response">{DEMO_RESPONSE}</p>
+                <button
+                  className="tsr-replay"
+                  onClick={() => { setDone(false); setKey(k => k + 1) }}
+                >
+                  ↺ Replay
+                </button>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    )
+  },
 }

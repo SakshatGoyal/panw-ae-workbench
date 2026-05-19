@@ -30,6 +30,7 @@
   width: 100%;
   display: flex;
   flex-direction: column;
+  margin-left: 6px; /* clearance for the hover row-selector button */
 }
 
 /* ─── Header row ─────────────────────────────────────────────────────────── */
@@ -43,11 +44,17 @@
   Wrapper around each @ds/header Header instance.
   Provides position: relative for the absolute-positioned column button,
   and overflow: visible so the button can sit above without clipping.
-  No extra padding — Header handles its own internal spacing.
+  The Header component defaults to padding: 0 16px — overridden to 8px here
+  so header and cell horizontal padding match.
 */
 .dt__header-cell {
   position: relative;
   overflow: visible;
+}
+
+.dt__header-cell .panw--header {
+  padding-left: 8px;
+  padding-right: 8px;
 }
 
 /* Transparent bridge above header: keeps :hover alive as cursor moves up */
@@ -128,22 +135,22 @@
 
 /*
    Transparent bridge to the LEFT — keeps :hover on .dt__row active while
-   cursor crosses the 4px gap to the row-select button.
-   Width: 4px gap + 32px button + 4px extra.
+   cursor crosses the gap to the row-select button.
+   Width: 2px gap + 28px xs button + 4px extra = 34px.
 */
 .dt__row::after {
   content: '';
   position: absolute;
   top: 0;
   right: 100%;
-  width: 40px;
+  width: 34px;
   height: 100%;
 }
 
 /* ─── Cell ────────────────────────────────────────────────────────────────── */
 
 .dt__cell {
-  padding: 8px 12px;
+  padding: 8px;   /* 8px on all sides — horizontal matches header override */
   min-width: 0;
 }
 
@@ -151,7 +158,7 @@
 
 .dt__row-btn {
   position: absolute;
-  right: calc(100% + 4px);
+  right: calc(100% + 2px); /* 2px gap between row left edge and button */
   top: 50%;
   transform: translateY(-50%);
   opacity: 0;

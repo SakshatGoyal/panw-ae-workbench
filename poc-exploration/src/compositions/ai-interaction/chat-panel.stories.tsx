@@ -21,19 +21,25 @@
 import type { Meta, StoryObj } from '@storybook/react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { Button, IconButton } from '@ds/button'
+import { CellContents } from '@ds/cell-contents'
 import { Flyout, FlyoutList, FlyoutItem } from '@ds/flyout'
+import { Header } from '@ds/header'
 import {
   ArrowLeft,
   ArrowUp,
   ChevronDown,
+  Close,
+  CommentAdd,
   Copy,
   Delete,
   Edit,
   ExternalLink,
+  GridHorizontal,
   More,
   Plus,
   ThumbsUp,
 } from '@ds/icons'
+import { Tags } from '@ds/tags'
 import logoSalesforce from './logos/logo-salesforce.jpeg'
 import logoPeopleai   from './logos/logo-people-ai.jpeg'
 
@@ -51,6 +57,7 @@ function AiPromptIcon({ 'aria-label': ariaLabel }: { 'aria-label'?: string }) {
 }
 import './chat-window-header.css'
 import './past-sessions.css'
+import './selectable-table.css'
 import './suggestions.css'
 import './user-message.css'
 import './prompt-entry-field.css'
@@ -233,6 +240,30 @@ function ResponseActions() {
 
   return (
     <div className="raf">
+      {/* ── Top: icon buttons (left-aligned) ──────────────────────────────── */}
+      <div className="raf__buttons">
+        <IconButton
+          kind="ghost" size="xs" iconSize={16}
+          renderIcon={ThumbsDown}
+          isSelected={disliked}
+          aria-label={disliked ? 'Undo dislike' : 'Dislike response'}
+          onClick={handleDislike}
+        />
+        <IconButton
+          kind="ghost" size="xs" iconSize={16}
+          renderIcon={ThumbsUp}
+          isSelected={liked}
+          aria-label={liked ? 'Unlike response' : 'Like response'}
+          onClick={handleLike}
+        />
+        <IconButton
+          kind="ghost" size="xs" iconSize={16}
+          renderIcon={Copy}
+          aria-label="Copy response"
+        />
+      </div>
+
+      {/* ── Below buttons: feedback panel ─────────────────────────────────── */}
       <div className="raf__panel-slot">
         {phase !== 'idle' && (
           <div
@@ -252,27 +283,6 @@ function ResponseActions() {
             </div>
           </div>
         )}
-      </div>
-      <div className="raf__buttons">
-        <IconButton
-          kind="ghost" size="xs" iconSize={12}
-          renderIcon={ThumbsDown}
-          isSelected={disliked}
-          aria-label={disliked ? 'Undo dislike' : 'Dislike response'}
-          onClick={handleDislike}
-        />
-        <IconButton
-          kind="ghost" size="xs" iconSize={12}
-          renderIcon={ThumbsUp}
-          isSelected={liked}
-          aria-label={liked ? 'Unlike response' : 'Like response'}
-          onClick={handleLike}
-        />
-        <IconButton
-          kind="ghost" size="xs" iconSize={12}
-          renderIcon={Copy}
-          aria-label="Copy response"
-        />
       </div>
     </div>
   )
@@ -367,9 +377,68 @@ function PastSessionRow({ id, label }: { id: string; label: string }) {
   )
 }
 
+// ─── TableRef — row reference inserted into the PEF ──────────────────────────
+
+interface TableRef {
+  /** Always 'row' for row-level references from the opportunities table. */
+  type: 'row' | 'column'
+  /** Cell values: first entry is bold anchor, rest are comma-separated. */
+  values: string[]
+}
+
+/**
+ * PEFTableRefBlock — renders the selected row reference inside the PEF.
+ * Mirrors the PEFTableRefBlock from prompt-entry-field.stories.tsx.
+ * Uses pef__table-ref CSS classes from prompt-entry-field.css (already imported).
+ */
+function PEFTableRefBlock({
+  type,
+  values,
+  onRemove,
+}: TableRef & { onRemove: () => void }) {
+  const [first, ...rest] = values
+  return (
+    <div className="pef__table-ref">
+      <div className="pef__table-ref-body">
+        <div className="pef__table-ref-header">
+          <Tags
+            size="default"
+            color="cobalt"
+            contrast="low"
+            shape="rounded"
+            icon
+            renderIcon={GridHorizontal}
+            label={type === 'row' ? 'Row' : 'Column'}
+          />
+        </div>
+        <p className="pef__table-ref-values">
+          <span className="pef__table-ref-first">{first}</span>
+          {rest.length > 0 && <span>, {rest.join(', ')}</span>}
+        </p>
+      </div>
+      <div className="pef__table-ref-close">
+        <IconButton
+          kind="ghost"
+          size="sm"
+          iconSize={16}
+          renderIcon={Close}
+          aria-label="Remove table reference"
+          onClick={onRemove}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ─── PromptEntryField (simplified interactive) ────────────────────────────────
 
-function ChatPromptField() {
+function ChatPromptField({
+  tableRef,
+  onRemoveTableRef,
+}: {
+  tableRef?: TableRef
+  onRemoveTableRef?: () => void
+}) {
   const [value,   setValue]   = useState('')
   const [focused, setFocused] = useState(false)
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -383,7 +452,8 @@ function ChatPromptField() {
 
   useEffect(() => { syncHeight() }, [value, syncHeight])
 
-  const isElevated = focused || value.trim().length > 0
+  // Elevated when focused, has text, OR has a table reference attached
+  const isElevated = focused || value.trim().length > 0 || !!tableRef
 
   return (
     <div
@@ -391,10 +461,18 @@ function ChatPromptField() {
       role="group"
       aria-label="AI prompt input"
     >
+      {/* Table reference block — sits above the textarea, dismissable */}
+      {tableRef && (
+        <PEFTableRefBlock
+          {...tableRef}
+          onRemove={() => onRemoveTableRef?.()}
+        />
+      )}
+
       <textarea
         ref={textareaRef}
         className="pef__textarea"
-        placeholder="Ready when you are…"
+        placeholder={tableRef ? 'Ask about this row…' : 'Ready when you are…'}
         value={value}
         rows={1}
         aria-label="Prompt"
@@ -450,8 +528,23 @@ function StepSource({
 
 // ─── RetraceChip + DerivationPanel (G — Distinguished) ───────────────────────
 
-function AIResponseBlock() {
+function AIResponseBlock({
+  showTable = false,
+  selectedRowId = null,
+  onSelectRow,
+}: {
+  showTable?: boolean
+  selectedRowId?: string | null
+  onSelectRow?: (id: string, values: string[]) => void
+}) {
   const [open, setOpen] = useState(false)
+
+  // ── ResponseActions state (lifted) ──────────────────────────────────────
+  const [liked,        setLiked]        = useState(false)
+  const [disliked,     setDisliked]     = useState(false)
+  const [phase,        setPhase]        = useState<FeedbackPhase>('idle')
+  const [panelExiting, setPanelExiting] = useState(false)
+  const [timerKey,     setTimerKey]     = useState(0)
 
   // Unique sources for the chip logo stack
   const uniqueSources = STEPS.reduce<Array<'salesforce' | 'peopleai'>>((acc, s) => {
@@ -472,6 +565,40 @@ function AIResponseBlock() {
     if (citNum !== null) distSources.push({ step, citNum })
   })
 
+  // ── Feedback handlers ────────────────────────────────────────────────────
+  const dismissPanel = (callback?: () => void) => {
+    setPanelExiting(true)
+    setTimeout(() => {
+      setPhase('idle')
+      setDisliked(false)
+      setPanelExiting(false)
+      callback?.()
+    }, 110)
+  }
+
+  const handleLike = () => {
+    if (disliked) { setDisliked(false); setPhase('idle') }
+    setLiked(v => !v)
+  }
+
+  const handleDislike = () => {
+    if (phase !== 'idle') { dismissPanel(); return }
+    if (liked) setLiked(false)
+    setDisliked(true)
+    setPhase('feedback')
+    setTimerKey(k => k + 1)
+  }
+
+  const handleTimerComplete = () =>
+    setPhase(current => (current === 'feedback' ? 'thanks' : current))
+
+  useEffect(() => {
+    if (phase !== 'thanks') return
+    const t = setTimeout(() => dismissPanel(), 3000)
+    return () => clearTimeout(t)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [phase])
+
   return (
     <div className="cp-ai-block">
       <p className="cp-ai-response">
@@ -481,38 +608,70 @@ function AIResponseBlock() {
         in the 45 days since evaluation closed.
       </p>
 
-      {/*
-        G — Distinguished: inherits E — Inline chip + panel chrome via air--inline;
-        air--distinguished overrides step layout (numbered list + Vancouver citations)
-        and kills the icon-node spine pseudo-elements.
-      */}
-      <div className="air air--inline air--distinguished">
-        {/* Retrace chip — identical to E — Inline */}
-        <div className="air__chip-wrap">
-          <button
-            type="button"
-            className={['air__chip', open ? 'air__chip--open' : ''].filter(Boolean).join(' ')}
-            aria-expanded={open}
-            onClick={() => setOpen(v => !v)}
-          >
-            <span className="air__logo-stack" aria-hidden="true">
-              {uniqueSources.map(src => (
-                <img
-                  key={src}
-                  src={LOGOS[src]}
-                  className="air__logo-stack__item"
-                  alt={src === 'salesforce' ? 'Salesforce' : 'people.ai'}
-                />
-              ))}
-            </span>
-            <span>Trace</span>
-            <span className="air__chip-arrow" aria-hidden="true">
-              <ChevronDown size={12} />
-            </span>
-          </button>
+      {/* ── Opportunities table — shown only in the table variant ─────── */}
+      {showTable && (
+        <div className="cp-response-table">
+          <OpportunitiesTable
+            selectedId={selectedRowId}
+            onSelectRow={onSelectRow ?? (() => {})}
+          />
+        </div>
+      )}
+
+      {/* ── Trace chip + icon buttons + derivation panel — all inside .air--inline
+           so chip CSS selectors (.air--inline .air__chip etc.) resolve correctly ── */}
+      <div className="air air--inline air--distinguished cp-air-inline">
+        {/* Actions row: chip (left) + icon buttons (right), 16px gap */}
+        <div className="cp-actions-row">
+          <div className="air__chip-wrap">
+            <button
+              type="button"
+              className={['air__chip', open ? 'air__chip--open' : ''].filter(Boolean).join(' ')}
+              aria-expanded={open}
+              onClick={() => setOpen(v => !v)}
+            >
+              <span className="air__logo-stack" aria-hidden="true">
+                {uniqueSources.map(src => (
+                  <img
+                    key={src}
+                    src={LOGOS[src]}
+                    className="air__logo-stack__item"
+                    alt={src === 'salesforce' ? 'Salesforce' : 'people.ai'}
+                  />
+                ))}
+              </span>
+              <span>Trace</span>
+              <span className="air__chip-arrow" aria-hidden="true">
+                <ChevronDown size={12} />
+              </span>
+            </button>
+          </div>
+
+          {/* Icon buttons — 8px gap via .cp-actions-row .raf__buttons */}
+          <div className="raf__buttons">
+            <IconButton
+              kind="ghost" size="xs" iconSize={16}
+              renderIcon={ThumbsDown}
+              isSelected={disliked}
+              aria-label={disliked ? 'Undo dislike' : 'Dislike response'}
+              onClick={handleDislike}
+            />
+            <IconButton
+              kind="ghost" size="xs" iconSize={16}
+              renderIcon={ThumbsUp}
+              isSelected={liked}
+              aria-label={liked ? 'Unlike response' : 'Like response'}
+              onClick={handleLike}
+            />
+            <IconButton
+              kind="ghost" size="xs" iconSize={16}
+              renderIcon={Copy}
+              aria-label="Copy response"
+            />
+          </div>
         </div>
 
-        {/* Derivation panel — numbered steps with inline citations */}
+        {/* Derivation panel — opens below the actions row */}
         <div className="air__panel" aria-hidden={!open ? 'true' : undefined}>
           <ol className="air__steps">
             {STEPS.map((step, i) => {
@@ -534,7 +693,6 @@ function AIResponseBlock() {
             })}
           </ol>
 
-          {/* Vancouver source list */}
           {distSources.length > 0 && (
             <div className="air__dist-sources">
               <h3 className="air__dist-sources-heading">Sources</h3>
@@ -553,8 +711,123 @@ function AIResponseBlock() {
         </div>
       </div>
 
-      <div className="cp-ai-actions">
-        <ResponseActions />
+      {/* ── Give Feedback — full width, aligned with text, 12px below row ─ */}
+      {phase !== 'idle' && (
+        <div className="cp-feedback-slot">
+          <div
+            className={['raf__panel cp-feedback-panel', panelExiting ? 'raf__panel--exiting' : ''].filter(Boolean).join(' ')}
+            data-phase={phase}
+          >
+            <div className="raf__panel-grid">
+              <div className="raf__feedback">
+                <FeedbackTimer key={timerKey} durationMs={7000} onComplete={handleTimerComplete} />
+                <span className="raf__feedback-label">Give Feedback</span>
+                <div className="raf__feedback-btns">
+                  <Button kind="primary" size="xs" onClick={() => setPhase('thanks')}>Yes</Button>
+                  <Button kind="ghost"   size="xs" onClick={() => dismissPanel()}>No</Button>
+                </div>
+              </div>
+              <div className="raf__thanks">That&rsquo;s alright! We&rsquo;re learning. Carry on&hellip;</div>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Opportunities table data ─────────────────────────────────────────────────
+
+interface Opportunity {
+  id:      string
+  opp:     string
+  account: string
+  value:   string
+}
+
+const OPPORTUNITIES: Opportunity[] = [
+  { id: '1', opp: 'Prisma Cloud Enterprise',  account: 'Northbay Financial', value: '$1.4M' },
+  { id: '2', opp: 'Cortex XDR Rollout',       account: 'Apex Logistics',     value: '$820K' },
+  { id: '3', opp: 'SASE Platform Adoption',   account: 'Meridian Health',    value: '$2.1M' },
+  { id: '4', opp: 'Strata Cloud Expansion',   account: 'Triton Global',      value: '$650K' },
+  { id: '5', opp: 'Zero Trust Pilot Program', account: 'Cascade Systems',    value: '$480K' },
+]
+
+// ─── OpportunitiesTable — built on the .dt SelectableTable class system ───────
+//
+// Uses the same .dt, .dt__head, .dt__header-cell, .dt__body, .dt__row,
+// .dt__cell, .dt__divider, .dt__row-btn, .dt__select-btn classes as the
+// ai-interactions/Selectable Table component — not a custom implementation.
+// --dt-cols is overridden in chat-panel.css to 3 columns for this context.
+
+function OpportunitiesTable({
+  selectedId,
+  onSelectRow,
+}: {
+  selectedId: string | null
+  onSelectRow: (id: string, values: string[]) => void
+}) {
+  return (
+    <div className="dt" role="grid" aria-label="Opportunities">
+
+      {/* ── Header ─────────────────────────────────────────────────────── */}
+      <div className="dt__head">
+        {[
+          { id: 'opp',     label: 'Opportunity Name', align: 'left'  as const },
+          { id: 'account', label: 'Account Name',     align: 'left'  as const },
+          { id: 'value',   label: 'Value',            align: 'right' as const },
+        ].map(col => (
+          <div key={col.id} className="dt__header-cell">
+            <Header size="sm" alignment={col.align}>{col.label}</Header>
+          </div>
+        ))}
+      </div>
+
+      {/* ── Body ───────────────────────────────────────────────────────── */}
+      <div className="dt__body">
+        {OPPORTUNITIES.map((row, i) => (
+          <React.Fragment key={row.id}>
+            {i > 0 && <div className="dt__divider" />}
+            <div
+              className={[
+                'dt__row',
+                selectedId === row.id ? 'dt__row--selected' : '',
+              ].filter(Boolean).join(' ')}
+              role="row"
+              aria-selected={selectedId === row.id}
+            >
+              <div className="dt__cell">
+                <CellContents content="text" text={row.opp} alignment="left" />
+              </div>
+              <div className="dt__cell">
+                <CellContents content="text" text={row.account} alignment="left" />
+              </div>
+              <div className="dt__cell">
+                <CellContents content="numbers" text={row.value} alignment="right" />
+              </div>
+
+              {/*
+                Row selector button — appears on hover, left side.
+                Click → inserts a row reference into the PEF (toggle: click again to deselect).
+                Stops propagation so clicking the button doesn't bubble to the row div.
+              */}
+              <div className="dt__row-btn">
+                <IconButton
+                  kind="ghost"
+                  size="xs"
+                  iconSize={16}
+                  renderIcon={CommentAdd}
+                  aria-label={`Add row to prompt: ${row.opp}`}
+                  className="dt__select-btn"
+                  onClick={e => {
+                    e.stopPropagation()
+                    onSelectRow(row.id, [row.opp, row.account, row.value])
+                  }}
+                />
+              </div>
+            </div>
+          </React.Fragment>
+        ))}
       </div>
     </div>
   )
@@ -708,6 +981,65 @@ function ActiveChatPanel() {
   )
 }
 
+// ─── Active panel — with table attachment ────────────────────────────────────
+
+function ActiveWithTableChatPanel() {
+  const sessionName = 'Which of my Prisma Cloud deals in AMER are stalled at technical evaluation?'
+
+  // Table reference state — lifted here so both the table and the PEF share it.
+  // Clicking the CommentAdd button on a row → inserts a row ref into the PEF.
+  // Clicking again (toggle) or pressing ✕ in the PEF → clears the ref.
+  const [selectedRowId, setSelectedRowId] = useState<string | null>(null)
+  const [tableRef,      setTableRef]      = useState<TableRef | undefined>(undefined)
+
+  const handleSelectRow = (id: string, values: string[]) => {
+    if (selectedRowId === id) {
+      // Toggle off — deselect
+      setSelectedRowId(null)
+      setTableRef(undefined)
+    } else {
+      setSelectedRowId(id)
+      setTableRef({ type: 'row', values })
+    }
+  }
+
+  const handleRemoveTableRef = () => {
+    setSelectedRowId(null)
+    setTableRef(undefined)
+  }
+
+  return (
+    <div className="cp-panel">
+      <ChatWindowHeader sessionName={sessionName} />
+
+      <div className="cp-body">
+        <div className="cp-conversation">
+          {/* User message */}
+          <div className="um-message-group">
+            <div className="um">
+              <p className="um__text">{sessionName}</p>
+            </div>
+          </div>
+
+          {/* AI response — table is part of the response, not the footer */}
+          <AIResponseBlock
+            showTable
+            selectedRowId={selectedRowId}
+            onSelectRow={handleSelectRow}
+          />
+        </div>
+      </div>
+
+      <div className="cp-footer">
+        <ChatPromptField
+          tableRef={tableRef}
+          onRemoveTableRef={handleRemoveTableRef}
+        />
+      </div>
+    </div>
+  )
+}
+
 // ─── Meta ─────────────────────────────────────────────────────────────────────
 
 const meta: Meta = {
@@ -746,6 +1078,23 @@ export const Active: StoryObj = {
     <div className="cp-canvas">
       <ResizablePanel>
         <ActiveChatPanel />
+      </ResizablePanel>
+    </div>
+  ),
+}
+
+/**
+ * Active — with table. Same conversation as Active, but the footer now has an
+ * opportunities table pinned above the prompt entry field. Click any row to
+ * select it (click again to deselect). Single-selection; headers are
+ * non-interactive.
+ */
+export const ActiveWithTable: StoryObj = {
+  name:   'Active - with table',
+  render: () => (
+    <div className="cp-canvas">
+      <ResizablePanel>
+        <ActiveWithTableChatPanel />
       </ResizablePanel>
     </div>
   ),

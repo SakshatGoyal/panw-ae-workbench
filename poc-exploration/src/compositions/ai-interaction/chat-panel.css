@@ -114,11 +114,24 @@
   background: var(--ds-surface-rest);
 }
 
+/*
+ * PEF inside the chat panel footer.
+ * Resting state keeps var(--ds-field-rest) from prompt-entry-field.css —
+ * do NOT override it here. Only the active (elevated) state goes white,
+ * because that is how text fields are designed: rest = field token,
+ * active = surface.rest (white) so typed text reads on a clean ground.
+ */
 .cp-footer .pef {
   box-shadow: none;
   width: auto;          /* overrides width:100% from prompt-entry-field.css   */
   margin-left: 24px;   /* 24px inset from panel left                         */
   margin-right: 24px;  /* 24px inset from panel right                        */
+}
+
+/* Active (focused / has content) — elevate to white */
+.cp-footer .pef.pef--active,
+.cp-footer .pef.pef--elevated {
+  background: var(--ds-surface-rest);
 }
 
 /* ─── Empty state ─────────────────────────────────────────────────────────── */
@@ -171,7 +184,7 @@
 /* ─── Active state — conversation area ────────────────────────────────────── */
 
 .cp-conversation {
-  padding: 24px 12px; /* 24px top/bottom, 12px left/right for the thread */
+  padding: 24px; /* 24px on all sides — matches the standard 24px panel edge inset */
   display: flex;
   flex-direction: column;
   gap: 20px;
@@ -186,8 +199,8 @@
 }
 
 /*
- * AI response text — 16 px left indent aligns the first character with
- * the text inside the user message bubble (.um: padding 12px 16px).
+ * AI response text — 16px horizontal padding on both sides for reading comfort.
+ * Symmetric with the user bubble's padding: 12px 16px.
  */
 .cp-ai-response {
   font-family: var(--ds-type-font-family-sans);
@@ -195,14 +208,90 @@
   line-height: 1.5;
   color: var(--ds-text-primary);
   margin: 0;
-  padding-left: 16px;
+  padding: 0 16px;
 }
 
-/* air--inline / air--distinguished wrapper — reset top margin in panel context */
-.cp-ai-block .air {
+/*
+ * Trace chip + icon buttons on the same row.
+ * 16px left padding aligns the chip with the AI response text.
+ * 16px gap between chip and buttons; 8px between icon buttons.
+ */
+.cp-actions-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  /* No padding-left — parent .air wrapper provides the 16px left inset */
+}
+
+/* 8px between icon buttons inside the actions row (4px default in response-actions.css) */
+.cp-actions-row .raf__buttons {
+  gap: 8px;
+}
+
+/* Zero out the chip-wrap's top margin so the chip and icon buttons share
+   the same vertical center axis within the flex row */
+.cp-actions-row .air__chip-wrap {
   margin-top: 0;
 }
 
-.cp-ai-actions {
+/* .air wrapper — aligns chip row and panel content with AI response text.
+   padding-left: 16px matches .cp-ai-response padding so everything lines up.
+   margin-top: 8px spaces the chip row below the text (or below the table). */
+.cp-ai-block .air {
   margin-top: 8px;
+  padding-left: 16px;
+  padding-right: 16px;
+}
+
+/* Give Feedback slot — aligns panel with AI response text edges */
+.cp-feedback-slot {
+  padding: 0 16px;
+  margin-top: 12px;
+}
+
+/* Give Feedback panel — chat-panel override: info surface bg, full width */
+.cp-feedback-panel {
+  width: 100%;
+  background: var(--ds-status-info-subtle) !important;
+}
+
+/* ─── Response table — inline in the conversation body as AI answer content ─ */
+
+/*
+ * Wrapper sits between the AI text paragraph and the actions row.
+ * 12px top — same rhythm as the actions row margin-top.
+ *
+ * Left padding calculation — must satisfy:
+ *   table_padding + dt_margin(6px) + cell_padding(8px) = ai_response_padding(16px)
+ *   table_padding = 16 − 6 − 8 = 2px
+ *
+ * This ensures the visible first-column text aligns with the AI paragraph text
+ * without touching any cell or header padding.
+ * Right: 16px — symmetric with the response text right padding.
+ */
+.cp-response-table {
+  padding: 12px 16px 0 2px;
+}
+
+/* ─── Selectable Table inside chat panel ─────────────────────────────────── */
+
+/*
+ * The .dt component uses --dt-cols for its grid template. Inside the chat
+ * panel we override to 3 columns: opp name (1fr), account (1fr), value (88px).
+ * The panel is narrow (~352px usable), so fixed 88px for the value column
+ * leaves equal flex space for the two text columns.
+ *
+ * Selected row: accent surface — distinct from the hover surface so the user
+ * can see which row is currently selected even without hover.
+ */
+.cp-response-table .dt {
+  --dt-cols: 1fr 1fr 88px;
+}
+
+.cp-response-table .dt__row--selected {
+  background: var(--ds-surface-accent-rest);
+}
+
+.cp-response-table .dt__row--selected:hover {
+  background: var(--ds-surface-accent-rest);
 }

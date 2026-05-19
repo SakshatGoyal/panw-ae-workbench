@@ -63,7 +63,7 @@ function ChatWindowHeader({
   if (!isActive) {
     return (
       <div className="cwh">
-        <span className="cwh__placeholder">New conversation</span>
+        <span className="cwh__placeholder">Hello Again</span>
       </div>
     )
   }

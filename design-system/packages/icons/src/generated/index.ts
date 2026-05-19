@@ -1,6 +1,10 @@
 // AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
 export { Abacus } from './components/Abacus';
+export { AiGeneral01 } from './components/AiGeneral01';
+export { AiGeneral02 } from './components/AiGeneral02';
+export { AiGeneral03 } from './components/AiGeneral03';
 export { AiMessage } from './components/AiMessage';
+export { AiPrompt } from './components/AiPrompt';
 export { AlarmSnooze } from './components/AlarmSnooze';
 export { Alerts } from './components/Alerts';
 export { Analytics } from './components/Analytics';

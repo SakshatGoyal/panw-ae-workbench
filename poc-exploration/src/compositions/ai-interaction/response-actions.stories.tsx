@@ -208,7 +208,37 @@ function ResponseActions({
 
   return (
     <div className="raf">
-      {/* ── Left: feedback panel ──────────────────────────────────────────── */}
+      {/* ── Top: icon buttons (left-aligned) ──────────────────────────────── */}
+      <div className="raf__buttons">
+        <IconButton
+          kind="ghost"
+          size="xs"
+          iconSize={16}
+          renderIcon={ThumbsDown}
+          isSelected={disliked}
+          aria-label={disliked ? 'Undo dislike' : 'Dislike response'}
+          onClick={handleDislike}
+        />
+        <IconButton
+          kind="ghost"
+          size="xs"
+          iconSize={16}
+          renderIcon={ThumbsUp}
+          isSelected={liked}
+          aria-label={liked ? 'Unlike response' : 'Like response'}
+          onClick={handleLike}
+        />
+        <IconButton
+          kind="ghost"
+          size="xs"
+          iconSize={16}
+          renderIcon={Copy}
+          aria-label="Copy response"
+          onClick={handleCopy}
+        />
+      </div>
+
+      {/* ── Below buttons: feedback panel ─────────────────────────────────── */}
       <div className="raf__panel-slot">
         {phase !== 'idle' && (
           <div
@@ -253,36 +283,6 @@ function ResponseActions({
         )}
       </div>
 
-      {/* ── Right: icon buttons (DOM order: dislike → like → copy) ───────── */}
-      {/* Visual reading right-to-left = copy | like | dislike per spec      */}
-      <div className="raf__buttons">
-        <IconButton
-          kind="ghost"
-          size="xs"
-          iconSize={12}
-          renderIcon={ThumbsDown}
-          isSelected={disliked}
-          aria-label={disliked ? 'Undo dislike' : 'Dislike response'}
-          onClick={handleDislike}
-        />
-        <IconButton
-          kind="ghost"
-          size="xs"
-          iconSize={12}
-          renderIcon={ThumbsUp}
-          isSelected={liked}
-          aria-label={liked ? 'Unlike response' : 'Like response'}
-          onClick={handleLike}
-        />
-        <IconButton
-          kind="ghost"
-          size="xs"
-          iconSize={12}
-          renderIcon={Copy}
-          aria-label="Copy response"
-          onClick={handleCopy}
-        />
-      </div>
     </div>
   )
 }

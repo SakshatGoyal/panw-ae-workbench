@@ -37,9 +37,9 @@ const sharedArgTypes = {
     table: { defaultValue: { summary: '"ghost"' } },
   },
   size: {
-    options: ['sm', 'md', 'lg'],
+    options: ['xs', 'sm', 'md', 'lg'],
     control: { type: 'select' },
-    description: 'sm=32/36, md=40/44, lg=48/52 (locked width = height per size × iconSize)',
+    description: 'xs=28 (icon-16 only), sm=32/36, md=40/44, lg=48/52 (locked width = height per size × iconSize)',
     table: { defaultValue: { summary: '"sm"' } },
   },
   iconSize: {
@@ -131,6 +131,7 @@ export const Highlight = () => (
 
 export const Sizes = () => (
   <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+    <IconButton size="xs" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add (extra small)" onClick={action('onClick')} />
     <IconButton size="sm" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add (small)" onClick={action('onClick')} />
     <IconButton size="md" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add (medium)" onClick={action('onClick')} />
     <IconButton size="lg" renderIcon={(p) => <Plus size={16} {...p} />} aria-label="Add (large)" onClick={action('onClick')} />
@@ -183,7 +184,7 @@ export const Disabled = () => (
 // ─── All Variants matrix ──────────────────────────────────────────────────────
 
 const IB_KINDS = ['ghost', 'ghost-accent', 'primary', 'secondary', 'danger', 'highlight'];
-const IB_SIZES = ['sm', 'md', 'lg'];
+const IB_SIZES = ['xs', 'sm', 'md', 'lg'];
 
 export const AllVariants = () => (
   <div style={{ fontFamily: 'Inter, sans-serif', padding: '24px', background: 'var(--ds-surface-alt-rest, #f5f5f5)' }}>

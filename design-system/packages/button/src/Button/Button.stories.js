@@ -29,9 +29,9 @@ const sharedArgTypes = {
     table: { defaultValue: { summary: '"primary"' } },
   },
   size: {
-    options: ['small', 'default', 'large'],
+    options: ['xs', 'small', 'default', 'large'],
     control: { type: 'select' },
-    description: 'Button height: small=32px, default=40px, large=48px',
+    description: 'Button height: xs=28px, small=32px, default=40px, large=48px',
     table: { defaultValue: { summary: '"default"' } },
   },
   disabled: {
@@ -146,6 +146,11 @@ export const Highlight = () => (
 
 // ─── Size stories ─────────────────────────────────────────────────────────────
 
+export const ExtraSmall = () => (
+  <Button size="xs" onClick={action('onClick')}>XS Button</Button>
+);
+ExtraSmall.storyName = 'Extra Small';
+
 export const Small = () => (
   <Button size="small" onClick={action('onClick')}>Small Button</Button>
 );
@@ -200,7 +205,7 @@ export const Skeleton = () => <ButtonSkeleton />;
 // ─── All Variants matrix ──────────────────────────────────────────────────────
 
 const KINDS = ['primary', 'secondary', 'tertiary', 'ghost', 'ghost-brand', 'danger', 'highlight'];
-const SIZES = ['small', 'default', 'large'];
+const SIZES = ['xs', 'small', 'default', 'large'];
 
 export const AllVariants = () => (
   <div style={{ fontFamily: 'Inter, sans-serif', padding: '24px', background: 'var(--ds-surface-alt-rest, #f5f5f5)' }}>

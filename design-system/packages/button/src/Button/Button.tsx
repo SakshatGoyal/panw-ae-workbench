@@ -30,8 +30,8 @@ export const ButtonKinds = [
 
 export type ButtonKind = (typeof ButtonKinds)[number];
 
-/** PANW size names map to: small=32px, default=40px, large=48px */
-export const ButtonSizes = ['small', 'default', 'large'] as const;
+/** PANW size names map to: xs=28px, small=32px, default=40px, large=48px */
+export const ButtonSizes = ['xs', 'small', 'default', 'large'] as const;
 
 export type ButtonSize = (typeof ButtonSizes)[number];
 

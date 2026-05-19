@@ -41,6 +41,14 @@
 
 // ─── Sizes ───────────────────────────────────────────────────────────────────
 
+// XS matches the large tag geometry: height derived from large-tag's
+// 5px v-padding + 16.8px line-height + 5px v-padding = 26.8px → 28px (4px grid).
+// Horizontal padding (7px) mirrors the large tag's horizontal pad.
+.panw--btn--xs {
+  height: 1.75rem; // 28px
+  padding: 5px 7px;
+}
+
 .panw--btn--default {
   height: 2.5rem;
   padding: 0.75rem 1rem;

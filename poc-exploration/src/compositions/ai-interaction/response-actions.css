@@ -18,34 +18,32 @@
    by re-keying FeedbackTimer from the parent).
    ──────────────────────────────────────────────────────────────────────────── */
 
-/* ─── Outer row ──────────────────────────────────────────────────────────── */
+/* ─── Outer column ───────────────────────────────────────────────────────── */
 
-/* Full-width so space-between pushes panel left and buttons right */
+/* Column layout: buttons on top-left, feedback panel below */
 .raf {
   display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   width: 100%;
-  align-items: center;
-  justify-content: space-between;
+  gap: 4px;
 }
 
-/* ─── Left slot — panel anchor ───────────────────────────────────────────── */
+/* ─── Icon buttons ───────────────────────────────────────────────────────── */
 
-/* flex:1 lets the panel grow to fill available space without displacing buttons */
-.raf__panel-slot {
-  flex: 1;
-  min-width: 0;
-  display: flex;
-  align-items: center;
-}
-
-/* ─── Right slot — icon buttons ──────────────────────────────────────────── */
-
-/* DOM order: dislike → like → copy (reads right-to-left: copy, like, dislike) */
+/* Left-aligned row; dislike → like → copy, 4px gap */
 .raf__buttons {
   display: flex;
   align-items: center;
   gap: 4px;
-  flex-shrink: 0;
+}
+
+/* ─── Panel slot — sits below buttons ───────────────────────────────────── */
+
+.raf__panel-slot {
+  min-width: 0;
+  display: flex;
+  align-items: center;
 }
 
 /* ─── Feedback panel ─────────────────────────────────────────────────────── */
@@ -53,6 +51,9 @@
 .raf__panel {
   display: flex;
   align-items: center;
+  padding: 5px 7px;
+  background: var(--ds-surface-alt);
+  border-radius: var(--ds-radius-tight);
   animation: raf-panel-enter 150ms var(--ds-motion-easing-standard) both;
 }
 

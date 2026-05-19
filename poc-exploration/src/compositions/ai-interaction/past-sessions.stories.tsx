@@ -62,6 +62,18 @@ const DEFAULT_SESSIONS: SessionItem[] = [
     id: '5',
     label: 'SASE deployment checklist and enterprise rollout plan',
   },
+  {
+    id: '6',
+    label: 'Which of my Prisma Cloud deals in AMER are stalled at evaluation?',
+  },
+  {
+    id: '7',
+    label: 'Compare Cortex XDR and CrowdStrike for enterprise endpoint coverage',
+  },
+  {
+    id: '8',
+    label: 'How does Panorama centralise NGFW policy across hybrid environments?',
+  },
 ]
 
 // ─── Single session row ───────────────────────────────────────────────────────
@@ -234,7 +246,7 @@ export const Interactive: Story = {
       <div className="ps-canvas">
         <div className="ps-demo">
           <div className="ps-demo__group">
-            <div className="ps-demo__label">Recent sessions</div>
+            <div className="ps-demo__label">Recent</div>
             <PastSessions
               sessions={sessions}
               onSessionClick={handleClick}
@@ -271,7 +283,7 @@ export const AllRows: Story = {
     <div className="ps-canvas">
       <div className="ps-demo">
         <div className="ps-demo__group">
-          <div className="ps-demo__label">Recent sessions</div>
+          <div className="ps-demo__label">Recent</div>
           <PastSessions />
         </div>
       </div>

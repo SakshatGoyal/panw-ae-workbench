@@ -147,7 +147,7 @@ function SelectButton({
   return (
     <IconButton
       kind="ghost"
-      size="sm"
+      size="xs"
       iconSize={16}
       renderIcon={icon}
       aria-label={ariaLabel}

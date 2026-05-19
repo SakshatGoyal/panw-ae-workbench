@@ -29,16 +29,21 @@
 
 /* ─── Empty state ─────────────────────────────────────────────────────────── */
 
+/*
+ * "Hello Again" — heading-01 (14px / semibold / 0.1px tracking).
+ * Left-aligned, primary color. Padding-left matches the 8px panel edge
+ * so the greeting sits flush with row content below it.
+ */
 .cwh__placeholder {
   flex: 1;
   font-family: var(--ds-type-font-family-sans);
   font-size: 14px;
   line-height: 18px;
-  font-weight: 400;
+  font-weight: var(--ds-type-font-weight-semibold);
   letter-spacing: 0.1px;
-  color: var(--ds-text-tertiary-rest);
-  /* centered within the bar */
-  text-align: center;
+  color: var(--ds-text-primary);
+  text-align: left;
+  padding-left: 4px; /* slight inset — optical breathing room from the panel edge */
 }
 
 /* ─── Active: back button ─────────────────────────────────────────────────── */
@@ -78,8 +83,17 @@
 
 /* ─── Flyout danger item ─────────────────────────────────────────────────── */
 
+/*
+ * Text (label) follows text.danger tokens.
+ * Icon follows icons.danger tokens — separate token family, different lightness.
+ * Three-class specificity on the icon rule beats flyout's own .panw--flyout__item-icon.
+ */
 .panw--flyout__item.cwh-flyout-item--danger {
   color: var(--ds-text-danger-rest);
+}
+
+.panw--flyout__item.cwh-flyout-item--danger .panw--flyout__item-icon {
+  color: var(--ds-icons-danger-rest);
 }
 
 .panw--flyout__item.cwh-flyout-item--danger:hover {
@@ -87,9 +101,17 @@
   color: var(--ds-text-danger-hover);
 }
 
+.panw--flyout__item.cwh-flyout-item--danger:hover .panw--flyout__item-icon {
+  color: var(--ds-icons-danger-hover);
+}
+
 .panw--flyout__item.cwh-flyout-item--danger:active {
   background: var(--ds-ghost-danger-pressed);
   color: var(--ds-text-danger-pressed);
+}
+
+.panw--flyout__item.cwh-flyout-item--danger:active .panw--flyout__item-icon {
+  color: var(--ds-icons-danger-pressed);
 }
 
 /* ─── Story canvas ───────────────────────────────────────────────────────── */

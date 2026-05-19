@@ -1025,9 +1025,10 @@
 
 .air__it-source {
   display: flex;
-  flex-direction: column;   /* Last updated stacks directly below its tag */
-  align-items: flex-start;
-  gap: 2px;                 /* tight coupling — clearly belongs to the tag above */
+  flex-direction: row;      /* tag + Last updated on the same line by default */
+  flex-wrap: wrap;          /* wraps below only when container is too narrow */
+  align-items: center;
+  gap: 6px;                 /* space between tag and Last updated text */
   margin-top: 5px;
   min-width: 0;             /* allow flex shrinkage for truncation */
 }

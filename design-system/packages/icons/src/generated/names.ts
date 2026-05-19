@@ -1,7 +1,11 @@
 // AUTO-GENERATED — do not edit. Regenerate via `npm run build:icons`.
 export const ICON_NAMES = [
   'abacus',
+  'ai-general-01',
+  'ai-general-02',
+  'ai-general-03',
   'ai-message',
+  'ai-prompt',
   'alarm-snooze',
   'alerts',
   'analytics',

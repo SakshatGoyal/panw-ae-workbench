@@ -26,6 +26,7 @@ export type IconButtonKind = (typeof IconButtonKinds)[number];
 
 /**
  * Locked square dimensions per size × iconSize:
+ *   xs + 16 → 28×28   (icon-20 not offered — only 4px clearance)
  *   sm + 16 → 32×32   md + 16 → 40×40   lg + 16 → 48×48
  *   sm + 20 → 36×36   md + 20 → 44×44   lg + 20 → 52×52
  *
@@ -37,7 +38,7 @@ export type IconButtonKind = (typeof IconButtonKinds)[number];
  * source of truth (md steppers inside a 40px field). Search and text-entry
  * follow the same pattern: clear button size = field size.
  */
-export const IconButtonSizes = ['sm', 'md', 'lg'] as const;
+export const IconButtonSizes = ['xs', 'sm', 'md', 'lg'] as const;
 
 export type IconButtonSize = (typeof IconButtonSizes)[number];
 

@@ -2622,11 +2622,14 @@ function OppRow({
         {showTag('products') && (
           <ProductCluster products={row.products} />
         )}
-        {/* Row-level action buttons — absolutely positioned to bottom-right
-            of the <tr>. Two ghost icon-buttons nested inside an inverse-
-            surface pill. Pill bg is surface.inverse.rest; buttons are
-            transparent at rest and shift through surface.inverse hover/pressed.
-            Icons carry icons.inverse for contrast on the dark ground. */}
+      </td>
+      {/* Column 5 — 0-width sticky-right cell that anchors the action buttons
+          to the visible right edge of the scroll container regardless of how
+          far the table has been scrolled. position:sticky on this <td>
+          creates the containing block for the absolutely-positioned pill
+          inside; right:6px on the pill is therefore 6px from the viewport's
+          right edge, not from the full row bounding box. */}
+      <td className="opp-actions-col" aria-hidden="true">
         <div className="opp-row-actions">
           <div className="opp-row-actions__pill">
             <HoverShell side="top" align="center" openDelayMs={400} panelClassName="opp-btn-tooltip" render={() => 'Ask question'}>
@@ -2648,23 +2651,54 @@ function OppRow({
 // state; subsequent drags adjust widths in pixels. Each drag shifts space
 // between the dragged column and the IMMEDIATE NEXT column so the table's
 // total width never changes — last column gets no handle. Min width
-// guard prevents either side of the drag from collapsing.
-function useColumnResize(columnCount: number, minPx: number = 80) {
+// guard (240px, enforced in both JS and CSS) prevents either side of the
+// drag from collapsing, and is the floor for ResizeObserver-driven scaling.
+// ResizeObserver on the table shell re-scales column widths proportionally
+// as the container changes width (e.g. right-rail expand). When the
+// scaled widths hit the 240px floor the table overflows and the shell's
+// overflow-x: auto triggers horizontal scroll.
+function useColumnResize(columnCount: number, minPx: number = 240) {
   const tableRef = useRef<HTMLTableElement | null>(null)
   const [widths, setWidths] = useState<number[] | null>(null)
+  const prevContainerWidthRef = useRef<number>(0)
   const dragRef = useRef<{ i: number; startX: number; a: number; b: number } | null>(null)
 
   useLayoutEffect(() => {
     if (widths !== null) return
     const t = tableRef.current
     if (!t) return
-    const ths = t.querySelectorAll('thead > tr > th')
+    // Select only the resizable data columns (.opp-c-equal) — the 5th
+    // sticky-right actions column has no resize handle and must be excluded.
+    const ths = t.querySelectorAll<HTMLElement>('thead > tr > th.opp-c-equal')
     if (ths.length !== columnCount) return
     const measured: number[] = []
-    ths.forEach((el) => measured.push((el as HTMLElement).getBoundingClientRect().width))
+    ths.forEach((el) => measured.push(Math.max(el.getBoundingClientRect().width, minPx)))
     setWidths(measured)
+    const shell = t.parentElement
+    if (shell) prevContainerWidthRef.current = shell.getBoundingClientRect().width
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [columnCount])
+  }, [columnCount, minPx])
+
+  // Scale column widths proportionally when the table shell is resized.
+  // Each width is clamped to minPx; once all columns are at the floor
+  // the table overflows and the scroll container shows a horizontal bar.
+  useEffect(() => {
+    const shell = tableRef.current?.parentElement
+    if (!shell) return
+    const ro = new ResizeObserver((entries) => {
+      if (dragRef.current) return // don't interfere with an active column-drag
+      const newWidth = entries[0].contentRect.width
+      const prevWidth = prevContainerWidthRef.current
+      if (prevWidth <= 0 || Math.abs(newWidth - prevWidth) < 1) return
+      const scale = newWidth / prevWidth
+      setWidths(prev =>
+        prev ? prev.map(w => Math.max(Math.round(w * scale), minPx)) : prev
+      )
+      prevContainerWidthRef.current = newWidth
+    })
+    ro.observe(shell)
+    return () => ro.disconnect()
+  }, [minPx])
 
   const handle = (i: number) => ({
     onPointerDown: (e: React.PointerEvent<HTMLDivElement>) => {
@@ -3054,6 +3088,8 @@ export function AEOpportunityTable({
                 {[0, 1, 2, 3].map((i) => (
                   <col key={i} style={colResize.widths ? { width: colResize.widths[i] } : undefined} />
                 ))}
+                {/* 5th col: 0-width sticky-right actions column */}
+                <col style={{ width: 0 }} />
               </colgroup>
               <thead>
                 <tr>
@@ -3072,6 +3108,8 @@ export function AEOpportunityTable({
                   <th className="opp-c-equal opp-no-sort">
                     <Header size="md" type="basic">Products</Header>
                   </th>
+                  {/* 5th column: 0-width sticky-right actions column — no header content */}
+                  <th className="opp-actions-col" aria-hidden="true" />
                 </tr>
               </thead>
               <tbody>
@@ -3079,7 +3117,7 @@ export function AEOpportunityTable({
                  * the inter-row dividers below, so the entire table
                  * uses one line grammar (no thead border). */}
                 <tr className="opp-divider-row" aria-hidden="true">
-                  <td colSpan={4}><div className="opp-divider" /></td>
+                  <td colSpan={5}><div className="opp-divider" /></td>
                 </tr>
                 {pagedRows.map((row, i) => (
                   <React.Fragment key={row.id}>
@@ -3348,7 +3386,23 @@ const LAYOUT_CSS = `
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
-.opp-table-shell { overflow-x: auto; }
+/* Right-edge inset shadow — visible only when content overflows to the right.
+ * Two background layers on the same right-edge position:
+ *   Layer 1 (local): cover, scrolls with content. At the right end of scroll
+ *     it aligns with layer 2 and hides it. Before the end it's off-screen.
+ *   Layer 2 (scroll): shadow gradient, fixed to the viewport right edge.
+ * Because the table always fills container width (width:100%), when there is
+ * no overflow both layers sit at the same right edge and the cover wins. */
+.opp-table-shell {
+  overflow-x: auto;
+  background-image:
+    linear-gradient(to right, transparent 0%, var(--ds-surface-rest) 100%),
+    linear-gradient(to left,  rgba(0, 0, 0, 0.10) 0%, transparent 100%);
+  background-size: 32px 100%, 32px 100%;
+  background-position: right center, right center;
+  background-attachment: local, scroll;
+  background-repeat: no-repeat, no-repeat;
+}
 /* border-separate + border-spacing:0 allows border-radius on <td> —
  * border-collapse:collapse silently ignores border-radius on cells. */
 .opp-table { width: 100%; border-collapse: separate; border-spacing: 0; table-layout: fixed; }
@@ -3406,9 +3460,11 @@ const LAYOUT_CSS = `
 }
 
 /* Four equal columns split the full width — value and actions columns
- * both removed; value lives in column 1, actions float over the row. */
+ * both removed; value lives in column 1, actions float over the row.
+ * min-width: 240px mirrors the JS hook floor so the constraint is visible
+ * in both places; once columns hit 240px the shell's overflow-x kicks in. */
 .opp-table th.opp-c-equal,
-.opp-table td.opp-c-equal { width: 25%; }
+.opp-table td.opp-c-equal { width: 25%; min-width: 240px; }
 
 /* Row backgrounds — data rows only.
  * Hover lifts the band so row-level floating actions read as engaged;
@@ -3448,6 +3504,9 @@ const LAYOUT_CSS = `
   height: 0;
   line-height: 0;
   font-size: 0;
+  /* Reset sticky positioning inherited from data-row first-child rule */
+  position: static;
+  background-color: transparent;
 }
 .opp-divider { height: 1px; background-color: var(--ds-lines-neutral-rest); transition: opacity 110ms ease; margin: 0 16px 0 10px; }
 /* Hide the divider below the hovered row */
@@ -3472,8 +3531,23 @@ const LAYOUT_CSS = `
 .opp-table tbody td:first-child {
   padding: 8px 8px 8px 10px;
   border-radius: 8px 0 0 8px;
+  /* Sticky left — keeps column-1 identity visible as the user scrolls right.
+   * z-index 2 sits above normal cells but below the sticky header (z:4)
+   * and the sticky actions column (z:3). background-color is the opaque
+   * surface token; without it scrolled content would bleed through the
+   * transparent row background. hover re-applies the row tint on top. */
+  position: sticky;
+  left: 0;
+  z-index: 2;
+  background-color: var(--ds-surface-rest);
 }
-.opp-table tbody td:last-child {
+.opp-table tbody tr:hover td:first-child {
+  /* Match the row-level hover tint; composites over surface-rest above. */
+  background-color: rgb(228 232 235 / 40%);
+}
+/* 4th td (Products) keeps its right-side border-radius now that the 5th
+ * 0-width actions column is the last child. */
+.opp-table tbody td:nth-last-child(2) {
   padding: 8px;
   border-radius: 0 8px 8px 0;
 }
@@ -3485,6 +3559,29 @@ const LAYOUT_CSS = `
  *   th:not(:first-child) → 8 (matches every other cell) */
 .opp-table th .panw--header { padding-left: 8px; }
 .opp-table th:first-child .panw--header { padding-left: 10px; }
+/* Sticky header first cell — z-index 4 sits above sticky body cells (z:2)
+ * and sticky actions column (z:3) so it paints over both when scrolling. */
+.opp-table th:first-child {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  background-color: var(--ds-surface-rest);
+}
+/* 0-width sticky-right column that anchors row-level action buttons.
+ * overflow:visible lets the absolutely-positioned pill bleed left into
+ * the visible row area. No padding or background — the cell is invisible;
+ * only its right edge (which sticks to the viewport edge) matters. */
+.opp-actions-col {
+  width: 0;
+  max-width: 0;
+  padding: 0 !important;
+  border-radius: 0 !important;
+  position: sticky;
+  right: 0;
+  overflow: visible;
+  z-index: 3;
+  background: transparent !important;
+}
 
 /* Column 1 — name · account · value stacked.
  * Gaps are explicit margins (not flex gap) so each inter-element
@@ -4021,6 +4118,10 @@ const LAYOUT_CSS = `
  * through surface.inverse hover/pressed so the dark pill reads as a
  * single interactive unit, not two disconnected chips. */
 .opp-row { position: relative; }
+/* Action pill is absolutely positioned inside .opp-actions-col, the 0-width
+ * sticky-right <td>. right:6px / bottom:6px are relative to that cell's
+ * bounding box — its right edge is pinned to the viewport right edge by
+ * the sticky positioning, so the pill stays reachable regardless of scroll. */
 .opp-row-actions {
   position: absolute;
   bottom: 6px;

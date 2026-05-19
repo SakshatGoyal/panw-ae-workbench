@@ -3386,22 +3386,35 @@ const LAYOUT_CSS = `
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */
-/* Right-edge inset shadow — visible only when content overflows to the right.
- * Two background layers on the same right-edge position:
- *   Layer 1 (local): cover, scrolls with content. At the right end of scroll
- *     it aligns with layer 2 and hides it. Before the end it's off-screen.
- *   Layer 2 (scroll): shadow gradient, fixed to the viewport right edge.
- * Because the table always fills container width (width:100%), when there is
- * no overflow both layers sit at the same right edge and the cover wins. */
+/* Right-edge scroll affordance — visible only when content overflows right.
+ * Two background layers (background-attachment trick):
+ *   Layer 1 (local):  cover gradient, scrolls with content. Aligns with and
+ *     masks layer 2 when fully scrolled to the right end.
+ *   Layer 2 (scroll): shadow gradient, pinned to the viewport right edge.
+ * When there is no overflow both layers sit at the same right edge and the
+ * cover wins — shadow is invisible.
+ *
+ * Shadow opacity: derived from --ds-shadow-tiles (rgb(0 0 0 / 8%)) — the
+ * lowest content-panel elevation tier. No Stage token exists for a
+ * directional right-edge scroll affordance; --ds-shadow-tiles is the nearest
+ * applicable semantic (content panel, not flyout, not modal). The tile
+ * shadow's downward box-shadow geometry is replaced with a lateral gradient
+ * because direction matters here. --ds-shadow-shell (10%) is reserved with
+ * no assigned use and is explicitly excluded. */
 .opp-table-shell {
   overflow-x: auto;
   background-image:
     linear-gradient(to right, transparent 0%, var(--ds-surface-rest) 100%),
-    linear-gradient(to left,  rgba(0, 0, 0, 0.10) 0%, transparent 100%);
+    linear-gradient(to left,  rgb(0 0 0 / 8%) 0%, transparent 100%);
   background-size: 32px 100%, 32px 100%;
   background-position: right center, right center;
   background-attachment: local, scroll;
   background-repeat: no-repeat, no-repeat;
+  /* Bleed to actual viewport right edge when the table is wider than the
+   * padded page content area. Negative margin cancels the page's right
+   * padding (--ds-spacing-07 = 32px) for this element only. Non-table
+   * content above (search row, filter row) keeps its padding unaffected. */
+  margin-right: calc(-1 * var(--ds-spacing-07));
 }
 /* border-separate + border-spacing:0 allows border-radius on <td> —
  * border-collapse:collapse silently ignores border-radius on cells. */
@@ -3542,8 +3555,16 @@ const LAYOUT_CSS = `
   background-color: var(--ds-surface-rest);
 }
 .opp-table tbody tr:hover td:first-child {
-  /* Match the row-level hover tint; composites over surface-rest above. */
-  background-color: rgb(228 232 235 / 40%);
+  /* Keep surface-rest as the opaque base; layer the row hover tint on top
+   * via inset shadow instead of replacing background-color. Replacing it
+   * directly with the alpha tint makes the cell semi-transparent:
+   *   (a) scrolled columns bleed through the sticky cell (transparency issue)
+   *   (b) the tint composites over whatever is behind z-index:2, not over
+   *       surface-rest, so the visible hover hue diverges from adjacent cells
+   *       (hue-mismatch issue).
+   * inset 0 0 0 9999px fills the entire cell including under border-radius. */
+  background-color: var(--ds-surface-rest);
+  box-shadow: inset 0 0 0 9999px rgb(228 232 235 / 40%);
 }
 /* 4th td (Products) keeps its right-side border-radius now that the 5th
  * 0-width actions column is the last child. */

@@ -3,6 +3,7 @@ import AppShell from './shell/AppShell'
 import { AEOpportunityTable } from '../../poc-exploration/src/compositions/opportunity-table.stories'
 import { AEAccountTable } from '../../poc-exploration/src/compositions/account-table.stories'
 import { AccountPanel } from '../../poc-exploration/src/compositions/AE Account Panel.stories'
+import { EmptyChatPanel } from '../../poc-exploration/src/compositions/ai-interaction/chat-panel.stories'
 import { SalesPlayModal } from '../../poc-exploration/src/compositions/sales-play-modal.stories'
 import { ACCOUNTS } from '../../poc-exploration/src/mock/data/accounts'
 import { CONTACTS as CANONICAL_CONTACTS } from '../../poc-exploration/src/mock/data/contacts'
@@ -10,6 +11,7 @@ import { OPPORTUNITIES as CANONICAL_OPPORTUNITIES } from '../../poc-exploration/
 import { SALES_PLAY_INSTANCES } from '../../poc-exploration/src/mock/data/sales-play-instances'
 import { SALES_PLAYS } from '../../poc-exploration/src/mock/data/sales-plays'
 import { mapOpportunityToRow } from '../../poc-exploration/src/mock/opportunity-row-mapper'
+import { mapAccountToRow } from '../../poc-exploration/src/mock/account-row-mapper'
 import type { PlayContact, PlayOpportunity } from '../../poc-exploration/src/mock/sales-play-modal'
 
 function formatUsdCompact(n: number): string {
@@ -23,6 +25,9 @@ function formatUsdCompact(n: number): string {
 
 const MAPPED_ROWS = CANONICAL_OPPORTUNITIES.map(o =>
   mapOpportunityToRow(o, ACCOUNTS, SALES_PLAY_INSTANCES, SALES_PLAYS)
+)
+const MAPPED_ACCOUNT_ROWS = ACCOUNTS.map(a =>
+  mapAccountToRow(a, CANONICAL_OPPORTUNITIES, SALES_PLAY_INSTANCES, SALES_PLAYS)
 )
 const TOTAL_OPP_VALUE = MAPPED_ROWS.reduce((s, r) => s + r.valueUsd, 0)
 const OPP_SUMMARY_LABEL = `${MAPPED_ROWS.length} deals · ${formatUsdCompact(TOTAL_OPP_VALUE)}`
@@ -89,7 +94,7 @@ export default function App() {
         }
       />
     )
-    : undefined
+    : <EmptyChatPanel />
 
   function handleExpand(intent: { accountId: string; section: PanelSection; oppId?: string }) {
     setPanelIntent(intent)
@@ -132,7 +137,7 @@ export default function App() {
             </main>
           ) : (
             <main className="cd-app__main" aria-label="Account Workbench">
-              <AEAccountTable onExpand={handleExpand} onOpenSalesPlay={handleOpenSalesPlay} />
+              <AEAccountTable rows={MAPPED_ACCOUNT_ROWS} onExpand={handleExpand} onOpenSalesPlay={handleOpenSalesPlay} />
             </main>
           )}
         </div>
